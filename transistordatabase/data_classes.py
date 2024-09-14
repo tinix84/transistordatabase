@@ -2,7 +2,9 @@
 # Python standard libraries
 from __future__ import annotations
 from matplotlib import pyplot as plt
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Optional, Any
+from dataclasses import dataclass, field
+
 from datetime import datetime
 import numpy as np
 import numpy.typing as npt
@@ -11,13 +13,29 @@ import numpy.typing as npt
 from transistordatabase.checker_functions import check_float
 from transistordatabase.helper_functions import isvalid_dict, get_img_raw_data
 
+def convert_to_dict(obj) -> dict:
+    """
+    Convert an object into dict datatype.
+
+    :param obj: The object to convert
+    :type obj: Any
+    :return: Object of dict type
+    :rtype: dict
+    """
+    d = dict(vars(obj))
+    for att_key in d:
+        if isinstance(d[att_key], np.ndarray):
+            d[att_key] = d[att_key].tolist()
+    return d
+
+@dataclass
 class GateChargeCurve:
     """A class to hold gate charge characteristics of switch which is added as a optional attribute inside switch class."""
 
     v_supply: float  #: same as drain-to-source (v_ds)/ collector-emitter (v_ce) voltages
     t_j: float  #: junction temperature
     i_channel: float  #: channel current at which the graph is recorded
-    i_g: float | None  #: gate to source/emitter current
+    i_g: Optional[float]  #: gate to source/emitter current
     graph_q_v: npt.NDArray[np.float64]  #: a 2D numpy array to store gate charge dependant on gate to source voltage
 
     def __init__(self, args):
@@ -41,11 +59,7 @@ class GateChargeCurve:
         :return: GateChargeCurve object of dict type
         :rtype: dict
         """
-        d = dict(vars(self))
-        for att_key in d:
-            if isinstance(d[att_key], np.ndarray):
-                d[att_key] = d[att_key].tolist()
-        return d
+        return convert_to_dict(self)
 
     def get_plots(self, ax=None):
         """
@@ -68,12 +82,12 @@ class GateChargeCurve:
             plt.grid()
             plt.show()
 
+@dataclass
 class SOA:
-    """Class to hold safe operating area characteristics of transistor type which is added as a optional attribute inside transistor class."""
-
-    t_c: float | None  #: case temperature
-    time_pulse: float | None  #: applied pulse duration
-    graph_i_v: npt.NDArray[np.float64]  #: a 2D numpy array to store SOA characteristics curves
+    """Class to hold safe operating area characteristics of transistor type."""
+    t_c: Optional[float] = None  #: case temperature
+    time_pulse: Optional[float] =  None #: pulse duration
+    graph_i_v: np.ndarray = field(default_factory=lambda: np.array([])) #: a 2D numpy array to store SOA characteristics curves
 
     def __init__(self, args: dict):
         """
@@ -94,11 +108,7 @@ class SOA:
         :return: SOA object of dict type
         :rtype: dict
         """
-        d = dict(vars(self))
-        for att_key in d:
-            if isinstance(d[att_key], np.ndarray):
-                d[att_key] = d[att_key].tolist()
-        return d
+        return convert_to_dict(self)
 
     def get_plots(self, ax=None):
         """
@@ -121,6 +131,8 @@ class SOA:
             plt.grid()
             plt.show()
 
+
+@dataclass
 class TemperatureDependResistance:
     """Store temperature dependant resistance curve."""
 
@@ -128,7 +140,7 @@ class TemperatureDependResistance:
     v_g: float  #: gate voltage
     dataset_type: str  #: curve datatype, can be either 't_r' or 't_factor'. 't_factor' is used to denote normalized gate curves
     graph_t_r: npt.NDArray[np.float64]  #: a 2D numpy array to store the temperature related channel on resistance
-    r_channel_nominal: float | None  #: a mandatory field if the dataset_type is 't_factor'
+    r_channel_nominal: Optional[float]  #: a mandatory field if the dataset_type is 't_factor'
 
     def __init__(self, args):
         """
@@ -151,11 +163,7 @@ class TemperatureDependResistance:
         :return: TemperatureDependResistance object of dict type
         :rtype: dict
         """
-        d = dict(vars(self))
-        for att_key in d:
-            if isinstance(d[att_key], np.ndarray):
-                d[att_key] = d[att_key].tolist()
-        return d
+        return convert_to_dict(self)
 
     def get_plots(self, ax=None):
         """
@@ -179,6 +187,7 @@ class TemperatureDependResistance:
             plt.grid()
             plt.show()
 
+@dataclass
 class EffectiveOutputCapacitance:
     """Record energy related or time related output capacitance of the switch."""
 
@@ -205,11 +214,7 @@ class EffectiveOutputCapacitance:
         :return: EffectiveOutputCapacitance object of dict type
         :rtype: dict
         """
-        d = dict(vars(self))
-        for att_key in d:
-            if isinstance(d[att_key], np.ndarray):
-                d[att_key] = d[att_key].tolist()
-        return d
+        return convert_to_dict(self)
 
     # ToDO: To be implemented for future boundary conditions in virtual datasheet
     def collect_data(self):
@@ -221,6 +226,7 @@ class EffectiveOutputCapacitance:
                     and (getattr(self, attr) is not None):
                 c_oss_related[attr.capitalize()] = getattr(self, attr)
         return c_oss_related
+
 
 class SwitchEnergyData:
     """
@@ -330,11 +336,7 @@ class SwitchEnergyData:
         :return: SwitchEnergyData object of dict type
         :rtype: dict
         """
-        d = dict(vars(self))
-        for att_key in d:
-            if isinstance(d[att_key], np.ndarray):
-                d[att_key] = d[att_key].tolist()
-        return d
+        return convert_to_dict(self)
 
     def plot_graph(self) -> None:
         """
@@ -417,11 +419,7 @@ class ChannelData:
         :return: ChannelData object of dict type
         :rtype: dict
         """
-        d = dict(vars(self))
-        for att_key in d:
-            if isinstance(d[att_key], np.ndarray):
-                d[att_key] = d[att_key].tolist()
-        return d
+        return convert_to_dict(self)
 
     def plot_graph(self) -> None:
         """
@@ -505,11 +503,7 @@ class VoltageDependentCapacitance:
         :return: VoltageDependentCapacitance object of dict type
         :rtype: dict
         """
-        d = dict(vars(self))
-        for att_key in d:
-            if isinstance(d[att_key], np.ndarray):
-                d[att_key] = d[att_key].tolist()
-        return d
+        return convert_to_dict(self)
 
     def get_plots(self, ax=None, label=None):
         """
@@ -600,11 +594,7 @@ class FosterThermalModel:
         :return: FosterThermalModel of dict type
         :rtype: dict
         """
-        d = dict(vars(self))
-        for att_key in d:
-            if isinstance(d[att_key], np.ndarray):
-                d[att_key] = d[att_key].tolist()
-        return d
+        return convert_to_dict(self)
 
     def get_plots(self, buffer_req: bool = False):
         """
@@ -723,7 +713,7 @@ class RawMeasurementData:
         d['dpt_off_vds'] = [c.tolist() for c in self.dpt_off_vds]
         d['dpt_off_id'] = [c.tolist() for c in self.dpt_off_id]
         return d
-
+    
     def dpt_calculate_energies(self, integration_interval: str, dataset_type: str, energies: str, mode: str):
         """
         Import double pulse measurements and calculates switching losses to each given working point.
@@ -740,31 +730,49 @@ class RawMeasurementData:
 
 
         """
-        if integration_interval == 'IEC 60747-9':
-            off_vds_limit = 0.1
-            off_is_limit = 0.02
-            on_vds_limit = 0.02
-            on_is_limit = 0.1
-        elif integration_interval == 'Mitsubishi':
-            off_vds_limit = 0.1
-            off_is_limit = 0.1
-            on_vds_limit = 0.1
-            on_is_limit = 0.1
-        elif integration_interval == 'Infineon':
-            off_vds_limit = 0.1
-            off_is_limit = 0.02
-            on_vds_limit = 0.02
-            on_is_limit = 0.1
-        elif integration_interval == 'Wolfspeed':
-            off_vds_limit = 0
-            off_is_limit = -0.1
-            on_vds_limit = -0.1
-            on_is_limit = 0
-        else:
-            off_vds_limit = 0.1
-            off_is_limit = 0.1
-            on_vds_limit = 0.1
-            on_is_limit = 0.1
+        # if integration_interval == 'IEC 60747-9':
+        #     off_vds_limit = 0.1
+        #     off_is_limit = 0.02
+        #     on_vds_limit = 0.02
+        #     on_is_limit = 0.1
+        # elif integration_interval == 'Mitsubishi':
+        #     off_vds_limit = 0.1
+        #     off_is_limit = 0.1
+        #     on_vds_limit = 0.1
+        #     on_is_limit = 0.1
+        # elif integration_interval == 'Infineon':
+        #     off_vds_limit = 0.1
+        #     off_is_limit = 0.02
+        #     on_vds_limit = 0.02
+        #     on_is_limit = 0.1
+        # elif integration_interval == 'Wolfspeed':
+        #     off_vds_limit = 0
+        #     off_is_limit = -0.1
+        #     on_vds_limit = -0.1
+        #     on_is_limit = 0
+        # else:
+        #     off_vds_limit = 0.1
+        #     off_is_limit = 0.1
+        #     on_vds_limit = 0.1
+        #     on_is_limit = 0.1
+
+        # Define a dictionary to map integration_interval to their corresponding limits
+        limits = {
+            'IEC 60747-9': {'off_vds_limit': 0.1, 'off_is_limit': 0.02, 'on_vds_limit': 0.02, 'on_is_limit': 0.1},
+            'Mitsubishi': {'off_vds_limit': 0.1, 'off_is_limit': 0.1, 'on_vds_limit': 0.1, 'on_is_limit': 0.1},
+            'Infineon': {'off_vds_limit': 0.1, 'off_is_limit': 0.02, 'on_vds_limit': 0.02, 'on_is_limit': 0.1},
+            'Wolfspeed': {'off_vds_limit': 0, 'off_is_limit': -0.1, 'on_vds_limit': -0.1, 'on_is_limit': 0},
+        }
+
+        # Set default limits
+        default_limits = {'off_vds_limit': 0.1, 'off_is_limit': 0.1, 'on_vds_limit': 0.1, 'on_is_limit': 0.1}
+
+        # Get the limits based on the integration_interval, or use the default limits if not found
+        selected_limits = limits.get(integration_interval, default_limits)
+        off_vds_limit = selected_limits['off_vds_limit']
+        off_is_limit = selected_limits['off_is_limit']
+        on_vds_limit = selected_limits['on_vds_limit']
+        on_is_limit = selected_limits['on_is_limit']
 
         label_x_plot = 'Id / A'
 

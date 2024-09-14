@@ -11,6 +11,7 @@ from transistordatabase.helper_functions import get_img_raw_data, isvalid_dict
 from transistordatabase.checker_functions import check_keys
 from transistordatabase.data_classes import FosterThermalModel, ChannelData, SwitchEnergyData, LinearizedModel, SOA
 from transistordatabase.exceptions import MissingDataError
+from transistordatabase.plot_functions import plot_soa_lib
 
 class Diode:
     """Data associated with the (reverse) diode-characteristics of a MOSFET/SiC-MOSFET or IGBT. Can contain multiple channel- and e_rr- datasets."""
@@ -412,25 +413,7 @@ class Diode:
 
         :return: Respective plots are displayed
         """
-        if not self.soa:
-            return None
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        if isinstance(self.soa, list) and self.soa:
-            for curve in self.soa:
-                line1, = curve.get_plots(ax)
-        plt.xlabel('$V_{ds}$ / $V_r$ [V]')
-        plt.ylabel('$I_d$ / $I_r$ [A]')
-        props = dict(fill=False, edgecolor='black', linewidth=1)
-        if len(self.soa):
-            plt.legend(fontsize=8)
-            r_on_condition = '\n'.join(["conditions: ", "$T_{c} $ =" + str(self.soa[0].t_c) + " [°C]"])
-            ax.text(0.65, 0.1, r_on_condition, transform=ax.transAxes, fontsize='small', bbox=props, ha='left', va='bottom')
-        plt.grid()
-        if buffer_req:
-            return get_img_raw_data(plt)
-        else:
-            plt.show()
+        return plot_soa_lib(self.soa, buffer_req)
 
     def collect_data(self) -> dict:
         """

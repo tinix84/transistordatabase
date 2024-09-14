@@ -27,13 +27,14 @@ from bson import json_util
 # Local libraries
 from transistordatabase.constants import *
 from transistordatabase.checker_functions import check_duplicates
-from transistordatabase.helper_functions import *
-from transistordatabase.data_classes import *
+from transistordatabase.helper_functions import isvalid_dict, get_img_raw_data, gen_exp_func, get_vc_plots, html_to_pdf, matlab_compatibility_test, get_gatedefaults, negate_and_append
+from transistordatabase.data_classes import RawMeasurementData, EffectiveOutputCapacitance, VoltageDependentCapacitance, SwitchEnergyData, TemperatureDependResistance, SOA, GateChargeCurve
 from transistordatabase.switch import Switch
 from transistordatabase.diode import Diode
 from transistordatabase.exceptions import MissingDataError
 from transistordatabase.exporter import dict2matlab
 import transistordatabase.colors as tdb_colors
+
 
 class Transistor:
     """
@@ -581,7 +582,7 @@ class Transistor:
         # add both capacitances
         c_dc_common_interp = c_dc_low_side_interp + c_dc_high_side_interp
 
-        plt.figure(figsize=[x/25.4 for x in figure_size_mm] if figure_size_mm is not None else None)
+        plt.figure(figsize=[x / 25.4 for x in figure_size_mm] if figure_size_mm is not None else None)
         plt.semilogy(v_dc_low_side_interp, c_dc_low_side_interp, label=r'$C_\mathrm{oss,LS}$', color=tdb_colors.gnome_colors["red"])
         plt.semilogy(v_dc_low_side_interp, c_dc_high_side_interp, label=r'$C_\mathrm{oss,HS}$', color=tdb_colors.gnome_colors["green"])
         plt.semilogy(v_dc_low_side_interp, c_dc_common_interp, label=r'$C_\mathrm{oss,HS+LS}$', color=tdb_colors.gnome_colors["blue"])

@@ -12,6 +12,54 @@ from transistordatabase.checker_functions import check_keys
 from transistordatabase.data_classes import FosterThermalModel, ChannelData, SwitchEnergyData, LinearizedModel, TemperatureDependResistance, \
     GateChargeCurve, SOA
 from transistordatabase.exceptions import MissingDataError
+from transistordatabase.plot_functions import plot_soa_lib
+
+def append_valid_datasets(target_list, datasets, validation_type, data_class):
+    """
+    Append valid datasets to the target list.
+
+    :param target_list: The list to append valid datasets to
+    :param datasets: The datasets to validate and append
+    :param validation_type: The type of validation to perform
+    :param data_class: The class to instantiate for valid datasets
+    """
+    if isinstance(datasets, list):
+        for dataset in datasets:
+            try:
+                if isvalid_dict(dataset, validation_type):
+                    target_list.append(data_class(dataset))
+            except KeyError as error:
+                handle_key_error(error, datasets, dataset, validation_type)
+            except ValueError as error:
+                handle_value_error(error, datasets, dataset, validation_type)
+    elif isvalid_dict(datasets, validation_type):
+        target_list.append(data_class(datasets))
+
+def handle_key_error(error, dict_list, dataset, validation_type):
+    """
+    Handle KeyError by raising an error with additional context.
+
+    :param error: The KeyError to handle
+    :param dict_list: The list of dictionaries being processed
+    :param dataset: The current dataset being processed
+    :param validation_type: The type of validation being performed
+    """
+    if not error.args:
+        error.args = ('',)  # This syntax is necessary because error.args is a tuple
+    error.args = (f"KeyError occurred for index [{str(dict_list.index(dataset))}] in list of "
+                  f"{validation_type} dictionaries: ",) + error.args
+    raise
+
+def handle_value_error(error, dict_list, dataset, validation_type):
+    """
+    Handle ValueError by raising an error with additional context.
+
+    :param error: The ValueError to handle
+    :param dict_list: The list of dictionaries being processed
+    :param dataset: The current dataset being processed
+    :param validation_type: The type of validation being performed
+    """
+    raise Exception(f"for index [{str(dict_list.index(dataset))}] in list of {validation_type} dictionaries:" + str(error))
 
 class Switch:
     """
@@ -58,182 +106,33 @@ class Switch:
             self.technology = switch_args.get('technology')
             # This currently accepts dictionaries and lists of dictionaries. Validity is only checked by keys and
             # not their values.
-            self.channel = []  # Default case: Empty list
-            try:
-                if isinstance(switch_args.get('channel'), list):
-                    # Loop through list and check each dict for validity. Only create ChannelData objects from valid
-                    # dicts. 'None' and empty dicts are ignored.
-                    for dataset in switch_args.get('channel'):
-                        if isvalid_dict(dataset, 'Switch_ChannelData'):
-                            self.channel.append(ChannelData(dataset))
-                elif isvalid_dict(switch_args.get('channel'), 'Switch_ChannelData'):
-                    # Only create ChannelData objects from valid dicts
-                    self.channel.append(ChannelData(switch_args.get('channel')))
-            except KeyError as error:
-                # If KeyError occurs during for loop, raise KeyError and add index of list occurrence to the message
-                dict_list = switch_args.get('channel')
-                if not error.args:
-                    error.args = ('',)  # This syntax is necessary because error.args is a tuple
-                error.args = (f"KeyError occurred for index [{str(dict_list.index(dataset))}] in list of "
-                              f"Switch_ChannelData dictionaries: ",) + error.args
-                raise
-            except ValueError as error:
-                dict_list = switch_args.get('channel')
-                raise Exception(f"for index [{str(dict_list.index(dataset))}] in list of Switch_ChannelData dictionaries:" + str(error))
 
-            self.e_on = []  # Default case: Empty list
-            if isinstance(switch_args.get('e_on'), list):
-                # Loop through list and check each dict for validity. Only create SwitchEnergyData objects from
-                # valid dicts. 'None' and empty dicts are ignored.
-                for dataset in switch_args.get('e_on'):
-                    try:
-                        if isvalid_dict(dataset, 'SwitchEnergyData'):
-                            self.e_on.append(SwitchEnergyData(dataset))
-                    # If KeyError occurs during this, raise KeyError and add index of list occurrence to the message
-                    except KeyError as error:
-                        dict_list = switch_args.get('e_on')
-                        if not error.args:
-                            error.args = ('',)  # This syntax is necessary because error.args is a tuple
-                        error.args = (f"KeyError occurred for index [{str(dict_list.index(dataset))}] in list of "
-                                      f"Switch-SwitchEnergyData dictionaries for e_on: ",) + error.args
-                        raise
-            elif isvalid_dict(switch_args.get('e_on'), 'SwitchEnergyData'):
-                # Only create SwitchEnergyData objects from valid dicts
-                self.e_on.append(SwitchEnergyData(switch_args.get('e_on')))
+            self.channel = []
+            append_valid_datasets(self.channel, switch_args.get('channel'), 'Switch_ChannelData', ChannelData)
 
-            self.e_off = []  # Default case: Empty list
-            if isinstance(switch_args.get('e_off'), list):
-                for dataset in switch_args.get('e_off'):
-                    try:
-                        if isvalid_dict(dataset, 'SwitchEnergyData'):
-                            self.e_off.append(SwitchEnergyData(dataset))
-                    # If KeyError occurs during this, raise KeyError and add index of list occurrence to the message
-                    except KeyError as error:
-                        dict_list = switch_args.get('e_off')
-                        if not error.args:
-                            error.args = ('',)  # This syntax is necessary because error.args is a tuple
-                        error.args = (f"KeyError occurred for index [{str(dict_list.index(dataset))}] in list of "
-                                      f"Switch-SwitchEnergyData dictionaries for e_off: ",) + error.args
-                        raise
-            elif isvalid_dict(switch_args.get('e_off'), 'SwitchEnergyData'):
-                self.e_off.append(SwitchEnergyData(switch_args.get('e_off')))
+            self.e_on = []
+            append_valid_datasets(self.e_on, switch_args.get('e_on'), 'SwitchEnergyData', SwitchEnergyData)
 
-            self.e_on_meas = []  # Default case: Empty list
-            if isinstance(switch_args.get('e_on_meas'), list):
-                # Loop through list and check each dict for validity. Only create SwitchEnergyData objects from
-                # valid dicts. 'None' and empty dicts are ignored.
-                for dataset in switch_args.get('e_on_meas'):
-                    try:
-                        if isvalid_dict(dataset, 'SwitchEnergyData'):
-                            self.e_on_meas.append(SwitchEnergyData(dataset))
-                    # If KeyError occurs during this, raise KeyError and add index of list occurrence to the message
-                    except KeyError as error:
-                        dict_list = switch_args.get('e_on_meas')
-                        if not error.args:
-                            error.args = ('',)  # This syntax is necessary because error.args is a tuple
-                        error.args = (f"KeyError occurred for index [{str(dict_list.index(dataset))}] in list of "
-                                      f"Switch-SwitchEnergyData dictionaries for e_on_meas: ",) + error.args
-                        raise
-            elif isvalid_dict(switch_args.get('e_on_meas'), 'SwitchEnergyData'):
-                # Only create SwitchEnergyData objects from valid dicts
-                self.e_on_meas.append(SwitchEnergyData(switch_args.get('e_on_meas')))
+            self.e_off = []
+            append_valid_datasets(self.e_off, switch_args.get('e_off'), 'SwitchEnergyData', SwitchEnergyData)
 
-            self.e_off_meas = []  # Default case: Empty list
-            if isinstance(switch_args.get('e_off_meas'), list):
-                for dataset in switch_args.get('e_off_meas'):
-                    try:
-                        if isvalid_dict(dataset, 'SwitchEnergyData'):
-                            self.e_off_meas.append(SwitchEnergyData(dataset))
-                    # If KeyError occurs during this, raise KeyError and add index of list occurrence to the message
-                    except KeyError as error:
-                        dict_list = switch_args.get('e_off_meas')
-                        if not error.args:
-                            error.args = ('',)  # This syntax is necessary because error.args is a tuple
-                        error.args = (f"KeyError occurred for index [{str(dict_list.index(dataset))}] in list of "
-                                      f"Switch-SwitchEnergyData dictionaries for e_off_meas: ",) + error.args
-                        raise
-            elif isvalid_dict(switch_args.get('e_off_meas'), 'SwitchEnergyData'):
-                self.e_off_meas.append(SwitchEnergyData(switch_args.get('e_off_meas')))
+            self.e_on_meas = []
+            append_valid_datasets(self.e_on_meas, switch_args.get('e_on_meas'), 'SwitchEnergyData', SwitchEnergyData)
 
-            self.linearized_switch = []  # Default case: Empty list
-            if isinstance(switch_args.get('linearized_switch'), list):
-                # Loop through list and check each dict for validity. Only create LinearizedModel objects from
-                # valid dicts. 'None' and empty dicts are ignored.
-                for dataset in switch_args.get('linearized_switch'):
-                    try:
-                        if isvalid_dict(dataset, 'Switch_LinearizedModel'):
-                            self.linearized_switch.append(LinearizedModel(dataset))
-                    # If KeyError occurs during this, raise KeyError and add index of list occurrence to the message
-                    except KeyError as error:
-                        dict_list = switch_args.get('linearized_switch')
-                        if not error.args:
-                            error.args = ('',)  # This syntax is necessary because error.args is a tuple
-                        error.args = (f"KeyError occurred for index [{str(dict_list.index(dataset))}] in list of "
-                                      f"Switch-LinearizedModel dictionaries for e_on: ",) + error.args
-                        raise
-            elif isvalid_dict(switch_args.get('linearized_switch'), 'Switch_LinearizedModel'):
-                # Only create LinearizedModel objects from valid dicts
-                self.linearized_switch.append(LinearizedModel(switch_args.get('linearized_switch')))
+            self.e_off_meas = []
+            append_valid_datasets(self.e_off_meas, switch_args.get('e_off_meas'), 'SwitchEnergyData', SwitchEnergyData)
 
-            self.r_channel_th = []  # Default case: Empty list
-            if isinstance(switch_args.get('r_channel_th'), list):
-                # Loop through list and check each dict for validity. Only create TemperatureDependResistance objects from
-                # valid dicts. 'None' and empty dicts are ignored.
-                for dataset in switch_args.get('r_channel_th'):
-                    try:
-                        if isvalid_dict(dataset, 'TemperatureDependResistance'):
-                            self.r_channel_th.append(TemperatureDependResistance(dataset))
-                    # If KeyError occurs during this, raise KeyError and add index of list occurrence to the message
-                    except KeyError as error:
-                        dict_list = switch_args.get('r_channel_th')
-                        if not error.args:
-                            error.args = ('',)  # This syntax is necessary because error.args is a tuple
-                        error.args = (f"KeyError occurred for index [{str(dict_list.index(dataset))}] in list of "
-                                      f"Switch-TemperatureDependResistance dictionaries for r_channel_th: ",) + error.args
-                        raise
-            elif isvalid_dict(switch_args.get('r_channel_th'), 'TemperatureDependResistance'):
-                # Only create TemperatureDependResistance objects form valid dicts
-                self.r_channel_th.append(TemperatureDependResistance(switch_args.get('r_channel_th')))
+            self.linearized_switch = []
+            append_valid_datasets(self.linearized_switch, switch_args.get('linearized_switch'), 'Switch_LinearizedModel', LinearizedModel)
 
-            self.charge_curve = []  # Default case: Empty list
-            if isinstance(switch_args.get('charge_curve'), list):
-                # Loop through list and check each dict for validity. Only create GateChargeCurve objects from
-                # valid dicts. 'None' and empty dicts are ignored.
-                for dataset in switch_args.get('charge_curve'):
-                    try:
-                        if isvalid_dict(dataset, 'GateChargeCurve'):
-                            self.charge_curve.append(GateChargeCurve(dataset))
-                    # If KeyError occurs during this, raise KeyError and add index of list occurrence to the message
-                    except KeyError as error:
-                        dict_list = switch_args.get('charge_curve')
-                        if not error.args:
-                            error.args = ('',)  # This syntax is necessary because error.args is a tuple
-                        error.args = (f"KeyError occurred for index [{str(dict_list.index(dataset))}] in list of "
-                                      f"Switch-GateChargeCurve dictionaries for charge_curve: ",) + error.args
-                        raise
-            elif isvalid_dict(switch_args.get('charge_curve'), 'GateChargeCurve'):
-                # Only create GateChargeCurve objects form valid dicts
-                self.charge_curve.append(GateChargeCurve(switch_args.get('charge_curve')))
+            self.r_channel_th = []
+            append_valid_datasets(self.r_channel_th, switch_args.get('r_channel_th'), 'TemperatureDependResistance', TemperatureDependResistance)
 
-            self.soa = []  # Default case: Empty list
-            if isinstance(switch_args.get('soa'), list):
-                # Loop through list and check each dict for validity. Only create SOA objects from
-                # valid dicts. 'None' and empty dicts are ignored.
-                for dataset in switch_args.get('soa'):
-                    try:
-                        if isvalid_dict(dataset, 'SOA'):
-                            self.soa.append(SOA(dataset))
-                    # If KeyError occurs during this, raise KeyError and add index of list occurrence to the message
-                    except KeyError as error:
-                        dict_list = switch_args.get('soa')
-                        if not error.args:
-                            error.args = ('',)  # This syntax is necessary because error.args is a tuple
-                        error.args = (f"KeyError occurred for index [{str(dict_list.index(dataset))}] in list of soa "
-                                      f"dictionaries: ",) + error.args
-                        raise
-            elif isvalid_dict(switch_args.get('soa'), 'SOA'):
-                # Only create SOA objects from valid dicts
-                self.soa.append(SOA(switch_args.get('soa')))
+            self.charge_curve = []
+            append_valid_datasets(self.charge_curve, switch_args.get('charge_curve'), 'GateChargeCurve', GateChargeCurve)
+
+            self.soa = []
+            append_valid_datasets(self.soa, switch_args.get('soa'), 'SOA', SOA)
 
         else:  # Can be constructed from empty or 'None' argument dictionary since no attributes are mandatory.
             self.comment = None
@@ -723,25 +622,7 @@ class Switch:
 
         :return: Respective plots are displayed
         """
-        if not self.soa:
-            return None
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        if isinstance(self.soa, list) and self.soa:
-            for curve in self.soa:
-                line1, = curve.get_plots(ax)
-        plt.xlabel('$V_{ds}$ / $V_r$ [V]')
-        plt.ylabel('$I_d$ / $I_r$ [A]')
-        props = dict(fill=False, edgecolor='black', linewidth=1)
-        if len(self.soa):
-            plt.legend(fontsize=8)
-            r_on_condition = '\n'.join(["conditions: ", "$T_{c} $ =" + str(self.soa[0].t_c) + " [°C]"])
-            ax.text(0.65, 0.1, r_on_condition, transform=ax.transAxes, fontsize='small', bbox=props, ha='left', va='bottom')
-        plt.grid()
-        if buffer_req:
-            return get_img_raw_data(plt)
-        else:
-            plt.show()
+        return plot_soa_lib(self.soa, buffer_req)
 
     def collect_data(self) -> Dict:
         """
