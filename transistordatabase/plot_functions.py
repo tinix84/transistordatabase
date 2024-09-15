@@ -29,3 +29,4 @@ def plot_soa_lib(soa, buffer_req: bool = False):
         return get_img_raw_data(plt)
     else:
         plt.show()
+        

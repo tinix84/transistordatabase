@@ -13,6 +13,7 @@ import numpy.typing as npt
 from transistordatabase.checker_functions import check_float
 from transistordatabase.helper_functions import isvalid_dict, get_img_raw_data
 
+
 def convert_to_dict(obj) -> dict:
     """
     Convert an object into dict datatype.
@@ -27,6 +28,7 @@ def convert_to_dict(obj) -> dict:
         if isinstance(d[att_key], np.ndarray):
             d[att_key] = d[att_key].tolist()
     return d
+
 
 @dataclass
 class GateChargeCurve:

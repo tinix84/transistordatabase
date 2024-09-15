@@ -27,8 +27,12 @@ from bson import json_util
 # Local libraries
 from transistordatabase.constants import *
 from transistordatabase.checker_functions import check_duplicates
-from transistordatabase.helper_functions import isvalid_dict, get_img_raw_data, gen_exp_func, get_vc_plots, html_to_pdf, matlab_compatibility_test, get_gatedefaults, negate_and_append
-from transistordatabase.data_classes import RawMeasurementData, EffectiveOutputCapacitance, VoltageDependentCapacitance, SwitchEnergyData, TemperatureDependResistance, SOA, GateChargeCurve
+from transistordatabase.helper_functions import (
+    isvalid_dict, get_img_raw_data, gen_exp_func, get_vc_plots, html_to_pdf,
+    matlab_compatibility_test, get_gatedefaults, negate_and_append)
+from transistordatabase.data_classes import (
+    RawMeasurementData, EffectiveOutputCapacitance, VoltageDependentCapacitance, 
+    SwitchEnergyData, TemperatureDependResistance, SOA, GateChargeCurve)
 from transistordatabase.switch import Switch
 from transistordatabase.diode import Diode
 from transistordatabase.exceptions import MissingDataError
