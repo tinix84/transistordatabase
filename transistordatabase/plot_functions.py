@@ -1,3 +1,4 @@
+"""Contains functions for plotting that are used in the transistordatabase package."""
 import matplotlib.pyplot as plt
 from transistordatabase.helper_functions import get_img_raw_data
 
@@ -30,3 +31,4 @@ def plot_soa_lib(soa, buffer_req: bool = False):
     else:
         plt.show()
         
+    return None

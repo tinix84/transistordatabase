@@ -87,9 +87,10 @@ class GateChargeCurve:
 @dataclass
 class SOA:
     """Class to hold safe operating area characteristics of transistor type."""
+
     t_c: Optional[float] = None  #: case temperature
-    time_pulse: Optional[float] =  None #: pulse duration
-    graph_i_v: np.ndarray = field(default_factory=lambda: np.array([])) #: a 2D numpy array to store SOA characteristics curves
+    time_pulse: Optional[float] = None  #: pulse duration
+    graph_i_v: np.ndarray = field(default_factory=lambda: np.array([]))  #: a 2D numpy array to store SOA characteristics curves
 
     def __init__(self, args: dict):
         """
