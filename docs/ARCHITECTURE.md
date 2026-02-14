@@ -169,4 +169,4 @@ The legacy modules (`transistor.py`, `data_classes.py`, `switch.py`, `diode.py`)
 | `data/` | Static reference data (housing types, manufacturers) |
 | `examples/` | Example transistor JSON files |
 | `tests/` | pytest test suite (292 tests) |
-| `topologies/` | Converter topology analyzers (PFC, DAB, LLC, SRC) |
+| `topologies/` | Converter topology analyzers (Buck, Boost, Buck-Boost) |

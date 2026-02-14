@@ -40,10 +40,9 @@ A unified Python toolkit for power semiconductor device characterization, simula
 - Integration with topology models
 
 #### 5. Topology Analysis
-- **Bridgeless PFC** — boost PFC loss analysis
-- **Dual Active Bridge (DAB)** — phase-shift modulation losses
-- **LLC Resonant Converter** — resonant transition losses
-- **Series Resonant Converter (SRC)** — ZVS range analysis
+- **Buck Converter** — step-down DC-DC converter loss analysis
+- **Boost Converter** — step-up DC-DC converter loss analysis
+- **Buck-Boost Converter** — inverting DC-DC converter loss analysis
 
 #### 6. User Interfaces
 - **PyQt5 Desktop GUI** — full-featured transistor viewer/editor
@@ -86,8 +85,7 @@ See `docs/ARCHITECTURE.md` for the full domain model. Key entities:
 - Core/backend/frontend separation complete with adapters
 - GUI refactored from 5,958-line god class → 8 mixin modules (950-line MainWindow)
 - FastAPI backend wired to real services
-- 292 tests passing, 0 ruff violations
-- Topologies module: Bridgeless PFC, DAB, LLC, SRC-ZVS
+- Topologies module: Buck, Boost, Buck-Boost converters
 - Analytical models: Biela, gate charge, IGBT tail, Rg formula
 - LTSpice DPT generation and analysis
 - Catalog importer with FOM ranking

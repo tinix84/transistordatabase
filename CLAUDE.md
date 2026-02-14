@@ -70,7 +70,7 @@ Transistor
 - **`waveform_losses.py`** — Time-domain conduction/switching loss from current waveforms
 - **`catalog_importer.py`** — CSV catalog import with FOM ranking (Rds*Qg)
 - **`rg_formula.py`** — Gate resistance dependent switching energy interpolation
-- **`topologies/`** — Power converter topology analyzers (Bridgeless PFC, DAB, LLC, SRC-ZVS)
+- **`topologies/`** — Power converter topology analyzers (Buck, Boost, Buck-Boost)
 - **`utils/ltspice_dpt.py`** — LTspice Double Pulse Test netlist generation and analysis
 
 ### PyQt5 GUI Architecture (refactored in v0.6.0)
