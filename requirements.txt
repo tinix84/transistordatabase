@@ -16,3 +16,5 @@ deepdiff
 xmltodict
 fastapi
 uvicorn[standard]
+playwright
+pytest-playwright

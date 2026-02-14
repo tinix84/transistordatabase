@@ -112,15 +112,31 @@ Requires Python >= 3.10.
 
 ### Testing
 ```bash
-pytest tests/ -q                   # Run all tests (~292 tests)
+pytest tests/ -q                   # Run all tests (~283 tests)
 pytest tests/test_core_services.py # Core backend services
 pytest tests/test_repository.py    # Repository + adapter bridge
 pytest tests/test_rest_api.py      # FastAPI endpoints (needs fastapi, httpx)
 pytest tests/test_adapters.py      # Legacy ↔ core roundtrip
 pytest tests/test_tdb_classes.py   # Legacy transistor classes
 pytest tests/test_database_manager.py  # Legacy DB manager
+pytest tests/test_gui_playwright.py -v --headed  # E2E browser tests (requires playwright)
 ```
-Test framework: pytest. MongoDB mocking via `mongomock`.
+Test framework: pytest. MongoDB mocking via `mongomock`. Browser testing via `playwright`.
+
+### E2E Testing with Playwright
+```bash
+# Install Playwright
+pip install playwright pytest-playwright
+playwright install chromium
+
+# Run E2E tests (headless)
+pytest tests/test_gui_playwright.py -v
+
+# Run with visible browser (debugging)
+pytest tests/test_gui_playwright.py -v --headed --slowmo 500
+
+# See tests/PLAYWRIGHT_TESTING.md for detailed guide
+```
 
 ### Core import check
 ```bash
