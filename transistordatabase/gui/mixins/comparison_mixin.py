@@ -406,12 +406,13 @@ class ComparisonToolsMixin:
         self.PopOutPlotWindow9.show()
 
     def comboBox_compare_transistor_changed(self, comboBox_compare_transistor, comboBox_compare_v_g_on_transistor,
-                                            comboBox_compare_v_g_off_transistor, lineEdit_compare_t_j_transistor,
+                                            comboBox_compare_v_g_off_transistor, _lineEdit_compare_t_j_transistor,
                                             slider_compare_r_g_on_transistor, label_compare_r_g_on_value_transistor,
                                             slider_compare_r_g_off_transistor, label_compare_r_g_off_value_transistor):
         """
         Fill the comboBoxes for transistor with data based on the available data in the transistordatabase.
 
+        :param _lineEdit_compare_t_j_transistor: Temperature input field (unused in this method)
         :return: None
         """
         transistor = self.tdb.load_transistor(comboBox_compare_transistor.currentText())

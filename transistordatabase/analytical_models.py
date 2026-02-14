@@ -292,11 +292,12 @@ class IgbtModel:
         return e_off_mosfet + e_tail
 
     def calc_conduction_loss(
-        self, i_avg: float, i_rms: float
+        self, i_avg: float, _i_rms: float
     ) -> float:
         """Calculate IGBT conduction loss using V_CE(sat) model.
 
         :param i_avg: Average current in A.
+        :param _i_rms: RMS current (unused in this model)
         :param i_rms: RMS current in A.
         :return: Conduction power loss in W.
         """

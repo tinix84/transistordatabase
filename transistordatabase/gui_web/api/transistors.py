@@ -1,7 +1,6 @@
 """Transistors API endpoints for Vercel serverless deployment."""
 
 from fastapi import FastAPI, HTTPException, UploadFile, File
-from fastapi.responses import JSONResponse
 from typing import List, Dict, Optional, Any
 import json
 import tempfile

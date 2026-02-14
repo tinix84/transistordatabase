@@ -580,15 +580,21 @@ class ComparisonService(IComparisonService):
     """Service for comparing transistors."""
 
     def compare_characteristics(
-        self, transistors: List[Transistor], comparison_type: str
+        self, transistors: List[Transistor], _comparison_type: str
     ) -> Dict[str, Any]:
-        """Compare characteristics of multiple transistors."""
+        """Compare characteristics of multiple transistors.
+
+        :param _comparison_type: Comparison type (reserved for future use)
+        """
         return self.compare_transistors(transistors)
 
     def rank_transistors(
-        self, transistors: List[Transistor], criteria: Dict[str, float]
+        self, transistors: List[Transistor], _criteria: Dict[str, float]
     ) -> list[tuple[Transistor, float]]:
-        """Rank transistors based on given criteria."""
+        """Rank transistors based on given criteria.
+
+        :param _criteria: Ranking criteria (reserved for future implementation)
+        """
         return [(t, 1.0) for t in transistors]
 
     def compare_transistors(

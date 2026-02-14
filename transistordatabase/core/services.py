@@ -185,15 +185,21 @@ class IComparisonService(ABC):
 
     @abstractmethod
     def compare_characteristics(
-        self, transistors: List[Transistor], comparison_type: str
+        self, transistors: List[Transistor], _comparison_type: str
     ) -> Dict[str, Any]:
-        """Compare characteristics of multiple transistors."""
+        """Compare characteristics of multiple transistors.
+
+        :param _comparison_type: Type of comparison (reserved for future use)
+        """
 
     @abstractmethod
     def rank_transistors(
-        self, transistors: List[Transistor], criteria: Dict[str, float]
+        self, transistors: List[Transistor], _criteria: Dict[str, float]
     ) -> List[Tuple[Transistor, float]]:
-        """Rank transistors based on given criteria."""
+        """Rank transistors based on given criteria.
+
+        :param _criteria: Ranking criteria weights (reserved for future use)
+        """
 
     @abstractmethod
     def compare_transistors(

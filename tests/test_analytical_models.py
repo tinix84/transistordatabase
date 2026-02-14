@@ -168,5 +168,5 @@ class TestIgbtModel:
 
     def test_conduction_loss(self, model: IgbtModel) -> None:
         """Verify conduction loss calculation."""
-        p_cond = model.calc_conduction_loss(i_avg=50.0, i_rms=60.0)
+        p_cond = model.calc_conduction_loss(i_avg=50.0, _i_rms=60.0)
         assert p_cond == pytest.approx(1.5 * 50.0)

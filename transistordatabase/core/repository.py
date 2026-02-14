@@ -238,7 +238,10 @@ class TransistorFactory:
         return Transistor(metadata, electrical, thermal)
     
     @staticmethod
-    def create_from_template(template_name: str, new_name: str) -> Transistor:
-        """Create transistor from existing template."""
+    def create_from_template(_template_name: str, new_name: str) -> Transistor:
+        """Create transistor from existing template.
+
+        :param _template_name: Template name (reserved for future implementation)
+        """
         # Implementation would load template and create new instance
         return TransistorFactory.create_empty_transistor(new_name)
