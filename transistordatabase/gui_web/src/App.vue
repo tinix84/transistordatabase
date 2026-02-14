@@ -19,23 +19,38 @@ const isLoading = ref(false)
 const isDarkTheme = ref(false)
 
 onMounted(async () => {
+  console.log('[App.vue] Component mounted, loading transistors...')
   await loadTransistors()
+  console.log('[App.vue] Transistors loaded, count:', transistors.value.length)
   // Load theme preference
   const savedTheme = localStorage.getItem('darkTheme')
   if (savedTheme !== null) {
     isDarkTheme.value = JSON.parse(savedTheme)
   }
   applyTheme()
+  console.log('[App.vue] Initialization complete')
 })
 
 async function loadTransistors() {
+  console.log('[loadTransistors] Starting...')
   isLoading.value = true
   try {
-    transistors.value = await transistorApi.getAll()
+    const data = await transistorApi.getAll()
+    console.log('[loadTransistors] API returned:', data)
+    console.log('[loadTransistors] Data type:', typeof data, 'Is Array:', Array.isArray(data))
+    console.log('[loadTransistors] Data length:', data?.length)
+    transistors.value = data
+    console.log('[loadTransistors] State updated, transistors.value.length:', transistors.value.length)
   } catch (error) {
-    console.error('Error loading transistors:', error)
+    console.error('[loadTransistors] Error:', error)
+    console.error('[loadTransistors] Error details:', {
+      message: error.message,
+      response: error.response,
+      stack: error.stack
+    })
   } finally {
     isLoading.value = false
+    console.log('[loadTransistors] Finished, isLoading:', isLoading.value)
   }
 }
 

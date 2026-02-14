@@ -17,6 +17,9 @@ const getBaseURL = () => {
 
 const BASE_URL = getBaseURL()
 
+// Debug logging
+console.log('[API] Initialized with BASE_URL:', BASE_URL)
+
 // Create axios instance with default config
 const api = axios.create({
   baseURL: BASE_URL,
@@ -25,12 +28,32 @@ const api = axios.create({
   },
 })
 
+// Request interceptor for debugging
+api.interceptors.request.use(
+  (config) => {
+    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`)
+    return config
+  },
+  (error) => {
+    console.error('[API Request Error]:', error)
+    return Promise.reject(error)
+  }
+)
+
 // Transistor API service
 export const transistorApi = {
   // Get all transistors
   async getAll() {
-    const response = await api.get('/api/transistors')
-    return response.data
+    console.log('[transistorApi.getAll] Fetching all transistors...')
+    try {
+      const response = await api.get('/api/transistors')
+      console.log('[transistorApi.getAll] Success! Received', response.data?.length || 0, 'transistors')
+      console.log('[transistorApi.getAll] Sample data:', response.data?.[0])
+      return response.data
+    } catch (error) {
+      console.error('[transistorApi.getAll] Failed:', error)
+      throw error
+    }
   },
 
   // Get a specific transistor by ID
@@ -90,11 +113,27 @@ export const transistorApi = {
   }
 }
 
-// Error handling interceptor
+// Response interceptor for debugging and error handling
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`[API Response] ${response.config.method?.toUpperCase()} ${response.config.url}:`,
+      response.status, response.statusText)
+    if (response.data) {
+      const dataInfo = Array.isArray(response.data)
+        ? `Array[${response.data.length}]`
+        : typeof response.data
+      console.log(`[API Response] Data type:`, dataInfo)
+    }
+    return response
+  },
   (error) => {
-    console.error('API Error:', error.response?.data || error.message)
+    console.error('[API Error]:', {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      url: error.config?.url
+    })
     throw error
   }
 )

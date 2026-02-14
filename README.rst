@@ -139,6 +139,46 @@ Complete documentation
 ##########################
 The complete documentation can be found `here <https://upb-lea.github.io/transistordatabase/main/transistordatabase.html>`__.
 
+##########################
+User Documentation
+##########################
+
+Getting Started
+***************
+* `Quick Start Guide <docs/QUICK_START.md>`_ - Get running in 5 minutes! Installation, first search, and basic workflows
+* `User Guide <docs/USER_GUIDE.md>`_ - Complete feature documentation covering all tabs and functionality
+* `Tutorial <docs/TUTORIAL.md>`_ - 5 hands-on tutorials from first search to converter design
+* `FAQ <docs/FAQ.md>`_ - Frequently asked questions with troubleshooting tips
+
+For Developers
+**************
+* `API Documentation <docs/API_DOCUMENTATION.md>`_ - Complete REST API reference with Python/JavaScript examples
+* `Video Tutorial Scripts <docs/VIDEO_TUTORIAL_SCRIPT.md>`_ - Production-ready scripts for creating video tutorials
+
+Web Interface
+*************
+The modern web interface provides:
+
+* **Vue 3** frontend with responsive design
+* **FastAPI** backend with automatic API documentation
+* Real-time search and filtering
+* Interactive comparison and topology calculator
+* Export to PLECS, MATLAB, Simulink, GeckoCIRCUITS
+
+Quick start:
+
+.. code-block::
+
+   # Terminal 1: Start backend
+   uvicorn transistordatabase.gui_web.backend.main:app --port 8002
+
+   # Terminal 2: Start frontend
+   cd transistordatabase/gui_web
+   npm install  # First time only
+   npm run dev
+
+   # Open browser: http://localhost:5173
+
 
 ##########################
 Usage

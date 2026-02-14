@@ -392,6 +392,21 @@ const props = defineProps({
 
 const emit = defineEmits(['load-to-exporting', 'load-to-comparison', 'load-to-topology'])
 
+// Debug logging
+onMounted(() => {
+  console.log('[SearchDatabase] Mounted')
+  console.log('[SearchDatabase] props.transistors:', props.transistors)
+  console.log('[SearchDatabase] transistors type:', typeof props.transistors, 'Is Array:', Array.isArray(props.transistors))
+  console.log('[SearchDatabase] transistors length:', props.transistors?.length)
+})
+
+// Watch for prop changes
+watch(() => props.transistors, (newVal, oldVal) => {
+  console.log('[SearchDatabase] transistors prop changed')
+  console.log('[SearchDatabase] Old length:', oldVal?.length, 'New length:', newVal?.length)
+  console.log('[SearchDatabase] New value sample:', newVal?.[0])
+})
+
 // Filter state
 const filters = ref({
   name: { enabled: false, value: '' },
@@ -415,19 +430,36 @@ const itemsPerPage = ref(20)
 
 // Computed properties for filter options
 const availableTypes = computed(() => {
+  if (!props.transistors || !Array.isArray(props.transistors)) {
+    console.warn('[SearchDatabase] availableTypes: transistors is not an array:', props.transistors)
+    return []
+  }
   return [...new Set(props.transistors.map(t => t.metadata.type))].sort()
 })
 
 const availableManufacturers = computed(() => {
+  if (!props.transistors || !Array.isArray(props.transistors)) {
+    console.warn('[SearchDatabase] availableManufacturers: transistors is not an array:', props.transistors)
+    return []
+  }
   return [...new Set(props.transistors.map(t => t.metadata.manufacturer))].sort()
 })
 
 const availableHousingTypes = computed(() => {
+  if (!props.transistors || !Array.isArray(props.transistors)) {
+    console.warn('[SearchDatabase] availableHousingTypes: transistors is not an array:', props.transistors)
+    return []
+  }
   return [...new Set(props.transistors.map(t => t.metadata.housing_type))].sort()
 })
 
 // Filtered and sorted transistors
 const filteredTransistors = computed(() => {
+  if (!props.transistors || !Array.isArray(props.transistors)) {
+    console.warn('[SearchDatabase] filteredTransistors: transistors is not an array:', props.transistors)
+    return []
+  }
+  console.log('[SearchDatabase] filteredTransistors computing with', props.transistors.length, 'transistors')
   let result = props.transistors.filter(transistor => {
     // Name filter
     if (filters.value.name.enabled) {

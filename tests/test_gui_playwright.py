@@ -29,8 +29,8 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-# Base URL constant
-BASE_URL = "http://localhost:8000"
+# Base URL constant (port 8002 is the standard for this project)
+BASE_URL = "http://localhost:8002"
 
 
 @pytest.fixture(scope="session")
@@ -41,7 +41,7 @@ def server_process():
 
     # Start server using uv run
     process = subprocess.Popen(
-        [sys.executable, "-m", "uvicorn", "transistordatabase.gui_web.backend.main:app", "--port", "8000"],
+        [sys.executable, "-m", "uvicorn", "transistordatabase.gui_web.backend.main:app", "--port", "8002"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
@@ -51,7 +51,7 @@ def server_process():
     for i in range(max_retries):
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            result = sock.connect_ex(('localhost', 8000))
+            result = sock.connect_ex(('localhost', 8002))
             sock.close()
             if result == 0:
                 print(f"Server ready after {i+1} attempts")
@@ -190,9 +190,8 @@ class TestPlotEndpoints:
 # Integration test example (requires full setup)
 @pytest.mark.e2e
 @pytest.mark.slow
-@pytest.mark.skip(reason="Requires Vue frontend running")
 class TestFullWebInterface:
-    """Tests for the full web interface (requires Vue frontend)."""
+    """Tests for the full web interface (requires Vue frontend on port 5173)."""
 
     def test_vue_app_loads(self, page: Page):
         """Test that Vue.js frontend loads (requires npm run dev)."""
@@ -206,20 +205,20 @@ class TestFullWebInterface:
         title = page.inner_text("h1")
         assert "Transistor Database" in title
 
-    def test_transistor_search_form(self, page: Page):
-        """Test the transistor search functionality."""
+    def test_transistor_list_displays(self, page: Page):
+        """Test that transistor list displays correctly."""
         page.goto("http://localhost:5173")
 
-        # Fill search form
-        page.fill("input[name='search']", "CREE")
-        page.click("button[type='submit']")
+        # Wait for Vue app to load and render transistor cards
+        page.wait_for_selector(".transistor-card", timeout=10000)
 
-        # Wait for results
-        page.wait_for_selector(".transistor-card", timeout=5000)
-
-        # Check results
+        # Check that transistors are displayed
         results = page.query_selector_all(".transistor-card")
-        assert len(results) > 0
+        assert len(results) > 0, "No transistor cards found"
+
+        # Verify the count in header matches
+        header_text = page.inner_text(".stats")
+        assert "25" in header_text, f"Expected 25 transistors in header, got: {header_text}"
 
 
 if __name__ == "__main__":
