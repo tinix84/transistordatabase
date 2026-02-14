@@ -5,6 +5,8 @@ This package contains the core business models, services, and interfaces
 that define the domain logic separated from presentation and infrastructure concerns.
 """
 
+__version__ = "1.0.0"
+
 from .models import (
     Transistor,
     Switch,
