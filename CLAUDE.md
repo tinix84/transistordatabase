@@ -73,12 +73,33 @@ Transistor
 - **`topologies/`** — Power converter topology analyzers (Bridgeless PFC, DAB, LLC, SRC-ZVS)
 - **`utils/ltspice_dpt.py`** — LTspice Double Pulse Test netlist generation and analysis
 
+### PyQt5 GUI Architecture (refactored in v0.6.0)
+The `gui/` directory was refactored from a 5,958-line god class into a modular mixin-based architecture:
+
+```
+transistordatabase/gui/
+├── gui.py                  — 950 LOC (MainWindow shell + helper classes)
+├── _widgets.py             — Reusable widgets (MatplotlibWidget, PopOutPlotWindow, ViewCurveWindow)
+├── _utils.py               — Shared utilities (resource_path)
+├── api_client.py           — REST client for FastAPI backend communication
+└── mixins/                 — 8 mixin modules (5,957 LOC total)
+    ├── utils_mixin.py      — Utilities (show_popup_message, browse_file, webbrowser_*)
+    ├── settings_mixin.py   — Settings save/load/export
+    ├── search_mixin.py     — Database search and filtering
+    ├── creation_mixin.py   — Transistor creation/editing
+    ├── curve_mixin.py      — Curve add/view/delete (switch/diode/capacitance)
+    ├── export_mixin.py     — Export to simulation tools
+    ├── comparison_mixin.py — Transistor comparison plots
+    └── topology_mixin.py   — Topology calculator (buck/boost/buck-boost)
+```
+
+**MainWindow** inherits from all 8 mixins via multiple inheritance. Helper classes (`CurveCheckerWindow`, `InformationWindow`) remain in `gui.py` as they reference the MainWindow singleton.
+
 ### Legacy root modules (still functional, bridged to core via adapters)
 - **`transistor.py`** — Monolithic Transistor class (used by export bridge)
 - **`data_classes.py`** — Legacy dataclasses (ChannelData, SwitchEnergyData, etc.)
 - **`database_manager.py`** — Legacy DatabaseManager with `load_transistor_core()` shim
 - **`helper_functions.py`** — Validation, CSV parsing (headless-safe)
-- **`gui/`** — PyQt5 desktop GUI with `api_client.py` for REST communication
 - **`gui_web/`** — Vue 3 + FastAPI web interface (wired to real services)
 
 ## Common Commands
@@ -138,6 +159,9 @@ cd docs/ && make html
 - `transistor.electrical_ratings` (not `transistor.electrical`)
 - `transistor.thermal_properties` (not `transistor.thermal`)
 - PyQt5 is isolated in `helper_pdf.py` and `gui/` — helper_functions.py is headless-safe
+- **GUI mixin pattern**: MainWindow uses multiple inheritance from 8 mixins instead of one monolithic class
+- **Circular import avoidance**: Independent widgets in `_widgets.py`, deferred imports for dependent classes
+- **Helper classes stay in gui.py**: `CurveCheckerWindow` and `InformationWindow` reference the MainWindow singleton
 
 ## Version Locations
 

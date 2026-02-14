@@ -75,12 +75,22 @@ See `docs/ARCHITECTURE.md` for the full domain model. Key entities:
 
 | Phase | Scope | Status |
 |---|---|---|
-| Phase 0 | Core refactoring (models, services, interfaces) | In Progress |
-| Phase 1 | PLECS import, analytical models, Rg formula | Planned |
-| Phase 2 | Waveform losses, topology analysis | Planned |
-| Phase 3 | Legacy migration, GUI refactor | Planned |
-| Phase 4 | LTSpice DPT, Digikey catalog, docs | Planned |
-| Phase 5 | Testing gate, v1.0 release | Planned |
+| Phase 0 | Core refactoring (models, services, interfaces) | ✅ Complete |
+| Phase 1 | PLECS import, analytical models, Rg formula | ✅ Complete |
+| Phase 2 | Waveform losses, topology analysis | ✅ Complete |
+| Phase 3 | Legacy migration, GUI refactor (mixin architecture) | ✅ Complete |
+| Phase 4 | LTSpice DPT, Digikey catalog, docs | ✅ Complete |
+| Phase 5 | Testing gate, v1.0 release | In Progress |
+
+**v0.6.0 Achievements (2024-Q1):**
+- Core/backend/frontend separation complete with adapters
+- GUI refactored from 5,958-line god class → 8 mixin modules (950-line MainWindow)
+- FastAPI backend wired to real services
+- 292 tests passing, 0 ruff violations
+- Topologies module: Bridgeless PFC, DAB, LLC, SRC-ZVS
+- Analytical models: Biela, gate charge, IGBT tail, Rg formula
+- LTSpice DPT generation and analysis
+- Catalog importer with FOM ranking
 
 ### Success Criteria
 
