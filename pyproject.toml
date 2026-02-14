@@ -81,3 +81,11 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_incomplete_defs = true
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+markers = [
+    "e2e: End-to-end browser tests",
+    "slow: Slow running tests",
+]

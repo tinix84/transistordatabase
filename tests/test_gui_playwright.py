@@ -29,60 +29,81 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-@pytest.fixture(scope="module")
-def base_url():
-    """Return the base URL for the web GUI."""
-    return "http://localhost:8000"
+# Base URL constant
+BASE_URL = "http://localhost:8000"
 
 
-@pytest.fixture(scope="module")
-def server_process(base_url):
+@pytest.fixture(scope="session")
+def server_process():
     """Start the FastAPI server for testing."""
-    # Start server
-    main_path = Path(__file__).parent.parent / "transistordatabase" / "gui_web" / "backend" / "main.py"
+    import sys
+    import socket
+
+    # Start server using uv run
     process = subprocess.Popen(
-        ["uvicorn", "transistordatabase.gui_web.backend.main:app", "--port", "8000"],
+        [sys.executable, "-m", "uvicorn", "transistordatabase.gui_web.backend.main:app", "--port", "8000"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
 
-    # Wait for server to start
-    time.sleep(2)
+    # Wait for server to be ready (poll the port)
+    max_retries = 30
+    for i in range(max_retries):
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            result = sock.connect_ex(('localhost', 8000))
+            sock.close()
+            if result == 0:
+                print(f"Server ready after {i+1} attempts")
+                break
+        except Exception:
+            pass
+        time.sleep(0.5)
+    else:
+        # Print error output if server didn't start
+        stdout, stderr = process.communicate(timeout=1)
+        print(f"Server stdout: {stdout.decode()}")
+        print(f"Server stderr: {stderr.decode()}")
+        process.terminate()
+        raise RuntimeError("Server failed to start within 15 seconds")
 
     yield process
 
     # Cleanup
     process.terminate()
-    process.wait(timeout=5)
+    try:
+        process.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        process.kill()
 
 
 @pytest.mark.e2e
 class TestWebGUIBasics:
     """Basic web GUI functionality tests."""
 
-    def test_homepage_loads(self, page: Page, base_url: str, server_process):
+    def test_homepage_loads(self, page: Page, server_process):
         """Test that the homepage loads successfully."""
-        page.goto(base_url)
+        page.goto(BASE_URL)
 
         # Check that we get a response (may be API response or static HTML)
         # For now, just check page loads without error
-        assert page.url == base_url + "/"
+        assert page.url == BASE_URL + "/"
 
         # API should return JSON with message
         content = page.content()
         assert "Transistor Database" in content or "message" in content
 
-    def test_api_root_endpoint(self, page: Page, base_url: str, server_process):
+    def test_api_root_endpoint(self, page: Page, server_process):
         """Test the API root endpoint."""
-        page.goto(f"{base_url}/")
+        page.goto(f"{BASE_URL}/")
 
         # Should return JSON
         content = page.content()
         assert "message" in content or "Transistor Database" in content
 
-    def test_api_transistors_list(self, page: Page, base_url: str, server_process):
+    def test_api_transistors_list(self, page: Page, server_process):
         """Test the transistors list endpoint."""
-        page.goto(f"{base_url}/api/transistors")
+        page.goto(f"{BASE_URL}/api/transistors")
 
         # Should return JSON array
         content = page.content()
@@ -95,24 +116,24 @@ class TestWebGUIBasics:
 class TestTransistorOperations:
     """Test transistor CRUD operations via web GUI."""
 
-    def test_get_transistor_by_name(self, page: Page, base_url: str, server_process):
+    def test_get_transistor_by_name(self, page: Page, server_process):
         """Test fetching a specific transistor."""
         # First check if CREE transistor exists
-        page.goto(f"{base_url}/api/transistors")
+        page.goto(f"{BASE_URL}/api/transistors")
         transistors_list = page.content()
 
         if "CREE_C3M0016120K" in transistors_list:
             # Fetch specific transistor
-            page.goto(f"{base_url}/api/transistors/CREE_C3M0016120K")
+            page.goto(f"{BASE_URL}/api/transistors/CREE_C3M0016120K")
             content = page.content()
 
             # Should contain transistor data
             assert "metadata" in content or "CREE" in content
             assert "manufacturer" in content.lower() or "type" in content.lower()
 
-    def test_api_docs_available(self, page: Page, base_url: str, server_process):
+    def test_api_docs_available(self, page: Page, server_process):
         """Test that API documentation is accessible."""
-        page.goto(f"{base_url}/docs")
+        page.goto(f"{BASE_URL}/docs")
 
         # FastAPI auto-generates /docs (Swagger UI)
         # Check for common Swagger UI elements
@@ -124,19 +145,19 @@ class TestTransistorOperations:
 class TestAPIEndpoints:
     """Test various API endpoints."""
 
-    def test_validation_endpoint(self, page: Page, base_url: str, server_process):
+    def test_validation_endpoint(self, page: Page, server_process):
         """Test validation endpoint for a transistor."""
         # Assuming CREE transistor exists
-        page.goto(f"{base_url}/api/transistors/CREE_C3M0016120K/validate")
+        page.goto(f"{BASE_URL}/api/transistors/CREE_C3M0016120K/validate")
 
         # Should return validation result (may be 200 or 404)
         content = page.content()
         # Either valid response or "not found"
         assert "errors" in content or "not found" in content.lower() or "detail" in content
 
-    def test_export_json_endpoint(self, page: Page, base_url: str, server_process):
+    def test_export_json_endpoint(self, page: Page, server_process):
         """Test JSON export endpoint."""
-        page.goto(f"{base_url}/api/transistors/CREE_C3M0016120K/export/json")
+        page.goto(f"{BASE_URL}/api/transistors/CREE_C3M0016120K/export/json")
 
         # Should trigger download or return JSON
         content = page.content()
@@ -149,17 +170,17 @@ class TestAPIEndpoints:
 class TestPlotEndpoints:
     """Test plot data endpoints."""
 
-    def test_channel_plot_endpoint(self, page: Page, base_url: str, server_process):
+    def test_channel_plot_endpoint(self, page: Page, server_process):
         """Test channel characteristics plot data."""
-        page.goto(f"{base_url}/api/plots/channel/CREE_C3M0016120K")
+        page.goto(f"{BASE_URL}/api/plots/channel/CREE_C3M0016120K")
 
         content = page.content()
         # Should return plot data or error
         assert "curves" in content or "error" in content or "not found" in content.lower()
 
-    def test_switching_plot_endpoint(self, page: Page, base_url: str, server_process):
+    def test_switching_plot_endpoint(self, page: Page, server_process):
         """Test switching losses plot data."""
-        page.goto(f"{base_url}/api/plots/switching/CREE_C3M0016120K")
+        page.goto(f"{BASE_URL}/api/plots/switching/CREE_C3M0016120K")
 
         content = page.content()
         # Should return plot data or error

@@ -16,5 +16,6 @@ deepdiff
 xmltodict
 fastapi
 uvicorn[standard]
+python-multipart
 playwright
 pytest-playwright
