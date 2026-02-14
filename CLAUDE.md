@@ -6,25 +6,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Transistor Database (TDB) is a Python package for managing power semiconductor transistor data (MOSFETs, SiC-MOSFETs, IGBTs, GaN) and exporting to simulation tools (GeckoCIRCUITS, PLECS, Simulink, MATLAB, LTSpice). Developed by LEA at University of Paderborn.
 
-**Status**: Transitioning from legacy monolith to clean architecture. The `core/` package is the source of truth for new development.
+**Status**: Clean architecture is wired and operational. The `core/` package is the source of truth, connected to legacy via bidirectional adapters.
 
-## Architecture (Two Layers)
+## Architecture
 
-### Primary: `core/` (clean architecture - all new code goes here)
+### Core layer (all new code goes here)
 ```
 transistordatabase/core/
-├── models.py        — Domain entities (Transistor, Switch, Diode, + 8 data classes)
+├── models.py        — Domain entities (Transistor, Switch, Diode, + 12 data classes)
 ├── services.py      — ABC interfaces (ICalculationService, IExportService, etc.)
-└── repository.py    — JSON/MongoDB persistence (JsonTransistorRepository)
+├── repository.py    — JSON persistence (JsonTransistorRepository, JsonTransistorLoader)
+└── adapters.py      — Bidirectional legacy ↔ core converters (legacy_to_core, core_to_legacy_dicts)
 
 transistordatabase/backend/
-├── __init__.py
-└── concrete_services.py  — Concrete implementations of core ABCs
+└── concrete_services.py  — Concrete implementations: Plotting, Calculation, Export,
+                            Validation, Comparison + ConcreteServiceFactory
 
 transistordatabase/frontend/
 ├── interfaces.py    — UI widget ABCs and controllers
 └── pyqt5_impl.py    — PyQt5 concrete implementations
+
+transistordatabase/gui_web/backend/
+└── main.py          — FastAPI REST API (CRUD, export, plot data endpoints)
+
+transistordatabase/gui/
+└── api_client.py    — REST client for PyQt5 GUI → FastAPI communication
 ```
+
+### Adapter Bridge Pattern
+Legacy and core are connected via `core/adapters.py`:
+- `legacy_to_core(legacy_transistor)` → core `Transistor`
+- `core_to_legacy_dicts(core_transistor)` → `(transistor_args, switch_args, diode_args)` for legacy constructor
+- `JsonTransistorLoader.load_from_json()` uses: JSON → numpy conversion → legacy Transistor → `legacy_to_core()`
+- Export services use: core Transistor → `core_to_legacy_dicts()` → legacy Transistor → legacy export method
+- `DatabaseManager.load_transistor_core()` returns core models directly
 
 ### Core Object Hierarchy (core/models.py)
 ```
@@ -58,14 +73,13 @@ Transistor
 - **`topologies/`** — Power converter topology analyzers (Bridgeless PFC, DAB, LLC, SRC-ZVS)
 - **`utils/ltspice_dpt.py`** — LTspice Double Pulse Test netlist generation and analysis
 
-### Legacy: root modules (deprecated, being migrated)
-- **`transistor.py`** — Monolithic Transistor class (2728 LOC, being migrated to core/)
+### Legacy root modules (still functional, bridged to core via adapters)
+- **`transistor.py`** — Monolithic Transistor class (used by export bridge)
 - **`data_classes.py`** — Legacy dataclasses (ChannelData, SwitchEnergyData, etc.)
-- **`database_manager.py`** — Legacy DatabaseManager (JSON + MongoDB modes)
-- **`helper_functions.py`** — Validation, CSV parsing (PyQt5 dependency removed)
-- **`helper_pdf.py`** — PDF export (PyQt5 isolated here)
-- **`gui/`** — PyQt5 desktop GUI (9600 LOC, being split into MVC)
-- **`gui_web/`** — Vue 3 + FastAPI web interface
+- **`database_manager.py`** — Legacy DatabaseManager with `load_transistor_core()` shim
+- **`helper_functions.py`** — Validation, CSV parsing (headless-safe)
+- **`gui/`** — PyQt5 desktop GUI with `api_client.py` for REST communication
+- **`gui_web/`** — Vue 3 + FastAPI web interface (wired to real services)
 
 ## Common Commands
 
@@ -77,7 +91,13 @@ Requires Python >= 3.10.
 
 ### Testing
 ```bash
-pytest tests/test_tdb_classes.py tests/test_database_manager.py -v
+pytest tests/ -q                   # Run all tests (~292 tests)
+pytest tests/test_core_services.py # Core backend services
+pytest tests/test_repository.py    # Repository + adapter bridge
+pytest tests/test_rest_api.py      # FastAPI endpoints (needs fastapi, httpx)
+pytest tests/test_adapters.py      # Legacy ↔ core roundtrip
+pytest tests/test_tdb_classes.py   # Legacy transistor classes
+pytest tests/test_database_manager.py  # Legacy DB manager
 ```
 Test framework: pytest. MongoDB mocking via `mongomock`.
 

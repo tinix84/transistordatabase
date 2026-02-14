@@ -4,7 +4,12 @@ from math import floor
 from scipy.interpolate import interpn
 from matplotlib.widgets import Cursor
 from decimal import Decimal
-from transistordatabase.gui.gui import MainWindow
+
+
+def _get_main_window():
+    """Deferred import to avoid circular dependency with gui.py."""
+    from transistordatabase.gui.gui import MainWindow
+    return MainWindow
 
 
 def new_annotation(axis):
@@ -110,7 +115,7 @@ def plot_all_energy_data(transistor, matplotlibwidget, switch_diode):
         else:
             matplotlibwidget.axis.clear()
             matplotlibwidget.figure.canvas.draw_idle()
-            MainWindow.show_popup_message(MainWindow, f"Switch energy i_e curves are not available for <b>{transistor.name}</b>!")
+            _get_main_window().show_popup_message(_get_main_window(), f"Switch energy i_e curves are not available for <b>{transistor.name}</b>!")
 
     if switch_diode == "diode":
         e_rr_i_e_curve_count = 0
@@ -150,7 +155,7 @@ def plot_all_energy_data(transistor, matplotlibwidget, switch_diode):
         else:
             matplotlibwidget.axis.clear()
             matplotlibwidget.figure.canvas.draw_idle()
-            MainWindow.show_popup_message(MainWindow, f"Diode reverse recovery energy i_e curves are not available for <b>{transistor.name}</b>!")
+            _get_main_window().show_popup_message(_get_main_window(), f"Diode reverse recovery energy i_e curves are not available for <b>{transistor.name}</b>!")
 
 def plot_all_energy_data_r_g(transistor, matplotlibwidget, switch_diode):
     """
@@ -215,7 +220,7 @@ def plot_all_energy_data_r_g(transistor, matplotlibwidget, switch_diode):
         else:
             matplotlibwidget.axis.clear()
             matplotlibwidget.figure.canvas.draw_idle()
-            MainWindow.show_popup_message(MainWindow, f"Switch energy r_e curves are not available for <b>{transistor.name}</b>!")
+            _get_main_window().show_popup_message(_get_main_window(), f"Switch energy r_e curves are not available for <b>{transistor.name}</b>!")
 
     if switch_diode == "diode":
         e_rr_r_e_curve_count = 0
@@ -256,7 +261,7 @@ def plot_all_energy_data_r_g(transistor, matplotlibwidget, switch_diode):
         else:
             matplotlibwidget.axis.clear()
             matplotlibwidget.figure.canvas.draw_idle()
-            MainWindow.show_popup_message(MainWindow, f"Diode reverse recovery energy r_e curves are not available for <b>{transistor.name}</b>!")
+            _get_main_window().show_popup_message(_get_main_window(), f"Diode reverse recovery energy r_e curves are not available for <b>{transistor.name}</b>!")
 
 
 def plot_all_channel_data(transistor, matplotlibwidget, switch_diode):
@@ -458,7 +463,7 @@ def plot_e_on(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
 
                 label = f"{transistor_list[m].name}, T_j = {t_j_available[0]}°C"
 
-                MainWindow.show_popup_message(MainWindow,
+                _get_main_window().show_popup_message(_get_main_window(),
                                               f"Switch energy i_e curve for <b>{transistor_list[m].name}</b> only available for T_j = "
                                               f"{t_j_available[0]}°C due to missing data!")
 
@@ -515,7 +520,7 @@ def plot_e_on(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
             matplotlibwidget.axis.plot(vec_i, vec_e_on, label=label, color=color_list[m])
 
         except:
-            MainWindow.show_popup_message(MainWindow, f"Switch energy i_e curve is not available for <b>{transistor_list[m].name}</b>!")
+            _get_main_window().show_popup_message(_get_main_window(), f"Switch energy i_e curve is not available for <b>{transistor_list[m].name}</b>!")
 
         try:
             matplotlibwidget.axis.legend(fontsize=5)
@@ -598,7 +603,7 @@ def plot_e_off(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_
 
                 label = f"{transistor_list[m].name}, T_j = {t_j_available[0]}°C"
 
-                MainWindow.show_popup_message(MainWindow, f"Switch energy i_e curve for <b>{transistor_list[m].name}</b> "
+                _get_main_window().show_popup_message(_get_main_window(), f"Switch energy i_e curve for <b>{transistor_list[m].name}</b> "
                                                           f"only available for T_j = {t_j_available[0]}°C due to missing data!")
 
             else:
@@ -658,7 +663,7 @@ def plot_e_off(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_
             matplotlibwidget.axis.plot(vec_i, vec_e_off, label=label, color=color_list[m])
 
         except:
-            MainWindow.show_popup_message(MainWindow, f"Switch energy i_e curve is not available for <b>{transistor_list[m].name}</b>!")
+            _get_main_window().show_popup_message(_get_main_window(), f"Switch energy i_e curve is not available for <b>{transistor_list[m].name}</b>!")
 
         try:
             matplotlibwidget.axis.legend(fontsize=5)
@@ -740,7 +745,7 @@ def plot_e_rr(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
                     vec_i = transistor_list[m].wp.e_rr.graph_i_e[0]
 
                 label = f"{transistor_list[m].name}, T_j = {t_j_available[0]}°C"
-                MainWindow.show_popup_message(MainWindow, f"Diode energy i_e curve for <b>{transistor_list[m].name}</b> only available for "
+                _get_main_window().show_popup_message(_get_main_window(), f"Diode energy i_e curve for <b>{transistor_list[m].name}</b> only available for "
                                                           f"T_j = {t_j_available[0]}°C due to missing data!")
 
             else:
@@ -790,7 +795,7 @@ def plot_e_rr(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
             matplotlibwidget.axis.plot(vec_i, vec_e_rr, label=label, color=color_list[m])
 
         except:
-            MainWindow.show_popup_message(MainWindow, f"Diode energy i_e curve is not available for <b>{transistor_list[m].name}</b>!")
+            _get_main_window().show_popup_message(_get_main_window(), f"Diode energy i_e curve is not available for <b>{transistor_list[m].name}</b>!")
 
         try:
             matplotlibwidget.axis.legend(fontsize=5)
@@ -869,7 +874,7 @@ def plot_channel(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, 
                     vec_v = transistor_list[m].wp.switch_channel.graph_v_i[0]
                     vec_i = transistor_list[m].wp.switch_channel.graph_v_i[1]
                     label = f"{transistor_list[m]}, T_j = {t_j_available[0]}"
-                    MainWindow.show_popup_message(MainWindow, f"Switch channel v_i curve for <b>{transistor_list[m].name}</b> only available for T_j = "
+                    _get_main_window().show_popup_message(_get_main_window(), f"Switch channel v_i curve for <b>{transistor_list[m].name}</b> only available for T_j = "
                                                               f"{t_j_available[0]}°C due to missing data!")
 
                 else:
@@ -906,7 +911,7 @@ def plot_channel(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, 
                 matplotlibwidget.axis.plot(vec_v, vec_i, label=label, color=color_list[m])
 
             except:
-                MainWindow.show_popup_message(MainWindow, f"Switch channel v_i curve is not available for <b>{transistor_list[m].name}</b>!")
+                _get_main_window().show_popup_message(_get_main_window(), f"Switch channel v_i curve is not available for <b>{transistor_list[m].name}</b>!")
 
     elif switch_diode == "diode":
         for m in range(len(transistor_list)):
@@ -933,7 +938,7 @@ def plot_channel(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, 
                     vec_v = transistor_list[m].wp.switch_channel.graph_v_i[0]
                     vec_i = transistor_list[m].wp.switch_channel.graph_v_i[1]
                     label = f"{transistor_list[m]}, T_j = {t_j_available[0]}"
-                    MainWindow.show_popup_message(MainWindow,
+                    _get_main_window().show_popup_message(_get_main_window(),
                                                   f"Diode channel v_i curve for <b>{transistor_list[m].name}</b> only available for T_j = "
                                                   f"{t_j_available[0]}°C due to missing data!")
 
@@ -971,7 +976,7 @@ def plot_channel(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, 
                 matplotlibwidget.axis.plot(vec_v, vec_i, label=label, color=color_list[m])
 
             except:
-                MainWindow.show_popup_message(MainWindow, f"Diode channel v_i curve is not available for <b>{transistor_list[m].name}</b>!")
+                _get_main_window().show_popup_message(_get_main_window(), f"Diode channel v_i curve is not available for <b>{transistor_list[m].name}</b>!")
 
     try:
         matplotlibwidget.axis.legend(fontsize=5)
@@ -1013,7 +1018,7 @@ def plot_v_eoss(transistor1, transistor2, transistor3, matplotlibwidget):
             matplotlibwidget.axis.plot(v_eoss[0], v_eoss[1], label=transistor_list[m].name, color=color_list[m])
         except:
             pass
-            MainWindow.show_popup_message(MainWindow, f"Output capacitance energy curves are not available for <b>{transistor_list[m].name}</b>!")
+            _get_main_window().show_popup_message(_get_main_window(), f"Output capacitance energy curves are not available for <b>{transistor_list[m].name}</b>!")
 
     try:
         matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
@@ -1058,7 +1063,7 @@ def plot_v_qoss(transistor1, transistor2, transistor3, matplotlibwidget):
             matplotlibwidget.axis.plot(v_qoss[0], v_qoss[1], label=transistor_list[m].name, color=color_list[m])
 
         except:
-            MainWindow.show_popup_message(MainWindow, f"Output capacitance charge curves are not available for <b>{transistor_list[m].name}</b>!")
+            _get_main_window().show_popup_message(_get_main_window(), f"Output capacitance charge curves are not available for <b>{transistor_list[m].name}</b>!")
 
     try:
         matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))

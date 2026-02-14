@@ -2,7 +2,7 @@
 # Python standard libraries
 from __future__ import annotations
 from matplotlib import pyplot as plt
-from typing import Dict, Union, List, Optional, Any
+from typing import Dict, Union, List, Optional
 from dataclasses import dataclass, field
 
 from datetime import datetime
@@ -14,15 +14,8 @@ from transistordatabase.checker_functions import check_float
 from transistordatabase.helper_functions import isvalid_dict, get_img_raw_data
 
 
-def convert_to_dict(obj) -> dict:
-    """
-    Convert an object into dict datatype.
-
-    :param obj: The object to convert
-    :type obj: Any
-    :return: Object of dict type
-    :rtype: dict
-    """
+def _obj_to_dict(obj) -> dict:
+    """Convert an object into dict datatype, converting numpy arrays to lists."""
     d = dict(vars(obj))
     for att_key in d:
         if isinstance(d[att_key], np.ndarray):
@@ -61,7 +54,7 @@ class GateChargeCurve:
         :return: GateChargeCurve object of dict type
         :rtype: dict
         """
-        return convert_to_dict(self)
+        return _obj_to_dict(self)
 
     def get_plots(self, ax=None):
         """
@@ -111,7 +104,7 @@ class SOA:
         :return: SOA object of dict type
         :rtype: dict
         """
-        return convert_to_dict(self)
+        return _obj_to_dict(self)
 
     def get_plots(self, ax=None):
         """
@@ -166,7 +159,7 @@ class TemperatureDependResistance:
         :return: TemperatureDependResistance object of dict type
         :rtype: dict
         """
-        return convert_to_dict(self)
+        return _obj_to_dict(self)
 
     def get_plots(self, ax=None):
         """
@@ -217,7 +210,7 @@ class EffectiveOutputCapacitance:
         :return: EffectiveOutputCapacitance object of dict type
         :rtype: dict
         """
-        return convert_to_dict(self)
+        return _obj_to_dict(self)
 
     # ToDO: To be implemented for future boundary conditions in virtual datasheet
     def collect_data(self):
@@ -339,29 +332,7 @@ class SwitchEnergyData:
         :return: SwitchEnergyData object of dict type
         :rtype: dict
         """
-        return convert_to_dict(self)
-
-    def plot_graph(self) -> None:
-        """
-        Plot switch / diode energy curve characteristics (either from graph_i_e or graph_r_e dataset).
-
-        :return: Respective plots are displayed
-        :rtype: None
-        """
-        plt.figure()
-        if self.dataset_type == 'graph_i_e':
-            label = f"v_g = {self.v_g} V, v_supply = {self.v_supply} V, r_g = {self.r_g} Ohm, t_j = {self.t_j} °C"
-            plt.plot(self.graph_i_e[0], self.graph_i_e[1], label=label)
-            plt.xlabel('current in A')
-        elif self.dataset_type == 'graph_r_e':
-            label = f"v_g = {self.v_g} V, v_supply = {self.v_supply} V, i_x = {self.i_x} Ohm, t_j = {self.t_j} °C"
-            plt.plot(self.graph_r_e[0], self.graph_r_e[1], label=label)
-            plt.xlabel('r_g in Ohm')
-
-        plt.legend()
-        plt.grid()
-        plt.ylabel('Energy in J')
-        plt.show()
+        return _obj_to_dict(self)
 
     def copy(self):
         """
@@ -422,23 +393,7 @@ class ChannelData:
         :return: ChannelData object of dict type
         :rtype: dict
         """
-        return convert_to_dict(self)
-
-    def plot_graph(self) -> None:
-        """
-        Plot the channel curve v_i characteristics called by using any ChannelData object.
-
-        :return: Respective plots are displayed
-        :rtype: None
-        """
-        plt.figure()
-        label = f"v_g = {self.v_g} V, t_j = {self.t_j} °C"
-        plt.plot(self.graph_v_i[0], self.graph_v_i[1], label=label)
-        plt.legend()
-        plt.grid()
-        plt.xlabel('Voltage in V')
-        plt.ylabel('Current in A')
-        plt.show()
+        return _obj_to_dict(self)
 
 class LinearizedModel:
     """
@@ -506,7 +461,7 @@ class VoltageDependentCapacitance:
         :return: VoltageDependentCapacitance object of dict type
         :rtype: dict
         """
-        return convert_to_dict(self)
+        return _obj_to_dict(self)
 
     def get_plots(self, ax=None, label=None):
         """
@@ -597,7 +552,7 @@ class FosterThermalModel:
         :return: FosterThermalModel of dict type
         :rtype: dict
         """
-        return convert_to_dict(self)
+        return _obj_to_dict(self)
 
     def get_plots(self, buffer_req: bool = False):
         """
@@ -716,358 +671,3 @@ class RawMeasurementData:
         d['dpt_off_vds'] = [c.tolist() for c in self.dpt_off_vds]
         d['dpt_off_id'] = [c.tolist() for c in self.dpt_off_id]
         return d
-    
-    def dpt_calculate_energies(self, integration_interval: str, dataset_type: str, energies: str, mode: str):
-        """
-        Import double pulse measurements and calculates switching losses to each given working point.
-
-        [1] options for the integration interval are based on following paper:
-        Link: https://ieeexplore.ieee.org/document/8515553
-
-        :param integration_interval: calculation standards for switching losses
-        :type integration_interval: str
-        :param dataset_type: defines what measurement set should should be calculated
-        :type dataset_type: str
-        :param energies: defines which switching energies should be calculated
-        :type energies: str
-
-
-        """
-        # if integration_interval == 'IEC 60747-9':
-        #     off_vds_limit = 0.1
-        #     off_is_limit = 0.02
-        #     on_vds_limit = 0.02
-        #     on_is_limit = 0.1
-        # elif integration_interval == 'Mitsubishi':
-        #     off_vds_limit = 0.1
-        #     off_is_limit = 0.1
-        #     on_vds_limit = 0.1
-        #     on_is_limit = 0.1
-        # elif integration_interval == 'Infineon':
-        #     off_vds_limit = 0.1
-        #     off_is_limit = 0.02
-        #     on_vds_limit = 0.02
-        #     on_is_limit = 0.1
-        # elif integration_interval == 'Wolfspeed':
-        #     off_vds_limit = 0
-        #     off_is_limit = -0.1
-        #     on_vds_limit = -0.1
-        #     on_is_limit = 0
-        # else:
-        #     off_vds_limit = 0.1
-        #     off_is_limit = 0.1
-        #     on_vds_limit = 0.1
-        #     on_is_limit = 0.1
-
-        # Define a dictionary to map integration_interval to their corresponding limits
-        limits = {
-            'IEC 60747-9': {'off_vds_limit': 0.1, 'off_is_limit': 0.02, 'on_vds_limit': 0.02, 'on_is_limit': 0.1},
-            'Mitsubishi': {'off_vds_limit': 0.1, 'off_is_limit': 0.1, 'on_vds_limit': 0.1, 'on_is_limit': 0.1},
-            'Infineon': {'off_vds_limit': 0.1, 'off_is_limit': 0.02, 'on_vds_limit': 0.02, 'on_is_limit': 0.1},
-            'Wolfspeed': {'off_vds_limit': 0, 'off_is_limit': -0.1, 'on_vds_limit': -0.1, 'on_is_limit': 0},
-        }
-
-        # Set default limits
-        default_limits = {'off_vds_limit': 0.1, 'off_is_limit': 0.1, 'on_vds_limit': 0.1, 'on_is_limit': 0.1}
-
-        # Get the limits based on the integration_interval, or use the default limits if not found
-        selected_limits = limits.get(integration_interval, default_limits)
-        off_vds_limit = selected_limits['off_vds_limit']
-        off_is_limit = selected_limits['off_is_limit']
-        on_vds_limit = selected_limits['on_vds_limit']
-        on_is_limit = selected_limits['on_is_limit']
-
-        label_x_plot = 'Id / A'
-
-        if dataset_type == 'graph_r_e':
-            label_x_plot = 'Ron / Ohm'
-
-        if energies == 'e_off' or energies == 'both':
-
-            sample_point = 0
-            measurement_points = len(self.dpt_off_id)
-            e_off = []
-            dv_dt_off = []
-            di_dt_off = []
-            time_correction = 0
-            time_input = 0
-
-            while measurement_points > sample_point:
-                # Load Uds and Id pairs in increasing order
-                vds_temp = self.dpt_off_vds[sample_point]
-                id_temp = self.dpt_off_id[sample_point]
-
-                sample_length = len(vds_temp)
-                sample_interval = abs(vds_temp[1, 0] - vds_temp[2, 0])
-                avg_interval = int(sample_length * 0.05)
-
-                vds_avg_max = 0
-                id_avg_max = 0
-
-                ##############################
-                # Find the max. Id in steady state
-                ##############################
-                i = 0
-                while i <= avg_interval:
-                    id_avg_max = id_avg_max + id_temp[i, 1] / avg_interval
-                    i += 1
-
-                ##############################
-                # Find the max. Uds in steady state
-                ##############################
-                i = 0
-                while i <= avg_interval:
-                    vds_avg_max = vds_avg_max + vds_temp[(sample_length - 1 - i), 1] / avg_interval
-                    i += 1
-
-                ##############################
-                # Find the starting point of the Eoff integration
-                # i equals the lower integration limit
-                ##############################
-                i = 0
-                e_off_temp = 0
-                while vds_temp[i, 1] < (vds_avg_max * off_vds_limit):
-                    i += 1
-
-                lower_integration_limit = i
-
-                # calculate di/dt, dv/dt
-                di_dt_counter_low = 0
-                while id_temp[di_dt_counter_low, 1] > (id_avg_max * 0.8):
-                    di_dt_counter_low += 1
-
-                di_dt_counter_high = di_dt_counter_low
-                while id_temp[di_dt_counter_high, 1] > (id_avg_max * 0.2):
-                    di_dt_counter_high += 1
-
-                dv_dt_counter_low = 0
-                while vds_temp[dv_dt_counter_low, 1] < (vds_avg_max * 0.2):
-                    dv_dt_counter_low += 1
-
-                dv_dt_counter_high = dv_dt_counter_low
-                while vds_temp[dv_dt_counter_high, 1] < (vds_avg_max * 0.8):
-                    dv_dt_counter_high += 1
-
-                ##############################
-                # Integrate the power with predefined integration limits
-                ##############################
-                while id_temp[i - time_correction, 1] >= (id_avg_max * off_is_limit):
-                    e_off_temp = e_off_temp + (vds_temp[i, 1] * id_temp[i - time_correction, 1] * sample_interval)
-                    i += 1
-
-                upper_integration_limit = i
-
-                if mode == 'analyze':
-                    text1 = f"E_off = {(e_off_temp * 1000000).round(2)} µJ, time correction = {(time_correction * sample_interval * 1000000000).round(2)} ns"
-                    text2 = f"Integration time = {((id_temp[upper_integration_limit, 0] - id_temp[lower_integration_limit, 0]) * 1000000000).round(2)} ns"
-                    fig, ax1 = plt.subplots()
-                    ax1.set_xlabel("t / ns")
-                    ax1.set_ylabel("Id / A", color='r')
-                    ax1.plot(((id_temp[:, 0] * 1000000000) + int(time_input)), id_temp[:, 1], color='r')
-                    plt.axvline(id_temp[upper_integration_limit, 0] * 1000000000, color='green', linestyle='dotted',
-                                linewidth=2)
-                    plt.axvline(id_temp[lower_integration_limit, 0] * 1000000000, color='green', linestyle='dotted',
-                                linewidth=2)
-                    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-                    ax1.text(0.02, 1.05, text1, transform=ax1.transAxes, fontsize=12,
-                             verticalalignment='bottom', horizontalalignment='left', bbox=props)
-                    ax1.text(0.02, .5, text2, transform=ax1.transAxes, fontsize=12,
-                             verticalalignment='center', horizontalalignment='left', bbox=props)
-                    plt.grid(axis='both', color='grey', linestyle='--', linewidth=1)
-                    ax2 = ax1.twinx()
-                    ax2.set_ylabel('Uds / V', color='b')
-                    ax2.plot(vds_temp[:, 0] * 1000000000, vds_temp[:, 1], color='b')
-                    plt.show()
-                    time_input = input('Please give a value for time correction in ns')
-                    if check_float(time_input):
-                        time_correction = int(float(time_input) / (sample_interval * 1000000000))
-                        continue
-                    else:
-                        time_correction = 0
-                        time_input = 0
-
-                if dataset_type == 'graph_r_e':
-                    e_off.append([self.r_g[sample_point], e_off_temp])
-                else:
-                    e_off.append([id_avg_max, e_off_temp])
-
-                di_dt_off.append((id_temp[di_dt_counter_high, 1] - id_temp[di_dt_counter_low, 1]) / (
-                    abs(id_temp[di_dt_counter_high, 0] - id_temp[di_dt_counter_low, 0]) * 1000000000))
-                dv_dt_off.append((vds_temp[dv_dt_counter_high, 1] - vds_temp[lower_integration_limit, 1]) / (
-                    abs(vds_temp[dv_dt_counter_high, 0] - vds_temp[lower_integration_limit, 0]) * 1000000000))
-
-                sample_point += 1
-
-            e_off_0 = [item[0] for item in e_off]
-            e_off_1 = [item[1] for item in e_off]
-
-            e_off_meas = {
-                'dataset_type': dataset_type,
-                't_j': self.t_j,
-                'load_inductance': self.load_inductance,
-                'commutation_inductance': self.commutation_inductance,
-                'commutation_device': self.commutation_device,
-                'comment': self.comment,
-                'measurement_date': self.measurement_date,
-                'measurement_testbench': self.measurement_testbench,
-                'v_supply': self.v_supply,
-                'v_g': self.v_g,
-                'v_g_off': self.v_g_off,
-                'r_g': self.r_g,
-                'r_g_off': self.r_g_off,
-                'graph_i_e': np.array([e_off_0, e_off_1]),
-                'graph_r_e': np.array([e_off_0, e_off_1]),
-                'e_x': float(e_off_1[0]),
-                'i_x': id_avg_max,
-                'di_dt': di_dt_off,
-                'dv_dt': dv_dt_off}
-
-            ##############################
-            # Plot Eoff
-            ##############################
-            x = [sub[0] for sub in e_off]
-            y = [sub[1] * 1000000 for sub in e_off]
-            fig, ax1 = plt.subplots()
-            color = 'tab:red'
-            ax1.set_xlabel(label_x_plot)
-            ax1.set_ylabel("Eoff / µJ", color=color)
-            ax1.plot(x, y, marker='o', color=color)
-            plt.grid('both')
-            plt.show(block=True)
-
-        if energies == 'e_on' or energies == 'both':
-
-            sample_point = 0
-            measurement_points = len(self.dpt_on_id)
-            e_on = []
-            dv_dt_on = []
-            di_dt_on = []
-            time_correction = 0
-            time_input = 0
-
-            while measurement_points > sample_point:
-                # Load Uds and Id pairs in increasing order
-                vds_temp = self.dpt_on_vds[sample_point]
-                id_temp = self.dpt_on_id[sample_point]
-
-                sample_length = len(vds_temp)
-                sample_interval = abs(vds_temp[1, 0] - vds_temp[2, 0])
-                avg_interval = int(sample_length * 0.05)
-                vds_avg_max = 0
-                id_avg_max = 0
-
-                ##############################
-                # Find the max. Id in steady state
-                ##############################
-                i = 0
-                while i <= avg_interval:
-                    id_avg_max = id_avg_max + (id_temp[(sample_length - 3 - i), 1] / avg_interval)
-                    i += 1
-
-                ##############################
-                # Find the max. Uds in steady state
-                ##############################
-                i = 0
-                while i <= avg_interval:
-                    vds_avg_max = vds_avg_max + (vds_temp[i, 1] / avg_interval)
-                    i += 1
-
-                ##############################
-                # Find the starting point of the Eon integration
-                # i equals the lower integration limit
-                ##############################
-                i = 0
-                e_on_temp = 0
-                while id_temp[i, 1] < (id_avg_max * on_is_limit):
-                    i += 1
-
-                lower_integration_limit = i
-
-                ##############################
-                # Integrate the power with predefined integration limits
-                ##############################
-                while vds_temp[i - time_correction, 1] >= (vds_avg_max * on_vds_limit):
-                    e_on_temp = e_on_temp + (vds_temp[i - time_correction, 1] * id_temp[i, 1] * sample_interval)
-                    i += 1
-
-                upper_integration_limit = i
-
-                if mode == 'analyze':
-                    text1 = f"E_on = {(e_on_temp * 1000000).round(2)} µJ, time correction = {(time_correction * sample_interval * 1000000000).round(2)} ns"
-                    text2 = f"Integration time = {((id_temp[upper_integration_limit, 0] - id_temp[lower_integration_limit, 0]) * 1000000000).round(2)} ns"
-                    fig, ax1 = plt.subplots()
-                    ax1.set_xlabel("t / ns")
-                    ax1.set_ylabel("Id / A", color='r')
-                    ax1.plot(id_temp[:, 0] * 1000000000, id_temp[:, 1], color='r')
-                    plt.axvline(id_temp[upper_integration_limit, 0] * 1000000000, color='green', linestyle='dotted',
-                                linewidth=2)
-                    plt.axvline(id_temp[lower_integration_limit, 0] * 1000000000, color='green', linestyle='dotted',
-                                linewidth=2)
-                    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-                    ax1.text(0.02, 1.05, text1, transform=ax1.transAxes, fontsize=12,
-                             verticalalignment='bottom', horizontalalignment='left', bbox=props)
-                    ax1.text(0.02, .5, text2, transform=ax1.transAxes, fontsize=12,
-                             verticalalignment='center', horizontalalignment='left', bbox=props)
-                    plt.grid(axis='both', color='grey', linestyle='--', linewidth=1)
-                    ax2 = ax1.twinx()
-                    ax2.set_ylabel('Uds / V', color='b')
-                    ax2.plot(vds_temp[:, 0] * 1000000000 + int(time_input), vds_temp[:, 1], color='b')
-                    plt.show()
-                    time_input = input('Please give a value for time correction in ns')
-                    if time_input.isnumeric():
-                        time_correction = int(int(time_input) / (sample_interval * 1000000000))
-                        continue
-                    else:
-                        time_correction = 0
-                        time_input = 0
-
-                if dataset_type == 'graph_r_e':
-                    e_on.append([self.r_g[sample_point], e_on_temp])
-                else:
-                    e_on.append([id_avg_max, e_on_temp])
-
-                dv_dt_on.append((vds_temp[dv_dt_counter_high, 1] - vds_temp[dv_dt_counter_low, 1]) / (
-                    abs(vds_temp[dv_dt_counter_high, 0] - vds_temp[dv_dt_counter_low, 0]) * 1000000000))
-                di_dt_on.append((id_temp[di_dt_counter_high, 1] - id_temp[di_dt_counter_low, 1]) / (
-                    abs(vds_temp[di_dt_counter_high, 0] - vds_temp[di_dt_counter_low, 0]) * 1000000000))
-                sample_point += 1
-
-            e_on_0 = [item[0] for item in e_on]
-            e_on_1 = [item[1] for item in e_on]
-
-            e_on_meas = {
-                'dataset_type': dataset_type,
-                't_j': self.t_j,
-                'load_inductance': self.load_inductance,
-                'commutation_inductance': self.commutation_inductance,
-                'commutation_device': self.commutation_device,
-                'comment': self.comment,
-                'measurement_date': self.measurement_date,
-                'measurement_testbench': self.measurement_testbench,
-                'v_supply': self.v_supply,
-                'v_g': self.v_g,
-                'v_g_off': self.v_g_off,
-                'r_g': self.r_g,
-                'r_g_off': self.r_g_off,
-                'graph_i_e': np.array([e_on_0, e_on_1]),
-                'graph_r_e': np.array([e_on_0, e_on_1]),
-                'e_x': float(e_on_1[0]),
-                'i_x': id_avg_max,
-                'dv_dt': dv_dt_on,
-                'di_dt': di_dt_on}
-
-            ##############################
-            # Plot Eon
-            ##############################
-            x = [sub[0] for sub in e_on]
-            y = [sub[1] * 1000000 for sub in e_on]
-            fig, ax1 = plt.subplots()
-            color = 'tab:red'
-            ax1.set_xlabel(label_x_plot)
-            ax1.set_ylabel("Eon / µJ", color=color)
-            ax1.plot(x, y, marker='o', color=color)
-            plt.grid('both')
-            plt.show(block=True)
-
-        dpt_dict = {'e_off_meas': e_off_meas, 'e_on_meas': e_on_meas}
-        return dpt_dict

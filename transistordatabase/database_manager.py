@@ -39,10 +39,13 @@ class DatabaseManager:
 
     module_manufacturers_file_path: str
     housing_types_file_path: str
-    
+
+    _core_repo: Optional[object]
+
     def __init__(self, housing_types_file_path: str = None, module_manufacturers_file_path: str = None):
         self.operation_mode = None
         self.tdb_directory = os.path.dirname(os.path.abspath(__file__))
+        self._core_repo = None
 
         # Load housing_types and module_manufacturers
         if housing_types_file_path is None:
@@ -210,6 +213,42 @@ class DatabaseManager:
             return self.convert_dict_to_transistor_object(self.mongodb_collection.find_one({"name": transistor_name}))
 
         return None
+
+    @property
+    def core_repository(self):
+        """Get a core ``JsonTransistorRepository`` backed by the JSON folder.
+
+        Lazily creates the repository on first access.  Only valid when
+        operation mode is JSON.
+
+        :return: A ``JsonTransistorRepository`` instance.
+        :rtype: JsonTransistorRepository
+        """
+        if self._core_repo is None:
+            from transistordatabase.core.repository import JsonTransistorRepository
+            from pathlib import Path
+            if self.operation_mode != OperationMode.JSON:
+                raise RuntimeError("core_repository is only supported in JSON mode.")
+            self._core_repo = JsonTransistorRepository(Path(self.json_folder))
+        return self._core_repo
+
+    def load_transistor_core(self, transistor_name: str):
+        """Load a transistor and return it as a core ``Transistor`` model.
+
+        This is the preferred way to obtain a core model from the database.
+        The legacy ``load_transistor()`` method is left unchanged for backward
+        compatibility.
+
+        :param transistor_name: Name of the transistor.
+        :type transistor_name: str
+        :return: Core Transistor object, or None if not found.
+        :rtype: core.Transistor | None
+        """
+        from transistordatabase.core.adapters import legacy_to_core
+        legacy = self.load_transistor(transistor_name)
+        if legacy is None:
+            return None
+        return legacy_to_core(legacy)
 
     def get_transistor_names_list(self) -> List[str]:
         """

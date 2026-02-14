@@ -9,11 +9,13 @@ from __future__ import annotations
 import csv
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Any, Dict, List
 
 import numpy as np
 
+from transistordatabase.core.adapters import core_to_legacy_dicts
 from transistordatabase.core.models import (
     FosterThermalModel,
     Transistor,
@@ -27,6 +29,37 @@ from transistordatabase.core.services import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _load_data_file(filename: str) -> list[str]:
+    """Load lines from a data file in the transistordatabase/data/ directory."""
+    data_dir = Path(__file__).resolve().parent.parent / "data"
+    file_path = data_dir / filename
+    items: list[str] = []
+    with open(file_path) as f:
+        for line in f.read().splitlines():
+            if line.startswith("#") or line.isspace() or not line:
+                continue
+            items.append(str(line))
+    return items
+
+
+def _build_legacy_transistor(transistor: Transistor):
+    """Convert a core Transistor to a legacy Transistor via the adapter.
+
+    :param transistor: Core Transistor object.
+    :return: Legacy ``transistordatabase.transistor.Transistor`` object.
+    """
+    from transistordatabase.transistor import Transistor as LegacyTransistor
+
+    t_args, sw_args, di_args = core_to_legacy_dicts(transistor)
+    housing_types = _load_data_file("housing_types.txt")
+    manufacturers = _load_data_file("module_manufacturers.txt")
+    return LegacyTransistor(
+        t_args, sw_args, di_args,
+        possible_housing_types=housing_types,
+        possible_module_manufacturers=manufacturers,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -450,22 +483,94 @@ class ExportService(IExportService):
         self, transistor: Transistor, output_path: Path,
         template_config: dict[str, Any] | None = None,
     ) -> None:
-        """Export transistor to PLECS format."""
-        raise NotImplementedError("PLECS export not yet implemented in backend")
+        """Export transistor to PLECS XML format.
+
+        Bridges through the adapter to use the legacy PLECS exporter which
+        relies on Jinja2 templates.
+
+        :param transistor: Core Transistor object.
+        :param output_path: Directory to write the XML files into.
+        :param template_config: Optional config with ``recheck`` (bool) and
+            ``gate_voltages`` (list of 4 floats: v_g_on, v_g_off, v_d_on,
+            v_d_off).
+        """
+        legacy = _build_legacy_transistor(transistor)
+        out = Path(output_path)
+        out.mkdir(parents=True, exist_ok=True)
+        cwd = os.getcwd()
+        try:
+            os.chdir(out)
+            recheck = True
+            gate_voltages = None
+            if template_config:
+                recheck = template_config.get('recheck', True)
+                gate_voltages = template_config.get('gate_voltages')
+            legacy.export_plecs(recheck=recheck, gate_voltages=gate_voltages)
+        finally:
+            os.chdir(cwd)
 
     def export_to_matlab(self, transistor: Transistor, output_path: Path) -> None:
-        """Export transistor to MATLAB format."""
-        raise NotImplementedError("MATLAB export not yet implemented in backend")
+        """Export transistor data to MATLAB .mat format.
+
+        :param transistor: Core Transistor object.
+        :param output_path: Directory to write the .mat file into.
+        """
+        legacy = _build_legacy_transistor(transistor)
+        out = Path(output_path)
+        out.mkdir(parents=True, exist_ok=True)
+        cwd = os.getcwd()
+        try:
+            os.chdir(out)
+            legacy.export_matlab()
+        finally:
+            os.chdir(cwd)
 
     def export_to_ltspice(self, transistor: Transistor, output_path: Path) -> None:
-        """Export transistor to LTSpice format."""
-        raise NotImplementedError("LTSpice export not yet implemented in backend")
+        """Export transistor to LTSpice DPT netlist.
+
+        Uses the ``LTspiceDPT`` utility from ``utils/ltspice_dpt.py`` which
+        works directly with core models.
+
+        :param transistor: Core Transistor object.
+        :param output_path: Directory or file path for the netlist.
+        """
+        from transistordatabase.utils.ltspice_dpt import DPTConfig, LTspiceDPT
+
+        config = DPTConfig(
+            v_dc=transistor.electrical_ratings.v_abs_max / 2,
+            i_target=transistor.electrical_ratings.i_cont,
+        )
+        dpt = LTspiceDPT(config)
+        dpt.generate_netlist(output_path, transistor=transistor)
 
     def export_to_gecko_circuits(
         self, transistor: Transistor, export_params: Dict[str, Any]
     ) -> Path:
-        """Export transistor to GeckoCIRCUITS format."""
-        raise NotImplementedError("GeckoCIRCUITS export not yet implemented")
+        """Export transistor to GeckoCIRCUITS .scl format.
+
+        :param transistor: Core Transistor object.
+        :param export_params: Dict with optional keys: ``recheck`` (bool),
+            ``v_supply``, ``v_g_on``, ``v_g_off``, ``r_g_on``, ``r_g_off``
+            (all float), and ``output_path`` (str or Path).
+        :return: Path to the output directory.
+        """
+        legacy = _build_legacy_transistor(transistor)
+        out_dir = Path(export_params.get('output_path', '.'))
+        out_dir.mkdir(parents=True, exist_ok=True)
+        cwd = os.getcwd()
+        try:
+            os.chdir(out_dir)
+            legacy.export_geckocircuits(
+                recheck=export_params.get('recheck', True),
+                v_supply=export_params.get('v_supply'),
+                v_g_on=export_params.get('v_g_on'),
+                v_g_off=export_params.get('v_g_off'),
+                r_g_on=export_params.get('r_g_on'),
+                r_g_off=export_params.get('r_g_off'),
+            )
+        finally:
+            os.chdir(cwd)
+        return out_dir
 
 
 # ---------------------------------------------------------------------------

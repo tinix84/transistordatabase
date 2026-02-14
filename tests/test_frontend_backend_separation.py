@@ -437,5 +437,121 @@ class TestArchitecturalSeparation:
         assert hasattr(validation_service, 'check_data_completeness')
 
 
+class TestExportServiceBridge:
+    """Test export service bridge to legacy via adapter."""
+
+    @pytest.fixture()
+    def rich_transistor(self):
+        """Create a transistor with channel and switching data for export tests."""
+        import numpy as np
+        from transistordatabase.core.models import (
+            ChannelCharacteristics,
+            SwitchingLossData,
+        )
+
+        metadata = TransistorMetadata(
+            name="Test_IGBT_Export",
+            type="IGBT",
+            manufacturer="Fuji Electric",
+            housing_type="TO247",
+            author="test_author",
+        )
+        electrical = ElectricalRatings(
+            v_abs_max=600, i_abs_max=100, i_cont=50, t_j_max=175,
+        )
+        thermal = ThermalProperties(
+            housing_area=367e-6, cooling_area=160e-6,
+            r_th_cs=0.05, r_th_switch_cs=0, r_th_diode_cs=0,
+        )
+        t = Transistor(metadata=metadata, electrical=electrical, thermal=thermal)
+
+        graph_v_i = np.array([
+            [0, 0.6, 0.8, 1.0, 1.2],
+            [0, 1e-03, 10, 30, 60],
+        ])
+        graph_i_e = np.array([
+            [0, 20, 40, 60, 80, 100],
+            [0, 5e-04, 1e-03, 1.5e-03, 2e-03, 2.5e-03],
+        ])
+
+        t.switch.channel_data = [
+            ChannelCharacteristics(t_j=25, graph_v_i=graph_v_i, v_g=15),
+        ]
+        t.switch.e_on_data = [
+            SwitchingLossData(
+                dataset_type='graph_i_e', t_j=25, v_supply=400,
+                v_g=15, r_g=1, graph_i_e=graph_i_e,
+            ),
+        ]
+        t.switch.e_off_data = [
+            SwitchingLossData(
+                dataset_type='graph_i_e', t_j=25, v_supply=400,
+                v_g=-15, r_g=1, graph_i_e=graph_i_e,
+            ),
+        ]
+        t.diode.channel_data = [
+            ChannelCharacteristics(t_j=25, graph_v_i=graph_v_i),
+        ]
+        t.diode.e_rr_data = [
+            SwitchingLossData(
+                dataset_type='graph_i_e', t_j=25, v_supply=400,
+                v_g=15, r_g=1, graph_i_e=graph_i_e,
+            ),
+        ]
+        return t
+
+    def test_export_to_ltspice(self, rich_transistor, tmp_path):
+        """LTSpice export generates a netlist file."""
+        export_service = ExportService()
+        export_service.export_to_ltspice(rich_transistor, tmp_path)
+
+        netlist_files = list(tmp_path.glob("*.asc"))
+        assert len(netlist_files) == 1
+        content = netlist_files[0].read_text()
+        assert "Double Pulse Test" in content
+
+    def test_export_to_matlab(self, rich_transistor, tmp_path):
+        """MATLAB export generates a .mat file."""
+        export_service = ExportService()
+        export_service.export_to_matlab(rich_transistor, tmp_path)
+
+        mat_files = list(tmp_path.glob("*.mat"))
+        assert len(mat_files) == 1
+
+    def test_export_to_gecko_circuits(self, rich_transistor, tmp_path):
+        """GeckoCIRCUITS export generates .scl files."""
+        export_service = ExportService()
+        result = export_service.export_to_gecko_circuits(
+            rich_transistor,
+            {'output_path': str(tmp_path), 'recheck': False},
+        )
+        assert result == tmp_path
+
+        scl_files = list(tmp_path.glob("*.scl"))
+        assert len(scl_files) >= 1
+
+    def test_export_to_plecs(self, rich_transistor, tmp_path):
+        """PLECS export generates XML files."""
+        export_service = ExportService()
+        export_service.export_to_plecs(
+            rich_transistor, tmp_path,
+            template_config={'recheck': False},
+        )
+
+        xml_files = list(tmp_path.glob("*.xml"))
+        assert len(xml_files) >= 1
+
+    def test_export_methods_no_longer_raise(self, rich_transistor, tmp_path):
+        """Verify no export method raises NotImplementedError."""
+        export_service = ExportService()
+
+        # LTSpice
+        export_service.export_to_ltspice(rich_transistor, tmp_path / "ltspice")
+
+        # MATLAB
+        export_service.export_to_matlab(rich_transistor, tmp_path / "matlab")
+        assert True  # If we got here, no NotImplementedError was raised
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

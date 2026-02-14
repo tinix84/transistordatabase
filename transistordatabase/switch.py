@@ -14,6 +14,7 @@ from transistordatabase.data_classes import FosterThermalModel, ChannelData, Swi
 from transistordatabase.exceptions import MissingDataError
 from transistordatabase.plot_functions import plot_soa_lib
 
+
 def append_valid_datasets(target_list, datasets, validation_type, data_class):
     """
     Append valid datasets to the target list.
@@ -29,37 +30,16 @@ def append_valid_datasets(target_list, datasets, validation_type, data_class):
                 if isvalid_dict(dataset, validation_type):
                     target_list.append(data_class(dataset))
             except KeyError as error:
-                handle_key_error(error, datasets, dataset, validation_type)
+                if not error.args:
+                    error.args = ('',)
+                error.args = (f"KeyError occurred for index [{str(datasets.index(dataset))}] in list of "
+                              f"{validation_type} dictionaries: ",) + error.args
+                raise
             except ValueError as error:
-                handle_value_error(error, datasets, dataset, validation_type)
+                raise Exception(f"for index [{str(datasets.index(dataset))}] in list of {validation_type} dictionaries:" + str(error))
     elif isvalid_dict(datasets, validation_type):
         target_list.append(data_class(datasets))
 
-def handle_key_error(error, dict_list, dataset, validation_type):
-    """
-    Handle KeyError by raising an error with additional context.
-
-    :param error: The KeyError to handle
-    :param dict_list: The list of dictionaries being processed
-    :param dataset: The current dataset being processed
-    :param validation_type: The type of validation being performed
-    """
-    if not error.args:
-        error.args = ('',)  # This syntax is necessary because error.args is a tuple
-    error.args = (f"KeyError occurred for index [{str(dict_list.index(dataset))}] in list of "
-                  f"{validation_type} dictionaries: ",) + error.args
-    raise
-
-def handle_value_error(error, dict_list, dataset, validation_type):
-    """
-    Handle ValueError by raising an error with additional context.
-
-    :param error: The ValueError to handle
-    :param dict_list: The list of dictionaries being processed
-    :param dataset: The current dataset being processed
-    :param validation_type: The type of validation being performed
-    """
-    raise Exception(f"for index [{str(dict_list.index(dataset))}] in list of {validation_type} dictionaries:" + str(error))
 
 class Switch:
     """

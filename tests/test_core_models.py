@@ -212,30 +212,38 @@ class TestJsonTransistorLoader:
             loader.load_from_json(fake_path)
     
     def test_save_and_load_roundtrip(self, tmp_path: Path):
-        """Test save and load roundtrip."""
-        # Create test transistor
-        transistor = TransistorFactory.create_empty_transistor("TEST_ROUNDTRIP", "IGBT")
-        transistor.electrical_ratings.v_abs_max = 1200.0
-        transistor.electrical_ratings.i_abs_max = 100.0
-        
-        # Save to file
+        """Test save and load roundtrip with valid transistor data.
+
+        The legacy Transistor constructor enforces mandatory fields (manufacturer,
+        housing_type, r_th_*, etc.) so the test transistor must be fully populated.
+        """
+        from transistordatabase.core.models import TransistorMetadata, ElectricalRatings, ThermalProperties
+        transistor = Transistor(
+            metadata=TransistorMetadata(
+                name="TEST_ROUNDTRIP", type="IGBT", author="test",
+                manufacturer="Infineon", housing_type="TO247",
+            ),
+            electrical=ElectricalRatings(
+                v_abs_max=1200.0, i_abs_max=100.0, i_cont=50.0, t_j_max=175.0,
+            ),
+            thermal=ThermalProperties(
+                housing_area=0.001, cooling_area=0.001,
+                r_th_cs=0.5, r_th_switch_cs=0.3, r_th_diode_cs=0.4,
+            ),
+        )
+
         loader = JsonTransistorLoader()
         test_file = tmp_path / "test_transistor.json"
-        
-        try:
-            loader.save_to_json(transistor, test_file)
-            assert test_file.exists()
-            
-            # Load back
-            loaded_transistor = loader.load_from_json(test_file)
-            
-            # Verify data integrity
-            assert loaded_transistor.metadata.name == "TEST_ROUNDTRIP"
-            assert loaded_transistor.metadata.type == "IGBT"
-            assert loaded_transistor.electrical_ratings.v_abs_max == 1200.0
-            assert loaded_transistor.electrical_ratings.i_abs_max == 100.0
-        except Exception as e:
-            pytest.fail(f"Roundtrip test failed: {e}")
+
+        loader.save_to_json(transistor, test_file)
+        assert test_file.exists()
+
+        loaded_transistor = loader.load_from_json(test_file)
+
+        assert loaded_transistor.metadata.name == "TEST_ROUNDTRIP"
+        assert loaded_transistor.metadata.type == "IGBT"
+        assert loaded_transistor.electrical_ratings.v_abs_max == 1200.0
+        assert loaded_transistor.electrical_ratings.i_abs_max == 100.0
 
 
 class TestTransistorFactory:

@@ -5,7 +5,6 @@ from typing import List, Dict, Tuple
 from matplotlib import pyplot as plt
 import xml.etree.ElementTree as et
 import numpy as np
-import sys
 import os
 import re
 import base64
@@ -18,7 +17,7 @@ from bson.objectid import ObjectId
 from transistordatabase.checker_functions import check_realnum, check_str, check_2d_dataset
 from transistordatabase.constants import *
 
-transistor_name_regex = "(\S*)( \((\d*)\))?"
+transistor_name_regex = r"(\S*)( \((\d*)\))?"
 
 
 # ==== Validation functions ====
@@ -678,35 +677,6 @@ def merge_curve(curve: np.array, curve_detail: np.array) -> np.array:
             merged_curve = np.append(merged_curve, [[curve[0][x]], [curve[1][x]]], axis=1)
             type(merged_curve)
     return merged_curve
-
-def r_g_max_rapid_channel_turn_off(v_gsth: float, c_ds: float, c_gd: float, i_off: float | List[float],
-                                   v_driver_off: float) -> float:
-    """
-    Calculate the maximum gate resistor to achieve no turn-off losses when working with MOSFETs 'rapid channel turn-off' (rcto).
-
-    :param v_gsth: gate threshold voltage
-    :type v_gsth: float
-    :param c_ds: equivalent drain-source capacitance
-    :type c_ds: float
-    :param c_gd: equivalent gate-drain capacitance
-    :type c_gd: float
-    :param i_off: turn-off current
-    :type i_off: float or List[float]
-    :param v_driver_off: Driver voltage during turn-off
-    :type v_driver_off: float
-
-    :return: r_g_max_rcto maximum gate resistor to achieve rapid channel turn-off
-    :rtype: float
-
-    .. note::
-        Input (e.g. i_off can also be a vector)
-
-    .. seealso::
-        D. Kubrick, T. Dürbaum, A. Bucher
-        'Investigation of Turn-Off Behaviour under the Assumption of Linear Capacitances'
-        International Conference of Power Electronics Intelligent Motion Power Quality 2006, PCIM 2006, p. 239 –244
-    """
-    return (v_gsth - v_driver_off) / i_off * (1 + c_ds / c_gd)
 
 def compare_list(parameter: List):
     """Check through the list of value for odd one out."""

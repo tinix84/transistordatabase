@@ -6,11 +6,117 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import numpy as np
+
 from .models import (
     Transistor, TransistorMetadata, ElectricalRatings, ThermalProperties,
     Switch, Diode, ChannelCharacteristics, SwitchingLossData
 )
 from .services import TransistorRepository, ITransistorLoader
+
+
+# ---------------------------------------------------------------------------
+# Helpers for JSON → numpy conversion
+# ---------------------------------------------------------------------------
+
+def _load_data_file(filename: str) -> list[str]:
+    """Load lines from a data file in the transistordatabase/data/ directory."""
+    data_dir = Path(__file__).resolve().parent.parent / "data"
+    file_path = data_dir / filename
+    items: list[str] = []
+    with open(file_path) as f:
+        for line in f.read().splitlines():
+            if line.startswith("#") or line.isspace() or not line:
+                continue
+            items.append(str(line))
+    return items
+
+
+def _convert_energy_arrays(items: list[dict]) -> None:
+    """Convert graph arrays to numpy for a list of switching energy dicts."""
+    for item in items:
+        ds_type = item.get('dataset_type', '')
+        if ds_type == 'graph_r_e' and 'graph_r_e' in item:
+            item['graph_r_e'] = np.array(item['graph_r_e'])
+        elif ds_type == 'graph_i_e' and 'graph_i_e' in item:
+            item['graph_i_e'] = np.array(item['graph_i_e'])
+        elif ds_type == 'graph_t_e' and 'graph_t_e' in item:
+            item['graph_t_e'] = np.array(item['graph_t_e'])
+
+
+def _convert_arrays_to_numpy(transistor_dict: dict) -> None:
+    """Convert JSON list arrays to numpy arrays in-place.
+
+    Replicates the conversion logic from
+    ``DatabaseManager.convert_dict_to_transistor_object()``.
+    """
+    # Capacitances
+    for cap_key in ('c_oss', 'c_iss', 'c_rss'):
+        if cap_key in transistor_dict and transistor_dict[cap_key] is not None:
+            for item in transistor_dict[cap_key]:
+                item['graph_v_c'] = np.array(item['graph_v_c'])
+    if 'graph_v_ecoss' in transistor_dict and transistor_dict['graph_v_ecoss'] is not None:
+        transistor_dict['graph_v_ecoss'] = np.array(transistor_dict['graph_v_ecoss'])
+
+    # Raw measurement data
+    if 'raw_measurement_data' in transistor_dict:
+        for item in transistor_dict['raw_measurement_data']:
+            for key in ('dpt_on_vds', 'dpt_on_id', 'dpt_off_vds', 'dpt_off_id'):
+                if key in item:
+                    for u in range(len(item[key])):
+                        item[key][u] = np.array(item[key][u])
+
+    # Switch
+    switch_args = transistor_dict.get('switch')
+    if switch_args:
+        if switch_args.get('thermal_foster', {}).get('graph_t_rthjc') is not None:
+            switch_args['thermal_foster']['graph_t_rthjc'] = np.array(
+                switch_args['thermal_foster']['graph_t_rthjc']
+            )
+        for ch in switch_args.get('channel', []):
+            ch['graph_v_i'] = np.array(ch['graph_v_i'])
+        for energy_key in ('e_on', 'e_off', 'e_on_meas', 'e_off_meas'):
+            if energy_key in switch_args:
+                _convert_energy_arrays(switch_args[energy_key])
+        for gc in switch_args.get('charge_curve', []):
+            gc['graph_q_v'] = np.array(gc['graph_q_v'])
+        for tr in switch_args.get('r_channel_th', []):
+            tr['graph_t_r'] = np.array(tr['graph_t_r'])
+        for soa in switch_args.get('soa', []):
+            soa['graph_i_v'] = np.array(soa['graph_i_v'])
+
+    # Diode
+    diode_args = transistor_dict.get('diode')
+    if diode_args:
+        if diode_args.get('thermal_foster', {}).get('graph_t_rthjc') is not None:
+            diode_args['thermal_foster']['graph_t_rthjc'] = np.array(
+                diode_args['thermal_foster']['graph_t_rthjc']
+            )
+        for ch in diode_args.get('channel', []):
+            ch['graph_v_i'] = np.array(ch['graph_v_i'])
+        if 'e_rr' in diode_args:
+            _convert_energy_arrays(diode_args['e_rr'])
+        for soa in diode_args.get('soa', []):
+            soa['graph_i_v'] = np.array(soa['graph_i_v'])
+
+
+def _json_dict_to_legacy_transistor(transistor_dict: dict):
+    """Convert a raw JSON dict to a legacy Transistor object.
+
+    Performs numpy array conversion, loads housing/manufacturer data,
+    and constructs the legacy Transistor.
+    """
+    from transistordatabase.transistor import Transistor as LegacyTransistor
+
+    _convert_arrays_to_numpy(transistor_dict)
+    switch_args = transistor_dict.get('switch', {})
+    diode_args = transistor_dict.get('diode', {})
+    housing_types = _load_data_file("housing_types.txt")
+    manufacturers = _load_data_file("module_manufacturers.txt")
+    return LegacyTransistor(
+        transistor_dict, switch_args, diode_args,
+        housing_types, manufacturers,
+    )
 
 
 class JsonTransistorRepository(TransistorRepository):
@@ -50,222 +156,56 @@ class JsonTransistorRepository(TransistorRepository):
 
 
 class JsonTransistorLoader(ITransistorLoader):
-    """JSON-based transistor loader."""
-    
+    """JSON-based transistor loader.
+
+    Uses the adapter bridge to load JSON files through the legacy Transistor
+    constructor (which handles full numpy array conversion and validation),
+    then converts the result to a core Transistor via ``legacy_to_core()``.
+    """
+
     def load_from_json(self, file_path: Path) -> Transistor:
-        """Load transistor from JSON file."""
+        """Load transistor from JSON file via adapter bridge.
+
+        Pipeline: JSON dict -> numpy conversion -> legacy Transistor
+        -> ``legacy_to_core()`` -> core Transistor.
+        """
+        from .adapters import legacy_to_core
+
         with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        
-        # Parse metadata
-        metadata = self._parse_metadata(data)
-        
-        # Parse electrical ratings
-        electrical = self._parse_electrical_ratings(data)
-        
-        # Parse thermal properties
-        thermal = self._parse_thermal_properties(data)
-        
-        # Create transistor
-        transistor = Transistor(metadata, electrical, thermal)
-        
-        # Load switch data
-        if 'switch' in data:
-            transistor.switch = self._parse_switch_data(data['switch'])
-        
-        # Load diode data
-        if 'diode' in data:
-            transistor.diode = self._parse_diode_data(data['diode'])
-        
-        return transistor
-    
+
+        legacy = _json_dict_to_legacy_transistor(data)
+        return legacy_to_core(legacy)
+
     def save_to_json(self, transistor: Transistor, file_path: Path) -> None:
-        """Save transistor to JSON file."""
-        data = {
-            'name': transistor.metadata.name,
-            'type': transistor.metadata.type,
-            'author': transistor.metadata.author,
-            'manufacturer': transistor.metadata.manufacturer,
-            'housing_type': transistor.metadata.housing_type,
-            'v_abs_max': transistor.electrical_ratings.v_abs_max,
-            'i_abs_max': transistor.electrical_ratings.i_abs_max,
-            'i_cont': transistor.electrical_ratings.i_cont,
-            't_j_max': transistor.electrical_ratings.t_j_max,
-        }
-        
-        # Add optional metadata
-        if transistor.metadata.comment:
-            data['comment'] = transistor.metadata.comment
-        if transistor.metadata.datasheet_hyperlink:
-            data['datasheet_hyperlink'] = transistor.metadata.datasheet_hyperlink
-        
-        # Add thermal properties
-        thermal_data = {
-            'housing_area': transistor.thermal_properties.housing_area,
-            'cooling_area': transistor.thermal_properties.cooling_area,
-        }
-        if transistor.thermal_properties.r_th_cs:
-            thermal_data['r_th_cs'] = transistor.thermal_properties.r_th_cs
-        data.update(thermal_data)
-        
-        # Add switch data
-        if transistor.switch.channel_data:
-            data['switch'] = self._serialize_switch_data(transistor.switch)
-        
-        # Add diode data
-        if transistor.diode.channel_data:
-            data['diode'] = self._serialize_diode_data(transistor.diode)
-        
+        """Save core transistor to JSON file via adapter bridge.
+
+        Pipeline: core Transistor -> ``core_to_legacy_dicts()`` -> legacy
+        Transistor -> ``convert_to_dict()`` -> JSON.
+        """
+        from .adapters import core_to_legacy_dicts
+        from transistordatabase.transistor import Transistor as LegacyTransistor
+
+        t_args, sw_args, di_args = core_to_legacy_dicts(transistor)
+        housing_types = _load_data_file("housing_types.txt")
+        manufacturers = _load_data_file("module_manufacturers.txt")
+        legacy = LegacyTransistor(
+            t_args, sw_args, di_args, housing_types, manufacturers,
+        )
+        legacy_dict = legacy.convert_to_dict()
+        if "_id" in legacy_dict:
+            del legacy_dict["_id"]
+
         with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2, default=self._json_serializer)
-    
-    def _parse_metadata(self, data: Dict[str, Any]) -> TransistorMetadata:
-        """Parse metadata from JSON data."""
-        return TransistorMetadata(
-            name=data['name'],
-            type=data['type'],
-            author=data.get('author', ''),
-            manufacturer=data.get('manufacturer', ''),
-            housing_type=data.get('housing_type', ''),
-            comment=data.get('comment'),
-            datasheet_hyperlink=data.get('datasheet_hyperlink'),
-            datasheet_date=self._parse_date(data.get('datasheet_date')),
-            datasheet_version=data.get('datasheet_version')
-        )
-    
-    def _parse_electrical_ratings(self, data: Dict[str, Any]) -> ElectricalRatings:
-        """Parse electrical ratings from JSON data."""
-        return ElectricalRatings(
-            v_abs_max=data.get('v_abs_max', 0.0),
-            i_abs_max=data.get('i_abs_max', 0.0),
-            i_cont=data.get('i_cont', 0.0),
-            t_j_max=data.get('t_j_max', 150.0)
-        )
-    
-    def _parse_thermal_properties(self, data: Dict[str, Any]) -> ThermalProperties:
-        """Parse thermal properties from JSON data."""
-        return ThermalProperties(
-            housing_area=data.get('housing_area', 0.0),
-            cooling_area=data.get('cooling_area', 0.0),
-            r_th_cs=data.get('r_th_cs'),
-            r_th_switch_cs=data.get('r_th_switch_cs'),
-            r_th_diode_cs=data.get('r_th_diode_cs'),
-            t_c_max=data.get('t_c_max')
-        )
-    
-    def _parse_switch_data(self, switch_data: Dict[str, Any]) -> Switch:
-        """Parse switch data from JSON."""
-        switch = Switch()
-        
-        # Parse channel data
-        if 'channel' in switch_data:
-            for channel_item in switch_data['channel']:
-                channel = ChannelCharacteristics(
-                    t_j=channel_item['t_j'],
-                    graph_v_i=self._parse_array_data(channel_item['graph_v_i']),
-                    v_g=channel_item.get('v_g')
-                )
-                switch.channel_data.append(channel)
-        
-        # Parse switching loss data
-        if 'e_on' in switch_data:
-            for loss_item in switch_data['e_on']:
-                loss_data = self._parse_switching_loss_data(loss_item)
-                switch.e_on_data.append(loss_data)
-        
-        if 'e_off' in switch_data:
-            for loss_item in switch_data['e_off']:
-                loss_data = self._parse_switching_loss_data(loss_item)
-                switch.e_off_data.append(loss_data)
-        
-        return switch
-    
-    def _parse_diode_data(self, diode_data: Dict[str, Any]) -> Diode:
-        """Parse diode data from JSON."""
-        diode = Diode()
-        
-        # Parse channel data
-        if 'channel' in diode_data:
-            for channel_item in diode_data['channel']:
-                channel = ChannelCharacteristics(
-                    t_j=channel_item['t_j'],
-                    graph_v_i=self._parse_array_data(channel_item['graph_v_i']),
-                    v_g=channel_item.get('v_g')
-                )
-                diode.channel_data.append(channel)
-        
-        # Parse reverse recovery data
-        if 'e_rr' in diode_data:
-            for loss_item in diode_data['e_rr']:
-                loss_data = self._parse_switching_loss_data(loss_item)
-                diode.e_rr_data.append(loss_data)
-        
-        return diode
-    
-    def _parse_switching_loss_data(self, loss_data: Dict[str, Any]) -> SwitchingLossData:
-        """Parse switching loss data from JSON."""
-        return SwitchingLossData(
-            dataset_type=loss_data['dataset_type'],
-            t_j=loss_data['t_j'],
-            v_supply=loss_data['v_supply'],
-            v_g=loss_data.get('v_g', 0.0),
-            e_x=loss_data.get('e_x'),
-            r_g=loss_data.get('r_g'),
-            i_x=loss_data.get('i_x'),
-            graph_i_e=self._parse_array_data(loss_data.get('graph_i_e')),
-            graph_r_e=self._parse_array_data(loss_data.get('graph_r_e'))
-        )
-    
-    def _parse_array_data(self, data: Any) -> Optional[Any]:
-        """Parse array data from JSON."""
-        if data is None:
-            return None
-        return data  # Simplified - would need proper numpy array conversion
-    
-    def _parse_date(self, date_str: Optional[str]) -> Optional[datetime]:
-        """Parse date string to datetime."""
-        if not date_str:
-            return None
-        try:
-            return datetime.fromisoformat(date_str)
-        except ValueError:
-            return None
-    
-    def _serialize_switch_data(self, switch: Switch) -> Dict[str, Any]:
-        """Serialize switch data to JSON-compatible format."""
-        data = {}
-        
-        if switch.channel_data:
-            data['channel'] = [
-                {
-                    't_j': ch.t_j,
-                    'v_g': ch.v_g,
-                    'graph_v_i': ch.graph_v_i.tolist() if hasattr(ch.graph_v_i, 'tolist') else ch.graph_v_i
-                }
-                for ch in switch.channel_data
-            ]
-        
-        return data
-    
-    def _serialize_diode_data(self, diode: Diode) -> Dict[str, Any]:
-        """Serialize diode data to JSON-compatible format."""
-        data = {}
-        
-        if diode.channel_data:
-            data['channel'] = [
-                {
-                    't_j': ch.t_j,
-                    'graph_v_i': ch.graph_v_i.tolist() if hasattr(ch.graph_v_i, 'tolist') else ch.graph_v_i
-                }
-                for ch in diode.channel_data
-            ]
-        
-        return data
-    
-    def _json_serializer(self, obj: Any) -> Any:
+            json.dump(legacy_dict, f, indent=2)
+
+    @staticmethod
+    def _json_serializer(obj: Any) -> Any:
         """Serialize special types to JSON-compatible format."""
         if isinstance(obj, datetime):
             return obj.isoformat()
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
         raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
 

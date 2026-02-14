@@ -42,6 +42,11 @@ from .repository import (
     TransistorFactory,
 )
 
+from .adapters import (
+    legacy_to_core,
+    core_to_legacy_dicts,
+)
+
 __all__ = [
     # Models
     'Transistor',
@@ -74,6 +79,9 @@ __all__ = [
     'JsonTransistorRepository',
     'JsonTransistorLoader',
     'TransistorFactory',
+    # Adapters
+    'legacy_to_core',
+    'core_to_legacy_dicts',
 ]
 
 __version__ = '1.0.0'

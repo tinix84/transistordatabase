@@ -12,3 +12,22 @@ from transistordatabase.exceptions import *
 from transistordatabase.database_manager import *
 from transistordatabase.colors import *
 from transistordatabase.generalplotsettings import *
+
+# Core architecture (preferred for new code)
+from transistordatabase.core.models import (  # noqa: F811
+    Transistor as CoreTransistor,
+    Switch as CoreSwitch,
+    Diode as CoreDiode,
+    TransistorMetadata,
+    ElectricalRatings,
+    ThermalProperties,
+)
+from transistordatabase.core.repository import (
+    JsonTransistorRepository,
+    JsonTransistorLoader,
+    TransistorFactory,
+)
+from transistordatabase.core.adapters import (
+    legacy_to_core,
+    core_to_legacy_dicts,
+)
