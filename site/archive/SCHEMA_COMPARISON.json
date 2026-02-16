@@ -1,0 +1,273 @@
+{
+  "comparison_timestamp": "2026-02-15",
+  "comparison_scope": "Analysis of TDB core schema vs File Exchange and SC archive formats",
+  "executive_summary": {
+    "tdb_fields_total": 89,
+    "file_exchange_coverage": "95%",
+    "sc_archive_coverage": "Graph curves only (field-specific)",
+    "status": "Field mappings complete, implementation ready"
+  },
+  "tdb_schema_analysis": {
+    "total_dataclasses": 13,
+    "total_top_level_fields": 10,
+    "nested_fields": 89,
+    "dataclasses": [
+      "TransistorMetadata (7 fields)",
+      "ElectricalRatings (4 fields)",
+      "ThermalProperties (6 fields)",
+      "FosterThermalModel (7 fields)",
+      "GateChargeCurve (5 fields)",
+      "SOA (3 fields)",
+      "VoltageDependentCapacitance (2 fields)",
+      "EffectiveOutputCapacitance (3 fields)",
+      "TemperatureDependResistance (4 fields)",
+      "RawMeasurementData (15 fields)",
+      "LinearizedModel (5 fields)",
+      "ChannelCharacteristics (3 fields)",
+      "SwitchingLossData (13 fields)"
+    ]
+  },
+  "file_exchange_format_analysis": {
+    "sample_file": "Infineon_IPBE65R050CFD7A.json",
+    "total_root_fields": 23,
+    "matched_fields": 22,
+    "coverage_percentage": 95.7,
+    "field_mapping_summary": {
+      "direct_mappings": {
+        "count": 18,
+        "examples": [
+          "name -> metadata.name",
+          "type -> metadata.type",
+          "manufacturer -> metadata.manufacturer",
+          "v_abs_max -> electrical_ratings.v_abs_max",
+          "i_abs_max -> electrical_ratings.i_abs_max",
+          "i_cont -> electrical_ratings.i_cont",
+          "housing_area -> thermal_properties.housing_area",
+          "cooling_area -> thermal_properties.cooling_area"
+        ]
+      },
+      "nested_mappings": {
+        "count": 4,
+        "examples": [
+          "switch.channel -> switch.channel_data (list of ChannelCharacteristics)",
+          "switch.e_on -> switch.e_on_data (list of SwitchingLossData)",
+          "diode.channel -> diode.channel_data (list of ChannelCharacteristics)",
+          "c_oss -> c_oss (list of VoltageDependentCapacitance)"
+        ]
+      },
+      "naming_normalizations": {
+        "count": 3,
+        "examples": [
+          "channel -> channel_data (makes TDB naming more explicit)",
+          "linearized_switch -> linearized_model (switch component owns it)",
+          "r_channel_th -> r_channel_temp (shortened for consistency)"
+        ]
+      }
+    },
+    "missing_in_file_exchange": [
+      "raw_measurement_data (DPT curves) - rarely included in File Exchange",
+      "Some Foster thermal vectors - often only totals provided"
+    ],
+    "extra_in_file_exchange": [
+      "c_oss_fix, c_iss_fix, c_rss_fix (fixed capacitance values)",
+      "r_g_int (internal gate resistance)",
+      "r_g_on_recommended, r_g_off_recommended (recommendations)",
+      "technology field (at root and component level)",
+      "template_version, template_date, creation_date, last_modified",
+      "graph_v_ecoss (energy-related C_oss curve)"
+    ]
+  },
+  "sc_archive_format_analysis": {
+    "format_type": "Binary graph data format",
+    "sample_file": "C2M0080120D_idvgs.json (extracted/exported to JSON)",
+    "structure": {
+      "axesColl": "Axis definitions with calibration",
+      "datasetColl": "Data points with x, y, and value tuples",
+      "measurementColl": "Additional measurement metadata"
+    },
+    "data_coverage": {
+      "contains": "Individual 2D curves (V-I, energy, thermal impedance, etc.)",
+      "matches_to_tdb": "Switch/diode channel_data or specific curve fields",
+      "challenge": "Curves are divorced from metadata context"
+    },
+    "integration_approach": {
+      "requirement": "Must be paired with metadata file",
+      "process": "1. Extract 2D arrays from SC graph format\n2. Identify curve type (V-I, E-loss, etc.)\n3. Map to appropriate TDB field\n4. Combine with separate metadata for complete transistor"
+    }
+  },
+  "format_comparison_matrix": {
+    "metadata": {
+      "tdb": "Complete in metadata class",
+      "file_exchange": "Complete root-level fields",
+      "sc_archive": "Missing - requires external file"
+    },
+    "electrical_ratings": {
+      "tdb": "ElectricalRatings class",
+      "file_exchange": "Root-level fields (v_abs_max, i_abs_max, i_cont)",
+      "sc_archive": "Not included"
+    },
+    "thermal_properties": {
+      "tdb": "ThermalProperties class",
+      "file_exchange": "Partial (housing_area, cooling_area, r_th fields)",
+      "sc_archive": "Not included"
+    },
+    "switch_component": {
+      "tdb": "Switch class with 9 fields",
+      "file_exchange": "switch object with mostly equivalent structure",
+      "sc_archive": "Individual curve files only"
+    },
+    "diode_component": {
+      "tdb": "Diode class with 6 fields",
+      "file_exchange": "diode object with mostly equivalent structure",
+      "sc_archive": "Individual curve files only"
+    },
+    "2d_curves": {
+      "tdb": "2D numpy arrays [[x], [y]]",
+      "file_exchange": "2D arrays [[x], [y]] in JSON",
+      "sc_archive": "Point-by-point tuples with calibration"
+    }
+  },
+  "key_differences_identified": {
+    "naming_conventions": {
+      "issue": "File Exchange uses 'channel', TDB uses 'channel_data'",
+      "resolution": "Rename during conversion",
+      "impact": "Low - easily handled in transformation"
+    },
+    "metadata_nesting": {
+      "issue": "File Exchange has flat root structure, TDB has metadata class",
+      "resolution": "Group metadata fields during conversion",
+      "impact": "Low - structured improvement"
+    },
+    "optional_fields": {
+      "issue": "File Exchange includes extra fields not in TDB core",
+      "resolution": "Map to metadata dict or store in comment field",
+      "impact": "Low - TDB handles via metadata dict on Switch/Diode"
+    },
+    "thermal_foster": {
+      "issue": "File Exchange often only includes totals, not vectors",
+      "resolution": "Allow null vectors when not provided",
+      "impact": "Medium - loss of detail but acceptable"
+    },
+    "unit_consistency": {
+      "issue": "All formats use consistent SI units",
+      "resolution": "No conversion needed",
+      "impact": "None - uniform already"
+    }
+  },
+  "conversion_complexity_assessment": {
+    "file_exchange_to_tdb": {
+      "difficulty": "Low",
+      "estimated_effort": "2-3 hours implementation",
+      "key_steps": [
+        "Parse root-level metadata",
+        "Create TransistorMetadata instance",
+        "Create ElectricalRatings instance",
+        "Create ThermalProperties instance",
+        "Recursively convert switch object",
+        "Recursively convert diode object",
+        "Convert capacitance curves",
+        "Validate all data"
+      ],
+      "risks": "Minimal - formats are very similar"
+    },
+    "sc_archive_to_tdb": {
+      "difficulty": "Medium",
+      "estimated_effort": "4-6 hours implementation",
+      "key_steps": [
+        "Parse SC graph format (extract calibration and data points)",
+        "Identify curve type from context",
+        "Convert point-by-point to 2D array",
+        "Determine source units (may need inference)",
+        "Load external metadata file",
+        "Map curve to appropriate TDB field",
+        "Create complete transistor object"
+      ],
+      "risks": "Unit inference, curve type identification, metadata pairing"
+    }
+  },
+  "recommendations": {
+    "priority_1": {
+      "action": "Implement File Exchange importer first",
+      "rationale": "High volume, low complexity, provides 95% of transistors",
+      "timeline": "Week 1"
+    },
+    "priority_2": {
+      "action": "Create SC archive converter",
+      "rationale": "Smaller dataset, more complex, provides specific curves",
+      "timeline": "Week 2-3"
+    },
+    "priority_3": {
+      "action": "Build validation layer",
+      "rationale": "Ensure data integrity during conversions",
+      "tools": "Use data_classes.py validation functions"
+    },
+    "priority_4": {
+      "action": "Create metadata reconciliation",
+      "rationale": "Handle File Exchange extra fields gracefully",
+      "location": "Store in Switch/Diode.metadata dicts"
+    }
+  },
+  "validation_checklist": {
+    "metadata_validation": [
+      "name is non-empty string",
+      "type is valid enum",
+      "manufacturer and author are non-empty",
+      "datasheet_hyperlink is valid URL if provided",
+      "datasheet_date parses correctly"
+    ],
+    "electrical_ratings_validation": [
+      "v_abs_max > 0 (typically 30-1700V)",
+      "i_abs_max > 0 (typically 1-1000A)",
+      "i_cont > 0 and <= i_abs_max",
+      "t_j_max > 0 (typically 150-200°C)"
+    ],
+    "thermal_validation": [
+      "housing_area > 0 (m²)",
+      "cooling_area > 0 (m²)",
+      "r_th values > 0 if provided (K/W)",
+      "thermal_foster vectors non-empty if present"
+    ],
+    "curve_validation": [
+      "All 2D arrays have matching dimensions [len(x) == len(y)]",
+      "x and y values are numeric",
+      "x values are monotonically increasing",
+      "No NaN or infinity values",
+      "Temperature values within physical range"
+    ],
+    "component_validation": [
+      "At least one channel_data entry if component present",
+      "v_g provided for all switch channel_data",
+      "v_g not required for diode channel_data",
+      "Switching loss types are valid enums"
+    ]
+  },
+  "file_statistics": {
+    "file_exchange": {
+      "sample_size": 1,
+      "example_file_size_kb": 250,
+      "compression_potential": "ZIP to ~50KB (80% reduction)",
+      "estimated_total_files": "150-200 transistors"
+    },
+    "sc_archive": {
+      "sample_size": 1,
+      "example_contains": "Single V-I curve for one condition",
+      "typical_complementary_files": "Associated metadata/XML files",
+      "estimated_curve_files": "500+ individual graph files"
+    }
+  },
+  "next_steps": {
+    "step_1": "Implement FileExchangeImporter class in backend/concrete_services.py",
+    "step_2": "Create unit tests for File Exchange import",
+    "step_3": "Add File Exchange import to CLI (if exists)",
+    "step_4": "Implement SCArchiveConverter for curve extraction",
+    "step_5": "Create comprehensive integration tests",
+    "step_6": "Document importer usage in docs/",
+    "step_7": "Create migration scripts for batch import"
+  },
+  "schema_completeness": {
+    "tdb_coverage": "100% of required fields defined",
+    "file_exchange_compatibility": "95%+ - excellent alignment",
+    "extensibility": "Metadata dicts allow unknown fields",
+    "future_proof": "Can absorb new device types and formats"
+  }
+}

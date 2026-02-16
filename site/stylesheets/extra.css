@@ -1,0 +1,20 @@
+/* Extra styles for Transistor Database documentation */
+
+/* Code block styling */
+.highlight pre {
+    border-radius: 4px;
+}
+
+/* API documentation styling */
+.doc-heading {
+    font-weight: 600;
+}
+
+/* Admonition custom colors */
+.admonition.note {
+    border-left-color: #448aff;
+}
+
+.admonition.warning {
+    border-left-color: #ff9800;
+}

@@ -1,0 +1,609 @@
+{
+  "pair_id": "wolfspeed-c2m0280120d",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "wolfspeed-c2m0280120d",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "C2M0280120D",
+      "type": "MOSFET",
+      "manufacturer": "Wolfspeed",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "cauer",
+        "elements": [
+          {
+            "r": 1.086,
+            "c": 0.00245
+          },
+          {
+            "r": 0.2844,
+            "c": 0.00685
+          },
+          {
+            "r": 0.2538,
+            "c": 0.07436
+          },
+          {
+            "r": 0.1713,
+            "c": 3.265
+          }
+        ]
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        -55.0,
+        25.0,
+        150.0,
+        900.0,
+        1000.0
+      ],
+      "curves": [
+        {
+          "t_j": -55.0,
+          "on_state_voltage": [
+            -3.314,
+            -2.54,
+            -1.728,
+            -0.903,
+            0.0,
+            0.915,
+            2.01,
+            3.33,
+            5.01
+          ],
+          "on_state_current": [
+            -16.0,
+            -12.0,
+            -8.0,
+            -4.0,
+            0.0,
+            4.0,
+            8.0,
+            12.0,
+            16.0
+          ]
+        },
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -4.326,
+            -3.222,
+            -2.125,
+            -1.092,
+            0.0,
+            1.12,
+            2.35,
+            4.03,
+            6.21
+          ],
+          "on_state_current": [
+            -16.0,
+            -12.0,
+            -8.0,
+            -4.0,
+            0.0,
+            4.0,
+            8.0,
+            12.0,
+            16.0
+          ]
+        },
+        {
+          "t_j": 150.0,
+          "on_state_voltage": [
+            -4.684,
+            -4.24,
+            -3.66,
+            -2.095,
+            0.0,
+            2.03,
+            4.58,
+            8.02,
+            13.79
+          ],
+          "on_state_current": [
+            -16.0,
+            -12.0,
+            -8.0,
+            -4.0,
+            0.0,
+            4.0,
+            8.0,
+            12.0,
+            16.0
+          ]
+        },
+        {
+          "t_j": 900.0,
+          "on_state_voltage": [
+            -4.882,
+            -4.34,
+            -3.88,
+            -2.195,
+            0.0,
+            2.13,
+            4.68,
+            8.12,
+            13.9
+          ],
+          "on_state_current": [
+            -16.0,
+            -12.0,
+            -8.0,
+            -4.0,
+            0.0,
+            4.0,
+            8.0,
+            12.0,
+            16.0
+          ]
+        },
+        {
+          "t_j": 1000.0,
+          "on_state_voltage": [
+            -4.882,
+            -4.34,
+            -3.88,
+            -2.195,
+            0.0,
+            2.13,
+            4.68,
+            8.12,
+            13.9
+          ],
+          "on_state_current": [
+            -16.0,
+            -12.0,
+            -8.0,
+            -4.0,
+            0.0,
+            4.0,
+            8.0,
+            12.0,
+            16.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "wolfspeed-c2m0280120d",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "C2M0280120D",
+      "type": "MOSFET",
+      "manufacturer": "Wolfspeed",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "cauer",
+        "elements": [
+          {
+            "r": 1.086,
+            "c": 0.00245
+          },
+          {
+            "r": 0.2844,
+            "c": 0.00685
+          },
+          {
+            "r": 0.2538,
+            "c": 0.07436
+          },
+          {
+            "r": 0.1713,
+            "c": 3.265
+          }
+        ]
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        -55.0,
+        25.0,
+        150.0,
+        900.0,
+        1000.0
+      ],
+      "curves": [
+        {
+          "t_j": -55.0,
+          "on_state_voltage": [
+            -3.314,
+            -2.54,
+            -1.728,
+            -0.903,
+            0.0,
+            0.915,
+            2.01,
+            3.33,
+            5.01
+          ],
+          "on_state_current": [
+            -16.0,
+            -12.0,
+            -8.0,
+            -4.0,
+            0.0,
+            4.0,
+            8.0,
+            12.0,
+            16.0
+          ]
+        },
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -4.326,
+            -3.222,
+            -2.125,
+            -1.092,
+            0.0,
+            1.12,
+            2.35,
+            4.03,
+            6.21
+          ],
+          "on_state_current": [
+            -16.0,
+            -12.0,
+            -8.0,
+            -4.0,
+            0.0,
+            4.0,
+            8.0,
+            12.0,
+            16.0
+          ]
+        },
+        {
+          "t_j": 150.0,
+          "on_state_voltage": [
+            -4.684,
+            -4.24,
+            -3.66,
+            -2.095,
+            0.0,
+            2.03,
+            4.58,
+            8.02,
+            13.79
+          ],
+          "on_state_current": [
+            -16.0,
+            -12.0,
+            -8.0,
+            -4.0,
+            0.0,
+            4.0,
+            8.0,
+            12.0,
+            16.0
+          ]
+        },
+        {
+          "t_j": 900.0,
+          "on_state_voltage": [
+            -4.882,
+            -4.34,
+            -3.88,
+            -2.195,
+            0.0,
+            2.13,
+            4.68,
+            8.12,
+            13.9
+          ],
+          "on_state_current": [
+            -16.0,
+            -12.0,
+            -8.0,
+            -4.0,
+            0.0,
+            4.0,
+            8.0,
+            12.0,
+            16.0
+          ]
+        },
+        {
+          "t_j": 1000.0,
+          "on_state_voltage": [
+            -4.882,
+            -4.34,
+            -3.88,
+            -2.195,
+            0.0,
+            2.13,
+            4.68,
+            8.12,
+            13.9
+          ],
+          "on_state_current": [
+            -16.0,
+            -12.0,
+            -8.0,
+            -4.0,
+            0.0,
+            4.0,
+            8.0,
+            12.0,
+            16.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "plecs_model",
+    "source_details": {},
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 0.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        -55.0,
+        25.0,
+        150.0,
+        900.0,
+        1000.0
+      ],
+      "current_axis": [
+        -10.0,
+        0.0,
+        2.0,
+        4.0,
+        6.0,
+        8.0,
+        10.0,
+        12.0,
+        14.0,
+        16.0
+      ],
+      "voltage_axis": [
+        -100.0,
+        0.0,
+        600.0,
+        800.0
+      ],
+      "energy": {
+        "-55.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "25.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "150.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "900.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "1000.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        -55.0,
+        25.0,
+        125.0,
+        900.0,
+        1000.0
+      ],
+      "current_axis": [
+        -10.0,
+        0.0,
+        2.0,
+        4.0,
+        6.0,
+        8.0,
+        10.0,
+        12.0,
+        14.0,
+        16.0
+      ],
+      "voltage_axis": [
+        -100.0,
+        0.0,
+        600.0,
+        800.0
+      ],
+      "energy": {
+        "-55.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "25.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "125.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "900.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "1000.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": "E/(1.6911e-6*2.5+29.281e-6)*(1.6911e-6*Rg+29.281e-6)",
+    "turn_off_formula": "E/(-1.3e-9*2.5^3+7.27e-8*2.5-5.182e-7*2.5+37.651e-6)*(-1.3e-9*Rg^3+7.27e-8*Rg^2-5.182e-7*Rg+37.651e-6)",
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0280120D.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0280120D_bodydiode.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0280120D.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0280120D_bodydiode.xml"
+    ],
+    "migration_date": "2026-02-16T06:49:14.642387",
+    "schema_version": "1.0",
+    "quality_score": 0.0
+  }
+}

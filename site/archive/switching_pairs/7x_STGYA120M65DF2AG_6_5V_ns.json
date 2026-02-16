@@ -1,0 +1,242 @@
+{
+  "pair_id": "7x_STGYA120M65DF2AG_6_5V_ns",
+  "pair_type": "parallel",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "STGYA120M65DF2AG_6_5V_ns",
+    "count": 7,
+    "role": "switch",
+    "metadata": {
+      "name": "7 x STGYA120M65DF2AG 6.5V/ns",
+      "type": "mosfet",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 16.52,
+      "weight": 0.35000000000000003
+    },
+    "electrical_ratings": {
+      "v_abs_max": 650.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.03428571428571429,
+      "r_th_cs": 0.08571428571428572,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -2.003508771929824,
+            -1.526315789473684,
+            -1.27719298245614,
+            -1.1403508771929822,
+            -1.0070175438596487,
+            -0.9052631578947364,
+            -0.8035087719298242,
+            -0.7122807017543853,
+            -0.6315789473684207,
+            -0.5403508771929821,
+            -0.35438596491228025,
+            -0.0035087719298241143,
+            -0.007153075822604412,
+            -0.22807017543859656,
+            0.28612303290414887,
+            0.4148783977110154,
+            0.47925608011444926,
+            0.5507868383404864,
+            0.6652360515021452,
+            0.7725321888412015,
+            0.8512160228898421,
+            0.9227467811158793,
+            1.1230329041487832,
+            1.4592274678111579,
+            2.560801144492131
+          ],
+          "on_state_current": [
+            -1395.9064327485382,
+            -763.4502923976607,
+            -485.0877192982455,
+            -354.09356725146205,
+            -241.52046783625735,
+            -167.83625730994143,
+            -108.4795321637427,
+            -67.54385964912274,
+            -40.935672514619625,
+            -26.60818713450281,
+            -4.093567251461997,
+            -0.0,
+            1.6022889842634926,
+            2.0467836257311443,
+            4.80686695278982,
+            9.613733905579476,
+            14.420600858369133,
+            28.841201716738432,
+            54.47782546495037,
+            84.92131616595162,
+            113.76251788269005,
+            141.001430615165,
+            237.13876967095845,
+            418.197424892704,
+            1115.1931330472103
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "STGYA120M65DF2AG_6_5V_ns",
+    "count": 7,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "7_x_STGYA120M65DF2AG_6_5V_ns.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -7e+100,
+        -0.0,
+        2.588757396449678,
+        207.1005917159763,
+        421.96745562130195,
+        833.5798816568049,
+        1677.5147928994086
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.005035022222222237,
+          0.0059235555555555534,
+          0.01184711111111114,
+          0.030802488888888833,
+          0.10484693333333331
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -7e+100,
+        -0.0,
+        15.532544378698436,
+        212.27810650887562,
+        460.7988165680474,
+        815.4585798816568,
+        1669.7485207100597
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0014364497041420073,
+          0.0022814201183431904,
+          0.0039713609467455615,
+          0.005999289940828402,
+          0.012421065088757396
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "7_x_STGYA120M65DF2AG_6_5V_ns.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.678254",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

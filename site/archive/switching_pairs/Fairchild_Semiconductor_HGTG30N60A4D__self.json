@@ -1,0 +1,216 @@
+{
+  "pair_id": "Fairchild_Semiconductor_HGTG30N60A4D__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "Fairchild_Semiconductor_HGTG30N60A4D",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "mosfet",
+      "manufacturer": "Fairchild",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 0.0,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -0.0,
+            -0.0059032,
+            -0.0,
+            0.16234,
+            0.28335,
+            0.41027,
+            0.65525,
+            0.77627,
+            0.94156,
+            1.0832,
+            1.1895,
+            1.278,
+            1.3459,
+            1.402,
+            1.4522,
+            1.5083,
+            1.5643,
+            1.6145,
+            1.6824,
+            1.7355
+          ],
+          "on_state_current": [
+            -1e+100,
+            -0.17331,
+            -0.0,
+            0.0866551,
+            0.17331,
+            0.259965,
+            0.433276,
+            0.866551,
+            2.07972,
+            3.63951,
+            5.89255,
+            9.18544,
+            13.5182,
+            17.851,
+            22.357,
+            26.9497,
+            32.7556,
+            37.2617,
+            44.2808,
+            50.26
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "Fairchild_Semiconductor_HGTG30N60A4D",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "Fairchild_Semiconductor_HGTG30N60A4D_150C.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 1.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.0,
+        1e+100
+      ],
+      "voltage_axis": [
+        1.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.0,
+        1e+100
+      ],
+      "voltage_axis": [
+        1.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "Fairchild_Semiconductor_HGTG30N60A4D_150C.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.308343",
+    "schema_version": "1.0",
+    "quality_score": 50.0
+  }
+}

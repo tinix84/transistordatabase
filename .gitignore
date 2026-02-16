@@ -20,3 +20,13 @@ output/
 .venv/
 docs/_build
 dictionary.dic
+
+# Temporary reports and summaries
+*_REPORT.*
+*_SUMMARY.*
+
+# Jupyter notebook checkpoints
+*.ipynb_checkpoints
+
+# Archived documentation
+docs/archive/

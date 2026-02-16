@@ -329,6 +329,11 @@ class Diode(ITransistorComponent):
         self.raw_measurement_data: List[RawMeasurementData] = []
         self.linearized_model: List[LinearizedModel] = []
         self.metadata: Dict[str, Any] = {}
+        # Body diode reverse recovery parameters (optional)
+        self.q_rr: float | None = None       # Reverse recovery charge in C
+        self.i_rr: float | None = None       # Peak reverse recovery current in A
+        self.t_rr: float | None = None       # Reverse recovery time in s
+        self.di_dt_rr: float | None = None   # Current slope during reverse recovery in A/s
 
     def get_channel_data(
         self, t_j: float, v_g: Optional[float] = None

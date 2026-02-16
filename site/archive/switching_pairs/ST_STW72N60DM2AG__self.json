@@ -1,0 +1,260 @@
+{
+  "pair_id": "ST_STW72N60DM2AG__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ST_STW72N60DM2AG",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "ST STW72N60DM2AG",
+      "type": "mosfet",
+      "manufacturer": "ST",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 4.45,
+      "weight": 0.006
+    },
+    "electrical_ratings": {
+      "v_abs_max": 600.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.28,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -0.5888888888888889,
+            -0.5722222222222222,
+            -0.5472222222222223,
+            -0.5249999999999999,
+            -0.49861111111111117,
+            -0.45972222222222225,
+            -0.4166666666666667,
+            -0.38055555555555554,
+            -0.3388888888888889,
+            -0.2867982648002335,
+            -0.22638888888888886,
+            -0.167011154855643,
+            -0.13812256196306938,
+            0.12786246579173619,
+            0.1824095869492974,
+            1.4459788846148747,
+            3.1069266955005608,
+            4.990080372550559,
+            6.70325924667165,
+            8.710125927784919,
+            10.814888544562265,
+            12.625963354347418,
+            14.779673938956787,
+            17.4718121697185,
+            20.066054464816148,
+            23.051880502570043,
+            27.359301671788785
+          ],
+          "on_state_current": [
+            -65.05050505050507,
+            -60.012626262626284,
+            -54.70959595959597,
+            -49.141414141414145,
+            -43.13131313131314,
+            -35.70707070707072,
+            -30.05050505050506,
+            -25.27777777777778,
+            -20.77020202020203,
+            -15.057381558365789,
+            -9.191919191919192,
+            -3.0084141944377896,
+            -1e-06,
+            1e-06,
+            0.7385178364268219,
+            17.846060462233936,
+            37.389378720718746,
+            59.87134379473624,
+            78.87735249463202,
+            98.87068632179509,
+            117.38303245805719,
+            131.94607808525004,
+            147.00278627607653,
+            163.0468195941704,
+            175.38838368501177,
+            186.74262264858586,
+            198.8373554576104
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "ST_STW72N60DM2AG",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "ST_STW72N60DM2AG_150C.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 1.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        1e+100
+      ],
+      "voltage_axis": [
+        1.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        5.0,
+        10.0,
+        15.0,
+        20.0,
+        25.0,
+        30.0,
+        35.0,
+        40.0,
+        45.0,
+        50.0,
+        55.0,
+        60.0,
+        65.0,
+        70.0
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          1.3300011539999999e-05,
+          7.1e-05,
+          0.000167,
+          0.000268,
+          0.000371,
+          0.000478,
+          0.000587,
+          0.000699,
+          0.000813,
+          0.000929,
+          0.00105,
+          0.00117,
+          0.00129,
+          0.00141,
+          0.00153
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "ST_STW72N60DM2AG_150C.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.807351",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

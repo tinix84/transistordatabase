@@ -1,0 +1,246 @@
+{
+  "pair_id": "ROHM_SCS220AE2HR__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ROHM_SCS220AE2HR",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "ROHM SCS220AE2HR",
+      "type": "mosfet",
+      "manufacturer": "ROHM",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 2.9,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 650.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -2.16614,
+            -1.80048,
+            -1.56598,
+            -1.41494,
+            -1.28776,
+            -1.13275,
+            -1.01351,
+            -0.930048,
+            -0.854531,
+            -0.81876,
+            -0.786963,
+            -0.715421,
+            -0.616057,
+            -0.524642,
+            -0.5141251887378235,
+            0.0,
+            0.0
+          ],
+          "on_state_current": [
+            -39.5973,
+            -29.356,
+            -22.5433,
+            -17.932,
+            -14.0151,
+            -9.51481,
+            -6.02037,
+            -3.80931,
+            -2.16869,
+            -1.52508,
+            -0.915336,
+            -0.20499,
+            -0.0200705,
+            -0.00207167,
+            -1e-06,
+            1e-06,
+            1e+100
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "ROHM_SCS220AE2HR",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "ROHM_SCS220AE2HR.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -45.0,
+        -40.0,
+        -35.0,
+        -30.0,
+        -25.0,
+        -20.0,
+        -15.0,
+        -10.0,
+        -5.0,
+        -1e-06,
+        1e-06,
+        1e+100
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          6.15e-05,
+          4.99e-05,
+          3.91e-05,
+          2.95e-05,
+          2.1e-05,
+          1.36e-05,
+          7.34e-06,
+          2.2e-06,
+          -1.79e-06,
+          -2.110035378e-08,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -45.0,
+        -40.0,
+        -35.0,
+        -30.0,
+        -25.0,
+        -20.0,
+        -15.0,
+        -10.0,
+        -5.0,
+        -1e-06,
+        1e-06,
+        1e+100
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          9.23e-06,
+          8.26e-06,
+          7.38e-06,
+          6.6e-06,
+          6.01e-06,
+          5.42e-06,
+          5.08e-06,
+          4.75e-06,
+          4.57e-06,
+          4.410000032e-06,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "ROHM_SCS220AE2HR.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.596249",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

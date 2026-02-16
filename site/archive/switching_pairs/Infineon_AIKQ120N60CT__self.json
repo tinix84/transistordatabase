@@ -1,0 +1,246 @@
+{
+  "pair_id": "Infineon_AIKQ120N60CT__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "Infineon_AIKQ120N60CT",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "Infineon AIKQ120N60CT",
+      "type": "mosfet",
+      "manufacturer": "Infineon",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 6.51,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 600.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.18,
+      "r_th_cs": 0.3,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -2.8381294964028783,
+            -2.487410071942446,
+            -2.082733812949641,
+            -1.715827338129497,
+            -1.321942446043166,
+            -1.0197841726618708,
+            -0.7122302158273386,
+            -0.4694244604316552,
+            -0.43057555993705104,
+            0.41334244212087046,
+            0.47433628318584065,
+            0.6725663716814158,
+            0.8637168141592918,
+            1.1964601769911511,
+            1.479646017699115,
+            1.9823008849557524,
+            2.6123893805309732,
+            3.3345132743362833,
+            3.9433628318584066
+          ],
+          "on_state_current": [
+            -354.27814569536423,
+            -285.1390728476821,
+            -205.9867549668874,
+            -136.37086092715236,
+            -80.58278145695368,
+            -42.437086092715234,
+            -13.82781456953644,
+            -1.9072847682119143,
+            -1e-06,
+            1e-06,
+            1.8872870249016582,
+            8.020969855832266,
+            19.344692005242415,
+            46.238532110091704,
+            73.60419397116642,
+            127.86369593709044,
+            201.9397116644823,
+            281.6775884665792,
+            351.0353866317169
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "Infineon_AIKQ120N60CT",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "Infineon_AIKQ120N60CT.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        19.2857142857143,
+        49.285714285714256,
+        86.1428571428572,
+        115.71428571428575,
+        150.42857142857147,
+        170.99999999999997,
+        201.8571428571429,
+        236.5714285714286
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.00021710530921052068,
+          0.001105263157894737,
+          0.002486842105263164,
+          0.004539473684210529,
+          0.006355263157894738,
+          0.00915789473684211,
+          0.011210526315789471,
+          0.01432894736842106,
+          0.01764473684210526
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        20.962566844919824,
+        39.35828877005347,
+        64.17112299465242,
+        96.68449197860964,
+        136.47058823529412,
+        174.11764705882354,
+        211.3368983957219,
+        234.43850267379676
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.00047614673474123963,
+          0.0011067193675889319,
+          0.0016600790513833996,
+          0.002332015810276684,
+          0.003399209486166009,
+          0.004624505928853758,
+          0.005968379446640317,
+          0.007588932806324113,
+          0.008458498023715419
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "Infineon_AIKQ120N60CT.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.362613",
+    "schema_version": "1.0",
+    "quality_score": 71.42857142857143
+  }
+}

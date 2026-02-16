@@ -1,0 +1,266 @@
+{
+  "pair_id": "ON_Semiconductor_NTH027N65S3F__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ON_Semiconductor_NTH027N65S3F",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "ON Semiconductor NTH027N65S3F",
+      "type": "mosfet",
+      "manufacturer": "ON Semiconductor",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 12.5,
+      "weight": 0.05
+    },
+    "electrical_ratings": {
+      "v_abs_max": 650.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.21,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -1.6156763590391914,
+            -1.117572692793932,
+            -0.9860935524652341,
+            -0.8773704171934262,
+            -0.7686472819216185,
+            -0.6826801517067005,
+            -0.6017699115044248,
+            -0.5284450063211124,
+            -0.470290771175727,
+            -0.4247787610619471,
+            -0.38179519595448813,
+            -0.2932996207332492,
+            -0.17699115044247776,
+            -0.055625790139064324,
+            0.20850179334653654,
+            0.47500949851063123,
+            1.3903600907592302,
+            3.501489210350596,
+            9.540756054507114
+          ],
+          "on_state_current": [
+            -180.84304378282894,
+            -80.689127767945,
+            -59.33299140100341,
+            -43.629222002695634,
+            -29.70838193368551,
+            -20.621746888373746,
+            -13.512544428798837,
+            -8.358224793938675,
+            -5.0716121798539335,
+            -3.1979220391134398,
+            -1.9404384021296817,
+            -0.4014358307866507,
+            -0.027776131932920695,
+            -0.0009809685329208874,
+            4.533778161616012,
+            10.200556049685991,
+            29.75887677690717,
+            72.43871776768826,
+            174.94676233556322
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "ON_Semiconductor_NTH027N65S3F",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "ON_Semiconductor_NTH027N65S3F.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        0.0,
+        5.0,
+        10.0,
+        15.0,
+        20.0,
+        25.0,
+        30.0,
+        35.0,
+        40.0,
+        45.0,
+        50.0,
+        55.0,
+        60.0,
+        65.0,
+        70.0
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          0.000499443,
+          0.000681934,
+          0.000917662,
+          0.00116901,
+          0.00144124,
+          0.00172841,
+          0.00204454,
+          0.00238719,
+          0.00274861,
+          0.00313537,
+          0.00354532,
+          0.0039769,
+          0.0044427,
+          0.00493163,
+          0.00544924
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        0.0,
+        5.0,
+        10.0,
+        15.0,
+        20.0,
+        25.0,
+        30.0,
+        35.0,
+        40.0,
+        45.0,
+        50.0,
+        55.0,
+        60.0,
+        65.0,
+        70.0
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          2.63e-05,
+          5.16e-05,
+          0.000183,
+          0.000305,
+          0.000431,
+          0.000561,
+          0.000695,
+          0.000835,
+          0.000979,
+          0.00113,
+          0.00128,
+          0.00144,
+          0.0016,
+          0.00177,
+          0.00194
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "ON_Semiconductor_NTH027N65S3F.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.562523",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

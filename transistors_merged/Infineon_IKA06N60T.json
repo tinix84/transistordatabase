@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "name": "Infineon_IKA06N60T",
+    "type": "IGBT",
+    "manufacturer": "Infineon",
+    "housing_type": "unknown",
+    "import_source": "plecs_xml:IKA06N60T_IGBT.xml",
+    "import_date": "2026-02-15T15:46:32.372325"
+  },
+  "electrical_ratings": {
+    "v_abs_max": 0.0,
+    "i_abs_max": 0.0,
+    "i_cont": 0.0,
+    "t_j_max": 150.0
+  },
+  "thermal_properties": {
+    "housing_area": 0.0,
+    "cooling_area": 0.0,
+    "r_th_jc": 0.0,
+    "r_th_cs": 0.0
+  },
+  "switch": {
+    "channel_data": [],
+    "e_on_data": [],
+    "e_off_data": [],
+    "gate_charge_curves": [],
+    "soa": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.381,
+          "tau": 0.0187
+        },
+        {
+          "R": 2.57,
+          "tau": 1.35
+        },
+        {
+          "R": 0.645,
+          "tau": 0.00221
+        },
+        {
+          "R": 1.454,
+          "tau": 0.000547
+        },
+        {
+          "R": 0.062,
+          "tau": 5.31e-05
+        },
+        {
+          "R": 0.186,
+          "tau": 0.593
+        }
+      ]
+    }
+  },
+  "diode": {
+    "channel_data": [],
+    "e_rr_data": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.381,
+          "tau": 0.0187
+        },
+        {
+          "R": 2.57,
+          "tau": 1.35
+        },
+        {
+          "R": 0.645,
+          "tau": 0.00221
+        },
+        {
+          "R": 1.454,
+          "tau": 0.000547
+        },
+        {
+          "R": 0.062,
+          "tau": 5.31e-05
+        },
+        {
+          "R": 0.186,
+          "tau": 0.593
+        }
+      ]
+    }
+  },
+  "c_oss": [],
+  "c_iss": [],
+  "c_rss": []
+}

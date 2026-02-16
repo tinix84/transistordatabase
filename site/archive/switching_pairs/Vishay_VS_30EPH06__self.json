@@ -1,0 +1,218 @@
+{
+  "pair_id": "Vishay_VS_30EPH06__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "Vishay_VS_30EPH06",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "VS-30EPH06_nlg5_sec_clampingdiode.png",
+      "type": "mosfet",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 0.0,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 600.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -0.0,
+            -0.0,
+            0.4891036056505639,
+            0.5318408139112922,
+            0.5983209156502038,
+            0.6600524386934792,
+            0.7027896469542075,
+            0.7977612208669389,
+            0.8689899013014867,
+            0.9592128965185812,
+            1.0731787852138581,
+            1.177647516517862,
+            1.3438477708651404,
+            1.4910537104298736,
+            1.6572539647771525,
+            1.818705640428795,
+            1.9801573160804375,
+            2.184346199992808,
+            2.364792190426996,
+            2.549986759556822,
+            2.6876955417302817
+          ],
+          "on_state_current": [
+            -1e+100,
+            -0.0,
+            1.0221241166421455,
+            1.5155458271115614,
+            2.3996362671653007,
+            3.5193222646596207,
+            4.8866762630040705,
+            7.166831410199394,
+            9.843054779770101,
+            13.817715649139616,
+            19.61075969751077,
+            26.93376904342945,
+            38.22568692762456,
+            53.077423122634784,
+            66.78793286549644,
+            84.04002519375946,
+            106.91192852705143,
+            131.6166098577604,
+            155.09148911194964,
+            184.76386959219553,
+            210.6875446261218
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "Vishay_VS_30EPH06",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "Vishay_VS_30EPH06_150C.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 1.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.0,
+        1e+100
+      ],
+      "voltage_axis": [
+        1.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.0,
+        1e+100
+      ],
+      "voltage_axis": [
+        1.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "Vishay_VS_30EPH06_150C.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.846762",
+    "schema_version": "1.0",
+    "quality_score": 57.14285714285714
+  }
+}

@@ -1,0 +1,258 @@
+{
+  "pair_id": "C3M0075120K__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "C3M0075120K",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "C3M0075120K",
+      "type": "mosfet",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 10.5,
+      "weight": 0.006
+    },
+    "electrical_ratings": {
+      "v_abs_max": 1200.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -9.71594335824884,
+            -9.020441989870939,
+            -8.029879434908477,
+            -6.902324186174607,
+            -5.795844736482496,
+            -4.194084009309152,
+            -2.9927634639291436,
+            -2.002200908966681,
+            -1.2540100429843943,
+            -0.5374328755647404,
+            -9.61795636319057e-08,
+            9.61795636319057e-08,
+            0.5374328755647404,
+            1.2540100429843943,
+            2.002200908966681,
+            2.9927634639291436,
+            4.194084009309152,
+            5.795844736482496,
+            6.902324186174607,
+            8.029879434908477,
+            9.020441989870939,
+            9.71594335824884
+          ],
+          "on_state_current": [
+            -69.568201893582,
+            -66.7742982030767,
+            -62.86283303636928,
+            -57.275025655358675,
+            -50.56965679814594,
+            -39.53373722065001,
+            -29.475683934830926,
+            -20.25580175616343,
+            -12.99165216084964,
+            -5.58780738101059,
+            -1e-06,
+            1e-06,
+            5.58780738101059,
+            12.99165216084964,
+            20.25580175616343,
+            29.475683934830926,
+            39.53373722065001,
+            50.56965679814594,
+            57.275025655358675,
+            62.86283303636928,
+            66.7742982030767,
+            69.568201893582
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "C3M0075120K",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "C3M0075120K.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 800.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        5.281064636929834,
+        10.341749378778905,
+        15.110471539367452,
+        20.60910015310731,
+        25.718445325166464,
+        30.341186195124756,
+        35.69383351823434,
+        40.17059309756237
+      ],
+      "voltage_axis": [
+        800.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          8.281133421765609e-05,
+          0.0001242223869488919,
+          0.00016390535559092587,
+          0.00021409263946173355,
+          0.000274784238561315,
+          0.0003366429837974268,
+          0.0003996688751700689,
+          0.00047786766631760654,
+          0.0005478964345094311
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        5.353817504655493,
+        10.614525139664801,
+        14.338919925512101,
+        18.66852886405959,
+        21.74115456238361,
+        25.27932960893855,
+        28.817504655493476,
+        31.8901303538175,
+        35.10242085661079,
+        38.268156424581,
+        40.17690875232775
+      ],
+      "voltage_axis": [
+        800.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          1.3191643794078079e-05,
+          2.454672245467228e-05,
+          3.570432357043242e-05,
+          4.463040446304056e-05,
+          6.136680613668062e-05,
+          7.364016736401684e-05,
+          8.926080892608098e-05,
+          0.00011157601115760112,
+          0.00012942817294281725,
+          0.00015174337517433753,
+          0.00017182705718270575,
+          0.00018856345885634587
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "C3M0075120K.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.260241",
+    "schema_version": "1.0",
+    "quality_score": 57.14285714285714
+  }
+}

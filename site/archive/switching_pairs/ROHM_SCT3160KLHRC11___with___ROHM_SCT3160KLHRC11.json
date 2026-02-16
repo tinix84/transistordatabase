@@ -1,0 +1,234 @@
+{
+  "pair_id": "ROHM_SCT3160KLHRC11___with___ROHM_SCT3160KLHRC11",
+  "pair_type": "combination",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ROHM_SCT3160KLHRC11",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "ROHM SCT3160KLHRC11 with ROHM SCT3160KLHRC11",
+      "type": "mosfet",
+      "manufacturer": "ROHM",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 3.84,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 1200.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -20.77626937781641,
+            -10.477804002076239,
+            -5.984488365871763,
+            -3.4716868189265595,
+            -1.4985653124037592,
+            -0.9396648314954705,
+            -0.3581410100125454,
+            -0.11683354854432924,
+            -0.010000000000000002,
+            0.38172264822232504,
+            2.836569402450427e-07,
+            2.826855123674913,
+            4.416961130742051,
+            6.30742049469965
+          ],
+          "on_state_current": [
+            -6.626970227670753,
+            -4.609457092819616,
+            -3.6007005253940463,
+            -2.8861646234676,
+            -2.255691768826621,
+            -1.9894921190893167,
+            -1.6252189141856406,
+            -1.3730297723292473,
+            -1.0788091068301229,
+            -1e-06,
+            1e-06,
+            9.965753424657537,
+            14.828767123287673,
+            19.93150684931507
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "ROHM_SCT3160KLHRC11",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "ROHM_SCT3160KLHRC11_with_ROHM_SCT3160KLHRC11.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 600.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        0.07054673721340403,
+        5.361552028218698,
+        10.017636684303353,
+        12.804232804232807,
+        14.497354497354497,
+        16.014109347442684,
+        17.248677248677247,
+        19.22398589065256
+      ],
+      "voltage_axis": [
+        600.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          3.894154280369231e-05,
+          3.924786324786325e-05,
+          6.222222222222212e-05,
+          0.00010434188034188038,
+          0.0001368888888888888,
+          0.00016273504273504267,
+          0.00019241025641025637,
+          0.000224,
+          0.00027952136752136753
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        0.035211267605632625,
+        5.000000000000001,
+        8.521126760563384,
+        10.52816901408451,
+        12.605633802816904,
+        15.387323943661976,
+        19.82394366197183
+      ],
+      "voltage_axis": [
+        600.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          7.644030695812735e-06,
+          7.671232876712375e-06,
+          1.1506849315068601e-05,
+          9.589041095890324e-06,
+          9.589041095890324e-06,
+          1.0547945205479545e-05,
+          1.4383561643835773e-05,
+          2.301369863013712e-05
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "ROHM_SCT3160KLHRC11_with_ROHM_SCT3160KLHRC11.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.646270",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

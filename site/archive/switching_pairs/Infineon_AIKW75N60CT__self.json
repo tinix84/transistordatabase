@@ -1,0 +1,246 @@
+{
+  "pair_id": "Infineon_AIKW75N60CT__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "Infineon_AIKW75N60CT",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "Infineon AIKW75N60CT",
+      "type": "mosfet",
+      "manufacturer": "Infineon",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 4.31,
+      "weight": 0.05
+    },
+    "electrical_ratings": {
+      "v_abs_max": 600.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.35,
+      "r_th_cs": 0.6,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -2.692913385826772,
+            -2.10236220472441,
+            -1.783464566929134,
+            -1.482283464566929,
+            -1.311023622047245,
+            -1.198818897637795,
+            -1.045275590551182,
+            -0.8799212598425195,
+            -0.7263779527559057,
+            -0.5551181102362202,
+            -0.3425196850393702,
+            -0.0,
+            0.4901185770750991,
+            0.6640316205533601,
+            0.8221343873517786,
+            1.027667984189723,
+            1.367588932806324,
+            1.636363636363637,
+            2.126482213438734,
+            2.790513833992095,
+            4.0
+          ],
+          "on_state_current": [
+            -222.0524017467249,
+            -135.2620087336244,
+            -95.63318777292575,
+            -62.88209606986897,
+            -46.50655021834058,
+            -35.69868995633186,
+            -25.54585152838427,
+            -15.72052401746724,
+            -8.515283842794755,
+            -3.602620087336255,
+            -0.0,
+            0.3275109170305731,
+            1.96506550218344,
+            5.567685589519699,
+            11.1353711790393,
+            20.63318777292579,
+            37.00873362445419,
+            53.38427947598257,
+            85.48034934497818,
+            128.056768558952,
+            199.7816593886463
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "Infineon_AIKW75N60CT",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "Infineon_AIKW75N60CT.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.0,
+        0.350109409190381,
+        9.803063457330405,
+        22.75711159737418,
+        46.5645514223195,
+        61.26914660831513,
+        77.02407002188185,
+        91.72866520787744,
+        116.5864332603939,
+        150.1969365426696
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.000439418416801292,
+          0.0004652665589660733,
+          0.0008529886914378059,
+          0.001680129240710824,
+          0.00230048465266559,
+          0.003075928917609047,
+          0.003928917609046853,
+          0.005815831987075933,
+          0.008710823909531505
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.0,
+        9.803063457330389,
+        20.30634573304155,
+        40.2625820568928,
+        63.01969365426697,
+        82.97592997811816,
+        108.1838074398249,
+        149.4967177242889
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.00046526655896607,
+          0.000827140549273018,
+          0.001499192245557352,
+          0.002326332794830373,
+          0.003205169628432957,
+          0.004394184168012928,
+          0.006668820678513734
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "Infineon_AIKW75N60CT.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.418768",
+    "schema_version": "1.0",
+    "quality_score": 71.42857142857143
+  }
+}

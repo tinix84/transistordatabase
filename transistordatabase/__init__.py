@@ -31,3 +31,17 @@ from transistordatabase.core.adapters import (
     legacy_to_core,
     core_to_legacy_dicts,
 )
+
+# Analytical models for device physics and switching loss estimation
+from transistordatabase.analytical_models import (
+    ChristenBielaModel,
+    HalfBridgeParams,
+    TransconductanceParams,
+    ReverseRecoveryParams,
+    SwitchingEnergyResult,
+    GateChargeModel,
+    GateChargeModelParams,
+    IgbtModel,
+    IgbtModelParams,
+    get_package_inductance,
+)

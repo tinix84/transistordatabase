@@ -1,0 +1,550 @@
+{
+  "schema_version": "1.0.0",
+  "last_updated": "2026-02-15",
+  "description": "Complete TDB JSON schema reference based on core/models.py",
+  "root_structure": {
+    "metadata": "TransistorMetadata - Core identification fields",
+    "electrical_ratings": "ElectricalRatings - Voltage/current/temperature limits",
+    "thermal_properties": "ThermalProperties - Thermal characteristics",
+    "switch": "Switch - Main switching component with all curves",
+    "diode": "Diode - Parasitic/intrinsic diode component",
+    "c_oss": "list[VoltageDependentCapacitance] - Output capacitance",
+    "c_iss": "list[VoltageDependentCapacitance] - Input capacitance",
+    "c_rss": "list[VoltageDependentCapacitance] - Reverse transfer capacitance",
+    "c_oss_er": "EffectiveOutputCapacitance - Energy-related C_oss",
+    "c_oss_tr": "EffectiveOutputCapacitance - Time-related C_oss"
+  },
+  "metadata": {
+    "type": "TransistorMetadata",
+    "fields": {
+      "name": {
+        "type": "string",
+        "description": "Unique identifier for transistor",
+        "example": "Infineon_IPBE65R050CFD7A"
+      },
+      "type": {
+        "type": "string",
+        "enum": ["MOSFET", "IGBT", "SiC-MOSFET", "GaN-Transistor"],
+        "description": "Semiconductor type"
+      },
+      "author": {
+        "type": "string",
+        "description": "Data author/creator"
+      },
+      "manufacturer": {
+        "type": "string",
+        "description": "Device manufacturer"
+      },
+      "housing_type": {
+        "type": "string",
+        "example": "TO263, TO247, TO220",
+        "description": "Package type"
+      },
+      "comment": {
+        "type": "string|null",
+        "description": "Optional comment"
+      },
+      "datasheet_hyperlink": {
+        "type": "string|null",
+        "description": "URL to manufacturer datasheet"
+      },
+      "datasheet_date": {
+        "type": "string|null",
+        "format": "ISO8601 or YYYY-MM",
+        "example": "2021-11"
+      },
+      "datasheet_version": {
+        "type": "string|null",
+        "example": "REV-2.2"
+      }
+    }
+  },
+  "electrical_ratings": {
+    "type": "ElectricalRatings",
+    "fields": {
+      "v_abs_max": {
+        "type": "float",
+        "unit": "Volts (V)",
+        "description": "Maximum drain-source / collector-emitter voltage"
+      },
+      "i_abs_max": {
+        "type": "float",
+        "unit": "Amperes (A)",
+        "description": "Maximum drain / collector current"
+      },
+      "i_cont": {
+        "type": "float",
+        "unit": "Amperes (A)",
+        "description": "Continuous drain / collector current"
+      },
+      "t_j_max": {
+        "type": "float",
+        "unit": "Celsius (°C)",
+        "description": "Maximum junction temperature"
+      }
+    }
+  },
+  "thermal_properties": {
+    "type": "ThermalProperties",
+    "fields": {
+      "housing_area": {
+        "type": "float",
+        "unit": "square meters (m²)",
+        "description": "Housing surface area"
+      },
+      "cooling_area": {
+        "type": "float",
+        "unit": "square meters (m²)",
+        "description": "Effective cooling surface area"
+      },
+      "r_th_cs": {
+        "type": "float|null",
+        "unit": "K/W",
+        "description": "Thermal resistance case-to-sink (overall)"
+      },
+      "r_th_switch_cs": {
+        "type": "float|null",
+        "unit": "K/W",
+        "description": "Thermal resistance switch case-to-sink"
+      },
+      "r_th_diode_cs": {
+        "type": "float|null",
+        "unit": "K/W",
+        "description": "Thermal resistance diode case-to-sink"
+      },
+      "t_c_max": {
+        "type": "float|null",
+        "unit": "Celsius (°C)",
+        "description": "Maximum case temperature"
+      }
+    }
+  },
+  "switch": {
+    "type": "Switch object",
+    "description": "Main switching transistor component",
+    "fields": {
+      "channel_data": {
+        "type": "list[ChannelCharacteristics]",
+        "description": "V-I characteristics at different conditions",
+        "structure": {
+          "t_j": "float - Junction temperature (°C)",
+          "graph_v_i": "2D array [[voltages], [currents]] - V-I curve",
+          "v_g": "float|null - Gate voltage (V) - mandatory for switch"
+        }
+      },
+      "e_on_data": {
+        "type": "list[SwitchingLossData]",
+        "description": "Turn-on switching loss data"
+      },
+      "e_off_data": {
+        "type": "list[SwitchingLossData]",
+        "description": "Turn-off switching loss data"
+      },
+      "e_on_meas": {
+        "type": "list[SwitchingLossData]",
+        "description": "Measured turn-on switching losses"
+      },
+      "e_off_meas": {
+        "type": "list[SwitchingLossData]",
+        "description": "Measured turn-off switching losses"
+      },
+      "thermal_foster": {
+        "type": "FosterThermalModel|null",
+        "description": "Foster RC thermal model for transient analysis"
+      },
+      "gate_charge_curves": {
+        "type": "list[GateChargeCurve]",
+        "description": "Gate charge (Qg) vs gate voltage curves"
+      },
+      "soa": {
+        "type": "list[SOA]",
+        "description": "Safe Operating Area curves at different conditions"
+      },
+      "r_channel_temp": {
+        "type": "list[TemperatureDependResistance]",
+        "description": "Temperature-dependent on-resistance"
+      },
+      "linearized_model": {
+        "type": "list[LinearizedModel]",
+        "description": "Linearized switch models at operating points"
+      },
+      "raw_measurement_data": {
+        "type": "list[RawMeasurementData]",
+        "description": "Raw measurement data (e.g., double pulse test)"
+      }
+    }
+  },
+  "switching_loss_data": {
+    "type": "SwitchingLossData",
+    "fields": {
+      "dataset_type": {
+        "type": "string",
+        "enum": ["single", "graph_i_e", "graph_r_e", "graph_t_e"],
+        "description": "Type of switching loss data"
+      },
+      "t_j": {
+        "type": "float",
+        "unit": "Celsius (°C)",
+        "description": "Junction temperature"
+      },
+      "v_supply": {
+        "type": "float",
+        "unit": "Volts (V)",
+        "description": "Supply/DC-link voltage"
+      },
+      "v_g": {
+        "type": "float",
+        "unit": "Volts (V)",
+        "description": "Gate drive voltage"
+      },
+      "e_x": {
+        "type": "float|null",
+        "unit": "Joules (J)",
+        "description": "Single-point switching energy (for dataset_type='single')"
+      },
+      "r_g": {
+        "type": "float|null",
+        "unit": "Ohms (Ω)",
+        "description": "Gate resistance"
+      },
+      "i_x": {
+        "type": "float|null",
+        "unit": "Amperes (A)",
+        "description": "Current point for single measurement"
+      },
+      "v_g_off": {
+        "type": "float|null",
+        "unit": "Volts (V)",
+        "description": "Gate voltage for turn-off"
+      },
+      "graph_i_e": {
+        "type": "2D array|null",
+        "structure": "[[currents], [energies]] in A and J",
+        "description": "Switching energy vs current graph"
+      },
+      "graph_r_e": {
+        "type": "2D array|null",
+        "structure": "[[resistances], [energies]] in Ω and J",
+        "description": "Switching energy vs gate resistance graph"
+      },
+      "graph_t_e": {
+        "type": "2D array|null",
+        "structure": "[[temperatures], [energies]] in °C and J",
+        "description": "Switching energy vs temperature graph"
+      },
+      "comment": {
+        "type": "string|null",
+        "description": "Measurement comment"
+      },
+      "measurement_date": {
+        "type": "datetime|null",
+        "description": "When measurement was taken"
+      },
+      "measurement_testbench": {
+        "type": "string|null",
+        "example": "infineon",
+        "description": "Testbench/lab identifier"
+      },
+      "commutation_device": {
+        "type": "string|null",
+        "example": "IDH09G65C5",
+        "description": "Counter/commutation device used"
+      },
+      "load_inductance": {
+        "type": "float|null",
+        "unit": "Henry (H)",
+        "description": "Test circuit load inductance"
+      },
+      "commutation_inductance": {
+        "type": "float|null",
+        "unit": "Henry (H)",
+        "description": "Test circuit commutation inductance"
+      }
+    }
+  },
+  "gate_charge_curve": {
+    "type": "GateChargeCurve",
+    "fields": {
+      "v_supply": {
+        "type": "float",
+        "unit": "Volts (V)",
+        "description": "Drain-source voltage during measurement"
+      },
+      "t_j": {
+        "type": "float",
+        "unit": "Celsius (°C)",
+        "description": "Junction temperature"
+      },
+      "i_channel": {
+        "type": "float",
+        "unit": "Amperes (A)",
+        "description": "Channel current during measurement"
+      },
+      "i_g": {
+        "type": "float|null",
+        "unit": "Amperes (A)",
+        "description": "Gate current"
+      },
+      "graph_q_v": {
+        "type": "2D array|null",
+        "structure": "[[charge in C], [voltage in V]]",
+        "description": "Gate charge vs gate voltage curve"
+      }
+    }
+  },
+  "voltage_dependent_capacitance": {
+    "type": "VoltageDependentCapacitance",
+    "fields": {
+      "t_j": {
+        "type": "float",
+        "unit": "Celsius (°C)",
+        "description": "Junction temperature"
+      },
+      "graph_v_c": {
+        "type": "2D array|null",
+        "structure": "[[voltages in V], [capacitances in F]]",
+        "description": "Voltage-dependent capacitance curve"
+      }
+    }
+  },
+  "soa": {
+    "type": "SOA",
+    "description": "Safe Operating Area characteristics",
+    "fields": {
+      "t_c": {
+        "type": "float|null",
+        "unit": "Celsius (°C)",
+        "description": "Case temperature"
+      },
+      "time_pulse": {
+        "type": "float|null",
+        "unit": "Seconds (s)",
+        "description": "Pulse duration"
+      },
+      "graph_i_v": {
+        "type": "2D array",
+        "structure": "[[voltages in V], [currents in A]]",
+        "description": "SOA curve: voltage vs current"
+      }
+    }
+  },
+  "foster_thermal_model": {
+    "type": "FosterThermalModel",
+    "description": "Foster RC network for transient thermal analysis",
+    "fields": {
+      "r_th_vector": {
+        "type": "list[float]|null",
+        "unit": "K/W",
+        "description": "Thermal resistance values per stage"
+      },
+      "r_th_total": {
+        "type": "float|null",
+        "unit": "K/W",
+        "description": "Sum of all thermal resistances"
+      },
+      "c_th_vector": {
+        "type": "list[float]|null",
+        "unit": "J/K",
+        "description": "Thermal capacitance values per stage"
+      },
+      "c_th_total": {
+        "type": "float|null",
+        "unit": "J/K",
+        "description": "Total thermal capacitance"
+      },
+      "tau_vector": {
+        "type": "list[float]|null",
+        "unit": "Seconds (s)",
+        "description": "Time constants per stage (R*C)"
+      },
+      "tau_total": {
+        "type": "float|null",
+        "unit": "Seconds (s)",
+        "description": "Total time constant"
+      },
+      "graph_t_rthjc": {
+        "type": "2D array|null",
+        "structure": "[[time in s], [Z_th in K/W]]",
+        "description": "Thermal impedance vs time curve"
+      }
+    }
+  },
+  "effective_output_capacitance": {
+    "type": "EffectiveOutputCapacitance",
+    "fields": {
+      "c_o": {
+        "type": "float",
+        "unit": "Farads (F)",
+        "description": "Fixed output capacitance value"
+      },
+      "v_gs": {
+        "type": "float",
+        "unit": "Volts (V)",
+        "description": "Gate-source voltage at measurement"
+      },
+      "v_ds": {
+        "type": "float",
+        "unit": "Volts (V)",
+        "description": "Drain-source voltage at measurement"
+      }
+    }
+  },
+  "linearized_model": {
+    "type": "LinearizedModel",
+    "description": "Linear approximation at specific operating point",
+    "fields": {
+      "t_j": {
+        "type": "float",
+        "unit": "Celsius (°C)",
+        "description": "Junction temperature"
+      },
+      "i_channel": {
+        "type": "float",
+        "unit": "Amperes (A)",
+        "description": "Channel current"
+      },
+      "r_channel": {
+        "type": "float",
+        "unit": "Ohms (Ω)",
+        "description": "Channel resistance (slope of V-I)"
+      },
+      "v0_channel": {
+        "type": "float",
+        "unit": "Volts (V)",
+        "description": "Channel threshold voltage (V-I intercept)"
+      },
+      "v_g": {
+        "type": "float|null",
+        "unit": "Volts (V)",
+        "description": "Gate voltage (mandatory for Switch)"
+      }
+    }
+  },
+  "diode": {
+    "type": "Diode object",
+    "description": "Intrinsic/parasitic diode component",
+    "fields": {
+      "channel_data": {
+        "type": "list[ChannelCharacteristics]",
+        "description": "Forward V-I characteristics"
+      },
+      "e_rr_data": {
+        "type": "list[SwitchingLossData]",
+        "description": "Reverse recovery loss data"
+      },
+      "thermal_foster": {
+        "type": "FosterThermalModel|null",
+        "description": "Foster thermal model"
+      },
+      "soa": {
+        "type": "list[SOA]",
+        "description": "Safe Operating Area"
+      },
+      "linearized_model": {
+        "type": "list[LinearizedModel]",
+        "description": "Linearized diode models"
+      },
+      "raw_measurement_data": {
+        "type": "list[RawMeasurementData]",
+        "description": "Raw measurement data"
+      }
+    }
+  },
+  "raw_measurement_data": {
+    "type": "RawMeasurementData",
+    "description": "Raw test data (e.g., double pulse test)",
+    "fields": {
+      "dataset_type": {
+        "type": "string",
+        "example": "dpt_u_i, dpt_u_i_r",
+        "description": "Type of raw measurement"
+      },
+      "comment": {
+        "type": "string|null"
+      },
+      "measurement_date": {
+        "type": "datetime|null"
+      },
+      "measurement_testbench": {
+        "type": "string|null"
+      },
+      "commutation_device": {
+        "type": "string|null"
+      },
+      "t_j": {
+        "type": "float|null",
+        "unit": "Celsius (°C)"
+      },
+      "v_supply": {
+        "type": "float|null",
+        "unit": "Volts (V)"
+      },
+      "v_g": {
+        "type": "float|null",
+        "unit": "Volts (V)"
+      },
+      "v_g_off": {
+        "type": "float|null",
+        "unit": "Volts (V)"
+      },
+      "r_g": {
+        "type": "list[float]|null",
+        "unit": "Ohms (Ω)",
+        "description": "Gate turn-on resistance(s)"
+      },
+      "r_g_off": {
+        "type": "list[float]|null",
+        "unit": "Ohms (Ω)",
+        "description": "Gate turn-off resistance(s)"
+      },
+      "load_inductance": {
+        "type": "float|null",
+        "unit": "Henry (H)"
+      },
+      "commutation_inductance": {
+        "type": "float|null",
+        "unit": "Henry (H)"
+      },
+      "dpt_on_vds": {
+        "type": "list[array]|null",
+        "unit": "Volts (V)",
+        "description": "Turn-on drain-source voltage traces"
+      },
+      "dpt_on_id": {
+        "type": "list[array]|null",
+        "unit": "Amperes (A)",
+        "description": "Turn-on drain current traces"
+      },
+      "dpt_off_vds": {
+        "type": "list[array]|null",
+        "unit": "Volts (V)",
+        "description": "Turn-off drain-source voltage traces"
+      },
+      "dpt_off_id": {
+        "type": "list[array]|null",
+        "unit": "Amperes (A)",
+        "description": "Turn-off drain current traces"
+      }
+    }
+  },
+  "unit_conventions": {
+    "temperature": "Celsius (°C) - always",
+    "voltage": "Volts (V) - always",
+    "current": "Amperes (A) - always",
+    "energy": "Joules (J) - always",
+    "charge": "Coulombs (C) - always",
+    "resistance": "Ohms (Ω) - always",
+    "capacitance": "Farads (F) - always",
+    "inductance": "Henry (H) - always",
+    "thermal_resistance": "K/W (Kelvin per Watt) - always",
+    "thermal_capacitance": "J/K (Joules per Kelvin) - always",
+    "time": "Seconds (s) - always"
+  },
+  "notes": {
+    "graph_convention": "All 2D arrays are [[x_axis], [y_axis]] format",
+    "null_handling": "null values indicate optional/missing data",
+    "numeric_precision": "Use 64-bit float (IEEE 754) for all numeric values",
+    "list_containers": "Arrays preserve insertion order",
+    "metadata_nesting": "Access via transistor.metadata.name, not transistor.name"
+  }
+}

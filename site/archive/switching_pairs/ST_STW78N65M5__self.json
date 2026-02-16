@@ -1,0 +1,256 @@
+{
+  "pair_id": "ST_STW78N65M5__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ST_STW78N65M5",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "ST STW78N65M5",
+      "type": "mosfet",
+      "manufacturer": "ST",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 10.59,
+      "weight": 0.05
+    },
+    "electrical_ratings": {
+      "v_abs_max": 650.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.28,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -0.9441358024691358,
+            -0.9052469135802467,
+            -0.875,
+            -0.8123456790123458,
+            -0.6891975308641978,
+            -0.5725308641975309,
+            0.0,
+            1.2704309063892991,
+            2.607726597325409,
+            3.9450222882615096,
+            5.884101040118871,
+            9.561664190193165,
+            12.771173848439815,
+            17.85289747399703
+          ],
+          "on_state_current": [
+            -51.07361963190185,
+            -34.325153374233125,
+            -27.51533742331288,
+            -19.96932515337423,
+            -10.030674846625768,
+            -0.9202453987729996,
+            0.0,
+            34.42622950819673,
+            68.85245901639342,
+            99.25484351713862,
+            133.23397913561848,
+            187.3323397913562,
+            215.49925484351712,
+            240.98360655737704
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "ST_STW78N65M5",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "ST_STW78N65M5.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        0.0,
+        5.0,
+        10.0,
+        15.0,
+        20.0,
+        25.0,
+        30.0,
+        35.0,
+        40.0,
+        45.0,
+        50.0,
+        55.0,
+        60.0,
+        65.0,
+        70.0
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          0.00034778,
+          0.000934734,
+          0.00170191,
+          0.00250116,
+          0.00333299,
+          0.00420066,
+          0.00509409,
+          0.00601159,
+          0.00695962,
+          0.00792354,
+          0.00892279,
+          0.00996356,
+          0.0110217,
+          0.0120735,
+          0.0131725
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        0.0,
+        5.0,
+        10.0,
+        15.0,
+        20.0,
+        25.0,
+        30.0,
+        35.0,
+        40.0,
+        45.0,
+        50.0,
+        55.0,
+        60.0,
+        65.0,
+        70.0
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          1.33e-05,
+          7.1e-05,
+          0.000167,
+          0.000268,
+          0.000371,
+          0.000478,
+          0.000587,
+          0.000699,
+          0.000813,
+          0.000929,
+          0.00105,
+          0.00117,
+          0.00129,
+          0.00141,
+          0.00153
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "ST_STW78N65M5.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.813783",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

@@ -1,0 +1,260 @@
+{
+  "pair_id": "Infineon_AIKW50N65DH5__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "Infineon_AIKW50N65DH5",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "Infineon AIKW50N65DH5",
+      "type": "mosfet",
+      "manufacturer": "Infineon",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 1.93,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 650.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -2.953124999999999,
+            -2.0976562499999996,
+            -1.7285156249999993,
+            -1.4999999999999998,
+            -1.3066406249999991,
+            -1.1074218749999993,
+            -0.9140624999999994,
+            -0.7089843749999994,
+            -0.4394531249999997,
+            -0.39044759799522255,
+            0.27054130928524184,
+            0.3707414829659321,
+            0.6212424849699395,
+            0.7515030060120232,
+            0.8717434869739478,
+            0.9819639278557112,
+            1.0921843687374746,
+            1.202404809619238,
+            1.3326653306613223,
+            1.5631262525050096,
+            1.7334669338677353,
+            1.9739478957915826,
+            2.2645290581162327,
+            3.226452905811623
+          ],
+          "on_state_current": [
+            -109.68345323741008,
+            -54.76258992805756,
+            -34.66187050359713,
+            -24.37410071942447,
+            -16.776978417266193,
+            -10.1294964028777,
+            -5.381294964028774,
+            -2.0575539568345276,
+            -0.31654676258992376,
+            -1e-06,
+            1e-06,
+            0.44117647058821574,
+            1.5441176470588012,
+            3.088235294117664,
+            5.073529411764712,
+            7.279411764705882,
+            10.58823529411764,
+            15.000000000000012,
+            20.51470588235294,
+            31.102941176470576,
+            41.02941176470588,
+            55.80882352941177,
+            76.54411764705883,
+            149.77941176470588
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "Infineon_AIKW50N65DH5",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "Infineon_AIKW50N65DH5.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        0.6550218340611208,
+        6.2227074235807995,
+        14.410480349344969,
+        23.908296943231452,
+        35.6986899563319,
+        53.71179039301307,
+        87.11790393013099,
+        149.6724890829694
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          0.00010703799295254256,
+          0.00011272141706924244,
+          0.00016103059581320568,
+          0.00035426731078904984,
+          0.0006119162640901798,
+          0.0009983896940418692,
+          0.0016747181964573282,
+          0.003027375201288246,
+          0.005893719806763285
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        0.3275109170305643,
+        6.2227074235807995,
+        17.030567685589524,
+        30.458515283842807,
+        43.5589519650655,
+        55.676855895196496,
+        70.08733624454146,
+        84.17030567685592,
+        101.52838427947597,
+        149.34497816593887
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          4.6519955364706406e-05,
+          4.830917874396324e-05,
+          8.051529790660394e-05,
+          0.00016103059581320568,
+          0.0003381642512077317,
+          0.000531400966183578,
+          0.0007729468599033844,
+          0.0011272141706924342,
+          0.0015297906602254451,
+          0.002061191626409019,
+          0.0038325281803542684
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "Infineon_AIKW50N65DH5.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.409934",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

@@ -1,0 +1,387 @@
+{
+  "mapping_version": "1.0.0",
+  "created_date": "2026-02-15",
+  "description": "Field mappings between source formats and TDB schema",
+  "common_unit_conversions": {
+    "temperature": {
+      "celsius_to_celsius": "multiply by 1.0",
+      "fahrenheit_to_celsius": "subtract 32, multiply by 5/9",
+      "kelvin_to_celsius": "subtract 273.15"
+    },
+    "voltage": {
+      "volts_to_volts": "multiply by 1.0",
+      "millivolts_to_volts": "multiply by 0.001",
+      "kilovolts_to_volts": "multiply by 1000"
+    },
+    "current": {
+      "amperes_to_amperes": "multiply by 1.0",
+      "milliamperes_to_amperes": "multiply by 0.001",
+      "kiloamperes_to_amperes": "multiply by 1000"
+    },
+    "energy": {
+      "joules_to_joules": "multiply by 1.0",
+      "millijoules_to_joules": "multiply by 0.001",
+      "microjoules_to_joules": "multiply by 0.000001"
+    },
+    "capacitance": {
+      "farads_to_farads": "multiply by 1.0",
+      "nanofarads_to_farads": "multiply by 1e-9",
+      "picofarads_to_farads": "multiply by 1e-12",
+      "microfarads_to_farads": "multiply by 1e-6"
+    },
+    "resistance": {
+      "ohms_to_ohms": "multiply by 1.0",
+      "milliohms_to_ohms": "multiply by 0.001",
+      "microohms_to_ohms": "multiply by 1e-6"
+    }
+  },
+  "file_exchange_format": {
+    "format_description": "TDB File Exchange JSON format",
+    "example_source": "/home/tinix/claude_wsl/file_exchange/Si-MOSFET/650V/Infineon_IPBE65R050CFD7A.json",
+    "root_level_fields": {
+      "name": {
+        "tdb_field": "metadata.name",
+        "transformation": "direct copy",
+        "example": "Infineon_IPBE65R050CFD7A"
+      },
+      "type": {
+        "tdb_field": "metadata.type",
+        "transformation": "direct copy or normalize",
+        "valid_values": ["MOSFET", "IGBT", "SiC-MOSFET", "GaN-Transistor"]
+      },
+      "author": {
+        "tdb_field": "metadata.author",
+        "transformation": "direct copy"
+      },
+      "manufacturer": {
+        "tdb_field": "metadata.manufacturer",
+        "transformation": "direct copy"
+      },
+      "housing_type": {
+        "tdb_field": "metadata.housing_type",
+        "transformation": "direct copy",
+        "example": "TO263"
+      },
+      "housing_area": {
+        "tdb_field": "thermal_properties.housing_area",
+        "transformation": "direct copy (must be in m²)"
+      },
+      "cooling_area": {
+        "tdb_field": "thermal_properties.cooling_area",
+        "transformation": "direct copy (must be in m²)"
+      },
+      "v_abs_max": {
+        "tdb_field": "electrical_ratings.v_abs_max",
+        "transformation": "direct copy (must be in V)"
+      },
+      "i_abs_max": {
+        "tdb_field": "electrical_ratings.i_abs_max",
+        "transformation": "direct copy (must be in A)"
+      },
+      "i_cont": {
+        "tdb_field": "electrical_ratings.i_cont",
+        "transformation": "direct copy (must be in A)"
+      },
+      "t_c_max": {
+        "tdb_field": "thermal_properties.t_c_max",
+        "transformation": "direct copy"
+      },
+      "r_th_cs": {
+        "tdb_field": "thermal_properties.r_th_cs",
+        "transformation": "direct copy (K/W)"
+      },
+      "r_th_switch_cs": {
+        "tdb_field": "thermal_properties.r_th_switch_cs",
+        "transformation": "direct copy (K/W)"
+      },
+      "r_th_diode_cs": {
+        "tdb_field": "thermal_properties.r_th_diode_cs",
+        "transformation": "direct copy (K/W)"
+      },
+      "datasheet_hyperlink": {
+        "tdb_field": "metadata.datasheet_hyperlink",
+        "transformation": "direct copy"
+      },
+      "datasheet_date": {
+        "tdb_field": "metadata.datasheet_date",
+        "transformation": "parse to ISO format YYYY-MM or full datetime"
+      },
+      "datasheet_version": {
+        "tdb_field": "metadata.datasheet_version",
+        "transformation": "direct copy"
+      }
+    },
+    "switch_object": {
+      "source_field": "switch",
+      "tdb_field": "switch",
+      "fields": {
+        "channel": {
+          "tdb_field": "switch.channel_data",
+          "transformation": "list of ChannelCharacteristics",
+          "note": "Renamed from 'channel' to 'channel_data' in TDB"
+        },
+        "e_on": {
+          "tdb_field": "switch.e_on_data",
+          "transformation": "list of SwitchingLossData"
+        },
+        "e_off": {
+          "tdb_field": "switch.e_off_data",
+          "transformation": "list of SwitchingLossData"
+        },
+        "e_on_meas": {
+          "tdb_field": "switch.e_on_meas",
+          "transformation": "list of SwitchingLossData"
+        },
+        "e_off_meas": {
+          "tdb_field": "switch.e_off_meas",
+          "transformation": "list of SwitchingLossData"
+        },
+        "charge_curve": {
+          "tdb_field": "switch.gate_charge_curves",
+          "transformation": "list of GateChargeCurve",
+          "note": "Renamed from 'charge_curve' to 'gate_charge_curves'"
+        },
+        "soa": {
+          "tdb_field": "switch.soa",
+          "transformation": "list of SOA"
+        },
+        "thermal_foster": {
+          "tdb_field": "switch.thermal_foster",
+          "transformation": "FosterThermalModel object"
+        },
+        "r_channel_th": {
+          "tdb_field": "switch.r_channel_temp",
+          "transformation": "list of TemperatureDependResistance",
+          "note": "Renamed from 'r_channel_th' to 'r_channel_temp'"
+        },
+        "linearized_switch": {
+          "tdb_field": "switch.linearized_model",
+          "transformation": "list of LinearizedModel",
+          "note": "Renamed from 'linearized_switch' to 'linearized_model'"
+        }
+      }
+    },
+    "diode_object": {
+      "source_field": "diode",
+      "tdb_field": "diode",
+      "fields": {
+        "channel": {
+          "tdb_field": "diode.channel_data",
+          "transformation": "list of ChannelCharacteristics"
+        },
+        "e_rr": {
+          "tdb_field": "diode.e_rr_data",
+          "transformation": "list of SwitchingLossData"
+        },
+        "thermal_foster": {
+          "tdb_field": "diode.thermal_foster",
+          "transformation": "FosterThermalModel object"
+        },
+        "soa": {
+          "tdb_field": "diode.soa",
+          "transformation": "list of SOA"
+        },
+        "linearized_diode": {
+          "tdb_field": "diode.linearized_model",
+          "transformation": "list of LinearizedModel",
+          "note": "Renamed from 'linearized_diode' to 'linearized_model'"
+        }
+      }
+    },
+    "capacitance_curves": {
+      "c_oss": {
+        "tdb_field": "c_oss",
+        "transformation": "list of VoltageDependentCapacitance"
+      },
+      "c_iss": {
+        "tdb_field": "c_iss",
+        "transformation": "list of VoltageDependentCapacitance"
+      },
+      "c_rss": {
+        "tdb_field": "c_rss",
+        "transformation": "list of VoltageDependentCapacitance"
+      },
+      "c_oss_er": {
+        "tdb_field": "c_oss_er",
+        "transformation": "EffectiveOutputCapacitance"
+      },
+      "c_oss_tr": {
+        "tdb_field": "c_oss_tr",
+        "transformation": "EffectiveOutputCapacitance"
+      }
+    }
+  },
+  "sc_archive_format": {
+    "format_description": "SC archive JSON format - typically contains individual curve data",
+    "example_source": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/example_wpd/C2M0080120D_idvgs.json",
+    "format_note": "SC format is a specialized graph format with calibration points and datasets",
+    "key_differences": {
+      "graph_structure": "Uses 'axesColl' and 'datasetColl' structure instead of direct 2D arrays",
+      "metadata": "Limited metadata in graph files - usually in accompanying files",
+      "transformation": "Must extract curve data and convert to TDB 2D array format",
+      "calibration": "Contains calibration points that may need to be processed"
+    },
+    "example_structure": {
+      "version": "Graph format version",
+      "axesColl": "Array of axis definitions with calibration",
+      "datasetColl": "Array of datasets with x,y,value tuples",
+      "measurementColl": "Additional measurement metadata"
+    },
+    "conversion_requirements": {
+      "extract_data": "Convert datasetColl to 2D array format [[x], [y]]",
+      "handle_calibration": "Apply calibration points if necessary",
+      "determine_source_fields": "Infer which TDB field this represents from filename/metadata",
+      "unit_handling": "May need unit conversion - determine source units from context"
+    }
+  },
+  "lgpl_format": {
+    "format_description": "Legacy LGPL/research format - may vary",
+    "expected_fields": "Depends on specific source",
+    "conversion_notes": "Will need to analyze actual files to determine mappings"
+  },
+  "channel_characteristics_mapping": {
+    "source_field": "channel or channel_data",
+    "tdb_field": "switch.channel_data or diode.channel_data",
+    "structure": {
+      "t_j": {
+        "source_name": "t_j",
+        "tdb_field": "t_j",
+        "transformation": "direct copy (°C)",
+        "required": true
+      },
+      "graph_v_i": {
+        "source_name": "graph_v_i",
+        "tdb_field": "graph_v_i",
+        "transformation": "2D array [[voltages], [currents]] in V and A",
+        "required": true
+      },
+      "v_g": {
+        "source_name": "v_g",
+        "tdb_field": "v_g",
+        "transformation": "direct copy (V) - mandatory for switch, optional for diode",
+        "required": "conditional"
+      }
+    }
+  },
+  "switching_loss_mapping": {
+    "source_fields": "e_on, e_off, e_on_meas, e_off_meas",
+    "tdb_fields": "switch.e_on_data, switch.e_off_data, etc.",
+    "structure": {
+      "dataset_type": {
+        "source_name": "dataset_type",
+        "tdb_field": "dataset_type",
+        "valid_values": ["single", "graph_i_e", "graph_r_e", "graph_t_e"]
+      },
+      "t_j": {
+        "transformation": "direct copy (°C)"
+      },
+      "v_supply": {
+        "transformation": "direct copy (V)"
+      },
+      "v_g": {
+        "transformation": "direct copy (V)"
+      },
+      "e_x": {
+        "source_name": "e_x or single_value",
+        "transformation": "direct copy (J) for single measurements"
+      },
+      "r_g": {
+        "transformation": "direct copy (Ω)"
+      },
+      "graph_i_e": {
+        "transformation": "2D array [[currents], [energies]] in A and J"
+      },
+      "graph_r_e": {
+        "transformation": "2D array [[resistances], [energies]] in Ω and J"
+      },
+      "graph_t_e": {
+        "transformation": "2D array [[temperatures], [energies]] in °C and J"
+      }
+    }
+  },
+  "capacity_curves_mapping": {
+    "source_fields": "c_oss, c_iss, c_rss",
+    "tdb_fields": "c_oss, c_iss, c_rss (lists)",
+    "structure": {
+      "t_j": {
+        "transformation": "direct copy (°C)",
+        "required": true
+      },
+      "graph_v_c": {
+        "source_name": "graph_v_c",
+        "transformation": "2D array [[voltages], [capacitances]] in V and F",
+        "required": true
+      }
+    }
+  },
+  "foster_thermal_mapping": {
+    "source_field": "thermal_foster",
+    "tdb_field": "thermal_foster",
+    "fields": {
+      "r_th_vector": {
+        "transformation": "direct copy list (K/W)"
+      },
+      "r_th_total": {
+        "transformation": "direct copy (K/W)"
+      },
+      "c_th_vector": {
+        "transformation": "direct copy list (J/K)"
+      },
+      "c_th_total": {
+        "transformation": "direct copy (J/K)"
+      },
+      "tau_vector": {
+        "transformation": "direct copy list (s) or compute from R*C"
+      },
+      "tau_total": {
+        "transformation": "direct copy (s) or compute"
+      },
+      "graph_t_rthjc": {
+        "transformation": "2D array [[time], [thermal_impedance]] in s and K/W"
+      }
+    }
+  },
+  "data_validation_rules": {
+    "voltage_ranges": {
+      "v_abs_max": "Should be positive, typically 30-1700V",
+      "v_supply": "Should be 0 to v_abs_max",
+      "v_g": "Gate voltage typically -10 to +20V"
+    },
+    "current_ranges": {
+      "i_abs_max": "Should be positive, typically 1-1000A",
+      "i_cont": "Should be <= i_abs_max"
+    },
+    "temperature_ranges": {
+      "t_j": "Junction temperature typically -40 to +200°C",
+      "t_j_max": "Should be positive, typically 150-200°C"
+    },
+    "resistance_ranges": {
+      "r_channel": "On-state resistance typically 0.001-1 Ω",
+      "r_g": "Gate resistance typically 0-50 Ω"
+    },
+    "capacitance_ranges": {
+      "c_oss": "Output capacitance typically pF to nF range",
+      "c_iss": "Input capacitance typically nF range",
+      "c_rss": "Reverse transfer capacitance typically pF to nF"
+    }
+  },
+  "error_handling": {
+    "missing_required_fields": "Mark transistor as incomplete, flag for review",
+    "unit_mismatch": "Apply conversion or reject if units unclear",
+    "data_inconsistency": "Example: i_cont > i_abs_max - flag for validation",
+    "null_values": "Allowed for optional fields, required fields must be present",
+    "invalid_ranges": "Check against physical limits, flag outliers"
+  },
+  "conversion_workflow": {
+    "step_1": "Parse source JSON",
+    "step_2": "Extract metadata to TDB metadata object",
+    "step_3": "Extract electrical ratings",
+    "step_4": "Extract thermal properties",
+    "step_5": "Extract switch component data",
+    "step_6": "Extract diode component data",
+    "step_7": "Extract capacitance curves",
+    "step_8": "Validate all data against rules",
+    "step_9": "Convert to TDB core model classes",
+    "step_10": "Persist to JSON using TDB repository"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "name": "Infineon_IKQ75N120CH3",
+    "type": "Diode",
+    "manufacturer": "Infineon",
+    "housing_type": "unknown",
+    "import_source": "plecs_xml:IKQ75N120CH3_Diode.xml",
+    "import_date": "2026-02-15T15:46:32.366595"
+  },
+  "electrical_ratings": {
+    "v_abs_max": 0.0,
+    "i_abs_max": 0.0,
+    "i_cont": 0.0,
+    "t_j_max": 150.0
+  },
+  "thermal_properties": {
+    "housing_area": 0.0,
+    "cooling_area": 0.0,
+    "r_th_jc": 0.0,
+    "r_th_cs": 0.0
+  },
+  "switch": {
+    "channel_data": [],
+    "e_on_data": [],
+    "e_off_data": [],
+    "gate_charge_curves": [],
+    "soa": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.01104,
+          "tau": 0.00036
+        },
+        {
+          "R": 0.10889,
+          "tau": 0.0027
+        },
+        {
+          "R": 0.1573,
+          "tau": 0.01681
+        },
+        {
+          "R": 0.0028,
+          "tau": 0.44863
+        },
+        {
+          "R": 0.0003,
+          "tau": 12.11241
+        }
+      ]
+    }
+  },
+  "diode": {
+    "channel_data": [],
+    "e_rr_data": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.01104,
+          "tau": 0.00036
+        },
+        {
+          "R": 0.10889,
+          "tau": 0.0027
+        },
+        {
+          "R": 0.1573,
+          "tau": 0.01681
+        },
+        {
+          "R": 0.0028,
+          "tau": 0.44863
+        },
+        {
+          "R": 0.0003,
+          "tau": 12.11241
+        }
+      ]
+    }
+  },
+  "c_oss": [],
+  "c_iss": [],
+  "c_rss": []
+}

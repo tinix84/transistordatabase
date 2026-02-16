@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "name": "Infineon_IGW50N60H3",
+    "type": "IGBT",
+    "manufacturer": "Infineon",
+    "housing_type": "unknown",
+    "import_source": "plecs_xml:IGW50N60H3_IGBT.xml",
+    "import_date": "2026-02-15T15:46:32.370263"
+  },
+  "electrical_ratings": {
+    "v_abs_max": 0.0,
+    "i_abs_max": 0.0,
+    "i_cont": 0.0,
+    "t_j_max": 150.0
+  },
+  "thermal_properties": {
+    "housing_area": 0.0,
+    "cooling_area": 0.0,
+    "r_th_jc": 0.0,
+    "r_th_cs": 0.0
+  },
+  "switch": {
+    "channel_data": [],
+    "e_on_data": [],
+    "e_off_data": [],
+    "gate_charge_curves": [],
+    "soa": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.007,
+          "tau": 4.4e-05
+        },
+        {
+          "R": 0.03736378,
+          "tau": 0.0001
+        },
+        {
+          "R": 0.09205027,
+          "tau": 0.00072
+        },
+        {
+          "R": 0.1299574,
+          "tau": 0.0083
+        },
+        {
+          "R": 0.1835461,
+          "tau": 0.07425315
+        }
+      ]
+    }
+  },
+  "diode": {
+    "channel_data": [],
+    "e_rr_data": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.007,
+          "tau": 4.4e-05
+        },
+        {
+          "R": 0.03736378,
+          "tau": 0.0001
+        },
+        {
+          "R": 0.09205027,
+          "tau": 0.00072
+        },
+        {
+          "R": 0.1299574,
+          "tau": 0.0083
+        },
+        {
+          "R": 0.1835461,
+          "tau": 0.07425315
+        }
+      ]
+    }
+  },
+  "c_oss": [],
+  "c_iss": [],
+  "c_rss": []
+}

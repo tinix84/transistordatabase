@@ -1,0 +1,220 @@
+{
+  "pair_id": "ROHM_SCT3022AL__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ROHM_SCT3022AL",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "ROHM SCT3022AL",
+      "type": "mosfet",
+      "manufacturer": "ROHM",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 28.18,
+      "weight": 0.05
+    },
+    "electrical_ratings": {
+      "v_abs_max": 650.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.44,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -1.349911190053287,
+            -0.5861456483126103,
+            -0.00888099467140332,
+            0.00888099467140332,
+            0.5861456483126103,
+            1.349911190053287
+          ],
+          "on_state_current": [
+            -44.92307692307692,
+            -19.99999999999999,
+            -0.07692307692307665,
+            0.07692307692307665,
+            19.99999999999999,
+            44.92307692307692
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "ROHM_SCT3022AL",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "ROHM_SCT3022AL.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 300.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.0,
+        17.94425087108011,
+        30.13937282229966,
+        40.41811846689895,
+        49.99999999999999,
+        59.40766550522648,
+        70.73170731707317,
+        79.7909407665505,
+        96.86411149825783
+      ],
+      "voltage_axis": [
+        300.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0001210084033613445,
+          0.000205042016806723,
+          0.000309243697478992,
+          0.0004504201680672272,
+          0.0006285714285714283,
+          0.0009109243697478994,
+          0.001166386554621849,
+          0.001815126050420168
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.0,
+        0.347222,
+        19.9653,
+        30.2083,
+        40.2778,
+        50.3472,
+        60.9375,
+        71.875,
+        78.4722,
+        84.7222,
+        98.9583
+      ],
+      "voltage_axis": [
+        300.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          5.7239e-05,
+          7.4074e-05,
+          0.00014141,
+          0.00022559,
+          0.0003367,
+          0.00049158,
+          0.00069024,
+          0.00081481,
+          0.00093603,
+          0.0012694
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "ROHM_SCT3022AL.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.620090",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

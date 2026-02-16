@@ -1,0 +1,134 @@
+site_name: Transistor Database
+site_description: Power semiconductor transistor database and simulation export tool
+site_author: LEA, University of Paderborn
+site_url: https://tinix84.github.io/transistordatabase/
+
+repo_name: tinix84/transistordatabase
+repo_url: https://github.com/tinix84/transistordatabase
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: sphinx
+            show_source: false
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source
+            group_by_category: true
+            show_category_heading: true
+            show_if_no_docstring: false
+            inherited_members: false
+            filters:
+              - "!^_"  # Exclude private members
+            heading_level: 3
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quickstart.md
+      - Examples: getting-started/examples.md
+  - User Guide:
+      - Overview: guide/overview.md
+      - Loading Transistors: guide/loading.md
+      - Exporting Data: guide/exporting.md
+      - Analytical Models: guide/analytical-models.md
+      - Database Management: guide/database.md
+      - Web Interface: guide/web-interface.md
+  - API Reference:
+      - Core:
+          - Models: api/core/models.md
+          - Services: api/core/services.md
+          - Repository: api/core/repository.md
+          - Adapters: api/core/adapters.md
+      - Backend:
+          - Concrete Services: api/backend/concrete_services.md
+      - Analytical Models: api/analytical_models.md
+      - Database Manager: api/database_manager.md
+      - Helper Functions: api/helper_functions.md
+  - Architecture:
+      - Overview: architecture/overview.md
+      - Core Design: architecture/core-design.md
+      - Service Layer: architecture/services.md
+      - GUI Architecture: architecture/gui.md
+  - Development:
+      - Contributing: development/contributing.md
+      - Testing: development/testing.md
+      - Documentation: development/docs.md
+      - Release Process: development/releases.md
+  - Changelog: CHANGELOG.md
+
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/tinix84/transistordatabase
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/transistordatabase/
+
+extra_css:
+  - stylesheets/extra.css
+
+copyright: Copyright &copy; 2024 LEA, University of Paderborn

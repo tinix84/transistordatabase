@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "name": "Infineon_IKB30N65ES5",
+    "type": "IGBT",
+    "manufacturer": "Infineon",
+    "housing_type": "unknown",
+    "import_source": "plecs_xml:IKB30N65ES5_IGBT.xml",
+    "import_date": "2026-02-15T15:46:32.385974"
+  },
+  "electrical_ratings": {
+    "v_abs_max": 0.0,
+    "i_abs_max": 0.0,
+    "i_cont": 0.0,
+    "t_j_max": 150.0
+  },
+  "thermal_properties": {
+    "housing_area": 0.0,
+    "cooling_area": 0.0,
+    "r_th_jc": 0.0,
+    "r_th_cs": 0.0
+  },
+  "switch": {
+    "channel_data": [],
+    "e_on_data": [],
+    "e_off_data": [],
+    "gate_charge_curves": [],
+    "soa": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.00926544,
+          "tau": 1.56547e-05
+        },
+        {
+          "R": 0.242714689,
+          "tau": 0.000341889
+        },
+        {
+          "R": 0.373612904,
+          "tau": 0.00266075
+        },
+        {
+          "R": 0.158334049,
+          "tau": 0.014105343
+        },
+        {
+          "R": 0.014318241,
+          "tau": 0.204768983
+        },
+        {
+          "R": 0.001938088,
+          "tau": 2.877416036
+        }
+      ]
+    }
+  },
+  "diode": {
+    "channel_data": [],
+    "e_rr_data": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.00926544,
+          "tau": 1.56547e-05
+        },
+        {
+          "R": 0.242714689,
+          "tau": 0.000341889
+        },
+        {
+          "R": 0.373612904,
+          "tau": 0.00266075
+        },
+        {
+          "R": 0.158334049,
+          "tau": 0.014105343
+        },
+        {
+          "R": 0.014318241,
+          "tau": 0.204768983
+        },
+        {
+          "R": 0.001938088,
+          "tau": 2.877416036
+        }
+      ]
+    }
+  },
+  "c_oss": [],
+  "c_iss": [],
+  "c_rss": []
+}

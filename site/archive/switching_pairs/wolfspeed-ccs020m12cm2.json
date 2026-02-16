@@ -1,0 +1,659 @@
+{
+  "pair_id": "wolfspeed-ccs020m12cm2",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "wolfspeed-ccs020m12cm2",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "CCS020M12CM2",
+      "type": "MOSFET",
+      "manufacturer": "Wolfspeed",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "cauer",
+        "elements": [
+          {
+            "r": 0.222,
+            "c": 0.00867
+          },
+          {
+            "r": 0.272,
+            "c": 0.0347
+          },
+          {
+            "r": 0.141,
+            "c": 1.17
+          },
+          {
+            "r": 0.111,
+            "c": 32.1
+          }
+        ]
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        -40.0,
+        25.0,
+        150.0,
+        900.0,
+        1000.0
+      ],
+      "curves": [
+        {
+          "t_j": -40.0,
+          "on_state_voltage": [
+            -1.81,
+            -1.63,
+            -1.454,
+            -1.272,
+            -1.064,
+            -0.624,
+            0.0,
+            0.68,
+            1.39,
+            2.18,
+            3.1,
+            4.2,
+            5.55
+          ],
+          "on_state_current": [
+            -60.0,
+            -50.0,
+            -40.0,
+            -30.0,
+            -20.0,
+            -10.0,
+            0.0,
+            10.0,
+            20.0,
+            30.0,
+            40.0,
+            50.0,
+            60.0
+          ]
+        },
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -1.986,
+            -1.768,
+            -1.55,
+            -1.315,
+            -1.101,
+            -0.725,
+            0.0,
+            0.76,
+            1.57,
+            2.47,
+            3.57,
+            4.89,
+            6.59
+          ],
+          "on_state_current": [
+            -60.0,
+            -50.0,
+            -40.0,
+            -30.0,
+            -20.0,
+            -10.0,
+            0.0,
+            10.0,
+            20.0,
+            30.0,
+            40.0,
+            50.0,
+            60.0
+          ]
+        },
+        {
+          "t_j": 150.0,
+          "on_state_voltage": [
+            -2.985,
+            -2.595,
+            -2.18,
+            -1.78,
+            -1.37,
+            -0.943,
+            0.0,
+            1.33,
+            2.78,
+            4.54,
+            6.72,
+            9.71,
+            14.42
+          ],
+          "on_state_current": [
+            -60.0,
+            -50.0,
+            -40.0,
+            -30.0,
+            -20.0,
+            -10.0,
+            0.0,
+            10.0,
+            20.0,
+            30.0,
+            40.0,
+            50.0,
+            60.0
+          ]
+        },
+        {
+          "t_j": 900.0,
+          "on_state_voltage": [
+            -4.179,
+            -3.633,
+            -3.052,
+            -2.492,
+            -1.918,
+            -1.32,
+            0.0,
+            1.862,
+            3.892,
+            6.356,
+            9.408,
+            13.59,
+            20.19
+          ],
+          "on_state_current": [
+            -60.0,
+            -50.0,
+            -40.0,
+            -30.0,
+            -20.0,
+            -10.0,
+            0.0,
+            10.0,
+            20.0,
+            30.0,
+            40.0,
+            50.0,
+            60.0
+          ]
+        },
+        {
+          "t_j": 1000.0,
+          "on_state_voltage": [
+            -4.179,
+            -3.633,
+            -3.052,
+            -2.492,
+            -1.918,
+            -1.32,
+            0.0,
+            1.862,
+            3.892,
+            6.356,
+            9.408,
+            13.59,
+            20.19
+          ],
+          "on_state_current": [
+            -60.0,
+            -50.0,
+            -40.0,
+            -30.0,
+            -20.0,
+            -10.0,
+            0.0,
+            10.0,
+            20.0,
+            30.0,
+            40.0,
+            50.0,
+            60.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "wolfspeed-ccs020m12cm2",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "CCS020M12CM2",
+      "type": "MOSFET",
+      "manufacturer": "Wolfspeed",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "cauer",
+        "elements": [
+          {
+            "r": 0.222,
+            "c": 0.00867
+          },
+          {
+            "r": 0.272,
+            "c": 0.0347
+          },
+          {
+            "r": 0.141,
+            "c": 1.17
+          },
+          {
+            "r": 0.111,
+            "c": 32.1
+          }
+        ]
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        -40.0,
+        25.0,
+        150.0,
+        900.0,
+        1000.0
+      ],
+      "curves": [
+        {
+          "t_j": -40.0,
+          "on_state_voltage": [
+            -1.81,
+            -1.63,
+            -1.454,
+            -1.272,
+            -1.064,
+            -0.624,
+            0.0,
+            0.68,
+            1.39,
+            2.18,
+            3.1,
+            4.2,
+            5.55
+          ],
+          "on_state_current": [
+            -60.0,
+            -50.0,
+            -40.0,
+            -30.0,
+            -20.0,
+            -10.0,
+            0.0,
+            10.0,
+            20.0,
+            30.0,
+            40.0,
+            50.0,
+            60.0
+          ]
+        },
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -1.986,
+            -1.768,
+            -1.55,
+            -1.315,
+            -1.101,
+            -0.725,
+            0.0,
+            0.76,
+            1.57,
+            2.47,
+            3.57,
+            4.89,
+            6.59
+          ],
+          "on_state_current": [
+            -60.0,
+            -50.0,
+            -40.0,
+            -30.0,
+            -20.0,
+            -10.0,
+            0.0,
+            10.0,
+            20.0,
+            30.0,
+            40.0,
+            50.0,
+            60.0
+          ]
+        },
+        {
+          "t_j": 150.0,
+          "on_state_voltage": [
+            -2.985,
+            -2.595,
+            -2.18,
+            -1.78,
+            -1.37,
+            -0.943,
+            0.0,
+            1.33,
+            2.78,
+            4.54,
+            6.72,
+            9.71,
+            14.42
+          ],
+          "on_state_current": [
+            -60.0,
+            -50.0,
+            -40.0,
+            -30.0,
+            -20.0,
+            -10.0,
+            0.0,
+            10.0,
+            20.0,
+            30.0,
+            40.0,
+            50.0,
+            60.0
+          ]
+        },
+        {
+          "t_j": 900.0,
+          "on_state_voltage": [
+            -4.179,
+            -3.633,
+            -3.052,
+            -2.492,
+            -1.918,
+            -1.32,
+            0.0,
+            1.862,
+            3.892,
+            6.356,
+            9.408,
+            13.59,
+            20.19
+          ],
+          "on_state_current": [
+            -60.0,
+            -50.0,
+            -40.0,
+            -30.0,
+            -20.0,
+            -10.0,
+            0.0,
+            10.0,
+            20.0,
+            30.0,
+            40.0,
+            50.0,
+            60.0
+          ]
+        },
+        {
+          "t_j": 1000.0,
+          "on_state_voltage": [
+            -4.179,
+            -3.633,
+            -3.052,
+            -2.492,
+            -1.918,
+            -1.32,
+            0.0,
+            1.862,
+            3.892,
+            6.356,
+            9.408,
+            13.59,
+            20.19
+          ],
+          "on_state_current": [
+            -60.0,
+            -50.0,
+            -40.0,
+            -30.0,
+            -20.0,
+            -10.0,
+            0.0,
+            10.0,
+            20.0,
+            30.0,
+            40.0,
+            50.0,
+            60.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "plecs_model",
+    "source_details": {},
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 0.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        -25.0,
+        25.0,
+        75.0,
+        150.0,
+        900.0,
+        1000.0
+      ],
+      "current_axis": [
+        0.0,
+        1.0,
+        10.0,
+        20.0,
+        30.0,
+        40.0
+      ],
+      "voltage_axis": [
+        -10.0,
+        0.0,
+        600.0,
+        800.0
+      ],
+      "energy": {
+        "-25.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "25.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "75.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "150.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "900.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "1000.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        -25.0,
+        25.0,
+        75.0,
+        150.0,
+        900.0,
+        1000.0
+      ],
+      "current_axis": [
+        0.0,
+        1.0,
+        10.0,
+        20.0,
+        30.0,
+        40.0
+      ],
+      "voltage_axis": [
+        -10.0,
+        0.0,
+        600.0,
+        800.0
+      ],
+      "energy": {
+        "-25.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "25.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "75.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "150.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "900.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "1000.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": "E/(1.36e-5*2.5+4.46e-4)*(1.36e-5*Rg+4.46e-4)",
+    "turn_off_formula": "E/(3.73e-6*2.5+4.067e-5)*(3.73e-6*Rg+4.067e-5)",
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CCS020M12CM2.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CCS020M12CM2_bodydiode.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CCS020M12CM2.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CCS020M12CM2_bodydiode.xml"
+    ],
+    "migration_date": "2026-02-16T06:49:14.621836",
+    "schema_version": "1.0",
+    "quality_score": 0.0
+  }
+}

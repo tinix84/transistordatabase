@@ -1,0 +1,220 @@
+{
+  "pair_id": "InternationalRectifier_IRG4PH40UDPbF_igbt__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "InternationalRectifier_IRG4PH40UDPbF_igbt",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "mosfet",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 0.0,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -0.0,
+            -0.0,
+            1.8071360596977908,
+            1.901185014414042,
+            2.0001285678716285,
+            2.086503840087632,
+            2.1582820990471827,
+            2.2578421126468693,
+            2.375347205564047,
+            2.5201876859609693,
+            2.666334215510156,
+            2.8690677018322126,
+            3.0354459005672623,
+            3.220536922809054,
+            3.494835579397355,
+            3.7288997189318027,
+            4.02375009376353,
+            4.453465177302955,
+            4.88756860783645,
+            5.244390142722728,
+            5.691063851254238,
+            6.106545310744021
+          ],
+          "on_state_current": [
+            -1e+100,
+            -0.0,
+            1.0140959011511077,
+            1.2598068092149284,
+            1.6785103060444584,
+            2.2052866356584513,
+            2.8173968474974664,
+            3.549375732737979,
+            4.829371084838743,
+            6.344999773714905,
+            8.106149137614945,
+            10.428865875181433,
+            13.138356241942775,
+            16.551790655490965,
+            20.56221561374836,
+            25.544348629494895,
+            31.956504627507403,
+            41.11324562897777,
+            51.7947467923121,
+            62.13167615132416,
+            74.53159674382292,
+            83.3628673821127
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "InternationalRectifier_IRG4PH40UDPbF_igbt",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "InternationalRectifier_IRG4PH40UDPbF_igbt_150C_Max.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 1.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.0,
+        1e+100
+      ],
+      "voltage_axis": [
+        1.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.0,
+        1e+100
+      ],
+      "voltage_axis": [
+        1.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "InternationalRectifier_IRG4PH40UDPbF_igbt_150C_Max.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.535515",
+    "schema_version": "1.0",
+    "quality_score": 42.857142857142854
+  }
+}

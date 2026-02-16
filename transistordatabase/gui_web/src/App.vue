@@ -3,11 +3,16 @@ import { ref, onMounted } from 'vue'
 import TransistorList from './components/TransistorList.vue'
 import TransistorForm from './components/TransistorForm.vue'
 import TransistorComparison from './components/TransistorComparison.vue'
+import TransistorComparisonEnhanced from './components/TransistorComparisonEnhanced.vue'
 import TransistorPlotter from './components/TransistorPlotter.vue'
 import DatabaseManager from './components/DatabaseManager.vue'
 import SearchDatabase from './components/SearchDatabase.vue'
 import ExportingTools from './components/ExportingTools.vue'
+import BatchExportPanel from './components/BatchExportPanel.vue'
 import TopologyCalculator from './components/TopologyCalculator.vue'
+import PLECSImporter from './components/PLECSImporter.vue'
+import AnalyticalCalculator from './components/AnalyticalCalculator.vue'
+import DPTManager from './components/DPTManager.vue'
 import { transistorApi } from './services/api.js'
 
 const currentView = ref('search')
@@ -17,6 +22,7 @@ const selectedForExport = ref([])
 const selectedForTopology = ref(null)
 const isLoading = ref(false)
 const isDarkTheme = ref(false)
+const showMoreMenu = ref(false)
 
 onMounted(async () => {
   console.log('[App.vue] Component mounted, loading transistors...')
@@ -87,6 +93,26 @@ function showComparison() {
 
 function showTopology() {
   currentView.value = 'topology'
+}
+
+function showAdvancedComparison() {
+  currentView.value = 'compare-advanced'
+}
+
+function showBatchExport() {
+  currentView.value = 'batch-export'
+}
+
+function showPLECSImport() {
+  currentView.value = 'plecs-import'
+}
+
+function showAnalytical() {
+  currentView.value = 'analytical'
+}
+
+function showDPT() {
+  currentView.value = 'dpt'
 }
 
 function showEditForm(transistor) {
@@ -177,41 +203,71 @@ function handleOpenDatabaseSearch() {
     </header>
 
     <nav class="main-nav sticky-nav">
-      <button 
-        @click="showSearch" 
+      <button
+        @click="showSearch"
         :class="{ active: currentView === 'search' }"
         class="nav-btn"
       >
-        🔍 Search Database
+        Search Database
       </button>
-      <button 
-        @click="showCreate" 
+      <button
+        @click="showCreate"
         :class="{ active: currentView === 'create' }"
         class="nav-btn"
       >
-        ➕ Create Transistor
+        Create/Edit
       </button>
-      <button 
-        @click="showExport" 
+      <button
+        @click="showExport"
         :class="{ active: currentView === 'export' }"
         class="nav-btn"
       >
-        📤 Exporting Tools
+        Export
       </button>
-      <button 
-        @click="showComparison" 
+      <button
+        @click="showComparison"
         :class="{ active: currentView === 'compare' }"
         class="nav-btn"
       >
-        🔍 Comparison Tools
+        Compare
       </button>
-      <button 
-        @click="showTopology" 
+      <button
+        @click="showAdvancedComparison"
+        :class="{ active: currentView === 'compare-advanced' }"
+        class="nav-btn"
+      >
+        Advanced Compare
+      </button>
+      <button
+        @click="showTopology"
         :class="{ active: currentView === 'topology' }"
         class="nav-btn"
       >
-        🧮 Topology Calculator
+        Topology
       </button>
+      <div class="nav-dropdown">
+        <button
+          @click="showMoreMenu = !showMoreMenu"
+          :class="{ active: ['plecs-import', 'analytical', 'dpt', 'batch-export'].includes(currentView) }"
+          class="nav-btn"
+        >
+          More Tools ▾
+        </button>
+        <div v-if="showMoreMenu" class="dropdown-menu" @mouseleave="showMoreMenu = false">
+          <button @click="showPLECSImport(); showMoreMenu = false" class="dropdown-item">
+            PLECS Import
+          </button>
+          <button @click="showAnalytical(); showMoreMenu = false" class="dropdown-item">
+            Analytical Models
+          </button>
+          <button @click="showDPT(); showMoreMenu = false" class="dropdown-item">
+            DPT Manager
+          </button>
+          <button @click="showBatchExport(); showMoreMenu = false" class="dropdown-item">
+            Batch Export
+          </button>
+        </div>
+      </div>
     </nav>
 
     <main class="app-main">
@@ -245,18 +301,47 @@ function handleOpenDatabaseSearch() {
         @open-database-search="handleOpenDatabaseSearch"
       />
       
-      <!-- Comparison Tools -->
-      <TransistorComparison 
+      <!-- Basic Comparison -->
+      <TransistorComparison
         v-if="currentView === 'compare'"
         :transistors="transistors"
       />
-      
+
+      <!-- Advanced Comparison (3 transistors, 9 plots, R_g sliders) -->
+      <TransistorComparisonEnhanced
+        v-if="currentView === 'compare-advanced'"
+      />
+
       <!-- Topology Calculator -->
-      <TopologyCalculator 
+      <TopologyCalculator
         v-if="currentView === 'topology'"
         :transistors="transistors"
         @transistor-selected="handleTransistorSelected"
         @view-transistor-details="showEditForm"
+      />
+
+      <!-- PLECS Import -->
+      <PLECSImporter
+        v-if="currentView === 'plecs-import'"
+        @import-complete="loadTransistors"
+        @view-transistor="showEditForm"
+      />
+
+      <!-- Analytical Models Calculator -->
+      <AnalyticalCalculator
+        v-if="currentView === 'analytical'"
+      />
+
+      <!-- DPT Manager -->
+      <DPTManager
+        v-if="currentView === 'dpt'"
+      />
+
+      <!-- Batch Export -->
+      <BatchExportPanel
+        v-if="currentView === 'batch-export'"
+        @close="showSearch"
+        @export-complete="() => {}"
       />
     </main>
 
@@ -437,6 +522,40 @@ body {
   color: var(--accent-blue);
   border-bottom-color: var(--accent-blue);
   background: var(--accent-blue-light);
+}
+
+.nav-dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px var(--shadow);
+  min-width: 180px;
+  z-index: 200;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-tertiary);
+  color: var(--accent-blue);
 }
 
 .app-main {

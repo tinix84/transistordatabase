@@ -1,0 +1,2776 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Power semiconductor transistor database and simulation export tool">
+      
+      
+        <meta name="author" content="LEA, University of Paderborn">
+      
+      
+        <link rel="canonical" href="https://upb-lea.github.io/transistordatabase/CHANGELOG/">
+      
+      
+        <link rel="prev" href="../development/releases/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Changelog - Transistor Database</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Transistor Database" class="md-header__button md-logo" aria-label="Transistor Database" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Transistor Database
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changelog
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/upb-lea/transistordatabase" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    upb-lea/transistordatabase
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guide/overview/" class="md-tabs__link">
+          
+  
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api/core/models/" class="md-tabs__link">
+          
+  
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../architecture/overview.md" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../development/contributing/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Transistor Database" class="md-nav__button md-logo" aria-label="Transistor Database" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Transistor Database
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/upb-lea/transistordatabase" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    upb-lea/transistordatabase
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/loading.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loading Transistors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/exporting.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exporting Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/analytical-models.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analytical Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/database.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/web-interface.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web Interface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Core
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/core/models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/core/services/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Services
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/core/repository/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repository
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/core/adapters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adapters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Backend
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/backend/concrete_services/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concrete Services
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/analytical_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analytical Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/database_manager.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Manager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/helper_functions.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Helper Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/overview.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/core-design.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/services.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Service Layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/gui.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GUI Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/docs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/releases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#100-2026-02-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1.0.0] - 2026-02-14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[1.0.0] - 2026-02-14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#060-2026-02-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [0.6.0] - 2026-02-13
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[0.6.0] - 2026-02-13">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased-date" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased - Date
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unreleased - Date">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#updated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#051-2024-06-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5.1 - 2024-06-22
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.5.1 - 2024-06-22">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#050-2024-06-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5.0 - 2024-06-22
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.5.0 - 2024-06-22">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#041-2022-07-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.1 - 2022-07-18
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.4.1 - 2022-07-18">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#100-2026-02-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1.0.0] - 2026-02-14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[1.0.0] - 2026-02-14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#060-2026-02-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [0.6.0] - 2026-02-13
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[0.6.0] - 2026-02-13">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased-date" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased - Date
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unreleased - Date">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#updated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#051-2024-06-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5.1 - 2024-06-22
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.5.1 - 2024-06-22">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#050-2024-06-22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5.0 - 2024-06-22
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.5.0 - 2024-06-22">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#041-2022-07-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.1 - 2022-07-18
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.4.1 - 2022-07-18">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<p>All notable changes to this project will be documented in this file.</p>
+<p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
+and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<h2 id="100-2026-02-14">[1.0.0] - 2026-02-14<a class="headerlink" href="#100-2026-02-14" title="Permanent link">&para;</a></h2>
+<h3 id="breaking-changes">Breaking Changes<a class="headerlink" href="#breaking-changes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Removed advanced topology modules</strong>: Bridgeless PFC, DAB, LLC, SRC-ZVS topologies removed from the package. Simple PWM topologies (Buck, Boost, Buck-Boost) remain in <code>topologies/converter_common.py</code>.</li>
+</ul>
+<h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>PyQt5 GUI Refactoring</strong>: Split MainWindow god class (5,958 LOC) into 8 focused mixins for maintainability</li>
+<li><code>UtilitiesMixin</code>, <code>SettingsMixin</code>, <code>SearchDatabaseMixin</code>, <code>TransistorCreationMixin</code></li>
+<li><code>CurveManagementMixin</code>, <code>ExportToolsMixin</code>, <code>ComparisonToolsMixin</code>, <code>TopologyCalculatorMixin</code></li>
+<li><strong>Test Coverage Improvements</strong>:</li>
+<li>Added 15 new topology tests for Buck/Boost/Buck-Boost converters (100% of simple PWM topologies)</li>
+<li>Added 12 new REST API tests covering create/update endpoints and additional export formats</li>
+<li>Improved gui_web coverage from 63% to 84% (+21%)</li>
+<li><strong>Quality Assurance</strong>:</li>
+<li>Performance benchmarking script (<code>benchmark_performance.py</code>)</li>
+<li>Performance metrics documentation (<code>PERFORMANCE.md</code>)</li>
+<li>Quality gates report (<code>QUALITY_REPORT.md</code>)</li>
+</ul>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Code Quality</strong>: Resolved all 10 dead code warnings identified by vulture (min-confidence 80)</li>
+<li>Marked intentionally unused parameters with underscore prefix</li>
+<li>Removed unused imports (JSONResponse, Mock, patch)</li>
+<li><strong>Circular Import</strong>: Fixed gui.py circular import by extracting independent widgets to <code>_widgets.py</code> and using deferred imports</li>
+</ul>
+<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>MainWindow reduced from 5,958 LOC to 950 LOC + 8 mixin modules (totaling 5,957 LOC in mixins)</li>
+<li>Test suite: 283 tests passing, 4 skipped (all test_rest_api.py create/update tests pending adapter bridge enhancements)</li>
+</ul>
+<h3 id="performance">Performance<a class="headerlink" href="#performance" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✓ Package import time: 1229ms (target: &lt;2000ms, 39% under target)</li>
+<li>✓ JSON load time: 2.3ms (target: &lt;100ms, 97.7% under target)</li>
+</ul>
+<h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Updated CLAUDE.md with PyQt5 GUI architecture details</li>
+<li>Updated docs/ARCHITECTURE.md with mixin refactoring section</li>
+<li>Updated docs/PRD.md milestones (Phases 0-4 complete)</li>
+</ul>
+<h2 id="060-2026-02-13">[0.6.0] - 2026-02-13<a class="headerlink" href="#060-2026-02-13" title="Permanent link">&para;</a></h2>
+<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Clean architecture <code>core/</code> layer with domain models, service interfaces, and repository pattern</li>
+<li>PLECS XML importer (<code>plecs_importer.py</code>) for importing semiconductor library files</li>
+<li>Analytical switching loss models (<code>analytical_models.py</code>): Biela, gate charge, IGBT tail current</li>
+<li>Waveform-based loss calculation (<code>waveform_losses.py</code>) with ZVS/ZCS detection</li>
+<li>Catalog CSV importer (<code>catalog_importer.py</code>) with FOM ranking (Rds*Qg)</li>
+<li>Gate resistance dependent energy interpolation (<code>rg_formula.py</code>)</li>
+<li>Power converter topology analyzers (<code>topologies/</code>): Bridgeless PFC, DAB, LLC, SRC-ZVS</li>
+<li>LTspice Double Pulse Test utility (<code>utils/ltspice_dpt.py</code>) with netlist generation and waveform analysis</li>
+<li>Backend service implementations: ExportService, ComparisonService, ValidationService, CalculationService</li>
+<li>Frontend/backend separation with ABC interfaces and concrete implementations</li>
+<li>FastAPI web backend and Vue 3 frontend scaffolding</li>
+</ul>
+<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Python 3.10+ required (was 3.9)</li>
+<li>Ruff target updated to py310 with strict mode (0 violations)</li>
+<li>Isolated PyQt5 dependency to <code>helper_pdf.py</code> for headless compatibility</li>
+<li>Fixed GeckoCIRCUITS exporter <code>zip(strict=True)</code> crash with mismatched index lists</li>
+</ul>
+<h3 id="documentation_1">Documentation<a class="headerlink" href="#documentation_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Added <code>docs/ARCHITECTURE.md</code> with clean architecture overview</li>
+<li>Added <code>docs/PRD.md</code> with product requirements</li>
+<li>Updated <code>CLAUDE.md</code> with core architecture guidance</li>
+</ul>
+<h2 id="unreleased-date"><a href="https://github.com/upb-lea/transistordatabase/compare/0.5.1...HEAD">Unreleased</a> - Date<a class="headerlink" href="#unreleased-date" title="Permanent link">&para;</a></h2>
+<h3 id="updated">Updated<a class="headerlink" href="#updated" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Add marging for non-linear capacitance file export for GeckoCIRCUITS</li>
+</ul>
+<h2 id="051-2024-06-22"><a href="https://github.com/upb-lea/transistordatabase/compare/0.5.0...0.5.1">0.5.1</a> - 2024-06-22<a class="headerlink" href="#051-2024-06-22" title="Permanent link">&para;</a></h2>
+<h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Documentation pipeline issue</li>
+</ul>
+<h2 id="050-2024-06-22"><a href="https://github.com/upb-lea/transistordatabase/compare/0.4.1...0.5.0">0.5.0</a> - 2024-06-22<a class="headerlink" href="#050-2024-06-22" title="Permanent link">&para;</a></h2>
+<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Non-linear capacitance file export for GeckoCIRCUITS</li>
+<li>Introduction of database manager. See the template_example.py for API changes.</li>
+</ul>
+<h3 id="fixed_2">Fixed<a class="headerlink" href="#fixed_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Fix some GUI data does not accept float or negative values</li>
+<li>Fix reading GUI graph_r_e curves </li>
+</ul>
+<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>API has changed according to the introduction of the database manager. See the template_example.py for API changes. </li>
+</ul>
+<h2 id="041-2022-07-18"><a href="https://github.com/upb-lea/transistordatabase/compare/0.4.0...0.4.1">0.4.1</a> - 2022-07-18<a class="headerlink" href="#041-2022-07-18" title="Permanent link">&para;</a></h2>
+<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>General: Option to delete transistors from local database</li>
+<li>General: Gecko Exporter for GaN-Transistors: mirror 1. quadrant forward characteristic to 3rd quadrant</li>
+<li>GUI: Add options to display virtual and original datasheet for selected transistor</li>
+<li>
+<h1 id="90-add-email-workflow-to-add-new-transistor-to-the-transistordatabase-file-exchange-tdb-fe">90: Add email-workflow to add new transistor to the transistordatabase file exchange (TDB-FE)<a class="headerlink" href="#90-add-email-workflow-to-add-new-transistor-to-the-transistordatabase-file-exchange-tdb-fe" title="Permanent link">&para;</a></h1>
+</li>
+<li>Add log(x), log(y) for adding/viewing plots</li>
+</ul>
+<h3 id="fixed_3">Fixed<a class="headerlink" href="#fixed_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Fix PDF preview not working due to a workaround</li>
+<li>
+<h1 id="93-gui-manufacturer-parameters-for-switch-and-diode-must-be-optional">93: GUI Manufacturer parameters for switch and diode must be optional<a class="headerlink" href="#93-gui-manufacturer-parameters-for-switch-and-diode-must-be-optional" title="Permanent link">&para;</a></h1>
+</li>
+<li>Fix GUI measurement integration method when integrating own measurement.</li>
+<li>Fix some GUI data does not accept float or negative values</li>
+<li>Fix some wrong labels: Units in C-curves</li>
+</ul>
+<h2 id="040-2022-06-20"><a href="https://github.com/upb-lea/transistordatabase/compare/0.3.3...0.4.0">0.4.0</a> - 2022-06-20<a class="headerlink" href="#040-2022-06-20" title="Permanent link">&para;</a></h2>
+<h3 id="added_4">Added<a class="headerlink" href="#added_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>NEW: Graphical User Interface: Download exe-file, - or run the file "gui.py" within the directory ".../transistordatabase/transistordatabase/gui" to start the GUI</li>
+</ul>
+<h3 id="fixed_4">Fixed<a class="headerlink" href="#fixed_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="82-update_from_fileexchange-leads-to-failure-in-case-of-no-internet-connection">82: update_from_fileexchange() leads to failure in case of no internet connection<a class="headerlink" href="#82-update_from_fileexchange-leads-to-failure-in-case-of-no-internet-connection" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="84-process-is-still-running-when-closing-main-window">84: Process is still running when closing main window<a class="headerlink" href="#84-process-is-still-running-when-closing-main-window" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="85-ignore-missing-data-messages-at-gui-startup">85: Ignore missing-data messages at GUI startup<a class="headerlink" href="#85-ignore-missing-data-messages-at-gui-startup" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="87-database-not-visible-in-exe-file">87: Database not visible in exe-file<a class="headerlink" href="#87-database-not-visible-in-exe-file" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h2 id="033-2022-03-20"><a href="https://github.com/upb-lea/transistordatabase/compare/0.3.2...0.3.3">0.3.3</a> - 2022-03-20<a class="headerlink" href="#033-2022-03-20" title="Permanent link">&para;</a></h2>
+<h3 id="changed_3">Changed<a class="headerlink" href="#changed_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>do not re-assign r_th and c_th values when loading/creating a transistor object (do not run calc_thermal_params())</li>
+<li>Workaround for brocken export_datasheet(): temporary only html-files available instead of pdf-files</li>
+</ul>
+<h2 id="032-2022-02-02"><a href="https://github.com/upb-lea/transistordatabase/compare/0.3.1...0.3.2">0.3.2</a> - 2022-02-02<a class="headerlink" href="#032-2022-02-02" title="Permanent link">&para;</a></h2>
+<h3 id="added_5">Added<a class="headerlink" href="#added_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Add Rohm to manufacturer list</li>
+</ul>
+<h3 id="changes">Changes<a class="headerlink" href="#changes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Method 'print_TDB()' changes to 'print_tdb()'</li>
+<li>export_dataheet() can handle with measurement data</li>
+</ul>
+<h2 id="031-2021-12-15"><a href="https://github.com/upb-lea/transistordatabase/compare/0.3.0...0.3.1">0.3.1</a> - 2021-12-15<a class="headerlink" href="#031-2021-12-15" title="Permanent link">&para;</a></h2>
+<h3 id="bugfixes">Bugfixes<a class="headerlink" href="#bugfixes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="68-improved-user-warning-in-case-of-no-mongodb-installed">68: Improved user warning in case of no mongodb installed<a class="headerlink" href="#68-improved-user-warning-in-case-of-no-mongodb-installed" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="70-save-json-files-in-multiple-lines-to-avoid-that-a-small-change-is-very-difficult-to-see-in-version-control">70: Save .json-files in multiple lines, to avoid that a small change is very difficult to see in version control<a class="headerlink" href="#70-save-json-files-in-multiple-lines-to-avoid-that-a-small-change-is-very-difficult-to-see-in-version-control" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="71-72-fix-get_object_ir_e_simplified">71, #72: fix get_object_i/r_e_simplified<a class="headerlink" href="#71-72-fix-get_object_ir_e_simplified" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h2 id="030-2021-12-09"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.14...0.3.0">0.3.0</a> - 2021-12-09<a class="headerlink" href="#030-2021-12-09" title="Permanent link">&para;</a></h2>
+<h3 id="added_6">Added<a class="headerlink" href="#added_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li>NEW: Option to add own measurements to the database</li>
+<li>Add function export_all_datasheets()</li>
+<li>
+<h1 id="61-add-keys-to-add-r_dson-vs-junction-temperature">61: Add Keys to add R_DS,ON vs. junction temperature<a class="headerlink" href="#61-add-keys-to-add-r_dson-vs-junction-temperature" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="62-add-keys-for-gate-charge-curve">62: Add Keys for Gate Charge Curve<a class="headerlink" href="#62-add-keys-for-gate-charge-curve" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="63-add-keys-for-safe-operating-area">63: Add Keys for Safe-Operating-Area<a class="headerlink" href="#63-add-keys-for-safe-operating-area" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h3 id="updated_1">Updated<a class="headerlink" href="#updated_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="59-simplify-the-usage-of-tdbloadtransistorname-instead-of-tdbloadname-transistorname">59: simplify the usage of tdb.load('transistorname') instead of tdb.load({'name': 'transistorname'})<a class="headerlink" href="#59-simplify-the-usage-of-tdbloadtransistorname-instead-of-tdbloadname-transistorname" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h3 id="bugfixes_1">Bugfixes<a class="headerlink" href="#bugfixes_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="51-mutable-list-in-export_plecs">51: Mutable List in export_plecs<a class="headerlink" href="#51-mutable-list-in-export_plecs" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="58-fix-some-units-displayed-in-virtual-datasheet">58: Fix some units displayed in virtual datasheet<a class="headerlink" href="#58-fix-some-units-displayed-in-virtual-datasheet" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="66-cannot-get-the-corresponding-datasheet-according-to-the-procedures-in-the-tutorial">66: Cannot get the corresponding datasheet according to the procedures in the tutorial<a class="headerlink" href="#66-cannot-get-the-corresponding-datasheet-according-to-the-procedures-in-the-tutorial" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="67-problem-when-exporting-all-transistors-from-the-database-to-virtual-datasheet">67: Problem when exporting all transistors from the database to virtual datasheet<a class="headerlink" href="#67-problem-when-exporting-all-transistors-from-the-database-to-virtual-datasheet" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h2 id="0214-2021-11-02"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.13...0.2.14">0.2.14</a> - 2021-11-02<a class="headerlink" href="#0214-2021-11-02" title="Permanent link">&para;</a></h2>
+<h3 id="added_7">Added<a class="headerlink" href="#added_7" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Helper function 'collect_i_e_and_r_e_combination' to find and associate i_e and r_e based SwitchEnergyData objects for usage in gecko exporter</li>
+<li>Helper function 'check_keys' to validate the arguments provided to gecko exporter </li>
+<li>constants.py: dictates the default gate voltages for switch and diodes types based on the module type</li>
+<li>
+<h1 id="50-introduce-new-transitsor-keys-r_g_on_recommended-and-r_g_off_recommended">50: Introduce new transitsor keys: r_g_on_recommended and r_g_off_recommended<a class="headerlink" href="#50-introduce-new-transitsor-keys-r_g_on_recommended-and-r_g_off_recommended" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h3 id="updated_2">Updated<a class="headerlink" href="#updated_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Docstrings</li>
+<li>updated calc_thermal_params function to normalize the limit selections for curve fitting</li>
+<li>update to module manufacturers list and housing type list</li>
+<li>
+<h1 id="27-update-gecko-exporter-according-to-latest-working">27: Update gecko exporter according to latest working<a class="headerlink" href="#27-update-gecko-exporter-according-to-latest-working" title="Permanent link">&para;</a></h1>
+</li>
+<li>remodelled gecko exporter with added feature to find the nearest neighbours to the given v_supply, v_g, r_g if the exact curves doestn't exists</li>
+<li>remodelled gecko exporter with added feature to re-estimate the loss curves at given gate resistor</li>
+<li>Added case to handle gecko exporter request to find nearest neighbours in find_next_gate_voltage method</li>
+<li>update find_next_gate_voltage method to include the check_specific_curves parameter which now skips the curves while finding out nearest neighbours</li>
+</ul>
+<h3 id="bugfixes_2">Bugfixes<a class="headerlink" href="#bugfixes_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>fix #48: export_datasheet fails when exporting a SiC-MOSFET</li>
+<li>fix #49: Print housing_list and manufacturer_list in case of not maching housings/manufacturers when creating a transistor</li>
+</ul>
+<h2 id="0213-2021-09-30"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.12...0.2.13">0.2.13</a> - 2021-09-30<a class="headerlink" href="#0213-2021-09-30" title="Permanent link">&para;</a></h2>
+<h3 id="added_8">Added<a class="headerlink" href="#added_8" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="37-function-to-calculate-thermal-parameters-from-given-thermal-curve">37: Function to calculate thermal parameters from given thermal curve<a class="headerlink" href="#37-function-to-calculate-thermal-parameters-from-given-thermal-curve" title="Permanent link">&para;</a></h1>
+</li>
+<li>scipy curve fitting method is utilized to extract thermal parameters</li>
+</ul>
+<h3 id="updated_3">Updated<a class="headerlink" href="#updated_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Docstrings</li>
+<li>added calc_thermal_params function call to init block of transistor object to calculate the missing thermal parameters</li>
+</ul>
+<h3 id="bugfixes_3">Bugfixes<a class="headerlink" href="#bugfixes_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="19-problems-in-windows-when-removing-cloned-repo">19: Problems in Windows when removing cloned repo<a class="headerlink" href="#19-problems-in-windows-when-removing-cloned-repo" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h2 id="0212-2021-09-15"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.11...0.2.12">0.2.12</a> - 2021-09-15<a class="headerlink" href="#0212-2021-09-15" title="Permanent link">&para;</a></h2>
+<h3 id="added_9">Added<a class="headerlink" href="#added_9" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Transistor method 'compare_channel_linearized()' to compare channel data with linearized data </li>
+<li>Sphinx documentation, see <a href="https://upb-lea.github.io/transistordatabase/transistordatabase.html">here</a></li>
+</ul>
+<h3 id="updated_4">Updated<a class="headerlink" href="#updated_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Docstrings</li>
+</ul>
+<h3 id="bugfixes_4">Bugfixes<a class="headerlink" href="#bugfixes_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="44-choose-another-linearisation-default-current-for-quickstart_wp">44: Choose another linearisation default current for quickstart_wp()<a class="headerlink" href="#44-choose-another-linearisation-default-current-for-quickstart_wp" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="48-crash-when-exporting-virtual-datasheet">48: Crash when exporting virtual datasheet<a class="headerlink" href="#48-crash-when-exporting-virtual-datasheet" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h2 id="0211-2021-08-07"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.10...0.2.11">0.2.11</a> - 2021-08-07<a class="headerlink" href="#0211-2021-08-07" title="Permanent link">&para;</a></h2>
+<h3 id="added_10">Added<a class="headerlink" href="#added_10" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="40-read-two-curves-for-parasitic-capacitance">40 Read two curves for parasitic capacitance<a class="headerlink" href="#40-read-two-curves-for-parasitic-capacitance" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h3 id="small-improvements">Small Improvements<a class="headerlink" href="#small-improvements" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="35-add-datasheet-hyperlink-to-simulink-loss-model-exporter">35 Add Datasheet Hyperlink to Simulink loss model exporter<a class="headerlink" href="#35-add-datasheet-hyperlink-to-simulink-loss-model-exporter" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="34-36-display-all-exported-file-folders-clickable">34, #36 Display all exported file folders clickable<a class="headerlink" href="#34-36-display-all-exported-file-folders-clickable" title="Permanent link">&para;</a></h1>
+</li>
+<li>Datasheet link (.export_datasheet()) is also clickable and opens the browser to display the datasheet</li>
+<li>
+<h1 id="38-update-template-with-new-examples">38 Update template with new examples<a class="headerlink" href="#38-update-template-with-new-examples" title="Permanent link">&para;</a></h1>
+</li>
+<li>Small changes on datasheet displaying</li>
+</ul>
+<h3 id="bugfixes_5">Bugfixes<a class="headerlink" href="#bugfixes_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>fix #43: Problem when paralleling transistors with no r-th-curve given</li>
+<li>fix #39: Problem when exporting datasheet with not r_th_vector and tau_vector variables</li>
+</ul>
+<h2 id="0210-2021-07-27"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.9...0.2.10">0.2.10</a> - 2021-07-27<a class="headerlink" href="#0210-2021-07-27" title="Permanent link">&para;</a></h2>
+<h3 id="added_11">Added<a class="headerlink" href="#added_11" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="14-virtual-datasheet-for-igbt-and-mosfet-types-which-collects-all-the-plot-and-data-of-transistor-switch-and-diode-and-presents-a-html-file-use-transistorexport_datasheet">14 Virtual datasheet for IGBT and MOSFET types which collects all the plot and data of transistor switch and diode and presents a HTMl file. Use 'transistor.export_datasheet()'<a class="headerlink" href="#14-virtual-datasheet-for-igbt-and-mosfet-types-which-collects-all-the-plot-and-data-of-transistor-switch-and-diode-and-presents-a-html-file-use-transistorexport_datasheet" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h3 id="bugfixes_6">Bugfixes<a class="headerlink" href="#bugfixes_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li>fix #32: incorrect template paths in PLECS exporter</li>
+</ul>
+<h2 id="029-2021-07-14"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.8...0.2.9">0.2.9</a> - 2021-07-14<a class="headerlink" href="#029-2021-07-14" title="Permanent link">&para;</a></h2>
+<h3 id="bugfixes_7">Bugfixes<a class="headerlink" href="#bugfixes_7" title="Permanent link">&para;</a></h3>
+<ul>
+<li>fix #30: Bad package dependency in setup.py</li>
+</ul>
+<h2 id="028-2021-07-14"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.7...0.2.8">0.2.8</a> - 2021-07-14<a class="headerlink" href="#028-2021-07-14" title="Permanent link">&para;</a></h2>
+<h3 id="added_12">Added<a class="headerlink" href="#added_12" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="25-allows-only-positive-channel-data-to-be-stored-or-created-for-both-switch-and-diode-types-added-mirror_xy_data-attribute-in-csv2array-function-to-do-so">25 Allows only positive channel data to be stored or created for both switch and diode types, added mirror_xy_data attribute in csv2array function to do so.<a class="headerlink" href="#25-allows-only-positive-channel-data-to-be-stored-or-created-for-both-switch-and-diode-types-added-mirror_xy_data-attribute-in-csv2array-function-to-do-so" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="28-integrated-calculating-curve-characteristics-at-different-r_g-values-into-simuliunk-exporter-and-added-exception-handlers">28 Integrated calculating curve characteristics at different r_g values into simuliunk exporter and added exception handlers<a class="headerlink" href="#28-integrated-calculating-curve-characteristics-at-different-r_g-values-into-simuliunk-exporter-and-added-exception-handlers" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="29-code-cleanup-and-added-recheck-functionality-for-plecs-exporter-to-find-new-gate-voltage">29 Code cleanup and added recheck functionality for plecs exporter to find new gate voltage<a class="headerlink" href="#29-code-cleanup-and-added-recheck-functionality-for-plecs-exporter-to-find-new-gate-voltage" title="Permanent link">&para;</a></h1>
+</li>
+<li>
+<h1 id="29-added-plecs-exporter-for-mosfet-and-igbt-modules-outputs-separate-switch-type-and-diode-type-xmls">29 Added plecs exporter for MOSFET and IGBT modules (outputs separate switch type and diode type xmls)<a class="headerlink" href="#29-added-plecs-exporter-for-mosfet-and-igbt-modules-outputs-separate-switch-type-and-diode-type-xmls" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h3 id="changed_4">Changed<a class="headerlink" href="#changed_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="22-moved-exporter-functions-to-transistor-classes-and-removed-exportfunctionspy">22 Moved exporter functions to transistor classes and removed exportFunctions.py<a class="headerlink" href="#22-moved-exporter-functions-to-transistor-classes-and-removed-exportfunctionspy" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h2 id="027-2021-06-28"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.6...0.2.7">0.2.7</a> - 2021-06-28<a class="headerlink" href="#027-2021-06-28" title="Permanent link">&para;</a></h2>
+<h3 id="added_13">Added<a class="headerlink" href="#added_13" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Module manufacturers, fix compatibility problem in 0.2.6</li>
+</ul>
+<h2 id="026-2021-06-27"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.5...0.2.6">0.2.6</a> - 2021-06-27<a class="headerlink" href="#026-2021-06-27" title="Permanent link">&para;</a></h2>
+<h3 id="bugfixes_8">Bugfixes<a class="headerlink" href="#bugfixes_8" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="3-8-fixes-to-avoid-typo-errors-in-manufacturer-and-housing-types-along-with-comment-line-additions">3, #8 : fixes to avoid typo errors in manufacturer and housing types along with comment line additions<a class="headerlink" href="#3-8-fixes-to-avoid-typo-errors-in-manufacturer-and-housing-types-along-with-comment-line-additions" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h3 id="added_14">Added<a class="headerlink" href="#added_14" title="Permanent link">&para;</a></h3>
+<ul>
+<li>method 'parallel_transistors()' to parallel transistors object of same type </li>
+</ul>
+<h3 id="changed_5">Changed<a class="headerlink" href="#changed_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>rewrite export_to_matlab() function</li>
+</ul>
+<h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>remove dependency from matlab-pip-package</li>
+</ul>
+<h2 id="025-2021-06-10"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.4...0.2.5">0.2.5</a> - 2021-06-10<a class="headerlink" href="#025-2021-06-10" title="Permanent link">&para;</a></h2>
+<h2 id="added_15">Added<a class="headerlink" href="#added_15" title="Permanent link">&para;</a></h2>
+<ul>
+<li>export_simulink_loss_model using new functions to search transistor elements (incl. fix #17)</li>
+</ul>
+<h3 id="removed_1">Removed<a class="headerlink" href="#removed_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>export_simulink_v1 (outdated)</li>
+</ul>
+<h2 id="024-2021-05-28"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.3...0.2.4">0.2.4</a> - 2021-05-28<a class="headerlink" href="#024-2021-05-28" title="Permanent link">&para;</a></h2>
+<h3 id="added_16">Added<a class="headerlink" href="#added_16" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="13-geckocircuits-exporter-exports-mirrowed-conducting-characterisitc-for-negative-currents">13: GeckoCircuits Exporter exports mirrowed conducting characterisitc for negative currents<a class="headerlink" href="#13-geckocircuits-exporter-exports-mirrowed-conducting-characterisitc-for-negative-currents" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h3 id="bugfixes_9">Bugfixes<a class="headerlink" href="#bugfixes_9" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<h1 id="11-12-path-displays-when-export-to-gecko-scl-or-to-json">11, #12: Path displays when export to gecko (.scl) or to .json<a class="headerlink" href="#11-12-path-displays-when-export-to-gecko-scl-or-to-json" title="Permanent link">&para;</a></h1>
+</li>
+</ul>
+<h2 id="023-2021-05-21"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.2...0.2.3">0.2.3</a> - 2021-05-21<a class="headerlink" href="#023-2021-05-21" title="Permanent link">&para;</a></h2>
+<h3 id="added_17">Added<a class="headerlink" href="#added_17" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Simple calculation method for mosfet gate resistor (Paper PCIM 2006: D.Kübrich 'Invetsigation of Turn-Off Behaviour under the Assumption of Linear Capacitances')</li>
+</ul>
+<h3 id="bugfix">Bugfix<a class="headerlink" href="#bugfix" title="Permanent link">&para;</a></h3>
+<ul>
+<li>bug #7: was not fully fixed. Fixed now.</li>
+<li>bug #9: in case of no err-data, fill working point with object instead of list</li>
+</ul>
+<h2 id="022-2021-05-11"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.1...0.2.2">0.2.2</a> - 2021-05-11<a class="headerlink" href="#022-2021-05-11" title="Permanent link">&para;</a></h2>
+<h3 id="added_18">Added<a class="headerlink" href="#added_18" title="Permanent link">&para;</a></h3>
+<ul>
+<li>print_TDB() returns a list with transistor names</li>
+<li>add some CREE power module housing types</li>
+</ul>
+<h3 id="bugfix_1">Bugfix<a class="headerlink" href="#bugfix_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>fix #6: Avoid KeyError when using devices without err-losscurves</li>
+<li>fix #7: wrong fill of wp.xxx_r_channel/xxx_v_channel when using transistor.update_wp() or transistor.quickstart_wp()</li>
+</ul>
+<h2 id="021-2021-05-06"><a href="https://github.com/upb-lea/transistordatabase/compare/0.2.0...0.2.1">0.2.1</a> - 2021-05-06<a class="headerlink" href="#021-2021-05-06" title="Permanent link">&para;</a></h2>
+<h3 id="bugfix_2">Bugfix<a class="headerlink" href="#bugfix_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Problem when reading .csv-files generated by english-language systems</li>
+</ul>
+<h2 id="020-2021-05-04"><a href="https://github.com/upb-lea/transistordatabase/compare/0.1.0...0.2.0">0.2.0</a> - 2021-05-04<a class="headerlink" href="#020-2021-05-04" title="Permanent link">&para;</a></h2>
+<h3 id="added_19">Added<a class="headerlink" href="#added_19" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Example template to generate a transistor object</li>
+<li>transistor method: linearize_switch_ui_graph</li>
+<li>transistor.switch methods: print_all_channel_data, print_channel_data_vge, print_channel_data_temp</li>
+<li>New class LinearizedModel: Contains data for a linearized Switch/Diode depending on given operating point.</li>
+<li>New class to store c_iss, c_oss, c_rss in Transistor.</li>
+<li>New Transistor attribute: e_coss</li>
+<li>Documentation drawing</li>
+<li>Exporter: GeckoCIRCUITS</li>
+<li>calc_object_i_e to calculate loss loss curves for other gate resistors/voltage levels</li>
+<li>New class 'wp' to store local calculation parameters to use in your program</li>
+<li>automatically fill 'wp' objects when using functions like find_approx_wp()</li>
+<li>added a quick start to fill in 'wp' values quick and easy</li>
+<li>New housing types</li>
+<li>.json exporter</li>
+</ul>
+<h3 id="removed_2">Removed<a class="headerlink" href="#removed_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Removed Metadata class. Added its attributes to Transistor class instead</li>
+</ul>
+<h3 id="changed_6">Changed<a class="headerlink" href="#changed_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Restructured foster thermal model argument handover</li>
+<li>Rename package to transistordatabase (instead of transistor_database) due to pip package rules</li>
+<li>csv2array callable with options</li>
+<li>move some functionality out of transistor class (tdb.Transistor. -&gt; tdb.)</li>
+</ul>
+<h2 id="010-2021-02-04"><a href="https://github.com/upb-lea/transistordatabase/compare/0.1.0...0.1.0">0.1.0</a> - 2021-02-04<a class="headerlink" href="#010-2021-02-04" title="Permanent link">&para;</a></h2>
+<h3 id="added_20">Added<a class="headerlink" href="#added_20" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Construct a Transistor-object and save relevant data in its attributes and subclasses</li>
+<li>Class structure documented in a class UML diagram</li>
+<li>Save Transistor-object in an object database created with mongodb</li>
+<li>Mandatory attributes and restricted types/values to guarantee only valid and functional Transistors can be added to
+  the database</li>
+<li>Matlab-Exporter</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 LEA, University of Paderborn
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/upb-lea/transistordatabase" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://pypi.org/project/transistordatabase/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

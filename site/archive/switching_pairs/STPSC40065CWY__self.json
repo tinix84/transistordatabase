@@ -1,0 +1,256 @@
+{
+  "pair_id": "STPSC40065CWY__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "STPSC40065CWY",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "STPSC40065CWY",
+      "type": "mosfet",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 7.36,
+      "weight": 0.00443
+    },
+    "electrical_ratings": {
+      "v_abs_max": 650.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -0.0,
+            -0.0,
+            0.02387342195826762,
+            0.8319101123595507,
+            1.1038202247191014,
+            1.2431460674157304,
+            1.400449438202247,
+            2.9892134831460675,
+            1.6049438202247193,
+            1.8026966292134836,
+            2.0791011235955055,
+            1.771689013358877
+          ],
+          "on_state_current": [
+            -1e+100,
+            -1e-06,
+            1e-06,
+            1.4724675324675343,
+            8.50277056277056,
+            13.108831168831166,
+            18.1391341991342,
+            24.017922077922076,
+            24.987619047619045,
+            31.35125541125541,
+            40.01792207792207,
+            45.7102902639296
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "STPSC40065CWY",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "STPSC40065CWY.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        5.0,
+        10.0,
+        15.0,
+        20.0,
+        25.0,
+        30.0,
+        35.0,
+        40.0,
+        45.0,
+        50.0,
+        55.0,
+        60.0,
+        65.0,
+        70.0
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          -4.079999686e-06,
+          -2.51e-06,
+          9.16e-07,
+          5.26e-06,
+          1.03e-05,
+          1.63e-05,
+          2.33e-05,
+          3.11e-05,
+          3.99e-05,
+          4.96e-05,
+          6.01e-05,
+          7.15e-05,
+          8.39e-05,
+          9.71e-05,
+          0.00011106
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        5.0,
+        10.0,
+        15.0,
+        20.0,
+        25.0,
+        30.0,
+        35.0,
+        40.0,
+        45.0,
+        50.0,
+        55.0,
+        60.0,
+        65.0,
+        70.0
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          4.33000007e-06,
+          4.68e-06,
+          5.09e-06,
+          5.6e-06,
+          6.36e-06,
+          7.22e-06,
+          8.26e-06,
+          9.5e-06,
+          1.09e-05,
+          1.26e-05,
+          1.44e-05,
+          1.64e-05,
+          1.87e-05,
+          2.12e-05,
+          2.4e-05
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "STPSC40065CWY.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.689114",
+    "schema_version": "1.0",
+    "quality_score": 57.14285714285714
+  }
+}

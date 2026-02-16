@@ -1,0 +1,254 @@
+{
+  "pair_id": "ST_STGW40M120DF3__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ST_STGW40M120DF3",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "ST STGW40M120DF3",
+      "type": "mosfet",
+      "manufacturer": "ST",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 5.28,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 1200.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.32,
+      "r_th_cs": 0.74,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -3.555858310626703,
+            -3.155313351498638,
+            -2.664850136239783,
+            -2.2561307901907357,
+            -1.9863760217983664,
+            -1.7411444141689372,
+            -1.5204359673024521,
+            -1.2098092643051777,
+            -0.9210205870061943,
+            0.0666967497569906,
+            1.0013458950201883,
+            1.3485868102288017,
+            1.582772543741588,
+            1.90578734858681,
+            2.4468371467025576,
+            3.8196500672947518,
+            4.756393001345896,
+            5.353970390309556,
+            5.99192462987887
+          ],
+          "on_state_current": [
+            -160.207756232687,
+            -127.797783933518,
+            -89.77839335180053,
+            -61.93905817174514,
+            -45.94182825484764,
+            -32.22991689750691,
+            -22.04986149584486,
+            -10.623268698060926,
+            -1e-06,
+            1e-06,
+            5.361930294906158,
+            11.796246648793543,
+            17.80160857908846,
+            27.024128686327057,
+            44.182305630026804,
+            89.43699731903483,
+            116.4611260053619,
+            131.26005361930294,
+            143.485254691689
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "ST_STGW40M120DF3",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "ST_STGW40M120DF3.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 600.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        0.12195121951219967,
+        9.87804878048781,
+        20.243902439024396,
+        29.512195121951226,
+        33.65853658536585,
+        40.36585365853659,
+        47.19512195121951,
+        58.292682926829265,
+        78.17073170731707
+      ],
+      "voltage_axis": [
+        600.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          0.00044945804235772406,
+          0.0004552845528455291,
+          0.0009214092140921383,
+          0.0014959349593495928,
+          0.002005420054200542,
+          0.0022764227642276423,
+          0.002818428184281843,
+          0.0034579945799457995,
+          0.004585365853658536,
+          0.006634146341463415
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        0.24357239512855253,
+        10.23004059539918,
+        16.07577807848444,
+        20.70365358592693,
+        25.818673883626523,
+        31.177266576454667,
+        37.997293640054124,
+        45.548037889039236,
+        60.16238159675237,
+        70.148849797023,
+        79.89174560216509
+      ],
+      "voltage_axis": [
+        600.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          0.0001729430913920874,
+          0.00019485791610284064,
+          0.0010933694181326102,
+          0.00171041948579161,
+          0.0020893098782138026,
+          0.002489851150202977,
+          0.002901217861975643,
+          0.0033234100135318,
+          0.003745602165087957,
+          0.0044600811907983765,
+          0.0049364005412719895,
+          0.005412719891745603
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "ST_STGW40M120DF3.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.739069",
+    "schema_version": "1.0",
+    "quality_score": 71.42857142857143
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "pair_id": "Infineon_FS820R08A6P2B__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "Infineon_FS820R08A6P2B",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "Infineon FS820R08A6P2B",
+      "type": "mosfet",
+      "manufacturer": "Infineon",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 270.0,
+      "weight": 0.8
+    },
+    "electrical_ratings": {
+      "v_abs_max": 750.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.14,
+      "r_th_cs": 0.2,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -2.1176870748299326,
+            -1.7472789115646263,
+            -1.391836734693878,
+            -1.2197278911564626,
+            -1.0738095238095244,
+            -0.950340136054422,
+            -0.8006802721088436,
+            -0.7108843537414967,
+            -0.5986394557823129,
+            0.0,
+            0.003741496598639357,
+            0.5868465430016865,
+            0.6812816188870151,
+            0.7554806070826304,
+            0.863406408094435,
+            1.0185497470489036,
+            1.2478920741989885,
+            1.9426644182124786
+          ],
+          "on_state_current": [
+            -1600.0,
+            -1035.2941176470588,
+            -585.3658536585366,
+            -404.01721664275436,
+            -275.46628407460554,
+            -188.2352941176471,
+            -103.29985652797706,
+            -66.57101865136319,
+            -32.137733142037206,
+            0.0,
+            2.2955523672884226,
+            34.09090909090935,
+            75.0,
+            118.18181818181853,
+            202.27272727272734,
+            359.0909090909092,
+            634.0909090909091,
+            1597.7272727272727
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "Infineon_FS820R08A6P2B",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "Infineon_FS820R08A6P2B.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.0,
+        1.543739279588407,
+        47.85591766723835,
+        149.74271012006864,
+        257.80445969125213,
+        401.37221269296754,
+        514.0651801029159,
+        702.401372212693,
+        895.368782161235
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0014161849710982556,
+          0.002933526011560678,
+          0.006473988439306356,
+          0.010014450867052011,
+          0.015578034682080927,
+          0.020635838150289004,
+          0.029537572254335252,
+          0.03894508670520231
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        0.0,
+        46.39175257731962,
+        120.61855670103083,
+        242.78350515463927,
+        347.93814432989683,
+        544.3298969072165,
+        895.360824742268
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          0.0030346820809248522,
+          0.005361271676300577,
+          0.009205202312138724,
+          0.015780346820809248,
+          0.02225433526011561,
+          0.037023121387283246,
+          0.06686416184971097
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "Infineon_FS820R08A6P2B.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.431284",
+    "schema_version": "1.0",
+    "quality_score": 71.42857142857143
+  }
+}

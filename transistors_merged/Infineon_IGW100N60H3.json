@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "name": "Infineon_IGW100N60H3",
+    "type": "Diode",
+    "manufacturer": "Infineon",
+    "housing_type": "unknown",
+    "import_source": "plecs_xml:IGW100N60H3_Diode.xml",
+    "import_date": "2026-02-15T15:46:32.368704"
+  },
+  "electrical_ratings": {
+    "v_abs_max": 0.0,
+    "i_abs_max": 0.0,
+    "i_cont": 0.0,
+    "t_j_max": 150.0
+  },
+  "thermal_properties": {
+    "housing_area": 0.0,
+    "cooling_area": 0.0,
+    "r_th_jc": 0.0,
+    "r_th_cs": 0.0
+  },
+  "switch": {
+    "channel_data": [],
+    "e_on_data": [],
+    "e_off_data": [],
+    "gate_charge_curves": [],
+    "soa": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.07228401,
+          "tau": 9.4e-06
+        },
+        {
+          "R": 0.1019218,
+          "tau": 0.00013
+        },
+        {
+          "R": 0.1401017,
+          "tau": 0.0015
+        },
+        {
+          "R": 0.2213981,
+          "tau": 0.02221235
+        },
+        {
+          "R": 0.2642944,
+          "tau": 0.3064102
+        }
+      ]
+    }
+  },
+  "diode": {
+    "channel_data": [],
+    "e_rr_data": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.07228401,
+          "tau": 9.4e-06
+        },
+        {
+          "R": 0.1019218,
+          "tau": 0.00013
+        },
+        {
+          "R": 0.1401017,
+          "tau": 0.0015
+        },
+        {
+          "R": 0.2213981,
+          "tau": 0.02221235
+        },
+        {
+          "R": 0.2642944,
+          "tau": 0.3064102
+        }
+      ]
+    }
+  },
+  "c_oss": [],
+  "c_iss": [],
+  "c_rss": []
+}

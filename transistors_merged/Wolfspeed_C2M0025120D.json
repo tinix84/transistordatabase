@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "name": "Wolfspeed_C2M0025120D",
+    "type": "Diode",
+    "manufacturer": "Wolfspeed",
+    "housing_type": "unknown",
+    "import_source": "plecs_xml:C2M0025120D_bodydiode.xml",
+    "import_date": "2026-02-15T15:46:32.447513"
+  },
+  "electrical_ratings": {
+    "v_abs_max": 0.0,
+    "i_abs_max": 0.0,
+    "i_cont": 0.0,
+    "t_j_max": 150.0
+  },
+  "thermal_properties": {
+    "housing_area": 0.0,
+    "cooling_area": 0.0,
+    "r_th_jc": 0.0,
+    "r_th_cs": 0.0
+  },
+  "switch": {
+    "channel_data": [],
+    "e_on_data": [],
+    "e_off_data": [],
+    "gate_charge_curves": [],
+    "soa": [],
+    "thermal_foster": null
+  },
+  "diode": {
+    "channel_data": [],
+    "e_rr_data": [],
+    "thermal_foster": null
+  },
+  "c_oss": [],
+  "c_iss": [],
+  "c_rss": []
+}

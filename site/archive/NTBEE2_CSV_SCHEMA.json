@@ -1,0 +1,391 @@
+{
+  "timestamp": "2026-02-15T00:00:00",
+  "analysis_type": "ntbee2 Semiconductor CSV Schema Analysis",
+  "source_files": [
+    "/home/tinix/claude_wsl/ntbees2/models/semiconductor.py",
+    "/home/tinix/claude_wsl/ntbees2/models/semiconductor_database.py",
+    "/home/tinix/claude_wsl/ntbees2/models/semiconductor_combo_database.py"
+  ],
+  "csv_schemas": {
+    "plecs_devices.csv": {
+      "purpose": "PLECS-derived semiconductor database with single test point measurements",
+      "loader_class": "SemiconductorRecord",
+      "csv_parser": "_load_csv() in semiconductor_database.py",
+      "columns": {
+        "part_number": {
+          "type": "string",
+          "required": true,
+          "description": "Unique part number identifier",
+          "example": "C2M0080120D"
+        },
+        "vendor": {
+          "type": "string",
+          "required": true,
+          "description": "Manufacturer name",
+          "example": "Wolfspeed"
+        },
+        "type": {
+          "type": "string (enum)",
+          "required": true,
+          "description": "Device type",
+          "allowed_values": ["mosfet", "igbt", "diode"],
+          "example": "mosfet"
+        },
+        "technology": {
+          "type": "string (enum)",
+          "required": true,
+          "description": "Semiconductor technology",
+          "allowed_values": ["Si", "SiC", "GaN"],
+          "example": "SiC"
+        },
+        "V_br_V": {
+          "type": "float",
+          "required": true,
+          "unit": "Volts",
+          "description": "Breakdown voltage (voltage rating)",
+          "example": 650.0
+        },
+        "R_dson_mOhm": {
+          "type": "float",
+          "required": false,
+          "unit": "milliOhms",
+          "description": "On-state resistance (MOSFET only, NaN for IGBT/diode)",
+          "note": "Use R_d_mOhm for IGBT/diode devices",
+          "example": 80.0
+        },
+        "V_ce_sat_V": {
+          "type": "float",
+          "required": false,
+          "unit": "Volts",
+          "description": "Saturation voltage (IGBT only, NaN for MOSFET)",
+          "example": 0.65
+        },
+        "R_d_mOhm": {
+          "type": "float",
+          "required": false,
+          "unit": "milliOhms",
+          "description": "Dynamic resistance (IGBT/diode alternative to R_dson)",
+          "example": 100.0
+        },
+        "E_on_uJ": {
+          "type": "float",
+          "required": true,
+          "unit": "microJoules",
+          "description": "Turn-on switching energy at test point",
+          "note": "Measured at (V_test_V, I_test_A)",
+          "example": 150.0
+        },
+        "E_off_uJ": {
+          "type": "float",
+          "required": true,
+          "unit": "microJoules",
+          "description": "Turn-off switching energy at test point",
+          "note": "Measured at (V_test_V, I_test_A)",
+          "example": 120.0
+        },
+        "V_test_V": {
+          "type": "float",
+          "required": true,
+          "unit": "Volts",
+          "description": "Reference voltage for switching energy measurement",
+          "example": 400.0
+        },
+        "I_test_A": {
+          "type": "float",
+          "required": true,
+          "unit": "Amperes",
+          "description": "Reference current for switching energy measurement",
+          "example": 20.0
+        },
+        "Rth_jc_KW": {
+          "type": "float",
+          "required": true,
+          "unit": "Kelvin/Watt",
+          "description": "Junction-to-case thermal resistance",
+          "example": 0.5
+        },
+        "package": {
+          "type": "string",
+          "required": false,
+          "description": "Package type designation",
+          "example": "TO-247"
+        }
+      },
+      "total_columns": 14,
+      "missing_data_handling": "NaN values are parsed by _parse_float() and skipped in filtering logic"
+    },
+    "raggl_combos.csv": {
+      "purpose": "Transistor-diode combo database with Raggl model coefficients for PFC applications",
+      "loader_class": "DeviceComboRecord",
+      "csv_parser": "_load_csv() in semiconductor_combo_database.py",
+      "model_reference": "Raggl model (IEEE TIE 2009, Eqs. 7-11) - Current-dependent energy per event",
+      "equations": {
+        "E_on(I)": "a_on + k_on × I                    [µJ, linear]      (Eq. 9)",
+        "E_off(I)": "a_off + k_off × I²                [µJ, quadratic]   (Eq. 10)",
+        "E_RR(I)": "a_RR + k_RR × I                   [µJ, linear]      (Eq. 11)"
+      },
+      "columns": {
+        "combo_id": {
+          "type": "string",
+          "required": true,
+          "description": "Unique combo identifier",
+          "example": "C2M0080120D+body"
+        },
+        "transistor_pn": {
+          "type": "string",
+          "required": true,
+          "description": "Transistor part number",
+          "example": "C2M0080120D"
+        },
+        "diode_pn": {
+          "type": "string",
+          "required": true,
+          "description": "Anti-parallel diode part number",
+          "example": "CDHD10-12"
+        },
+        "vendor": {
+          "type": "string",
+          "required": true,
+          "description": "Manufacturer name",
+          "example": "Wolfspeed"
+        },
+        "technology": {
+          "type": "string (enum)",
+          "required": true,
+          "description": "Semiconductor technology",
+          "allowed_values": ["Si", "SiC", "GaN"],
+          "example": "SiC"
+        },
+        "V_class_V": {
+          "type": "float",
+          "required": true,
+          "unit": "Volts",
+          "description": "Device voltage class rating",
+          "allowed_values": [600, 900, 1200, 1700],
+          "example": 600.0
+        },
+        "V_test_V": {
+          "type": "float",
+          "required": true,
+          "unit": "Volts",
+          "description": "Reference voltage for Raggl fit (used for voltage scaling)",
+          "note": "Switching energies scale as E × (V_dc / V_test)",
+          "example": 400.0
+        },
+        "R_dson_mOhm": {
+          "type": "float",
+          "required": true,
+          "unit": "milliOhms",
+          "description": "Conduction: Transistor on-resistance or dynamic resistance",
+          "example": 80.0
+        },
+        "V_ce_sat_V": {
+          "type": "float",
+          "required": false,
+          "unit": "Volts",
+          "description": "Conduction: IGBT saturation voltage (0 for MOSFET)",
+          "example": 0.0
+        },
+        "a_on_uJ": {
+          "type": "float",
+          "required": true,
+          "unit": "microJoules",
+          "description": "Turn-on energy intercept (Eq. 9)",
+          "note": "E_on(I) = a_on + k_on × I",
+          "example": 10.0
+        },
+        "k_on_uJ_A": {
+          "type": "float",
+          "required": true,
+          "unit": "microJoules/Ampere",
+          "description": "Turn-on energy slope (Eq. 9)",
+          "note": "E_on(I) = a_on + k_on × I",
+          "example": 5.0
+        },
+        "a_off_uJ": {
+          "type": "float",
+          "required": true,
+          "unit": "microJoules",
+          "description": "Turn-off energy intercept (Eq. 10)",
+          "note": "E_off(I) = a_off + k_off × I²",
+          "example": 15.0
+        },
+        "k_off_uJ_A2": {
+          "type": "float",
+          "required": true,
+          "unit": "microJoules/Ampere²",
+          "description": "Turn-off energy slope (quadratic) (Eq. 10)",
+          "note": "E_off(I) = a_off + k_off × I²",
+          "example": 0.05
+        },
+        "a_RR_uJ": {
+          "type": "float",
+          "required": true,
+          "unit": "microJoules",
+          "description": "Reverse recovery energy intercept (Eq. 11)",
+          "note": "E_RR(I) = a_RR + k_RR × I",
+          "example": 5.0
+        },
+        "k_RR_uJ_A": {
+          "type": "float",
+          "required": true,
+          "unit": "microJoules/Ampere",
+          "description": "Reverse recovery energy slope (Eq. 11)",
+          "note": "E_RR(I) = a_RR + k_RR × I",
+          "example": 3.0
+        },
+        "U_f_V": {
+          "type": "float",
+          "required": true,
+          "unit": "Volts",
+          "description": "Diode forward voltage drop",
+          "example": 0.7
+        },
+        "R_f_mOhm": {
+          "type": "float",
+          "required": true,
+          "unit": "milliOhms",
+          "description": "Diode forward resistance",
+          "example": 10.0
+        },
+        "Rth_jc_trans_KW": {
+          "type": "float",
+          "required": true,
+          "unit": "Kelvin/Watt",
+          "description": "Transistor junction-to-case thermal resistance",
+          "example": 0.5
+        },
+        "Rth_jc_diode_KW": {
+          "type": "float",
+          "required": true,
+          "unit": "Kelvin/Watt",
+          "description": "Diode junction-to-case thermal resistance",
+          "example": 1.0
+        },
+        "package": {
+          "type": "string",
+          "required": false,
+          "description": "Package type designation",
+          "example": "TO-247"
+        },
+        "n_Eon_points": {
+          "type": "integer",
+          "required": true,
+          "description": "Number of data points used for E_on fit",
+          "note": "Fit quality indicator",
+          "example": 5
+        },
+        "r2_Eon": {
+          "type": "float",
+          "required": true,
+          "unit": "dimensionless",
+          "description": "R² goodness-of-fit for E_on model",
+          "note": "Range [0, 1], closer to 1 is better",
+          "example": 0.98
+        },
+        "r2_Eoff": {
+          "type": "float",
+          "required": true,
+          "unit": "dimensionless",
+          "description": "R² goodness-of-fit for E_off model",
+          "note": "Range [0, 1], closer to 1 is better",
+          "example": 0.96
+        }
+      },
+      "total_columns": 23,
+      "missing_data_handling": "NaN values parsed by _parse_float(); n_Eon_points cast to int with NaN→0 fallback"
+    }
+  },
+  "key_classes": {
+    "DeviceModel": {
+      "purpose": "Polynomial-fitted model with temperature scaling",
+      "uses": "Loss calculations for switching/conduction",
+      "factory_methods": ["from_config()"],
+      "properties": [
+        "Rds_coeffs: [a0, a1, a2, a3] for R_ds = a0 + a1×V + a2×V² + a3×V×I [mOhm]",
+        "Eon_coeffs: [b0, b1, b2, b3] for E_on = b0 + b1×V + b2×I + b3×V×I [µJ]",
+        "Eoff_coeffs: [c0, c1, c2, c3] for E_off = c0 + c1×V + c2×I + c3×V×I [µJ]",
+        "alpha_T: R_ds temperature coefficient [1/K] (default 0.004)",
+        "beta_T: E_sw temperature coefficient [1/K] (default 0.002)"
+      ]
+    },
+    "Semiconductor": {
+      "purpose": "Leibl-compatible measurement-based model with 2-D interpolation",
+      "uses": "Loss calculations from measured data points",
+      "factory_methods": ["from_datasheet()", "from_config()"],
+      "data_structure": {
+        "switching_data": {
+          "transistor_on": {"voltage": [], "current": [], "energy": []},
+          "transistor_off": {"voltage": [], "current": [], "energy": []},
+          "diode_on": {"voltage": [], "current": [], "energy": []},
+          "diode_off": {"voltage": [], "current": [], "energy": []}
+        },
+        "conducting_data": {
+          "forward": {"resistance": "float or voltage/current arrays"},
+          "reverse": {"resistance": "float"}
+        },
+        "thermal_data": {
+          "transistor": {"thermal_resistance": "float", "rated_junction_temperature": "float"},
+          "diode": {"thermal_resistance": "float", "rated_junction_temperature": "float"}
+        }
+      }
+    }
+  },
+  "integration_notes": {
+    "unit_conversions": {
+      "voltage": "[V] ← V_br_V, V_test_V, V_ce_sat_V, V_class_V, U_f_V",
+      "resistance": "[mOhm] ← R_dson_mOhm, R_d_mOhm, R_f_mOhm → [Ohm] for loss calculations (÷1000)",
+      "thermal_resistance": "[K/W] ← Rth_jc_* directly in Kelvin/Watt",
+      "energy": "[µJ] ← E_on_uJ, E_off_uJ, a_*_uJ → [J] for loss calculations (÷1e6)",
+      "current": "[A] ← I_test_A, k_*_uJ_A, k_RR_uJ_A directly in Amperes"
+    },
+    "matching_tdb_to_ntbee2": {
+      "TDB_metadata.name": "→ ntbee2.part_number",
+      "TDB_metadata.type": "→ ntbee2.type (mosfet|igbt|diode)",
+      "TDB_metadata.manufacturer": "→ ntbee2.vendor",
+      "TDB_electrical_ratings.v_abs_max": "→ ntbee2.V_br_V",
+      "TDB_electrical_ratings.i_abs_max": "→ ntbee2.I_test_A (proxy)",
+      "TDB_electrical_ratings.t_j_max": "→ ntbee2 thermal_data.rated_junction_temperature",
+      "TDB_switch.channel_data[0].r_channel": "→ ntbee2.R_dson_mOhm (at 25°C, V_gs=15V)",
+      "TDB_switch.e_on_data[0]": "→ ntbee2.E_on_uJ (at test point V, I)",
+      "TDB_switch.e_off_data[0]": "→ ntbee2.E_off_uJ (at test point V, I)",
+      "TDB_thermal_properties.r_th_jc": "→ ntbee2.Rth_jc_KW",
+      "note": "TDB uses detailed curve data; ntbee2 uses single test points + Raggl coefficients"
+    },
+    "reverse_matching_ntbee2_to_tdb": {
+      "ntbee2.part_number": "→ TDB_metadata.name",
+      "ntbee2.type": "→ TDB_metadata.type",
+      "ntbee2.vendor": "→ TDB_metadata.manufacturer",
+      "ntbee2.V_br_V": "→ TDB_electrical_ratings.v_abs_max",
+      "ntbee2.R_dson_mOhm×1e-3": "→ TDB_switch.channel_data[0].r_channel",
+      "ntbee2.E_on_uJ×1e-6": "→ TDB_switch.e_on_data[0].energy (synthesized single point)",
+      "ntbee2.E_off_uJ×1e-6": "→ TDB_switch.e_off_data[0].energy (synthesized single point)",
+      "note": "Raggl coefficients have no direct TDB equivalent; conversion loses model detail"
+    },
+    "critical_differences": [
+      "ntbee2 plecs_devices.csv: Single test point (V_test_V, I_test_A) for switching energies",
+      "ntbee2 raggl_combos.csv: Current-dependent Raggl model E(I) = a + k×I or a + k×I²",
+      "TDB: Full curve data with multiple measurement points for interpolation",
+      "ntbee2 raggl: Assumes sinusoidal PFC waveforms (special averaging formulas)",
+      "ntbee2 units: Consistent [mOhm], [µJ], [K/W]; TDB uses [Ohm], [J], [K/W]"
+    ]
+  },
+  "csv_file_locations": {
+    "plecs_devices.csv": "/home/tinix/claude_wsl/ntbees2/models/config/semi/plecs_devices.csv",
+    "raggl_combos.csv": "/home/tinix/claude_wsl/ntbees2/models/config/semi/raggl_combos.csv"
+  },
+  "field_type_summary": {
+    "required_fields_plecs": [
+      "part_number", "vendor", "type", "technology", "V_br_V", "E_on_uJ", "E_off_uJ", "V_test_V", "I_test_A", "Rth_jc_KW"
+    ],
+    "optional_fields_plecs": [
+      "R_dson_mOhm", "V_ce_sat_V", "R_d_mOhm", "package"
+    ],
+    "required_fields_raggl": [
+      "combo_id", "transistor_pn", "diode_pn", "vendor", "technology", "V_class_V", "V_test_V", "R_dson_mOhm", "a_on_uJ", "k_on_uJ_A", "a_off_uJ", "k_off_uJ_A2", "a_RR_uJ", "k_RR_uJ_A", "U_f_V", "R_f_mOhm", "Rth_jc_trans_KW", "Rth_jc_diode_KW", "n_Eon_points", "r2_Eon", "r2_Eoff"
+    ],
+    "optional_fields_raggl": [
+      "V_ce_sat_V", "package"
+    ]
+  }
+}

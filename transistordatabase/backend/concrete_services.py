@@ -577,7 +577,11 @@ class ExportService(IExportService):
 # Comparison
 # ---------------------------------------------------------------------------
 class ComparisonService(IComparisonService):
-    """Service for comparing transistors."""
+    """Service for comparing transistors with advanced plot generation."""
+
+    def __init__(self) -> None:
+        """Initialize comparison service with plotting support."""
+        self.plotting_service = PlottingService()
 
     def compare_characteristics(
         self, transistors: List[Transistor], _comparison_type: str
@@ -600,7 +604,7 @@ class ComparisonService(IComparisonService):
     def compare_transistors(
         self, transistors: List[Transistor]
     ) -> Dict[str, Any]:
-        """Compare multiple transistors."""
+        """Compare multiple transistors (basic comparison)."""
         if len(transistors) < 2:
             return {'error': 'At least 2 transistors required for comparison'}
 
@@ -620,6 +624,420 @@ class ComparisonService(IComparisonService):
                     'avg': sum(i_values) / len(i_values),
                 },
             },
+        }
+
+    def generate_advanced_comparison(
+        self,
+        transistors: List[Transistor],
+        config: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Generate advanced comparison with 9 plot types and configurations.
+
+        :param transistors: 2-3 transistors to compare
+        :param config: Configuration dict with keys:
+            - t_j: Junction temperature (default 25°C)
+            - v_supply: List of supply voltages per transistor
+            - r_g_on: List of gate resistances for turn-on per transistor
+            - r_g_off: List of gate resistances for turn-off per transistor
+            - parallel_count: List of parallel transistor counts per transistor
+            - i_channel: Channel current for comparison
+        :return: Dict with 9 plot types
+        """
+        if not 2 <= len(transistors) <= 3:
+            return {'error': 'Comparison requires 2-3 transistors'}
+
+        t_j = config.get('t_j', 25.0)
+        v_supply = config.get('v_supply', [600] * len(transistors))
+        r_g_on = config.get('r_g_on', [10] * len(transistors))
+        r_g_off = config.get('r_g_off', [10] * len(transistors))
+        parallel_count = config.get('parallel_count', [1] * len(transistors))
+        i_channel = config.get('i_channel', 50.0)
+
+        return {
+            'channel_characteristics': self._plot_channel_comparison(
+                transistors, t_j
+            ),
+            'switching_losses_eon': self._plot_switching_comparison(
+                transistors, 'e_on', t_j, v_supply, r_g_on
+            ),
+            'switching_losses_eoff': self._plot_switching_comparison(
+                transistors, 'e_off', t_j, v_supply, r_g_off
+            ),
+            'gate_charge': self._plot_gate_charge_comparison(transistors, t_j),
+            'soa': self._plot_soa_comparison(transistors),
+            'thermal_impedance': self._plot_thermal_comparison(transistors),
+            'capacitances': self._plot_capacitance_comparison(transistors, t_j),
+            'loss_breakdown': self._plot_loss_breakdown(
+                transistors, t_j, v_supply, r_g_on, r_g_off, i_channel
+            ),
+            'efficiency': self._plot_efficiency_comparison(
+                transistors, t_j, v_supply, r_g_on, r_g_off, parallel_count
+            ),
+            'config': {
+                't_j': t_j,
+                'v_supply': v_supply,
+                'r_g_on': r_g_on,
+                'r_g_off': r_g_off,
+                'parallel_count': parallel_count,
+            }
+        }
+
+    def _plot_channel_comparison(
+        self, transistors: List[Transistor], t_j: float
+    ) -> Dict[str, Any]:
+        """Generate channel characteristic comparison plot data."""
+        curves = []
+
+        for t in transistors:
+            # Get channel data closest to target t_j
+            channel_data = t.switch.channel_data
+            if not channel_data:
+                continue
+
+            closest = min(
+                channel_data,
+                key=lambda ch: abs(ch.t_j - t_j),
+                default=None
+            )
+
+            if closest and closest.graph_v_i is not None:
+                v_data = closest.graph_v_i[0].tolist()
+                i_data = closest.graph_v_i[1].tolist()
+                curves.append({
+                    'name': t.metadata.name,
+                    'v_data': v_data,
+                    'i_data': i_data,
+                    't_j': closest.t_j,
+                    'v_g': closest.v_g,
+                })
+
+        return {
+            'title': f'Channel Characteristics Comparison (T_j ≈ {t_j}°C)',
+            'xlabel': 'Voltage [V]',
+            'ylabel': 'Current [A]',
+            'curves': curves,
+        }
+
+    def _plot_switching_comparison(
+        self,
+        transistors: List[Transistor],
+        loss_type: str,
+        t_j: float,
+        v_supply: List[float],
+        r_g: List[float]
+    ) -> Dict[str, Any]:
+        """Generate switching loss comparison plot data."""
+        curves = []
+
+        for idx, t in enumerate(transistors):
+            if loss_type == 'e_on':
+                loss_data = t.switch.e_on_data
+            elif loss_type == 'e_off':
+                loss_data = t.switch.e_off_data
+            else:
+                continue
+
+            if not loss_data:
+                continue
+
+            # Find data matching conditions
+            target_v = v_supply[idx] if idx < len(v_supply) else 600
+            target_r_g = r_g[idx] if idx < len(r_g) else 10
+
+            for loss in loss_data:
+                if abs(loss.t_j - t_j) > 25:
+                    continue
+                if abs(loss.v_supply - target_v) > 100:
+                    continue
+                if loss.r_g and abs(loss.r_g - target_r_g) > 5:
+                    continue
+
+                if loss.graph_i_e is not None:
+                    curves.append({
+                        'name': f"{t.metadata.name} (R_g={loss.r_g}Ω)",
+                        'i_data': loss.graph_i_e[0].tolist(),
+                        'e_data': loss.graph_i_e[1].tolist(),
+                        't_j': loss.t_j,
+                        'v_supply': loss.v_supply,
+                        'r_g': loss.r_g,
+                    })
+                    break
+
+        return {
+            'title': f'{loss_type.upper()} Switching Loss Comparison',
+            'xlabel': 'Current [A]',
+            'ylabel': 'Energy [J]',
+            'curves': curves,
+        }
+
+    def _plot_gate_charge_comparison(
+        self, transistors: List[Transistor], t_j: float
+    ) -> Dict[str, Any]:
+        """Generate gate charge comparison plot data."""
+        curves = []
+
+        for t in transistors:
+            gc_curves = t.switch.gate_charge_curves
+            if not gc_curves:
+                continue
+
+            closest = min(
+                gc_curves,
+                key=lambda gc: abs(gc.t_j - t_j),
+                default=None
+            )
+
+            if closest and closest.graph_q_v is not None:
+                curves.append({
+                    'name': t.metadata.name,
+                    'q_data': closest.graph_q_v[0].tolist(),
+                    'v_data': closest.graph_q_v[1].tolist(),
+                    't_j': closest.t_j,
+                    'v_supply': closest.v_supply,
+                })
+
+        return {
+            'title': f'Gate Charge Comparison (T_j ≈ {t_j}°C)',
+            'xlabel': 'Gate Charge [C]',
+            'ylabel': 'Gate Voltage [V]',
+            'curves': curves,
+        }
+
+    def _plot_soa_comparison(
+        self, transistors: List[Transistor]
+    ) -> Dict[str, Any]:
+        """Generate SOA comparison plot data."""
+        curves = []
+
+        for t in transistors:
+            soa_curves = t.switch.soa
+            if not soa_curves:
+                continue
+
+            for soa in soa_curves:
+                if soa.graph_i_v is not None and len(soa.graph_i_v) == 2:
+                    curves.append({
+                        'name': f"{t.metadata.name} (T_c={soa.t_c}°C, t={soa.time_pulse}s)",
+                        'v_data': soa.graph_i_v[0].tolist(),
+                        'i_data': soa.graph_i_v[1].tolist(),
+                        't_c': soa.t_c,
+                        'time_pulse': soa.time_pulse,
+                    })
+
+        return {
+            'title': 'Safe Operating Area Comparison',
+            'xlabel': 'Voltage [V]',
+            'ylabel': 'Current [A]',
+            'curves': curves,
+        }
+
+    def _plot_thermal_comparison(
+        self, transistors: List[Transistor]
+    ) -> Dict[str, Any]:
+        """Generate thermal impedance comparison plot data."""
+        curves = []
+
+        time_points = np.logspace(-6, 1, 100)  # 1µs to 10s
+
+        for t in transistors:
+            foster = t.switch.thermal_foster
+            if not foster:
+                continue
+
+            try:
+                z_th = [foster.get_thermal_impedance(tp) for tp in time_points]
+                curves.append({
+                    'name': t.metadata.name,
+                    'time_data': time_points.tolist(),
+                    'z_th_data': z_th,
+                })
+            except (ValueError, AttributeError):
+                continue
+
+        return {
+            'title': 'Thermal Impedance Comparison',
+            'xlabel': 'Time [s]',
+            'ylabel': 'Thermal Impedance [K/W]',
+            'curves': curves,
+            'log_scale_x': True,
+        }
+
+    def _plot_capacitance_comparison(
+        self, transistors: List[Transistor], t_j: float
+    ) -> Dict[str, Any]:
+        """Generate capacitance comparison plot data."""
+        cap_types = {'c_oss': 'C_oss', 'c_iss': 'C_iss', 'c_rss': 'C_rss'}
+        all_curves = {}
+
+        for cap_type, label in cap_types.items():
+            curves = []
+            for t in transistors:
+                cap_list = getattr(t, cap_type, [])
+                if not cap_list:
+                    continue
+
+                closest = min(
+                    cap_list,
+                    key=lambda c: abs(c.t_j - t_j),
+                    default=None
+                )
+
+                if closest and closest.graph_v_c is not None:
+                    curves.append({
+                        'name': f"{t.metadata.name} - {label}",
+                        'v_data': closest.graph_v_c[0].tolist(),
+                        'c_data': closest.graph_v_c[1].tolist(),
+                        't_j': closest.t_j,
+                    })
+
+            all_curves[cap_type] = curves
+
+        return {
+            'title': f'Capacitance Comparison (T_j ≈ {t_j}°C)',
+            'xlabel': 'Voltage [V]',
+            'ylabel': 'Capacitance [F]',
+            'c_oss': all_curves.get('c_oss', []),
+            'c_iss': all_curves.get('c_iss', []),
+            'c_rss': all_curves.get('c_rss', []),
+        }
+
+    def _plot_loss_breakdown(
+        self,
+        transistors: List[Transistor],
+        t_j: float,
+        v_supply: List[float],
+        r_g_on: List[float],
+        r_g_off: List[float],
+        i_channel: float
+    ) -> Dict[str, Any]:
+        """Generate loss breakdown comparison (conduction + switching)."""
+        breakdown = []
+
+        for idx, t in enumerate(transistors):
+            target_v = v_supply[idx] if idx < len(v_supply) else 600
+
+            # Estimate conduction loss
+            p_cond = 0.0
+            if t.switch.channel_data:
+                try:
+                    closest_ch = min(
+                        t.switch.channel_data,
+                        key=lambda ch: abs(ch.t_j - t_j)
+                    )
+                    r_ds = closest_ch.get_resistance_at_current(i_channel)
+                    p_cond = r_ds * (i_channel ** 2)
+                except (ValueError, AttributeError):
+                    pass
+
+            # Estimate switching losses
+            p_sw_on = 0.0
+            p_sw_off = 0.0
+
+            if t.switch.e_on_data:
+                for loss in t.switch.e_on_data:
+                    if abs(loss.t_j - t_j) < 25 and abs(loss.v_supply - target_v) < 100:
+                        if loss.graph_i_e is not None:
+                            try:
+                                e_on = float(np.interp(
+                                    i_channel,
+                                    loss.graph_i_e[0],
+                                    loss.graph_i_e[1]
+                                ))
+                                p_sw_on = e_on * 100000  # Assume 100kHz
+                            except Exception:
+                                pass
+                        break
+
+            if t.switch.e_off_data:
+                for loss in t.switch.e_off_data:
+                    if abs(loss.t_j - t_j) < 25 and abs(loss.v_supply - target_v) < 100:
+                        if loss.graph_i_e is not None:
+                            try:
+                                e_off = float(np.interp(
+                                    i_channel,
+                                    loss.graph_i_e[0],
+                                    loss.graph_i_e[1]
+                                ))
+                                p_sw_off = e_off * 100000  # Assume 100kHz
+                            except Exception:
+                                pass
+                        break
+
+            p_total = p_cond + p_sw_on + p_sw_off
+
+            breakdown.append({
+                'name': t.metadata.name,
+                'conduction': p_cond,
+                'switching_on': p_sw_on,
+                'switching_off': p_sw_off,
+                'total': p_total,
+            })
+
+        return {
+            'title': 'Loss Breakdown Comparison',
+            'breakdown': breakdown,
+            'conditions': {
+                't_j': t_j,
+                'i_channel': i_channel,
+                'f_sw': 100000,
+            }
+        }
+
+    def _plot_efficiency_comparison(
+        self,
+        transistors: List[Transistor],
+        t_j: float,
+        v_supply: List[float],
+        r_g_on: List[float],
+        r_g_off: List[float],
+        parallel_count: List[int]
+    ) -> Dict[str, Any]:
+        """Generate efficiency vs current comparison."""
+        curves = []
+
+        current_points = np.linspace(1, 100, 50)
+
+        for idx, t in enumerate(transistors):
+            efficiencies = []
+            target_v = v_supply[idx] if idx < len(v_supply) else 600
+            n_parallel = parallel_count[idx] if idx < len(parallel_count) else 1
+
+            for i_load in current_points:
+                i_per_device = i_load / n_parallel
+
+                # Calculate losses per device
+                p_cond = 0.0
+                if t.switch.channel_data:
+                    try:
+                        closest_ch = min(
+                            t.switch.channel_data,
+                            key=lambda ch: abs(ch.t_j - t_j)
+                        )
+                        r_ds = closest_ch.get_resistance_at_current(i_per_device)
+                        p_cond = r_ds * (i_per_device ** 2)
+                    except Exception:
+                        p_cond = 0.01 * i_per_device  # Fallback
+
+                p_sw = 0.0001 * i_per_device  # Simplified switching loss
+
+                p_loss_total = (p_cond + p_sw) * n_parallel
+                p_out = target_v * i_load
+                p_in = p_out + p_loss_total
+
+                efficiency = (p_out / p_in * 100) if p_in > 0 else 0
+                efficiencies.append(efficiency)
+
+            curves.append({
+                'name': f"{t.metadata.name} (x{n_parallel})",
+                'current_data': current_points.tolist(),
+                'efficiency_data': efficiencies,
+            })
+
+        return {
+            'title': 'Efficiency vs Load Current',
+            'xlabel': 'Load Current [A]',
+            'ylabel': 'Efficiency [%]',
+            'curves': curves,
         }
 
     def find_similar_transistors(

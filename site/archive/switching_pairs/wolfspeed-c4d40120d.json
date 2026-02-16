@@ -1,0 +1,453 @@
+{
+  "pair_id": "wolfspeed-c4d40120d",
+  "pair_type": "diode_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "wolfspeed-c4d40120d",
+    "count": 1,
+    "role": "diode",
+    "metadata": {
+      "name": "C4D40120D",
+      "type": "Diode",
+      "manufacturer": "Wolfspeed",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "cauer",
+        "elements": [
+          {
+            "r": 0.01526,
+            "c": 0.004736
+          },
+          {
+            "r": 0.061,
+            "c": 0.01201
+          },
+          {
+            "r": 0.1667,
+            "c": 0.02028
+          },
+          {
+            "r": 0.0458,
+            "c": 1.292
+          }
+        ]
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        -55.0,
+        25.0,
+        75.0,
+        125.0,
+        175.0,
+        900.0,
+        1000.0
+      ],
+      "curves": [
+        {
+          "t_j": -55.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.9855,
+            1.033,
+            2.108
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        },
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.8706,
+            0.9271,
+            2.203
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        },
+        {
+          "t_j": 75.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.8215,
+            0.889,
+            2.599
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        },
+        {
+          "t_j": 125.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.7388,
+            0.8338,
+            2.995
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        },
+        {
+          "t_j": 175.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.6812,
+            0.7843,
+            3.694
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        },
+        {
+          "t_j": 900.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.5098,
+            0.6598,
+            4.433
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        },
+        {
+          "t_j": 1000.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.5098,
+            0.6598,
+            4.433
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "wolfspeed-c4d40120d",
+    "count": 1,
+    "role": "diode",
+    "metadata": {
+      "name": "C4D40120D",
+      "type": "Diode",
+      "manufacturer": "Wolfspeed",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "cauer",
+        "elements": [
+          {
+            "r": 0.01526,
+            "c": 0.004736
+          },
+          {
+            "r": 0.061,
+            "c": 0.01201
+          },
+          {
+            "r": 0.1667,
+            "c": 0.02028
+          },
+          {
+            "r": 0.0458,
+            "c": 1.292
+          }
+        ]
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        -55.0,
+        25.0,
+        75.0,
+        125.0,
+        175.0,
+        900.0,
+        1000.0
+      ],
+      "curves": [
+        {
+          "t_j": -55.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.9855,
+            1.033,
+            2.108
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        },
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.8706,
+            0.9271,
+            2.203
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        },
+        {
+          "t_j": 75.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.8215,
+            0.889,
+            2.599
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        },
+        {
+          "t_j": 125.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.7388,
+            0.8338,
+            2.995
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        },
+        {
+          "t_j": 175.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.6812,
+            0.7843,
+            3.694
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        },
+        {
+          "t_j": 900.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.5098,
+            0.6598,
+            4.433
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        },
+        {
+          "t_j": 1000.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.5098,
+            0.6598,
+            4.433
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            1.053,
+            2.66,
+            79.82
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "plecs_model",
+    "source_details": {},
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 0.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        0.0
+      ],
+      "voltage_axis": [
+        0.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        0.0
+      ],
+      "voltage_axis": [
+        0.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": "0.97 + (T*-1.4e-3) + i*(0.023 + (T*2.71e-4))"
+  },
+  "migration": {
+    "source_files": [
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D40120D.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D40120D.xml"
+    ],
+    "migration_date": "2026-02-16T06:49:14.608500",
+    "schema_version": "1.0",
+    "quality_score": 0.0
+  }
+}

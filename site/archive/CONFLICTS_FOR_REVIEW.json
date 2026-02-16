@@ -1,0 +1,2819 @@
+[
+  {
+    "transistor_id": "Infineon_IPBE65R050CFD7A",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Infineon_IPBE65R050CFD7A.json",
+    "existing_score": 45.16,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/Si-MOSFET/650V/Infineon_IPBE65R050CFD7A.json",
+    "new_score": 45.16,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IPW65R090CFD7",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Infineon_IPW65R090CFD7.json",
+    "existing_score": 45.16,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/Si-MOSFET/650V/Infineon_IPW65R090CFD7.json",
+    "new_score": 45.16,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Fuji_2MBI100XAA120-50",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Fuji_2MBI100XAA120-50.json",
+    "existing_score": 48.39,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/IGBT/1200V/Fuji_2MBI100XAA120-50.json",
+    "new_score": 48.39,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Mitsubishi_CM200DY-24T",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Mitsubishi_CM200DY-24T.json",
+    "existing_score": 48.39,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/IGBT/1200V/Mitsubishi_CM200DY-24T.json",
+    "new_score": 48.39,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_FF300R12KE3",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Infineon_FF300R12KE3.json",
+    "existing_score": 35.48,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/IGBT/1200V/Infineon_FF300R12KE3.json",
+    "new_score": 35.48,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_FF200R12KE3",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Infineon_FF200R12KE3.json",
+    "existing_score": 38.71,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/IGBT/1200V/Infineon_FF200R12KE3.json",
+    "new_score": 38.71,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Semikron_SKM400GB12T4",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Semikron_SKM400GB12T4.json",
+    "existing_score": 38.71,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/IGBT/1200V/Semikron_SKM400GB12T4.json",
+    "new_score": 38.71,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Fuji_2MBI300XBE120-50",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Fuji_2MBI300XBE120-50.json",
+    "existing_score": 48.39,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/IGBT/1200V/Fuji_2MBI300XBE120-50.json",
+    "new_score": 48.39,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Fuji_2MBI200XBE120-50",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Fuji_2MBI200XBE120-50.json",
+    "existing_score": 48.39,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/IGBT/1200V/Fuji_2MBI200XBE120-50.json",
+    "new_score": 48.39,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Fuji_2MBI600XEE065-50",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Fuji_2MBI600XEE065-50.json",
+    "existing_score": 48.39,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/IGBT/650V/Fuji_2MBI600XEE065-50.json",
+    "new_score": 48.39,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Fuji_2MBI400U2B-060",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Fuji_2MBI400U2B-060.json",
+    "existing_score": 48.39,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/IGBT/650V/Fuji_2MBI400U2B-060.json",
+    "new_score": 48.39,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Fuji_2MBI300XBE065-50",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Fuji_2MBI300XBE065-50.json",
+    "existing_score": 48.39,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/IGBT/650V/Fuji_2MBI300XBE065-50.json",
+    "new_score": 48.39,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Fuji_2MBI200XAA065-50",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Fuji_2MBI200XAA065-50.json",
+    "existing_score": 48.39,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/IGBT/650V/Fuji_2MBI200XAA065-50.json",
+    "new_score": 48.39,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Fuji_2MBI400XBE065-50",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Fuji_2MBI400XBE065-50.json",
+    "existing_score": 48.39,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/IGBT/650V/Fuji_2MBI400XBE065-50.json",
+    "new_score": 48.39,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "CREE_C3M0016120K",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/CREE_C3M0016120K.json",
+    "existing_score": 45.16,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/SiC-MOSFET/1200V/CREE_C3M0016120K.json",
+    "new_score": 45.16,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "CREE_CAB530M12BM3",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/CREE_CAB530M12BM3.json",
+    "existing_score": 45.16,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/SiC-MOSFET/1200V/CREE_CAB530M12BM3.json",
+    "new_score": 45.16,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "CREE_WAB300M12BM3",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/CREE_WAB300M12BM3.json",
+    "existing_score": 45.16,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/SiC-MOSFET/1200V/CREE_WAB300M12BM3.json",
+    "new_score": 45.16,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "CREE_C3M0120065J",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/CREE_C3M0120065J.json",
+    "existing_score": 45.16,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/SiC-MOSFET/650V/CREE_C3M0120065J.json",
+    "new_score": 45.16,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "UnitedSiC_UF3SC065007K4S",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/UnitedSiC_UF3SC065007K4S.json",
+    "existing_score": 45.16,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/SiC-MOSFET/650V/UnitedSiC_UF3SC065007K4S.json",
+    "new_score": 45.16,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "ROHMSemiconductor_SCT3120AW7",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/ROHMSemiconductor_SCT3120AW7.json",
+    "existing_score": 45.16,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/SiC-MOSFET/650V/ROHMSemiconductor_SCT3120AW7.json",
+    "new_score": 45.16,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Rohm_SCT3060AW7",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/Rohm_SCT3060AW7.json",
+    "existing_score": 45.16,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/SiC-MOSFET/650V/ROHMSemiconductor_SCT3060AW7.json",
+    "new_score": 45.16,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "CREE_C3M0065100J",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/CREE_C3M0065100J.json",
+    "existing_score": 45.16,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/SiC-MOSFET/1000V/CREE_C3M0065100J.json",
+    "new_score": 45.16,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "CREE_C3M0120100J",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/CREE_C3M0120100J.json",
+    "existing_score": 45.16,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/SiC-MOSFET/1000V/CREE_C3M0120100J.json",
+    "new_score": 45.16,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "GaNSystems_GS66506T",
+    "existing_file": "/home/tinix/claude_wsl/transistordatabase/database/GaNSystems_GS66506T.json",
+    "existing_score": 45.16,
+    "new_file": "/home/tinix/claude_wsl/file_exchange/GaN/650V/GaNSystems_GS66506T.json",
+    "new_score": 45.16,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Eloss_DoublePulseTester_EPC8009_sync",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/Eloss_DoublePulseTester_EPC8009_sync.csv",
+    "existing_score": 32.26,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/utils/dpt/data/Eloss_DoublePulseTester_EPC8009_sync.csv",
+    "new_score": 32.26,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "C2M0080120D_idvgs25",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/C2M0080120D_idvgs25.csv",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/example_wpd/C2M0080120D_idvgs25.csv",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGB20N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGB20N60H3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGB20N60H3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGA30N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGA30N60H3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGA30N60H3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW50N60DTP",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW50N60DTP_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW50N60DTP_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKP20N60TA",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP20N60TA_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP20N60TA_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW20N60TA",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW20N60TA_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW20N60TA_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW15N120H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW15N120H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW15N120H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW30N60TA",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW30N60TA_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW30N60TA_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGP10N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP10N60T_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP10N60T_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGB30N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGB30N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGB30N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW100N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW100N60H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW100N60H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGP20N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP20N60H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP20N60H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGP50N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP50N60T_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP50N60T_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW50N65H5",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW50N65H5_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW50N65H5_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW50N60TA",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW50N60TA_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW50N60TA_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW25N120H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW25N120H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW40N120H3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW75N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW75N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW75N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKP04N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP04N60T_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP04N60T_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW25N120H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW25N120H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW25N120H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW50N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW50N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW50N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW30N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW30N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW30N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKQ50N120CH3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ50N120CH3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ50N120CH3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKP20N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP20N60H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP20N60H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW60N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW60N60H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW60N60H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKFW50N60DH3E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW50N60DH3E_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW50N60DH3E_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKFW40N60DH3E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW40N60DH3E_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW40N60DH3E_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKB15N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB15N60T_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB15N60T_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW25N120T2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW25N120T2_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW25N120T2_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW75N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW75N60H3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW75N60H3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW15N120T2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW15N120T2_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW15N120T2_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKD03N60RF",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKD03N60RF_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKD03N60RF_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW50N60TP",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW50N60TP_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW50N60TP_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW50N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW50N60H3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW50N60H3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGU04N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGU04N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGU04N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW50N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW50N60H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW50N60H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKB20N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB20N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB20N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW15T120",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW25T120_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW15T120_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKFW50N60DH3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW50N60DH3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW50N60DH3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKB40N65ES5",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB40N65ES5_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB40N65ES5_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW08T120",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW08T120_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW08T120_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW40N120H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N120H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N120H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKQ40N120CH3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ40N120CH3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ40N120CH3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW75N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW75N60H3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW75N60H3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW25N120H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW25N120H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW40N120H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKFW75N60ET",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW75N60ET_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW75N60ET_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW15T120",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW25T120_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW15T120_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKQ75N120CT2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ75N120CT2_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ75N120CT2_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGD06N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGD06N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGD06N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW40N65ES5",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N65ES5_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N65ES5_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGP30N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP30N60H3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP30N60H3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW30N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW30N60H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW30N60H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKQ40N120CT2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ40N120CT2_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ40N120CT2_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW25T120",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW25T120_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW25T120_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKP15N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP15N60T_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP15N60T_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKA10N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKA10N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKA10N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW40N120T2_v2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N120T2_v2_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N120T2_v2_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW15N120H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW15N120H3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW15N120H3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW50N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW50N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW50N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGB15N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGB15N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGB15N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW40N120T2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N120T2_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N120T2_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKY75N120CH3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKY75N120CH3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKY75N120CH3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW30N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW30N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW30N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW15N65H5",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW15N65H5_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW15N65H5_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW20N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW20N60T_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW20N60T_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGB50N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGB50N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGB50N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKU04N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKU04N60T_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKU04N60T_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKB30N65ES5",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB30N65ES5_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB30N65ES5_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKQ50N120CT2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ50N120CT2_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ50N120CT2_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKFW60N60EH3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW60N60EH3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW60N60EH3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKB20N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB20N60H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB20N60H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKQ120N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ120N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ120N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKY50N120CH3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKY50N120CH3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKY50N120CH3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGB10N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGB10N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGB10N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKA15N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKA15N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKA15N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKFW50N60ET",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW50N60ET_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW50N60ET_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKP06N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP06N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP06N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKY40N120CH3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKY40N120CH3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKY40N120CH3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKQ75N120CH3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ75N120CH3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ75N120CH3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW40N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N60H3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N60H3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKI04N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKI04N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKI04N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW20N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW20N60H3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW20N60H3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGP15N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP15N60T_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP15N60T_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW30N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW30N60H3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW30N60H3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW30N60DTP",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW30N60DTP_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW30N60DTP_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW60T120",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW60T120_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW60T120_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKA08N65ET6",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKA08N65ET6_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKA08N65ET6_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKQ100N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ100N60T_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ100N60T_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW40T120",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW40T120_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW40T120_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKB10N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB10N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB10N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW20N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW20N60H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW20N60H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKB20N60TA",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB20N60TA_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB20N60TA_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKA10N65ET6",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKA10N65ET6_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKA10N65ET6_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW40N60TP",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW40N60TP_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW40N60TP_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKFW90N60EH3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW90N60EH3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW90N60EH3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW40N65H5",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N65H5_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N65H5_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW40N60DTP",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N60DTP_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N60DTP_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKP20N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP20N60T_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP20N60T_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW08T120",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW08T120_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW08T120_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKB06N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB06N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKB06N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW30N65ES5",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW30N65ES5_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW30N65ES5_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKFW60N60DH3E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW60N60DH3E_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKFW60N60DH3E_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW75N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW75N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW75N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW30N60TP",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW30N60TP_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW30N60TP_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW60N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW60N60H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW60N60H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKA06N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKA06N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKA06N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW75N60TA",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW75N60TA_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW75N60TA_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW40N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW40N60H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW40N60H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW08N65H5",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW08N65H5_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW08N65H5_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGW15T120",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW15T120_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW15T120_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGP30N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP30N60T_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP30N60T_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW25N120H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW25N120H3_IGBT.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW25N120H3_Diode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGB30N60H3",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGB30N60H3_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGB30N60H3_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKW40T120",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40T120_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40T120_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKA15N65ET6",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKA15N65ET6_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKA15N65ET6_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IGP06N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP06N60T_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGP06N60T_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Infineon_IKP10N60T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP10N60T_Diode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKP10N60T_IGBT.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "GaN_Systems_GS66506T",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/GaN-Systems/GS66506T_TEST.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/GaN-Systems/GS66506T.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D20065D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D20065D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D20060D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D08120A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D08120A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D08120E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0280090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0280090D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0280090D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0120100K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120100K.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120100K_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0025120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0025120D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0025120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0075120J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120J_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_E3M0280090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0280090D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0280090D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0021120K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0021120K_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0021120K.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0065090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065090D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065090D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0080170P",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0080170P_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0080170P.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0045170P",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0045170P_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0045170P.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0075120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0280090J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0280090J_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0280090J.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0120100J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120100J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120100J_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_E3M0120090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0120090D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0120090D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_E3M0065090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0065090D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0065090D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M1000170D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M1000170D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M1000170D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0016120K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0016120K.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0016120K_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0080120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0080120D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0080120D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0025120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0025120D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/test_multi_vars_C2M0025120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0065100K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065100K_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065100K.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0065090J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065090J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065090J_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0065100J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065100J_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065100J.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0040120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0040120D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0040120D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0010090K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0010090K.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0010090K_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0075120K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120K.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120K_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0030090K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0030090K_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0030090K.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0280120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0280120D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0280120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0045170D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0045170D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0045170D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0032120K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0032120K_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0032120K.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M1000170J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M1000170J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M1000170J_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0120090J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120090J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120090J_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0120090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120090D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120090D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0160120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0160120D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0160120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CCS020M12CM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CCS020M12CM2.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CCS020M12CM2_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CAS300M12BM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS300M12BM2.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS300M12BM2_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CAS300M17BM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS300M17BM2_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS300M17BM2.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CCS050M12CM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CCS050M12CM2_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CCS050M12CM2.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CAS120M12BM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS120M12BM2_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS120M12BM2.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D08065I",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D08065I.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D08065I.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D04065A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D04065A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D04065A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C6D06065A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C6D06065A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C6D06065A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D30120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D30120D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D30120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D10120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D10120D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D10120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D20120A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D20120A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D20120A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D16060D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D16060D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D16060D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D08065A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D08065A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D08065A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D02060F",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D02060F.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D02060F.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D15120A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D15120A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D15120A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D06060F",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D06060F.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D06060F.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D06060G",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D06060G.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D06060G.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D10060G",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D10060G.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D10060G.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D02120A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D02120A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D02120A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D10120E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D10120E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D10120E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C5D10170H",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C5D10170H.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C5D10170H.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D08120A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D08120A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D08120A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D10065E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D10065E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D10065E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D04060A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D04060A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D04060A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C5D25170H",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C5D25170H.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C5D25170H.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D10120A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D10120A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D10120A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D10120H",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D10120H.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D10120H.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D06065E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D06065E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D06065E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D06060A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D06060A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D06060A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D02060E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D02060E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D02060E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C6D10065A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C6D10065A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C6D10065A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D02120E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D02120E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D02120E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D10065A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D10065A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D10065A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D02060A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D02060A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D02060A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D10060A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D10060A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D10060A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D20065D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D20065D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D20065D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D03060A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D03060A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D03060A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D04060F",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D04060F.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D04060F.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D06065I",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D06065I.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D06065I.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D10065I",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D10065I.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D10065I.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D04060E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D04060E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D04060E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C6D08065A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C6D08065A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C6D08065A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_E4D10120A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/E4D10120A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/E4D10120A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D08060G",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D08060G.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D08060G.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CSD01060E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/CSD01060E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/CSD01060E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D20065D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D20065D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D20060D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D08060A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D08060A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D08060A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CVFD20065A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/CVFD20065A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/CVFD20065A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D08120A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D08120A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D08120E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D03060E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D03060E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D03060E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D20120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D20120D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D20120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D02065E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D02065E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D02065E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D03065E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D03065E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D03065E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D08065E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D08065E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D08065E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D15120H",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D15120H.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D15120H.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D40120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D40120D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D40120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D05120E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D05120E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D05120E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CSD01060A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/CSD01060A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/CSD01060A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D25170H",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D25170H.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D25170H.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D16065D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D16065D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D16065D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C4D20120H",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C4D20120H.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C4D20120H.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D10170H",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D10170H.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D10170H.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D04065E",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D04065E.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D04065E.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D06065A",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D06065A.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D06065A.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C5D05170H",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C5D05170H.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C5D05170H.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3D03060F",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C3D03060F.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C3D03060F.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_E3M0065090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0065090D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0065090D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0280090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0280090D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0280090D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0021120K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0021120K_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0021120K_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0120100K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120100K.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120100K.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0075120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0025120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0025120D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0025120D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0120100J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120100J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120100J.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0075120J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120J.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0065090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065090D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065090D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0016120K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0016120K.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0016120K.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0280090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0280090D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0280090D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0120100K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120100K.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120100K_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0065100J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065100J_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065100J_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_E3M0280090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0280090D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0280090D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0065100K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065100K_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065100K_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0025120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0025120D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0025120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M1000170D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M1000170D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M1000170D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0075120J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120J_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_E3M0280090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0280090D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0280090D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0080170P",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0080170P_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0080170P_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0021120K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0021120K_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0021120K.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0032120K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0032120K_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0032120K_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0040120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0040120D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0040120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0280090J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0280090J_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0280090J_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0065090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065090D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065090D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0045170P",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0045170P_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0045170P_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0065090J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065090J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065090J.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0080170P",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0080170P_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0080170P.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M1000170J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M1000170J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M1000170J.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_E3M0120090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0120090D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0120090D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0045170P",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0045170P_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0045170P.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0075120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0280090J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0280090J_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0280090J.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0120100J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120100J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120100J_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_E3M0120090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0120090D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0120090D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_E3M0065090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0065090D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/E3M0065090D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0075120K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120K.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120K.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0045170D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0045170D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0045170D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M1000170D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M1000170D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M1000170D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0016120K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0016120K.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0016120K_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0010090K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0010090K.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0010090K.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0030090K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0030090K_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0030090K_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0160120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0160120D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0160120D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0080120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0080120D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0080120D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0065100K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065100K_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065100K.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0065090J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065090J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065090J_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0065100J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065100J_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0065100J.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0040120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0040120D.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0040120D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0010090K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0010090K.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0010090K_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0075120K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120K.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0075120K_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0030090K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0030090K_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0030090K.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0280120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0280120D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0280120D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0280120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0280120D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0280120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0120090J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120090J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120090J.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0045170D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0045170D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0045170D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0032120K",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0032120K_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0032120K.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0120090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120090D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120090D_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M1000170J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M1000170J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M1000170J_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0120090J",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120090J.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120090J_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C3M0120090D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120090D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C3M0120090D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_C2M0160120D",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0160120D_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Wolfspeed_MOSFET_PLECS_10_2019/C2M0160120D.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CAS300M12BM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS300M12BM2.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CAS300M12BM2.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CCS020M12CM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CCS020M12CM2.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CCS020M12CM2.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CAS120M12BM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS120M12BM2_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CAS120M12BM2_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CCS020M12CM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CCS020M12CM2.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CCS020M12CM2_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CAS300M12BM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS300M12BM2.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CAS300M12BM2_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CCS050M12CM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CCS050M12CM2_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CCS050M12CM2_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CAS300M17BM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS300M17BM2_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CAS300M17BM2_bodydiode.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CAS300M17BM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS300M17BM2_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CAS300M17BM2.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CCS050M12CM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CCS050M12CM2_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CCS050M12CM2.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  },
+  {
+    "transistor_id": "Wolfspeed_CAS120M12BM2",
+    "existing_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS120M12BM2_bodydiode.xml",
+    "existing_score": 19.35,
+    "new_file": "/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CAS120M12BM2.xml",
+    "new_score": 19.35,
+    "recommendation": "keep_existing",
+    "score_difference": 0.0
+  }
+]

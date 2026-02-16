@@ -1,0 +1,278 @@
+{
+  "pair_id": "infineon-igw30n60tp",
+  "pair_type": "diode_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "infineon-igw30n60tp",
+    "count": 1,
+    "role": "diode",
+    "metadata": {
+      "name": "IGW30N60TP",
+      "type": "Diode",
+      "manufacturer": "Infineon",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "foster",
+        "elements": []
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        25.0,
+        175.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            0.816768819,
+            1.075937951,
+            1.267328407,
+            1.501362747,
+            1.856961633,
+            2.397269385,
+            3.2182294
+          ],
+          "on_state_current": [
+            0.0,
+            3.0,
+            7.5,
+            15.0,
+            30.0,
+            60.0,
+            120.0
+          ]
+        },
+        {
+          "t_j": 175.0,
+          "on_state_voltage": [
+            0.493902179,
+            0.845227467,
+            1.095290359,
+            1.397030735,
+            1.850166263,
+            2.530657912,
+            3.552579294
+          ],
+          "on_state_current": [
+            0.0,
+            3.0,
+            7.5,
+            15.0,
+            30.0,
+            60.0,
+            120.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "infineon-igw30n60tp",
+    "count": 1,
+    "role": "diode",
+    "metadata": {
+      "name": "IGW30N60TP",
+      "type": "Diode",
+      "manufacturer": "Infineon",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "foster",
+        "elements": []
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        25.0,
+        175.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            0.816768819,
+            1.075937951,
+            1.267328407,
+            1.501362747,
+            1.856961633,
+            2.397269385,
+            3.2182294
+          ],
+          "on_state_current": [
+            0.0,
+            3.0,
+            7.5,
+            15.0,
+            30.0,
+            60.0,
+            120.0
+          ]
+        },
+        {
+          "t_j": 175.0,
+          "on_state_voltage": [
+            0.493902179,
+            0.845227467,
+            1.095290359,
+            1.397030735,
+            1.850166263,
+            2.530657912,
+            3.552579294
+          ],
+          "on_state_current": [
+            0.0,
+            3.0,
+            7.5,
+            15.0,
+            30.0,
+            60.0,
+            120.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "plecs_model",
+    "source_details": {},
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 0.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        0.0
+      ],
+      "voltage_axis": [
+        0.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0,
+        175.0
+      ],
+      "current_axis": [
+        0.0,
+        3.0,
+        7.5,
+        15.0,
+        30.0,
+        60.0,
+        120.0
+      ],
+      "voltage_axis": [
+        -400.0,
+        0.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          2.132e-05,
+          4.05e-05,
+          6.58e-05,
+          0.0001069,
+          0.0001737,
+          0.0002823
+        ],
+        "175.0": [
+          0.0,
+          9.066e-05,
+          0.0001514,
+          0.0002232,
+          0.0003291,
+          0.0004851,
+          0.0007151
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW30N60TP_Diode.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IGW30N60TP_IGBT.xml"
+    ],
+    "migration_date": "2026-02-16T06:49:14.368896",
+    "schema_version": "1.0",
+    "quality_score": 0.0
+  }
+}

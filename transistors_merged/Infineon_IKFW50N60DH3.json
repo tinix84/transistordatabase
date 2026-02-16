@@ -1,0 +1,102 @@
+{
+  "metadata": {
+    "name": "Infineon_IKFW50N60DH3",
+    "type": "IGBT",
+    "manufacturer": "Infineon",
+    "housing_type": "unknown",
+    "import_source": "plecs_xml:IKFW50N60DH3_IGBT.xml",
+    "import_date": "2026-02-15T15:46:32.387728"
+  },
+  "electrical_ratings": {
+    "v_abs_max": 0.0,
+    "i_abs_max": 0.0,
+    "i_cont": 0.0,
+    "t_j_max": 150.0
+  },
+  "thermal_properties": {
+    "housing_area": 0.0,
+    "cooling_area": 0.0,
+    "r_th_jc": 0.0,
+    "r_th_cs": 0.0
+  },
+  "switch": {
+    "channel_data": [],
+    "e_on_data": [],
+    "e_off_data": [],
+    "gate_charge_curves": [],
+    "soa": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.003,
+          "tau": 1.6e-05
+        },
+        {
+          "R": 0.104852,
+          "tau": 0.00026
+        },
+        {
+          "R": 0.13662,
+          "tau": 0.0022
+        },
+        {
+          "R": 0.1914,
+          "tau": 0.018514
+        },
+        {
+          "R": 0.26906,
+          "tau": 0.201746
+        },
+        {
+          "R": 0.3091,
+          "tau": 0.902516
+        },
+        {
+          "R": 0.022616,
+          "tau": 15.90837
+        }
+      ]
+    }
+  },
+  "diode": {
+    "channel_data": [],
+    "e_rr_data": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.003,
+          "tau": 1.6e-05
+        },
+        {
+          "R": 0.104852,
+          "tau": 0.00026
+        },
+        {
+          "R": 0.13662,
+          "tau": 0.0022
+        },
+        {
+          "R": 0.1914,
+          "tau": 0.018514
+        },
+        {
+          "R": 0.26906,
+          "tau": 0.201746
+        },
+        {
+          "R": 0.3091,
+          "tau": 0.902516
+        },
+        {
+          "R": 0.022616,
+          "tau": 15.90837
+        }
+      ]
+    }
+  },
+  "c_oss": [],
+  "c_iss": [],
+  "c_rss": []
+}

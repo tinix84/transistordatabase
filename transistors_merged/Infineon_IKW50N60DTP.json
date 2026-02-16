@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "name": "Infineon_IKW50N60DTP",
+    "type": "Diode",
+    "manufacturer": "Infineon",
+    "housing_type": "unknown",
+    "import_source": "plecs_xml:IKW50N60DTP_Diode.xml",
+    "import_date": "2026-02-15T15:46:32.354268"
+  },
+  "electrical_ratings": {
+    "v_abs_max": 0.0,
+    "i_abs_max": 0.0,
+    "i_cont": 0.0,
+    "t_j_max": 150.0
+  },
+  "thermal_properties": {
+    "housing_area": 0.0,
+    "cooling_area": 0.0,
+    "r_th_jc": 0.0,
+    "r_th_cs": 0.0
+  },
+  "switch": {
+    "channel_data": [],
+    "e_on_data": [],
+    "e_off_data": [],
+    "gate_charge_curves": [],
+    "soa": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.03101824,
+          "tau": 2.9e-05
+        },
+        {
+          "R": 0.1189354,
+          "tau": 0.00017
+        },
+        {
+          "R": 0.1745904,
+          "tau": 0.0017
+        },
+        {
+          "R": 0.268737,
+          "tau": 0.0092
+        },
+        {
+          "R": 0.0286638,
+          "tau": 0.0630565
+        },
+        {
+          "R": 0.0014,
+          "tau": 1.832934
+        }
+      ]
+    }
+  },
+  "diode": {
+    "channel_data": [],
+    "e_rr_data": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.03101824,
+          "tau": 2.9e-05
+        },
+        {
+          "R": 0.1189354,
+          "tau": 0.00017
+        },
+        {
+          "R": 0.1745904,
+          "tau": 0.0017
+        },
+        {
+          "R": 0.268737,
+          "tau": 0.0092
+        },
+        {
+          "R": 0.0286638,
+          "tau": 0.0630565
+        },
+        {
+          "R": 0.0014,
+          "tau": 1.832934
+        }
+      ]
+    }
+  },
+  "c_oss": [],
+  "c_iss": [],
+  "c_rss": []
+}

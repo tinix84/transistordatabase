@@ -1,0 +1,234 @@
+{
+  "pair_id": "ROHM_SCT2080KE__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ROHM_SCT2080KE",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "ROHM SCT2080KE",
+      "type": "mosfet",
+      "manufacturer": "ROHM",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 0.0,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 1200.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -5.948051948051947,
+            -4.3636363636363615,
+            -3.53246753246753,
+            -3.012987012987013,
+            -2.5194805194805183,
+            -2.1558441558441537,
+            -1.662337662337662,
+            -1.220779220779221,
+            -1.1844922755750946,
+            1.4130521607157105e-07,
+            1.6524216524216513,
+            3.5612535612535616,
+            5.0427350427350435,
+            7.207977207977209
+          ],
+          "on_state_current": [
+            -24.190664525741152,
+            -9.856226877395699,
+            -5.364876741052676,
+            -3.3752184532845697,
+            -1.9467410023284917,
+            -0.8651808900090464,
+            -0.13167303784615017,
+            -0.010000000000000002,
+            -1e-06,
+            1e-06,
+            11.693989071038256,
+            22.95081967213115,
+            30.601092896174862,
+            39.67213114754099
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "ROHM_SCT2080KE",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "ROHM_SCT2080KE.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 600.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        0.2250803858520864,
+        9.678456591639875,
+        13.842443729903549,
+        15.980707395498401,
+        18.344051446945343,
+        21.83279742765274,
+        24.196141479099683,
+        27.684887459807086,
+        32.86173633440515
+      ],
+      "voltage_axis": [
+        600.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          5.723187617648939e-05,
+          5.981308411214959e-05,
+          0.00016822429906542062,
+          0.00025046728971962615,
+          0.0003028037383177571,
+          0.00037383177570093467,
+          0.0005121495327102806,
+          0.0006317757009345794,
+          0.0008261682242990653,
+          0.0012
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        0.1125401929260497,
+        9.678456591639875,
+        16.9935691318328,
+        23.63344051446946,
+        29.260450160771715,
+        35.11254019292605
+      ],
+      "voltage_axis": [
+        600.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          6.9711405660002575e-06,
+          7.4534161490682875e-06,
+          4.844720496894404e-05,
+          0.00011180124223602483,
+          0.00017515527950310545,
+          0.00024968944099378884,
+          0.00035776397515527953
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "ROHM_SCT2080KE.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.603495",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

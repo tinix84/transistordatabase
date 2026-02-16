@@ -1,0 +1,493 @@
+{
+  "pair_id": "wolfspeed-cas300m17bm2",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "wolfspeed-cas300m17bm2",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "CAS300M17BM2",
+      "type": "MOSFET",
+      "manufacturer": "Wolfspeed",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "cauer",
+        "elements": [
+          {
+            "r": 0.00693,
+            "c": 0.0911
+          },
+          {
+            "r": 0.0156,
+            "c": 0.292
+          },
+          {
+            "r": 0.0164,
+            "c": 0.701
+          },
+          {
+            "r": 0.0253,
+            "c": 4.48
+          }
+        ]
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        -40.0,
+        25.0,
+        150.0
+      ],
+      "curves": [
+        {
+          "t_j": -40.0,
+          "on_state_voltage": [
+            -1.56,
+            -0.8582,
+            -0.2393,
+            -0.06427,
+            -0.01868,
+            0.0,
+            0.01385,
+            0.06362,
+            0.2425,
+            0.9903,
+            5.952
+          ],
+          "on_state_current": [
+            -599.8,
+            -166.1,
+            -45.48,
+            -11.93,
+            -2.595,
+            0.0,
+            2.594,
+            11.92,
+            45.44,
+            165.9,
+            598.9
+          ]
+        },
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -1.848,
+            -0.9739,
+            -0.2898,
+            -0.07553,
+            -0.01644,
+            0.0,
+            0.01799,
+            0.08266,
+            0.3151,
+            1.287,
+            7.081
+          ],
+          "on_state_current": [
+            -599.8,
+            -166.1,
+            -45.48,
+            -11.93,
+            -2.595,
+            0.0,
+            2.594,
+            11.92,
+            45.44,
+            165.9,
+            598.9
+          ]
+        },
+        {
+          "t_j": 150.0,
+          "on_state_voltage": [
+            -2.96,
+            -1.24,
+            -0.5877,
+            -0.1512,
+            -0.0329,
+            0.0,
+            0.03791,
+            0.1741,
+            0.6639,
+            2.578,
+            13.5
+          ],
+          "on_state_current": [
+            -599.8,
+            -166.1,
+            -45.48,
+            -11.93,
+            -2.595,
+            0.0,
+            2.594,
+            11.92,
+            45.44,
+            165.9,
+            598.9
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "wolfspeed-cas300m17bm2",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "CAS300M17BM2",
+      "type": "MOSFET",
+      "manufacturer": "Wolfspeed",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "cauer",
+        "elements": [
+          {
+            "r": 0.00693,
+            "c": 0.0911
+          },
+          {
+            "r": 0.0156,
+            "c": 0.292
+          },
+          {
+            "r": 0.0164,
+            "c": 0.701
+          },
+          {
+            "r": 0.0253,
+            "c": 4.48
+          }
+        ]
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        -40.0,
+        25.0,
+        150.0
+      ],
+      "curves": [
+        {
+          "t_j": -40.0,
+          "on_state_voltage": [
+            -1.56,
+            -0.8582,
+            -0.2393,
+            -0.06427,
+            -0.01868,
+            0.0,
+            0.01385,
+            0.06362,
+            0.2425,
+            0.9903,
+            5.952
+          ],
+          "on_state_current": [
+            -599.8,
+            -166.1,
+            -45.48,
+            -11.93,
+            -2.595,
+            0.0,
+            2.594,
+            11.92,
+            45.44,
+            165.9,
+            598.9
+          ]
+        },
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -1.848,
+            -0.9739,
+            -0.2898,
+            -0.07553,
+            -0.01644,
+            0.0,
+            0.01799,
+            0.08266,
+            0.3151,
+            1.287,
+            7.081
+          ],
+          "on_state_current": [
+            -599.8,
+            -166.1,
+            -45.48,
+            -11.93,
+            -2.595,
+            0.0,
+            2.594,
+            11.92,
+            45.44,
+            165.9,
+            598.9
+          ]
+        },
+        {
+          "t_j": 150.0,
+          "on_state_voltage": [
+            -2.96,
+            -1.24,
+            -0.5877,
+            -0.1512,
+            -0.0329,
+            0.0,
+            0.03791,
+            0.1741,
+            0.6639,
+            2.578,
+            13.5
+          ],
+          "on_state_current": [
+            -599.8,
+            -166.1,
+            -45.48,
+            -11.93,
+            -2.595,
+            0.0,
+            2.594,
+            11.92,
+            45.44,
+            165.9,
+            598.9
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "plecs_model",
+    "source_details": {},
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 0.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        -40.0,
+        25.0,
+        150.0,
+        900.0,
+        1000.0
+      ],
+      "current_axis": [
+        -10.0,
+        0.0,
+        60.11,
+        120.2,
+        180.3,
+        240.4,
+        300.6
+      ],
+      "voltage_axis": [
+        -10.0,
+        0.0,
+        900.0,
+        1200.0
+      ],
+      "energy": {
+        "-40.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "25.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "150.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "900.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "1000.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        -40.0,
+        25.0,
+        150.0,
+        900.0,
+        1000.0
+      ],
+      "current_axis": [
+        -10.0,
+        0.0,
+        60.11,
+        120.2,
+        180.3,
+        240.4,
+        300.6
+      ],
+      "voltage_axis": [
+        -10.0,
+        0.0,
+        900.0,
+        1200.0
+      ],
+      "energy": {
+        "-40.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "25.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "150.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "900.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "1000.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": "E/(1.88e-3*2.5+8.8e-3)*(1.88e-3*Rg+8.8e-3)",
+    "turn_off_formula": "E/(1.84e-3*2.5+5.4e-3)*(1.84e-3*Rg+5.4e-3)",
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS300M17BM2.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Modue_PLECS_07_27_18/CAS300M17BM2_bodydiode.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CAS300M17BM2.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/WS_Modue_PLECS_07_27_18/CAS300M17BM2_bodydiode.xml"
+    ],
+    "migration_date": "2026-02-16T06:49:14.620288",
+    "schema_version": "1.0",
+    "quality_score": 0.0
+  }
+}

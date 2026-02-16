@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "name": "Infineon_IKFW90N60EH3",
+    "type": "Diode",
+    "manufacturer": "Infineon",
+    "housing_type": "unknown",
+    "import_source": "plecs_xml:IKFW90N60EH3_Diode.xml",
+    "import_date": "2026-02-15T15:46:32.405069"
+  },
+  "electrical_ratings": {
+    "v_abs_max": 0.0,
+    "i_abs_max": 0.0,
+    "i_cont": 0.0,
+    "t_j_max": 150.0
+  },
+  "thermal_properties": {
+    "housing_area": 0.0,
+    "cooling_area": 0.0,
+    "r_th_jc": 0.0,
+    "r_th_cs": 0.0
+  },
+  "switch": {
+    "channel_data": [],
+    "e_on_data": [],
+    "e_off_data": [],
+    "gate_charge_curves": [],
+    "soa": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.023958,
+          "tau": 0.00032
+        },
+        {
+          "R": 0.20273,
+          "tau": 0.0022
+        },
+        {
+          "R": 0.18183,
+          "tau": 0.016794
+        },
+        {
+          "R": 0.35024,
+          "tau": 0.189957
+        },
+        {
+          "R": 0.31834,
+          "tau": 0.886519
+        },
+        {
+          "R": 0.023474,
+          "tau": 15.81528
+        }
+      ]
+    }
+  },
+  "diode": {
+    "channel_data": [],
+    "e_rr_data": [],
+    "thermal_foster": {
+      "type": "Foster",
+      "branches": [
+        {
+          "R": 0.023958,
+          "tau": 0.00032
+        },
+        {
+          "R": 0.20273,
+          "tau": 0.0022
+        },
+        {
+          "R": 0.18183,
+          "tau": 0.016794
+        },
+        {
+          "R": 0.35024,
+          "tau": 0.189957
+        },
+        {
+          "R": 0.31834,
+          "tau": 0.886519
+        },
+        {
+          "R": 0.023474,
+          "tau": 15.81528
+        }
+      ]
+    }
+  },
+  "c_oss": [],
+  "c_iss": [],
+  "c_rss": []
+}

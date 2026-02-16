@@ -1,0 +1,214 @@
+{
+  "pair_id": "10x_ST_SCTW100N65G2AG",
+  "pair_type": "parallel",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ST_SCTW100N65G2AG",
+    "count": 10,
+    "role": "switch",
+    "metadata": {
+      "name": "10 x ST SCTW100N65G2AG",
+      "type": "mosfet",
+      "manufacturer": "ST",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 82.0,
+      "weight": 0.5
+    },
+    "electrical_ratings": {
+      "v_abs_max": 650.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.045,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -23.0,
+            -0.0,
+            23.0
+          ],
+          "on_state_current": [
+            -10000.0,
+            -0.0,
+            10000.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "ST_SCTW100N65G2AG",
+    "count": 10,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "10_x_ST_SCTW100N65G2AG.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 300.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+101,
+        -0.0,
+        179.44250871080112,
+        301.3937282229966,
+        404.18118466898954,
+        499.99999999999994,
+        594.0766550522649,
+        707.3170731707318,
+        797.9094076655051,
+        968.6411149825783
+      ],
+      "voltage_axis": [
+        300.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.001210084033613445,
+          0.00205042016806723,
+          0.00309243697478992,
+          0.004504201680672272,
+          0.006285714285714283,
+          0.009109243697478994,
+          0.01166386554621849,
+          0.01815126050420168
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+101,
+        -0.0,
+        3.4722199999999996,
+        199.653,
+        302.083,
+        402.778,
+        503.472,
+        609.375,
+        718.75,
+        784.722,
+        847.222,
+        989.583
+      ],
+      "voltage_axis": [
+        300.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          5.7239e-05,
+          7.4074e-05,
+          0.00014141,
+          0.00022559,
+          0.0003367,
+          0.00049158,
+          0.00069024,
+          0.00081481,
+          0.00093603,
+          0.0012694
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "10_x_ST_SCTW100N65G2AG.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.700555",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

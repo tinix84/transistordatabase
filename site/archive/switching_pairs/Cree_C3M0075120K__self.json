@@ -1,0 +1,260 @@
+{
+  "pair_id": "Cree_C3M0075120K__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "Cree_C3M0075120K",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "C3M0075120K",
+      "type": "mosfet",
+      "manufacturer": "Cree",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 9.45,
+      "weight": 0.05
+    },
+    "electrical_ratings": {
+      "v_abs_max": 1200.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 1.05,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -9.707865168539328,
+            -7.876404494382024,
+            -6.528089887640452,
+            -5.280898876404497,
+            -4.258426966292136,
+            -3.528089887640451,
+            -2.775280898876406,
+            -2.157303370786517,
+            -1.707865168539327,
+            -1.292134831460674,
+            -0.98876404494382,
+            -0.6629213483146071,
+            -0.3258426966292144,
+            0.0112359550561802,
+            -0.0112359550561802,
+            0.3258426966292144,
+            0.6629213483146071,
+            0.98876404494382,
+            1.292134831460674,
+            1.707865168539327,
+            2.157303370786517,
+            2.775280898876406,
+            3.528089887640451,
+            4.258426966292136,
+            5.280898876404497,
+            6.528089887640452,
+            7.876404494382024,
+            9.707865168539328
+          ],
+          "on_state_current": [
+            -69.78369384359402,
+            -62.29617304492513,
+            -55.40765391014976,
+            -47.47088186356074,
+            -39.53410981697172,
+            -33.84359400998337,
+            -27.25457570715475,
+            -21.26455906821963,
+            -17.22129783693846,
+            -13.17803660565727,
+            -9.88352745424293,
+            -6.589018302828626,
+            -3.144758735440935,
+            -0.1497504159733691,
+            0.1497504159733691,
+            3.144758735440935,
+            6.589018302828626,
+            9.88352745424293,
+            13.17803660565727,
+            17.22129783693846,
+            21.26455906821963,
+            27.25457570715475,
+            33.84359400998337,
+            39.53410981697172,
+            47.47088186356074,
+            55.40765391014976,
+            62.29617304492513,
+            69.78369384359402
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "Cree_C3M0075120K",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "Cree_C3M0075120K.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 800.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.0,
+        0.05592841163310905,
+        5.201342281879191,
+        10.01118568232662,
+        15.60402684563758,
+        20.13422818791946,
+        25.33557046979865,
+        30.08948545861298,
+        40.0447427293065
+      ],
+      "voltage_axis": [
+        800.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0001165829145728644,
+          0.0001219430485762145,
+          0.0001634840871021775,
+          0.0002197654941373533,
+          0.0002666666666666666,
+          0.0003309882747068676,
+          0.0003926298157453937,
+          0.0005440536013400335
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -0.055991,
+        -0.0,
+        5.20717,
+        9.96641,
+        15.3975,
+        20.0448,
+        25.9239,
+        31.355,
+        40.2016
+      ],
+      "voltage_axis": [
+        800.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          2.1441e-05,
+          -0.0,
+          2.1441e-05,
+          3.0821e-05,
+          4.6901e-05,
+          6.4322e-05,
+          9.1122e-05,
+          0.00012462,
+          0.00018492
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "Cree_C3M0075120K.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.300754",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

@@ -1,0 +1,204 @@
+[
+  {
+    "file": "Fuji_2MBI100XAA120-50.json",
+    "pair_id": "Fuji_2MBI100XAA120-50",
+    "pair_type": "igbt_self",
+    "valid": false,
+    "errors": [
+      "switching_data.turn_on.energy[25] has 19 values but current_axis has 23",
+      "switching_data.turn_on.energy[125] has 17 values but current_axis has 23",
+      "switching_data.turn_on.energy[150] has 15 values but current_axis has 23",
+      "switching_data.turn_off.energy[125] has 16 values but current_axis has 18",
+      "switching_data.turn_off.energy[150] has 15 values but current_axis has 18",
+      "switching_data.reverse_recovery.energy[25] has 17 values but current_axis has 21",
+      "switching_data.reverse_recovery.energy[125] has 17 values but current_axis has 21",
+      "switching_data.reverse_recovery.energy[150] has 18 values but current_axis has 21"
+    ],
+    "warnings": [],
+    "quality_score": 92.85714285714286,
+    "is_self_pair": true,
+    "is_parallel": false,
+    "devices": [
+      "Fuji_2MBI100XAA120-50"
+    ]
+  },
+  {
+    "file": "Fuji_2MBI200XAA065-50.json",
+    "pair_id": "Fuji_2MBI200XAA065-50",
+    "pair_type": "igbt_self",
+    "valid": false,
+    "errors": [
+      "switching_data.turn_on.energy[25] has 49 values but current_axis has 63",
+      "switching_data.turn_on.energy[125] has 47 values but current_axis has 63",
+      "switching_data.turn_on.energy[150] has 51 values but current_axis has 63",
+      "switching_data.turn_off.energy[25] has 39 values but current_axis has 42",
+      "switching_data.turn_off.energy[125] has 29 values but current_axis has 42",
+      "switching_data.turn_off.energy[150] has 40 values but current_axis has 42",
+      "switching_data.reverse_recovery.energy[25] has 38 values but current_axis has 43",
+      "switching_data.reverse_recovery.energy[125] has 31 values but current_axis has 43",
+      "switching_data.reverse_recovery.energy[150] has 39 values but current_axis has 43"
+    ],
+    "warnings": [],
+    "quality_score": 92.85714285714286,
+    "is_self_pair": true,
+    "is_parallel": false,
+    "devices": [
+      "Fuji_2MBI200XAA065-50"
+    ]
+  },
+  {
+    "file": "Fuji_2MBI200XBE120-50.json",
+    "pair_id": "Fuji_2MBI200XBE120-50",
+    "pair_type": "igbt_self",
+    "valid": false,
+    "errors": [
+      "switching_data.turn_on.energy[25] has 33 values but current_axis has 35",
+      "switching_data.turn_on.energy[125] has 33 values but current_axis has 35",
+      "switching_data.turn_on.energy[150] has 32 values but current_axis has 35",
+      "switching_data.turn_off.energy[25] has 29 values but current_axis has 34",
+      "switching_data.turn_off.energy[125] has 33 values but current_axis has 34",
+      "switching_data.turn_off.energy[150] has 33 values but current_axis has 34",
+      "switching_data.reverse_recovery.energy[25] has 34 values but current_axis has 38",
+      "switching_data.reverse_recovery.energy[125] has 31 values but current_axis has 38",
+      "switching_data.reverse_recovery.energy[150] has 35 values but current_axis has 38"
+    ],
+    "warnings": [],
+    "quality_score": 92.85714285714286,
+    "is_self_pair": true,
+    "is_parallel": false,
+    "devices": [
+      "Fuji_2MBI200XBE120-50"
+    ]
+  },
+  {
+    "file": "Fuji_2MBI300XBE065-50.json",
+    "pair_id": "Fuji_2MBI300XBE065-50",
+    "pair_type": "igbt_self",
+    "valid": false,
+    "errors": [
+      "switching_data.turn_on.energy[25] has 54 values but current_axis has 69",
+      "switching_data.turn_on.energy[125] has 43 values but current_axis has 69",
+      "switching_data.turn_on.energy[150] has 50 values but current_axis has 69",
+      "switching_data.turn_off.energy[25] has 46 values but current_axis has 55",
+      "switching_data.turn_off.energy[125] has 44 values but current_axis has 55",
+      "switching_data.turn_off.energy[175] has 52 values but current_axis has 55",
+      "switching_data.reverse_recovery.energy[25] has 49 values but current_axis has 56",
+      "switching_data.reverse_recovery.energy[125] has 36 values but current_axis has 56",
+      "switching_data.reverse_recovery.energy[150] has 45 values but current_axis has 56"
+    ],
+    "warnings": [],
+    "quality_score": 92.85714285714286,
+    "is_self_pair": true,
+    "is_parallel": false,
+    "devices": [
+      "Fuji_2MBI300XBE065-50"
+    ]
+  },
+  {
+    "file": "Fuji_2MBI300XBE120-50.json",
+    "pair_id": "Fuji_2MBI300XBE120-50",
+    "pair_type": "igbt_self",
+    "valid": false,
+    "errors": [
+      "switching_data.turn_on.energy[25] has 33 values but current_axis has 35",
+      "switching_data.turn_on.energy[125] has 28 values but current_axis has 35",
+      "switching_data.turn_on.energy[150] has 30 values but current_axis has 35",
+      "switching_data.turn_off.energy[25] has 31 values but current_axis has 34",
+      "switching_data.turn_off.energy[125] has 31 values but current_axis has 34",
+      "switching_data.turn_off.energy[150] has 30 values but current_axis has 34",
+      "switching_data.reverse_recovery.energy[25] has 33 values but current_axis has 35",
+      "switching_data.reverse_recovery.energy[125] has 31 values but current_axis has 35",
+      "switching_data.reverse_recovery.energy[150] has 33 values but current_axis has 35"
+    ],
+    "warnings": [],
+    "quality_score": 92.85714285714286,
+    "is_self_pair": true,
+    "is_parallel": false,
+    "devices": [
+      "Fuji_2MBI300XBE120-50"
+    ]
+  },
+  {
+    "file": "Fuji_2MBI400U2B-060.json",
+    "pair_id": "Fuji_2MBI400U2B-060",
+    "pair_type": "igbt_self",
+    "valid": false,
+    "errors": [
+      "switching_data.turn_on.energy[25] has 33 values but current_axis has 35",
+      "switching_data.turn_off.energy[25] has 34 values but current_axis has 35"
+    ],
+    "warnings": [],
+    "quality_score": 92.85714285714286,
+    "is_self_pair": true,
+    "is_parallel": false,
+    "devices": [
+      "Fuji_2MBI400U2B-060"
+    ]
+  },
+  {
+    "file": "Fuji_2MBI400XBE065-50.json",
+    "pair_id": "Fuji_2MBI400XBE065-50",
+    "pair_type": "igbt_self",
+    "valid": false,
+    "errors": [
+      "switching_data.turn_on.energy[125] has 14 values but current_axis has 17",
+      "switching_data.turn_on.energy[150] has 15 values but current_axis has 17",
+      "switching_data.turn_on.energy[175] has 16 values but current_axis has 17",
+      "switching_data.turn_off.energy[25] has 17 values but current_axis has 19",
+      "switching_data.turn_off.energy[125] has 17 values but current_axis has 19",
+      "switching_data.turn_off.energy[150] has 15 values but current_axis has 19",
+      "switching_data.reverse_recovery.energy[25] has 14 values but current_axis has 15",
+      "switching_data.reverse_recovery.energy[125] has 14 values but current_axis has 15",
+      "switching_data.reverse_recovery.energy[175] has 12 values but current_axis has 15"
+    ],
+    "warnings": [],
+    "quality_score": 92.85714285714286,
+    "is_self_pair": true,
+    "is_parallel": false,
+    "devices": [
+      "Fuji_2MBI400XBE065-50"
+    ]
+  },
+  {
+    "file": "Fuji_2MBI600XEE065-50.json",
+    "pair_id": "Fuji_2MBI600XEE065-50",
+    "pair_type": "igbt_self",
+    "valid": false,
+    "errors": [
+      "switching_data.turn_on.energy[25] has 47 values but current_axis has 48",
+      "switching_data.turn_on.energy[125] has 38 values but current_axis has 48",
+      "switching_data.turn_on.energy[150] has 46 values but current_axis has 48",
+      "switching_data.turn_off.energy[25] has 45 values but current_axis has 47",
+      "switching_data.turn_off.energy[125] has 44 values but current_axis has 47",
+      "switching_data.turn_off.energy[150] has 46 values but current_axis has 47",
+      "switching_data.reverse_recovery.energy[25] has 51 values but current_axis has 56",
+      "switching_data.reverse_recovery.energy[125] has 35 values but current_axis has 56",
+      "switching_data.reverse_recovery.energy[150] has 44 values but current_axis has 56"
+    ],
+    "warnings": [],
+    "quality_score": 92.85714285714286,
+    "is_self_pair": true,
+    "is_parallel": false,
+    "devices": [
+      "Fuji_2MBI600XEE065-50"
+    ]
+  },
+  {
+    "file": "Mitsubishi_CM200DY-24T.json",
+    "pair_id": "Mitsubishi_CM200DY-24T",
+    "pair_type": "igbt_self",
+    "valid": false,
+    "errors": [
+      "switching_data.turn_on.energy[125] has 26 values but current_axis has 51",
+      "switching_data.turn_off.energy[125] has 19 values but current_axis has 40",
+      "switching_data.reverse_recovery.energy[125] has 17 values but current_axis has 37"
+    ],
+    "warnings": [],
+    "quality_score": 92.85714285714286,
+    "is_self_pair": true,
+    "is_parallel": false,
+    "devices": [
+      "Mitsubishi_CM200DY-24T"
+    ]
+  }
+]

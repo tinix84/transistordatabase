@@ -1,0 +1,2693 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Power semiconductor transistor database and simulation export tool">
+      
+      
+        <meta name="author" content="LEA, University of Paderborn">
+      
+      
+        <link rel="canonical" href="https://upb-lea.github.io/transistordatabase/VIDEO_TUTORIAL_SCRIPT/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Video Tutorial Scripts - Transistor Database</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#video-tutorial-scripts" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Transistor Database" class="md-header__button md-logo" aria-label="Transistor Database" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Transistor Database
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Video Tutorial Scripts
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/upb-lea/transistordatabase" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    upb-lea/transistordatabase
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guide/overview/" class="md-tabs__link">
+          
+  
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api/core/models/" class="md-tabs__link">
+          
+  
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../architecture/overview.md" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../development/contributing/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../CHANGELOG/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Transistor Database" class="md-nav__button md-logo" aria-label="Transistor Database" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Transistor Database
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/upb-lea/transistordatabase" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    upb-lea/transistordatabase
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/loading.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loading Transistors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/exporting.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exporting Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/analytical-models.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analytical Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/database.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/web-interface.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web Interface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Core
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/core/models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/core/services/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Services
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/core/repository/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repository
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/core/adapters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adapters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Backend
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/backend/concrete_services/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concrete Services
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/analytical_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analytical Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/database_manager.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Manager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/helper_functions.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Helper Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/overview.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/core-design.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/services.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Service Layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/gui.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GUI Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/docs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/releases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#video-series-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Video Series Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#video-1-introduction-quick-tour-5-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Video 1: Introduction &amp; Quick Tour (5 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Video 1: Introduction &amp; Quick Tour (5 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#video-2-searching-filtering-8-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Video 2: Searching &amp; Filtering (8 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Video 2: Searching &amp; Filtering (8 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#script_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#video-3-comparing-transistors-10-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Video 3: Comparing Transistors (10 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Video 3: Comparing Transistors (10 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#script_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#video-4-adding-your-own-transistor-15-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Video 4: Adding Your Own Transistor (15 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Video 4: Adding Your Own Transistor (15 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#script_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#video-5-exporting-to-simulation-tools-12-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Video 5: Exporting to Simulation Tools (12 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Video 5: Exporting to Simulation Tools (12 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#script_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#video-6-topology-calculator-buck-converter-design-18-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Video 6: Topology Calculator - Buck Converter Design (18 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Video 6: Topology Calculator - Buck Converter Design (18 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#script_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#production-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Production Notes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Production Notes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#equipment-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Equipment Needed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#screen-recording-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Screen Recording Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audio-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audio Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#browser-setup-for-recording" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Browser Setup for Recording
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#editing-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Editing Checklist
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#youtube-upload-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        YouTube Upload Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timestamps-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timestamps Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-video-ideas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Video Ideas
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Additional Video Ideas">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#advanced-topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Topics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#application-specific" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application-Specific
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#community-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Community Content
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="video-tutorial-scripts">Video Tutorial Scripts<a class="headerlink" href="#video-tutorial-scripts" title="Permanent link">&para;</a></h1>
+<p>Production-ready scripts for creating Transistor Database video tutorials.</p>
+<h2 id="video-series-overview">Video Series Overview<a class="headerlink" href="#video-series-overview" title="Permanent link">&para;</a></h2>
+<p><strong>Target audience</strong>: Power electronics engineers, researchers, students</p>
+<p><strong>Recommended format</strong>: Screen recording with voiceover, 1080p, 30fps</p>
+<p><strong>Suggested platform</strong>: YouTube, with chapters/timestamps</p>
+<hr />
+<h2 id="video-1-introduction-quick-tour-5-minutes">Video 1: Introduction &amp; Quick Tour (5 minutes)<a class="headerlink" href="#video-1-introduction-quick-tour-5-minutes" title="Permanent link">&para;</a></h2>
+<h3 id="script">Script<a class="headerlink" href="#script" title="Permanent link">&para;</a></h3>
+<p><strong>[00:00 - Opening]</strong></p>
+<blockquote>
+<p>"Welcome to the Transistor Database - an open-source tool for managing power semiconductor data and analyzing converter designs. I'm [Your Name], and in this video, I'll give you a quick tour of the interface and show you how to get started."</p>
+</blockquote>
+<p><strong>[00:15 - Show homepage]</strong></p>
+<blockquote>
+<p>"The Transistor Database comes in two flavors: a desktop PyQt5 interface and a modern web interface. Today we'll use the web interface, which runs on localhost:5173 with a FastAPI backend on port 8002."</p>
+</blockquote>
+<p><strong>[00:30 - Show main navigation]</strong></p>
+<blockquote>
+<p>"At the top, we have six main tabs. Let's go through each one quickly."</p>
+</blockquote>
+<p><strong>[00:45 - Search Database tab]</strong></p>
+<blockquote>
+<p>"First, Search Database. This is where you'll spend most of your time. You can filter transistors by type, voltage rating, current rating, housing type, and more. Let's filter for SiC MOSFETs rated above 1000 volts."</p>
+</blockquote>
+<p><strong>[01:15 - Apply filters, show results]</strong></p>
+<blockquote>
+<p>"Great! We found several devices. Notice the table shows key specifications: voltage rating, current rating, on-resistance, and thermal resistance. Click any transistor name to see complete details."</p>
+</blockquote>
+<p><strong>[01:45 - Create Transistor tab]</strong></p>
+<blockquote>
+<p>"Second tab: Create Transistor. This is where you add new devices to your database. You'll need the datasheet handy. Fill in metadata like name and manufacturer, then add electrical ratings, thermal properties, and characteristic curves."</p>
+</blockquote>
+<p><strong>[02:15 - Exporting Tools tab]</strong></p>
+<blockquote>
+<p>"Third: Exporting Tools. This is a killer feature. Select a transistor, choose your simulation tool - PLECS, MATLAB, Simulink, or GeckoCIRCUITS - and export. The tool generates properly formatted files ready to import into your simulator."</p>
+</blockquote>
+<p><strong>[02:45 - Comparison Tools tab]</strong></p>
+<blockquote>
+<p>"Fourth: Comparison Tools. Select two or three transistors and compare them side-by-side. You get charts for on-resistance, switching losses, capacitance curves - everything you need to make an informed choice."</p>
+</blockquote>
+<p><strong>[03:15 - Topology Calculator tab]</strong></p>
+<blockquote>
+<p>"Fifth: Topology Calculator. This is where it gets really cool. Select a converter topology - Buck, Boost, or Buck-Boost - choose your transistor, input your specifications, and the calculator predicts efficiency, losses, and junction temperature."</p>
+</blockquote>
+<p><strong>[03:45 - Settings tab]</strong></p>
+<blockquote>
+<p>"Finally, Settings. Configure your database path, export preferences, and display options."</p>
+</blockquote>
+<p><strong>[04:00 - Closing]</strong></p>
+<blockquote>
+<p>"That's the quick tour! In the next videos, we'll dive deeper into each feature. The database comes with sample transistors, and you can add your own from datasheets. It's completely free and open source on GitHub."</p>
+</blockquote>
+<p><strong>[04:20 - Call to action]</strong></p>
+<blockquote>
+<p>"If you found this helpful, like and subscribe! Check the description for installation instructions and documentation links. See you in the next video!"</p>
+</blockquote>
+<p><strong>[04:30 - End card]</strong></p>
+<hr />
+<h2 id="video-2-searching-filtering-8-minutes">Video 2: Searching &amp; Filtering (8 minutes)<a class="headerlink" href="#video-2-searching-filtering-8-minutes" title="Permanent link">&para;</a></h2>
+<h3 id="script_1">Script<a class="headerlink" href="#script_1" title="Permanent link">&para;</a></h3>
+<p><strong>[00:00 - Opening]</strong></p>
+<blockquote>
+<p>"Welcome back! Today we're diving deep into the Search Database feature. By the end of this video, you'll be able to quickly find the perfect transistor for your design."</p>
+</blockquote>
+<p><strong>[00:15 - Show Search tab]</strong></p>
+<blockquote>
+<p>"Let's start with a real-world scenario: I'm designing a 400-volt Buck converter with 50 amps output current. I need a SiC MOSFET with good efficiency."</p>
+</blockquote>
+<p><strong>[00:30 - Type filter]</strong></p>
+<blockquote>
+<p>"First, enable the Type filter and select SiC-MOSFET. SiC devices have lower switching losses than silicon, which is perfect for high-frequency converters."</p>
+</blockquote>
+<p><strong>[01:00 - Voltage filter]</strong></p>
+<blockquote>
+<p>"Next, voltage rating. My DC bus is 400 volts, but I want 50% margin for safety. So I need at least 600 volts. Enable the Voltage Rating filter, set minimum to 600, and leave maximum blank to see all options."</p>
+</blockquote>
+<p><strong>[01:30 - Current filter]</strong></p>
+<blockquote>
+<p>"For current: my output is 50 amps, but peak current during transients could be higher. Let's filter for at least 60 amps continuous current."</p>
+</blockquote>
+<p><strong>[02:00 - Show results]</strong></p>
+<blockquote>
+<p>"Perfect! We have several candidates. Notice the table is sortable - click any column header to sort. Let's sort by on-resistance to find the most efficient option."</p>
+</blockquote>
+<p><strong>[02:30 - Click top result]</strong></p>
+<blockquote>
+<p>"Here's our winner: the CREE C3M0060065J. 650 volts, 60 amps continuous, only 6 milliohms on-resistance. Click the name to see full details."</p>
+</blockquote>
+<p><strong>[03:00 - Show details view]</strong></p>
+<blockquote>
+<p>"Look at all this data! Electrical ratings, thermal properties, switching characteristics, capacitance curves. All extracted from the manufacturer's datasheet."</p>
+</blockquote>
+<p><strong>[03:30 - Additional filters]</strong></p>
+<blockquote>
+<p>"Back to search. We have more filters available: housing type if you need a specific footprint, manufacturer if you have a preferred supplier, and name search if you know exactly what you're looking for."</p>
+</blockquote>
+<p><strong>[04:15 - Housing filter demo]</strong></p>
+<blockquote>
+<p>"Let's say I need a TO-247 package for easy heatsink mounting. Enable Housing Type, select TO-247-3, and re-search. Now we're seeing only TO-247 devices."</p>
+</blockquote>
+<p><strong>[04:45 - Reset filters]</strong></p>
+<blockquote>
+<p>"The Reset Filters button clears everything and shows the full database again. Very handy when you want to start over."</p>
+</blockquote>
+<p><strong>[05:00 - Export filtered results]</strong></p>
+<blockquote>
+<p>"Here's a pro tip: after filtering, you can export the entire result set. Click Export Results, choose JSON, and you have a backup of your filtered selection."</p>
+</blockquote>
+<p><strong>[05:30 - Name contains filter]</strong></p>
+<blockquote>
+<p>"One more trick: the Name Contains filter is great when you remember part of a device name. Type 'IPT' and it shows all Infineon IPT-series transistors."</p>
+</blockquote>
+<p><strong>[06:00 - Practical tips]</strong></p>
+<blockquote>
+<p>"Some practical tips for effective searching: First, start broad and narrow down. Don't enable all filters at once or you might get zero results. Second, use voltage and current filters first - these eliminate the most options. Third, sort results by the parameter that matters most for your application."</p>
+</blockquote>
+<p><strong>[06:45 - Common mistakes]</strong></p>
+<blockquote>
+<p>"Common mistake: setting voltage exactly to your bus voltage. Remember, you need headroom! I recommend at least 30-50% margin. For a 400V bus, search for 600V devices minimum."</p>
+</blockquote>
+<p><strong>[07:15 - Closing]</strong></p>
+<blockquote>
+<p>"That's everything you need to master the search function! In the next video, we'll compare multiple transistors side-by-side to make the final selection. Thanks for watching!"</p>
+</blockquote>
+<p><strong>[07:30 - End card]</strong></p>
+<hr />
+<h2 id="video-3-comparing-transistors-10-minutes">Video 3: Comparing Transistors (10 minutes)<a class="headerlink" href="#video-3-comparing-transistors-10-minutes" title="Permanent link">&para;</a></h2>
+<h3 id="script_2">Script<a class="headerlink" href="#script_2" title="Permanent link">&para;</a></h3>
+<p><strong>[00:00 - Opening]</strong></p>
+<blockquote>
+<p>"You've filtered down to three candidate transistors, but which one should you actually use? That's where the Comparison Tools come in. Let's compare devices and make an informed decision."</p>
+</blockquote>
+<p><strong>[00:15 - Navigate to Comparison tab]</strong></p>
+<blockquote>
+<p>"Switch to the Comparison Tools tab. You'll see three dropdown menus for selecting transistors to compare."</p>
+</blockquote>
+<p><strong>[00:30 - Select first transistor]</strong></p>
+<blockquote>
+<p>"From our previous search, we shortlisted three SiC MOSFETs. Let's compare them: CREE C3M0060065J, Infineon IPT60R028G7, and Rohm SCT3040KL."</p>
+</blockquote>
+<p><strong>[01:00 - Show comparison table]</strong></p>
+<blockquote>
+<p>"Boom! Instant side-by-side comparison. The table shows every important parameter. Notice the color coding: green for best, yellow for middle, red for worst in each category."</p>
+</blockquote>
+<p><strong>[01:30 - Electrical ratings]</strong></p>
+<blockquote>
+<p>"Let's analyze the electrical ratings. All three are 650V class, so voltage is not a differentiator. But look at current ratings: CREE is 60A continuous, Infineon 45A, Rohm 50A. CREE wins on current capability."</p>
+</blockquote>
+<p><strong>[02:00 - On-resistance]</strong></p>
+<blockquote>
+<p>"Now on-resistance, which determines conduction losses. CREE: 6 milliohms. Infineon: 2.8 milliohms - that's fantastic! Rohm: 4 milliohms. For conduction losses, Infineon is the winner."</p>
+</blockquote>
+<p><strong>[02:30 - Switching characteristics]</strong></p>
+<blockquote>
+<p>"But we also need to consider switching losses. Scroll down to the switching characteristics chart. This shows turn-on and turn-off energy at different currents."</p>
+</blockquote>
+<p><strong>[03:00 - Analyze switching loss chart]</strong></p>
+<blockquote>
+<p>"At 50 amps: CREE has 0.8 millijoules turn-on, Infineon 1.2 millijoules, Rohm 0.9 millijoules. CREE wins on switching losses. This is the classic SiC tradeoff: Infineon has lower conduction loss but higher switching loss."</p>
+</blockquote>
+<p><strong>[03:45 - Thermal comparison]</strong></p>
+<blockquote>
+<p>"Thermal resistance is critical for reliability. CREE: 0.24 K/W junction-to-case. Infineon: 0.30 K/W. Rohm: 0.26 K/W. CREE has the best thermal performance."</p>
+</blockquote>
+<p><strong>[04:15 - Capacitance comparison]</strong></p>
+<blockquote>
+<p>"Output capacitance affects switching speed and losses. Check the capacitance chart. At 400V: CREE has 350 picofarads, Infineon 280pF, Rohm 320pF. Lower is better for fast switching, so Infineon wins here."</p>
+</blockquote>
+<p><strong>[04:45 - Cost considerations note]</strong></p>
+<blockquote>
+<p>"Now, the database doesn't include pricing - that changes too frequently - but typically, devices with better specs cost more. Infineon's low on-resistance probably comes with a price premium."</p>
+</blockquote>
+<p><strong>[05:15 - Application-specific decision]</strong></p>
+<blockquote>
+<p>"So which transistor should you choose? It depends on your application! If you're running high frequency - say, 100 kHz or above - switching losses dominate, so choose CREE. If you're at lower frequency with high average current, choose Infineon for the lower conduction loss."</p>
+</blockquote>
+<p><strong>[06:00 - Export comparison]</strong></p>
+<blockquote>
+<p>"You can export this comparison as a PDF report or Excel spreadsheet. Great for design documentation or sharing with your team."</p>
+</blockquote>
+<p><strong>[06:30 - Pop-out charts]</strong></p>
+<blockquote>
+<p>"Each chart has a pop-out button. Click it to see the chart in full screen. Perfect for presentations or closer analysis."</p>
+</blockquote>
+<p><strong>[07:00 - Gate resistance slider]</strong></p>
+<blockquote>
+<p>"Here's a cool feature: the gate resistance slider. Gate resistance affects switching speed and losses. Drag the slider to see how different gate resistances change the comparison. Lower gate resistance means faster switching but more ringing."</p>
+</blockquote>
+<p><strong>[07:45 - Clear and reset]</strong></p>
+<blockquote>
+<p>"The Clear button removes all selections so you can start a fresh comparison. Handy when you want to compare a different set of devices."</p>
+</blockquote>
+<p><strong>[08:00 - Practical tips]</strong></p>
+<blockquote>
+<p>"Pro tips: First, compare devices in the same voltage class. Don't compare a 650V SiC with a 1200V IGBT - they're for different applications. Second, pay attention to test conditions. Switching losses are measured at specific voltage, current, and gate resistance. Make sure they're comparable."</p>
+</blockquote>
+<p><strong>[08:45 - Closing]</strong></p>
+<blockquote>
+<p>"That's how you compare transistors like a pro! Next video, we'll take our chosen device and export it to PLECS for thermal simulation. See you then!"</p>
+</blockquote>
+<p><strong>[09:00 - End card]</strong></p>
+<hr />
+<h2 id="video-4-adding-your-own-transistor-15-minutes">Video 4: Adding Your Own Transistor (15 minutes)<a class="headerlink" href="#video-4-adding-your-own-transistor-15-minutes" title="Permanent link">&para;</a></h2>
+<h3 id="script_3">Script<a class="headerlink" href="#script_3" title="Permanent link">&para;</a></h3>
+<p><strong>[00:00 - Opening]</strong></p>
+<blockquote>
+<p>"You've found the perfect transistor for your design, but it's not in the database yet. No problem! In this video, I'll show you how to add a new transistor from the datasheet. We'll go through the entire process step-by-step."</p>
+</blockquote>
+<p><strong>[00:20 - Show datasheet]</strong></p>
+<blockquote>
+<p>"I'm adding the Wolfspeed C3M0025065K - a 650V, 90A SiC MOSFET. I have the datasheet open in another window. You can download datasheets from manufacturer websites. Search for the part number plus 'datasheet'."</p>
+</blockquote>
+<p><strong>[00:45 - Navigate to Create Transistor]</strong></p>
+<blockquote>
+<p>"Switch to the Create Transistor tab. The form is organized into sections: Metadata, Electrical Ratings, Thermal Properties, Switch Characteristics, Diode Characteristics, and Capacitances."</p>
+</blockquote>
+<p><strong>[01:15 - Fill metadata]</strong></p>
+<blockquote>
+<p>"Let's start with metadata. Name: use the format Manufacturer_PartNumber, so 'Wolfspeed_C3M0025065K'. Type: this is a SiC MOSFET, so select that from the dropdown. Manufacturer: Wolfspeed. Housing: look at the datasheet... it's TO-247-3."</p>
+</blockquote>
+<p><strong>[02:00 - Datasheet link]</strong></p>
+<blockquote>
+<p>"Datasheet hyperlink: copy the URL from the manufacturer's website and paste it here. This way you can always get back to the original datasheet."</p>
+</blockquote>
+<p><strong>[02:20 - Electrical ratings from datasheet]</strong></p>
+<blockquote>
+<p>"Now electrical ratings. Open the datasheet to the 'Maximum Ratings' table, usually on page 2. V_abs_max: the datasheet says 650 volts. I_abs_max: 285 amps pulsed. I_cont: 90 amps at 25 degrees Celsius. T_j_max: 175 degrees Celsius. All SiC devices can handle high temperatures."</p>
+</blockquote>
+<p><strong>[03:15 - Thermal properties]</strong></p>
+<blockquote>
+<p>"Thermal properties: find the 'Thermal Resistance' section. R_th_junction_case: 0.25 K/W. This is critical for thermal calculations. R_th_case_heatsink: usually 0 if you're using thermal paste. Leave blank if not specified."</p>
+</blockquote>
+<p><strong>[03:45 - On-resistance note]</strong></p>
+<blockquote>
+<p>"The form shows R_ds_on fields for different temperatures. From the datasheet: 2.5 milliohms at 25°C with 15V gate voltage. At 150°C: about 3.8 milliohms. Temperature dependence is important for accurate loss calculations."</p>
+</blockquote>
+<p><strong>[04:30 - Switch characteristics intro]</strong></p>
+<blockquote>
+<p>"Now the fun part: characteristic curves! These curves are what make the database so powerful. Let's add the channel characteristics first."</p>
+</blockquote>
+<p><strong>[05:00 - Add channel characteristic]</strong></p>
+<blockquote>
+<p>"Click 'Add Channel Characteristic'. We need to digitize the I-V curve from the datasheet. Find the 'Output Characteristics' graph - shows drain current versus drain-source voltage at different gate voltages."</p>
+</blockquote>
+<p><strong>[05:30 - Digitizing the curve]</strong></p>
+<blockquote>
+<p>"Here's how to digitize: Look at the curve for V_gs = 15V at T_j = 25°C. Pick 5-7 points along the curve. At V_ds = 0V, I_d = 0A. At 0.5V, about 10A. At 1V, about 20A. At 1.5V, about 28A. At 2V, it's saturated at 30A. Enter these values in the form."</p>
+</blockquote>
+<p><strong>[06:30 - Multiple curves]</strong></p>
+<blockquote>
+<p>"Repeat for the high-temperature curve at 150°C. More curves mean more accurate simulations, but even two curves (25°C and 150°C) give good results."</p>
+</blockquote>
+<p><strong>[07:00 - Switching losses]</strong></p>
+<blockquote>
+<p>"Next: switching losses. Find the 'Switching Energy vs Current' graphs. There are two: E_on for turn-on energy and E_off for turn-off energy."</p>
+</blockquote>
+<p><strong>[07:30 - E_on curve]</strong></p>
+<blockquote>
+<p>"Click 'Add E_on Data'. Test conditions matter! The datasheet shows measurements at 400V bus voltage, 15V gate voltage, 10 ohm gate resistance, 25°C. Enter these first. Then digitize the E_on curve: at 10A, 0.2 millijoules. At 30A, 0.8 millijoules. At 50A, 1.5 millijoules. And so on."</p>
+</blockquote>
+<p><strong>[08:30 - E_off curve]</strong></p>
+<blockquote>
+<p>"Repeat for E_off. Usually E_off is slightly lower than E_on for SiC MOSFETs."</p>
+</blockquote>
+<p><strong>[09:00 - Diode characteristics]</strong></p>
+<blockquote>
+<p>"Don't skip the diode characteristics! SiC MOSFETs have body diodes. Find the 'Diode Forward Characteristics' graph. Same process: digitize voltage versus current at different temperatures."</p>
+</blockquote>
+<p><strong>[09:45 - Reverse recovery]</strong></p>
+<blockquote>
+<p>"And reverse recovery energy E_rr. This is important for hard-switching converters. Find the E_rr graph and digitize it."</p>
+</blockquote>
+<p><strong>[10:30 - Capacitances]</strong></p>
+<blockquote>
+<p>"Almost done! Add capacitance curves. Find the 'Capacitance vs Voltage' graph. There are three capacitances: C_oss (output), C_iss (input), and C_rss (reverse transfer). Digitize each one."</p>
+</blockquote>
+<p><strong>[11:15 - Gate charge]</strong></p>
+<blockquote>
+<p>"Finally, gate charge curves if available. Find the 'Gate Charge vs Gate Voltage' graph. These curves show how the gate capacitance charges during switching."</p>
+</blockquote>
+<p><strong>[11:45 - Review before saving]</strong></p>
+<blockquote>
+<p>"Before saving, scroll through and double-check everything. Common mistakes: wrong decimal places (microohms instead of milliohms), mixing up temperatures, missing units."</p>
+</blockquote>
+<p><strong>[12:15 - Save transistor]</strong></p>
+<blockquote>
+<p>"Click Save! The transistor is now in your database. You'll see a confirmation message."</p>
+</blockquote>
+<p><strong>[12:30 - Verify in search]</strong></p>
+<blockquote>
+<p>"Let's verify: go to Search Database, filter for SiC-MOSFET, and there it is! Click the name to see all the data you just entered. Beautiful!"</p>
+</blockquote>
+<p><strong>[13:00 - Virtual datasheet]</strong></p>
+<blockquote>
+<p>"Pro tip: use the 'Preview on Virtual Datasheet' button before saving. This generates a PDF with all your curves plotted. Great way to spot errors before committing."</p>
+</blockquote>
+<p><strong>[13:30 - Backup tip]</strong></p>
+<blockquote>
+<p>"Another pro tip: after adding transistors, export your database to JSON. This is your backup. Store it in Git or cloud storage. If something goes wrong, you can restore from the backup."</p>
+</blockquote>
+<p><strong>[14:00 - Closing]</strong></p>
+<blockquote>
+<p>"That's how you add your own transistors! Yes, it takes time - maybe 15-20 minutes per device - but you only do it once, and then you have perfect data for all your future projects. In the next video, we'll export this transistor to PLECS. Thanks for watching!"</p>
+</blockquote>
+<p><strong>[14:30 - End card]</strong></p>
+<hr />
+<h2 id="video-5-exporting-to-simulation-tools-12-minutes">Video 5: Exporting to Simulation Tools (12 minutes)<a class="headerlink" href="#video-5-exporting-to-simulation-tools-12-minutes" title="Permanent link">&para;</a></h2>
+<h3 id="script_4">Script<a class="headerlink" href="#script_4" title="Permanent link">&para;</a></h3>
+<p><strong>[00:00 - Opening]</strong></p>
+<blockquote>
+<p>"You've got your transistor data in the database. Now let's get it into your simulation tool! Today we'll export to PLECS, MATLAB, and Simulink. By the end of this video, you'll be running thermal simulations with accurate models."</p>
+</blockquote>
+<p><strong>[00:15 - Navigate to Export Tools]</strong></p>
+<blockquote>
+<p>"Switch to the Exporting Tools tab. Select a transistor from the dropdown - I'm using CREE C3M0060065J."</p>
+</blockquote>
+<p><strong>[00:30 - Export format overview]</strong></p>
+<blockquote>
+<p>"You have six export formats: JSON for data interchange, MATLAB for scripts, PLECS for thermal models, Simulink for Simscape, GeckoCIRCUITS, and Virtual Datasheet for a nice PDF summary."</p>
+</blockquote>
+<p><strong>[01:00 - PLECS export walkthrough]</strong></p>
+<blockquote>
+<p>"Let's start with PLECS, which is super popular for power electronics. Click the PLECS button. A dialog appears asking if you want to include thermal models. Say yes. Click Export."</p>
+</blockquote>
+<p><strong>[01:30 - Show exported file]</strong></p>
+<blockquote>
+<p>"The file downloads as an XML file. Let's open it in a text editor. See all that XML? This is PLECS thermal library format. It contains: electrical parameters like on-resistance and voltage rating, thermal parameters like junction-to-case resistance, and switching loss tables."</p>
+</blockquote>
+<p><strong>[02:15 - Import into PLECS]</strong></p>
+<blockquote>
+<p>"Now let's import it into PLECS. Open PLECS, go to PLECS → Thermal Library. Click Import, browse to our XML file, and open. Done! The transistor is now in your PLECS thermal library."</p>
+</blockquote>
+<p><strong>[02:45 - Use in PLECS circuit]</strong></p>
+<blockquote>
+<p>"To use it: drag a MOSFET from the library into your circuit. Right-click, select Component Properties, then Thermal Description. You'll see our transistor in the list! Select it, and PLECS now uses accurate thermal and switching loss models."</p>
+</blockquote>
+<p><strong>[03:30 - Run PLECS simulation demo]</strong></p>
+<blockquote>
+<p>"Let's run a quick simulation. I've set up a simple Buck converter at 400V input, 12V output, 100 kHz. Run the simulation... and look at that! Junction temperature rises to 85°C. With thermal models, we can predict reliability."</p>
+</blockquote>
+<p><strong>[04:15 - MATLAB export]</strong></p>
+<blockquote>
+<p>"Back to the Transistor Database. Let's export to MATLAB. Select the transistor, click MATLAB, and export. This generates a .m script file."</p>
+</blockquote>
+<p><strong>[04:45 - Show MATLAB script]</strong></p>
+<blockquote>
+<p>"Open the script in a text editor. It's pure MATLAB code! All the transistor parameters are defined as variables: v_abs_max equals 650, i_abs_max equals 120, r_ds_on equals 0.006. The switching loss data is in matrices. You can load this script and use the variables in your own MATLAB calculations."</p>
+</blockquote>
+<p><strong>[05:30 - Load in MATLAB]</strong></p>
+<blockquote>
+<p>"In MATLAB: run the script. Now type 'v_abs_max' in the command window... 650! All variables are in your workspace. Super easy to use in custom scripts."</p>
+</blockquote>
+<p><strong>[06:00 - Simulink export]</strong></p>
+<blockquote>
+<p>"Simulink export is similar but creates a .mat file. This is a binary format that loads directly into Simulink/Simscape models."</p>
+</blockquote>
+<p><strong>[06:30 - Import into Simulink]</strong></p>
+<blockquote>
+<p>"In Simulink: use a Simscape MOSFET block, open parameters, and load the .mat file. The block now uses your custom transistor data. Perfect for detailed power loss and thermal analysis."</p>
+</blockquote>
+<p><strong>[07:00 - GeckoCIRCUITS export]</strong></p>
+<blockquote>
+<p>"GeckoCIRCUITS users: export as .ipes format. This is GeckoCIRCUITS' native format. Open GeckoCIRCUITS, go to File → Import, select your .ipes file, and the transistor appears in your component library."</p>
+</blockquote>
+<p><strong>[07:45 - Virtual Datasheet]</strong></p>
+<blockquote>
+<p>"The Virtual Datasheet export is special. It creates a PDF with all the curves and specifications, formatted like a real datasheet. This is perfect for documentation, design reviews, or sharing with colleagues who don't have the database installed."</p>
+</blockquote>
+<p><strong>[08:30 - Show virtual datasheet]</strong></p>
+<blockquote>
+<p>"Let's generate one. Click Virtual Datasheet, export, and open the PDF. Beautiful! Page 1 has electrical ratings and thermal properties. Page 2 shows channel characteristics at different temperatures. Page 3 has switching loss curves. Page 4 shows capacitance curves. It's publication-quality!"</p>
+</blockquote>
+<p><strong>[09:15 - JSON export use case]</strong></p>
+<blockquote>
+<p>"Finally, JSON export. This is the raw data format. Use it for: backing up your database, sharing transistors with colleagues, or importing into custom tools. It's human-readable and easy to parse programmatically."</p>
+</blockquote>
+<p><strong>[09:45 - Bulk export tip]</strong></p>
+<blockquote>
+<p>"Pro tip: you can export multiple transistors at once. Go to Search Database, apply filters, and click 'Export Filtered Results'. All transistors in your search export as a ZIP file. Great for archiving or migrating databases."</p>
+</blockquote>
+<p><strong>[10:15 - Re-import tip]</strong></p>
+<blockquote>
+<p>"Another tip: if you receive a JSON file from a colleague, you can import it. Go to Create Transistor, click 'Import from JSON', and load the file. The form auto-fills with all the data."</p>
+</blockquote>
+<p><strong>[10:45 - Common export errors]</strong></p>
+<blockquote>
+<p>"Common issues: if export fails, check that the transistor has all required data. Missing switching loss curves? The PLECS export will fail. Check the browser console for error messages."</p>
+</blockquote>
+<p><strong>[11:15 - Closing]</strong></p>
+<blockquote>
+<p>"That's everything about exporting! You now know how to get your transistor data into any simulation tool. Next video: using the Topology Calculator to design a complete converter. Don't miss it!"</p>
+</blockquote>
+<p><strong>[11:30 - End card]</strong></p>
+<hr />
+<h2 id="video-6-topology-calculator-buck-converter-design-18-minutes">Video 6: Topology Calculator - Buck Converter Design (18 minutes)<a class="headerlink" href="#video-6-topology-calculator-buck-converter-design-18-minutes" title="Permanent link">&para;</a></h2>
+<h3 id="script_5">Script<a class="headerlink" href="#script_5" title="Permanent link">&para;</a></h3>
+<p><strong>[00:00 - Opening]</strong></p>
+<blockquote>
+<p>"Today we're designing a complete Buck converter using the Topology Calculator. We'll size components, predict efficiency, and verify thermal performance - all without breadboarding a single circuit. Let's get started!"</p>
+</blockquote>
+<p><strong>[00:20 - Design specs]</strong></p>
+<blockquote>
+<p>"Here's our design: input voltage 400V, output voltage 12V, output current 50A, switching frequency 100 kHz. This is a typical DC-DC converter for telecom or server power supplies."</p>
+</blockquote>
+<p><strong>[00:45 - Navigate to Topology Calculator]</strong></p>
+<blockquote>
+<p>"Go to the Topology Calculator tab. First, select the topology. We want Buck - that's a step-down converter. The dropdown shows Buck, Boost, and Buck-Boost."</p>
+</blockquote>
+<p><strong>[01:15 - Select transistor]</strong></p>
+<blockquote>
+<p>"Next, select the transistor. I'm using the CREE C3M0060065J we looked at earlier. 650V rating handles the 400V input with margin. 60A continuous rating handles our 50A output."</p>
+</blockquote>
+<p><strong>[01:45 - Enter specifications]</strong></p>
+<blockquote>
+<p>"Now enter the design specs. Input voltage: 400. Output voltage: 12. Output current: 50. Switching frequency: 100000 - that's 100 kHz in Hertz."</p>
+</blockquote>
+<p><strong>[02:15 - Inductance calculation]</strong></p>
+<blockquote>
+<p>"We need to specify inductance. How do we calculate it? For CCM operation, use the formula L = V_out × (1 - D) / (f_sw × delta_I), where delta_I is the current ripple. Let's target 20% ripple, so delta_I = 0.2 × 50A = 10A. Plugging in: L = 12 × (1 - 0.03) / (100000 × 10) = 11.6 microhenries. Let's use 15 microhenries to be safe."</p>
+</blockquote>
+<p><strong>[03:15 - Output capacitance]</strong></p>
+<blockquote>
+<p>"Output capacitance: this filters the current ripple. For a target output voltage ripple of 50mV with 10A current ripple, C = I_ripple / (8 × f_sw × V_ripple) = 10 / (8 × 100000 × 0.05) = 25 microfarads. Use 50 microfarads for margin."</p>
+</blockquote>
+<p><strong>[03:45 - Gate resistance]</strong></p>
+<blockquote>
+<p>"Gate resistance: this controls switching speed. Start with 10 ohms - a middle-of-the-road value. We'll optimize it in a minute using the slider."</p>
+</blockquote>
+<p><strong>[04:00 - Click calculate]</strong></p>
+<blockquote>
+<p>"Click Calculate! The tool crunches the numbers... and here are our results!"</p>
+</blockquote>
+<p><strong>[04:15 - Duty cycle result]</strong></p>
+<blockquote>
+<p>"First: duty cycle. The calculator shows 3%. That makes sense: D = V_out / V_in = 12 / 400 = 0.03 or 3%. The transistor is on for 3% of each switching period and off for 97%."</p>
+</blockquote>
+<p><strong>[04:45 - Power loss breakdown]</strong></p>
+<blockquote>
+<p>"Power losses: conduction loss in the transistor is 1.2 watts. Switching loss is 3.5 watts. Diode loss is 0.8 watts. Total loss: 5.5 watts out of 600 watts output power."</p>
+</blockquote>
+<p><strong>[05:15 - Efficiency result]</strong></p>
+<blockquote>
+<p>"Efficiency: 99.1%! That's excellent. SiC really shines here. With a silicon MOSFET, we'd be lucky to get 97% at this frequency."</p>
+</blockquote>
+<p><strong>[05:45 - Thermal results]</strong></p>
+<blockquote>
+<p>"Junction temperature: 67°C with 25°C ambient. That's well below the 175°C max. We have plenty of thermal margin. The calculator assumes a small heatsink - check the thermal resistance parameters to see the assumptions."</p>
+</blockquote>
+<p><strong>[06:15 - Waveforms]</strong></p>
+<blockquote>
+<p>"Scroll down to see waveforms. Here's the inductor current: triangular waveform with 10A peak-to-peak ripple, just as we designed. Gate voltage waveform shows clean switching with 10 ohm gate resistance."</p>
+</blockquote>
+<p><strong>[06:45 - Gate resistance optimization]</strong></p>
+<blockquote>
+<p>"Now let's optimize! See the gate resistance slider at the bottom? Let's sweep it. Drag left to 5 ohms... efficiency increases to 99.3%! Lower gate resistance means faster switching and lower switching loss."</p>
+</blockquote>
+<p><strong>[07:30 - But watch the tradeoffs]</strong></p>
+<blockquote>
+<p>"But look at the current waveform: more ringing now. That's the tradeoff. Faster switching causes more ringing due to parasitic inductance. In a real circuit, this could cause EMI issues. Let's try the other direction: increase to 20 ohms."</p>
+</blockquote>
+<p><strong>[08:00 - Higher gate resistance]</strong></p>
+<blockquote>
+<p>"At 20 ohms: efficiency drops to 98.8%. Switching is slower, more loss, but cleaner waveforms. The optimal gate resistance depends on your layout and EMI requirements."</p>
+</blockquote>
+<p><strong>[08:30 - Component stress]</strong></p>
+<blockquote>
+<p>"Check the component stress section. Peak transistor current: 55A - that's within the 60A rating. Peak voltage: 400V - within the 650V rating. RMS current: 3.5A - important for selecting the inductor."</p>
+</blockquote>
+<p><strong>[09:00 - Losses at different loads]</strong></p>
+<blockquote>
+<p>"Here's a cool feature: click 'Scan Load Current'. The calculator sweeps output current from 10% to 100% and plots efficiency versus load. See how efficiency peaks at 75% load? That's typical for switching converters."</p>
+</blockquote>
+<p><strong>[09:45 - Frequency sweep]</strong></p>
+<blockquote>
+<p>"You can also sweep frequency. Click 'Scan Frequency'. This plots efficiency versus switching frequency. See how efficiency drops at higher frequencies due to increased switching loss? But component sizes shrink. Classic tradeoff."</p>
+</blockquote>
+<p><strong>[10:30 - Thermal analysis]</strong></p>
+<blockquote>
+<p>"Let's dive into thermal analysis. Click 'Show Thermal Model'. This displays the thermal equivalent circuit: junction to case, case to heatsink, heatsink to ambient. Each block shows resistance and temperature drop."</p>
+</blockquote>
+<p><strong>[11:00 - Heatsink sizing]</strong></p>
+<blockquote>
+<p>"Say junction temperature is too high. How do we fix it? Add a better heatsink. Change R_th_heatsink_ambient from 10 K/W to 5 K/W. Recalculate... temperature drops to 52°C. Perfect!"</p>
+</blockquote>
+<p><strong>[11:30 - Forced cooling]</strong></p>
+<blockquote>
+<p>"Or add a fan. With forced cooling, you can use R_th_heatsink_ambient of 2 K/W. Now temperature is 38°C - plenty of margin even at high ambient temperatures."</p>
+</blockquote>
+<p><strong>[12:00 - Export results]</strong></p>
+<blockquote>
+<p>"Once you're happy with the design, export the results. Click 'Export Results' and choose PDF. This generates a design report with all specifications, waveforms, and efficiency plots. Perfect for design documentation."</p>
+</blockquote>
+<p><strong>[12:30 - Compare topologies]</strong></p>
+<blockquote>
+<p>"Want to compare with a different topology? Change to Boost and recalculate. Wait, Boost won't work here - it steps up voltage, not down. But you could compare Buck versus Buck-Boost to see the efficiency difference."</p>
+</blockquote>
+<p><strong>[13:00 - Save design]</strong></p>
+<blockquote>
+<p>"The calculator doesn't automatically save your design. So write down your final values: 15 µH inductor, 50 µF capacitor, 10 ohm gate resistance, 100 kHz frequency. You'll need these for the PCB design."</p>
+</blockquote>
+<p><strong>[13:30 - Practical tips]</strong></p>
+<blockquote>
+<p>"Practical tips: First, the calculator assumes ideal components. Real inductors have DC resistance and core loss. Deduct 0.5-1% from the calculated efficiency. Second, layout matters! Parasitic inductance in the switching loop causes ringing. Keep traces short and use good grounding."</p>
+</blockquote>
+<p><strong>[14:15 - Validation]</strong></p>
+<blockquote>
+<p>"Third, validate in simulation. Export the transistor to PLECS, build the Buck converter, and verify the results. The calculator gives you a great starting point, but detailed simulation catches second-order effects."</p>
+</blockquote>
+<p><strong>[14:45 - When to use Buck-Boost]</strong></p>
+<blockquote>
+<p>"When to use Buck-Boost instead of Buck? When input voltage varies widely. Buck only works when V_in &gt; V_out. If V_in can drop below V_out, you need Buck-Boost. But efficiency is slightly lower due to the extra switching device."</p>
+</blockquote>
+<p><strong>[15:30 - Frequency selection]</strong></p>
+<blockquote>
+<p>"How to choose switching frequency? Higher frequency means smaller components but lower efficiency. For converters under 1 kW, 100-200 kHz is typical. Above 1 kW, consider 50-100 kHz. SiC enables higher frequencies than silicon."</p>
+</blockquote>
+<p><strong>[16:15 - Parallel transistors note]</strong></p>
+<blockquote>
+<p>"If one transistor isn't enough, parallel multiple devices. The calculator doesn't support this directly, but you can approximate: divide current by N devices and multiply R_ds_on by 1/N."</p>
+</blockquote>
+<p><strong>[16:45 - Closing]</strong></p>
+<blockquote>
+<p>"That's the complete workflow: spec your design, enter parameters, calculate, optimize gate resistance, verify thermal performance, and export results. You now have everything to design efficient power converters with confidence!"</p>
+</blockquote>
+<p><strong>[17:15 - Next steps]</strong></p>
+<blockquote>
+<p>"Next steps: breadboard your design! Use the transistor you modeled, the calculated component values, and test it. Then compare measured efficiency to the prediction. It should be within a few percent if your data is accurate."</p>
+</blockquote>
+<p><strong>[17:45 - End card]</strong></p>
+<blockquote>
+<p>"Thanks for watching this deep dive! Check out the other videos in the series for more advanced topics. And don't forget to star the project on GitHub - it's open source! See you next time!"</p>
+</blockquote>
+<p><strong>[18:00 - End]</strong></p>
+<hr />
+<h2 id="production-notes">Production Notes<a class="headerlink" href="#production-notes" title="Permanent link">&para;</a></h2>
+<h3 id="equipment-needed">Equipment Needed<a class="headerlink" href="#equipment-needed" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Screen recording software</strong>: OBS Studio (free), Camtasia, ScreenFlow</li>
+<li><strong>Microphone</strong>: USB condenser mic (minimum Blue Yeti quality)</li>
+<li><strong>Video editing</strong>: DaVinci Resolve (free), Adobe Premiere, Final Cut Pro</li>
+<li><strong>Thumbnail creation</strong>: Canva, Photoshop</li>
+</ul>
+<h3 id="screen-recording-settings">Screen Recording Settings<a class="headerlink" href="#screen-recording-settings" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Resolution</strong>: 1920×1080 (1080p)</li>
+<li><strong>Frame rate</strong>: 30 fps (60 fps for smooth animations)</li>
+<li><strong>Bitrate</strong>: 5-10 Mbps</li>
+<li><strong>Format</strong>: MP4 (H.264 codec)</li>
+</ul>
+<h3 id="audio-settings">Audio Settings<a class="headerlink" href="#audio-settings" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Format</strong>: 48 kHz, 16-bit</li>
+<li><strong>Noise reduction</strong>: Apply in post-production</li>
+<li><strong>Normalization</strong>: -3 dB peak</li>
+<li><strong>Room treatment</strong>: Record in quiet space with soft furnishings</li>
+</ul>
+<h3 id="browser-setup-for-recording">Browser Setup for Recording<a class="headerlink" href="#browser-setup-for-recording" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Start backend</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>uvicorn<span class="w"> </span>transistordatabase.gui_web.backend.main:app<span class="w"> </span>--port<span class="w"> </span><span class="m">8002</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Start frontend</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">cd</span><span class="w"> </span>transistordatabase/gui_web<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Open in browser at 1920x1080 resolution</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># Zoom to 100% (Ctrl+0)</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># Clear browser cache before recording (Ctrl+Shift+Del)</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Close all other tabs</span>
+</span></code></pre></div>
+<h3 id="editing-checklist">Editing Checklist<a class="headerlink" href="#editing-checklist" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] Remove long pauses and "um"s</li>
+<li>[ ] Add intro/outro graphics (5-7 seconds each)</li>
+<li>[ ] Add text overlays for key points</li>
+<li>[ ] Add zoom effects for small UI elements</li>
+<li>[ ] Add background music (low volume, 10-15%)</li>
+<li>[ ] Color grade for consistent brightness</li>
+<li>[ ] Export with YouTube presets</li>
+</ul>
+<h3 id="youtube-upload-settings">YouTube Upload Settings<a class="headerlink" href="#youtube-upload-settings" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Title</strong>: "Transistor Database Tutorial: [Topic] | Power Electronics"</li>
+<li><strong>Description</strong>: Include links to docs, GitHub repo, timestamps</li>
+<li><strong>Tags</strong>: power electronics, transistor database, MOSFET, SiC, PLECS, power converter</li>
+<li><strong>Thumbnail</strong>: 1280×720, bright colors, text overlay with topic</li>
+<li><strong>Playlist</strong>: Add to "Transistor Database Tutorials"</li>
+<li><strong>Cards</strong>: Link to next video at 80% mark</li>
+<li><strong>End screen</strong>: Subscribe button + 2 related videos</li>
+</ul>
+<h3 id="timestamps-template">Timestamps Template<a class="headerlink" href="#timestamps-template" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>0:00 Introduction
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>0:15 Overview
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>1:30 Main Topic Part 1
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>5:00 Main Topic Part 2
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>8:45 Advanced Tips
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>12:00 Common Mistakes
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>14:30 Summary
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>15:00 Next Steps
+</span></code></pre></div>
+<hr />
+<h2 id="additional-video-ideas">Additional Video Ideas<a class="headerlink" href="#additional-video-ideas" title="Permanent link">&para;</a></h2>
+<h3 id="advanced-topics">Advanced Topics<a class="headerlink" href="#advanced-topics" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Python API Usage</strong> (12 min) - Scripting with transistordatabase</li>
+<li><strong>Batch Processing</strong> (10 min) - Analyzing multiple transistors programmatically</li>
+<li><strong>Custom Export Formats</strong> (8 min) - Creating your own export templates</li>
+<li><strong>Database Management</strong> (10 min) - Organizing large transistor libraries</li>
+<li><strong>Integration with LTspice</strong> (15 min) - Exporting and simulating</li>
+</ol>
+<h3 id="application-specific">Application-Specific<a class="headerlink" href="#application-specific" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>PFC Design</strong> (20 min) - Designing a bridgeless PFC with the calculator</li>
+<li><strong>Automotive Applications</strong> (15 min) - Selecting transistors for EV inverters</li>
+<li><strong>Solar Inverter Design</strong> (18 min) - String inverter optimization</li>
+<li><strong>Server PSU Design</strong> (20 min) - High-efficiency telecom supplies</li>
+<li><strong>Motor Drive Design</strong> (18 min) - Three-phase inverter analysis</li>
+</ol>
+<h3 id="community-content">Community Content<a class="headerlink" href="#community-content" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Contributing to the Database</strong> (12 min) - How to submit your transistors</li>
+<li><strong>Reporting Issues</strong> (5 min) - GitHub issues workflow</li>
+<li><strong>Feature Requests</strong> (8 min) - Requesting new functionality</li>
+</ol>
+<hr />
+<p><strong>Ready to record? Follow these scripts and you'll create professional, helpful tutorials for the Transistor Database community!</strong> 🎥</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 LEA, University of Paderborn
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/upb-lea/transistordatabase" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://pypi.org/project/transistordatabase/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

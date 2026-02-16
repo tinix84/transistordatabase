@@ -1,0 +1,260 @@
+{
+  "pair_id": "ON_Semiconductor_NTH4L080N120SC1__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ON_Semiconductor_NTH4L080N120SC1",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "ON Semiconductor NTH4L080N120SC1",
+      "type": "mosfet",
+      "manufacturer": "ON Semiconductor",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 5.88,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 1200.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.48,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -5.0,
+            -4.504310344827585,
+            -4.0032327586206895,
+            -3.5021551724137923,
+            -2.9903017241379306,
+            -2.4946120689655165,
+            -2.1012931034482754,
+            -1.5948275862068961,
+            -0.07543103448275862,
+            -0.07541934581105554,
+            0.027817032137773118,
+            2.030633802816901,
+            4.200352112676056,
+            6.898591549295774,
+            10.459154929577462,
+            13.85281690140845,
+            20.779225352112668,
+            27.67781690140845
+          ],
+          "on_state_current": [
+            -36.79817924456694,
+            -28.43030459302665,
+            -18.694277429178882,
+            -9.808365445406672,
+            -3.4947600859910555,
+            -0.792792738945059,
+            -0.1580809553296922,
+            -0.009558553094685313,
+            -1.0735254011650388e-06,
+            -1e-06,
+            1e-06,
+            15.320334261838438,
+            29.805013927576603,
+            44.28969359331475,
+            58.91364902506963,
+            69.3593314763231,
+            83.14763231197772,
+            89.55431754874651
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "ON_Semiconductor_NTH4L080N120SC1",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "ON_Semiconductor_NTH4L080N120SC1.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 800.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        5.0,
+        10.0,
+        15.0,
+        20.0,
+        25.0,
+        30.0,
+        35.0,
+        40.0,
+        45.0,
+        50.0,
+        55.0,
+        60.0
+      ],
+      "voltage_axis": [
+        800.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          9.629350664530001e-05,
+          0.00012952,
+          0.000162746,
+          0.00019506,
+          0.000227881,
+          0.000251636,
+          0.000286291,
+          0.000336078,
+          0.000383975,
+          0.000431542,
+          0.000466016,
+          0.000529865,
+          0.000604187
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        5.0,
+        10.0,
+        15.0,
+        20.0,
+        25.0,
+        30.0,
+        35.0,
+        40.0,
+        45.0,
+        50.0,
+        55.0,
+        60.0
+      ],
+      "voltage_axis": [
+        800.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          1.885202226e-06,
+          1.30152e-05,
+          2.41452e-05,
+          3.62321e-05,
+          4.8534e-05,
+          6.28079e-05,
+          7.59734e-05,
+          8.7557e-05,
+          0.000100252,
+          0.000112963,
+          0.00012731,
+          0.000139884,
+          0.000152309
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "ON_Semiconductor_NTH4L080N120SC1.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.571595",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

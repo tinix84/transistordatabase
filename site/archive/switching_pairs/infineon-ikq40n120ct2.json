@@ -1,0 +1,278 @@
+{
+  "pair_id": "infineon-ikq40n120ct2",
+  "pair_type": "diode_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "infineon-ikq40n120ct2",
+    "count": 1,
+    "role": "diode",
+    "metadata": {
+      "name": "IKQ40N120CT2",
+      "type": "Diode",
+      "manufacturer": "Infineon",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "foster",
+        "elements": []
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        25.0,
+        175.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            0.72,
+            1.02,
+            1.24,
+            1.52,
+            1.9,
+            2.59,
+            3.58
+          ],
+          "on_state_current": [
+            0.0,
+            4.0,
+            10.0,
+            20.0,
+            40.0,
+            80.0,
+            160.0
+          ]
+        },
+        {
+          "t_j": 175.0,
+          "on_state_voltage": [
+            0.49,
+            0.8,
+            1.06,
+            1.39,
+            1.85,
+            2.73,
+            4.03
+          ],
+          "on_state_current": [
+            0.0,
+            4.0,
+            10.0,
+            20.0,
+            40.0,
+            80.0,
+            160.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "infineon-ikq40n120ct2",
+    "count": 1,
+    "role": "diode",
+    "metadata": {
+      "name": "IKQ40N120CT2",
+      "type": "Diode",
+      "manufacturer": "Infineon",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "foster",
+        "elements": []
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        25.0,
+        175.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            0.72,
+            1.02,
+            1.24,
+            1.52,
+            1.9,
+            2.59,
+            3.58
+          ],
+          "on_state_current": [
+            0.0,
+            4.0,
+            10.0,
+            20.0,
+            40.0,
+            80.0,
+            160.0
+          ]
+        },
+        {
+          "t_j": 175.0,
+          "on_state_voltage": [
+            0.49,
+            0.8,
+            1.06,
+            1.39,
+            1.85,
+            2.73,
+            4.03
+          ],
+          "on_state_current": [
+            0.0,
+            4.0,
+            10.0,
+            20.0,
+            40.0,
+            80.0,
+            160.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "plecs_model",
+    "source_details": {},
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 0.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        0.0
+      ],
+      "voltage_axis": [
+        0.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0,
+        175.0
+      ],
+      "current_axis": [
+        0.0,
+        4.0,
+        10.0,
+        20.0,
+        40.0,
+        80.0,
+        160.0
+      ],
+      "voltage_axis": [
+        -600.0,
+        0.0
+      ],
+      "energy": {
+        "25.0": [
+          5.96e-07,
+          0.000226,
+          0.000386,
+          0.00058,
+          0.00087,
+          0.00131,
+          0.00196
+        ],
+        "175.0": [
+          0.0,
+          0.000818,
+          0.00127,
+          0.00176,
+          0.00245,
+          0.00342,
+          0.00476
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ40N120CT2_Diode.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKQ40N120CT2_IGBT.xml"
+    ],
+    "migration_date": "2026-02-16T06:49:14.504628",
+    "schema_version": "1.0",
+    "quality_score": 0.0
+  }
+}

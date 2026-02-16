@@ -1,0 +1,513 @@
+{
+  "pair_id": "wolfspeed-c6d10065a",
+  "pair_type": "diode_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "wolfspeed-c6d10065a",
+    "count": 1,
+    "role": "diode",
+    "metadata": {
+      "name": "C6D10065A",
+      "type": "Diode",
+      "manufacturer": "Wolfspeed",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "cauer",
+        "elements": [
+          {
+            "r": 0.1341,
+            "c": 0.000343
+          },
+          {
+            "r": 0.7157,
+            "c": 0.001658
+          },
+          {
+            "r": 0.3703,
+            "c": 0.009119
+          },
+          {
+            "r": 0.3946,
+            "c": 0.08441
+          }
+        ]
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        -55.0,
+        25.0,
+        75.0,
+        125.0,
+        175.0,
+        900.0
+      ],
+      "curves": [
+        {
+          "t_j": -55.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.973,
+            1.01,
+            1.077,
+            1.274,
+            1.394,
+            1.514,
+            1.632
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            0.12,
+            0.5,
+            2.0,
+            8.0,
+            12.0,
+            16.0,
+            20.0
+          ]
+        },
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.874,
+            0.91,
+            1.0,
+            1.21,
+            1.336,
+            1.462,
+            1.599
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            0.12,
+            0.5,
+            2.0,
+            8.0,
+            12.0,
+            16.0,
+            20.0
+          ]
+        },
+        {
+          "t_j": 75.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.82,
+            0.866,
+            0.957,
+            1.2,
+            1.36,
+            1.505,
+            1.659
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            0.12,
+            0.5,
+            2.0,
+            8.0,
+            12.0,
+            16.0,
+            20.0
+          ]
+        },
+        {
+          "t_j": 125.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.762,
+            0.81,
+            0.92,
+            1.225,
+            1.418,
+            1.6,
+            1.792
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            0.12,
+            0.5,
+            2.0,
+            8.0,
+            12.0,
+            16.0,
+            20.0
+          ]
+        },
+        {
+          "t_j": 175.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.695,
+            0.76,
+            0.89,
+            1.27,
+            1.5,
+            1.74,
+            1.98
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            0.12,
+            0.5,
+            2.0,
+            8.0,
+            12.0,
+            16.0,
+            20.0
+          ]
+        },
+        {
+          "t_j": 900.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.6603,
+            0.722,
+            0.8455,
+            1.333,
+            1.575,
+            1.827,
+            2.079
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            0.12,
+            0.5,
+            2.0,
+            8.0,
+            12.0,
+            16.0,
+            20.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "wolfspeed-c6d10065a",
+    "count": 1,
+    "role": "diode",
+    "metadata": {
+      "name": "C6D10065A",
+      "type": "Diode",
+      "manufacturer": "Wolfspeed",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "cauer",
+        "elements": [
+          {
+            "r": 0.1341,
+            "c": 0.000343
+          },
+          {
+            "r": 0.7157,
+            "c": 0.001658
+          },
+          {
+            "r": 0.3703,
+            "c": 0.009119
+          },
+          {
+            "r": 0.3946,
+            "c": 0.08441
+          }
+        ]
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        -55.0,
+        25.0,
+        75.0,
+        125.0,
+        175.0,
+        900.0
+      ],
+      "curves": [
+        {
+          "t_j": -55.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.973,
+            1.01,
+            1.077,
+            1.274,
+            1.394,
+            1.514,
+            1.632
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            0.12,
+            0.5,
+            2.0,
+            8.0,
+            12.0,
+            16.0,
+            20.0
+          ]
+        },
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.874,
+            0.91,
+            1.0,
+            1.21,
+            1.336,
+            1.462,
+            1.599
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            0.12,
+            0.5,
+            2.0,
+            8.0,
+            12.0,
+            16.0,
+            20.0
+          ]
+        },
+        {
+          "t_j": 75.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.82,
+            0.866,
+            0.957,
+            1.2,
+            1.36,
+            1.505,
+            1.659
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            0.12,
+            0.5,
+            2.0,
+            8.0,
+            12.0,
+            16.0,
+            20.0
+          ]
+        },
+        {
+          "t_j": 125.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.762,
+            0.81,
+            0.92,
+            1.225,
+            1.418,
+            1.6,
+            1.792
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            0.12,
+            0.5,
+            2.0,
+            8.0,
+            12.0,
+            16.0,
+            20.0
+          ]
+        },
+        {
+          "t_j": 175.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.695,
+            0.76,
+            0.89,
+            1.27,
+            1.5,
+            1.74,
+            1.98
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            0.12,
+            0.5,
+            2.0,
+            8.0,
+            12.0,
+            16.0,
+            20.0
+          ]
+        },
+        {
+          "t_j": 900.0,
+          "on_state_voltage": [
+            0.0,
+            0.0,
+            0.6603,
+            0.722,
+            0.8455,
+            1.333,
+            1.575,
+            1.827,
+            2.079
+          ],
+          "on_state_current": [
+            -5.0,
+            0.0,
+            0.12,
+            0.5,
+            2.0,
+            8.0,
+            12.0,
+            16.0,
+            20.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "plecs_model",
+    "source_details": {},
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 0.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        0.0
+      ],
+      "voltage_axis": [
+        0.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        0.0
+      ],
+      "voltage_axis": [
+        0.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": "0.94 + (T*-1.3e-3) + i*(0.044 + (T*4.4e-4))"
+  },
+  "migration": {
+    "source_files": [
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/WS_Diodes/C6D10065A.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/data/cree_plecs/Diodes_PLECS/C6D10065A.xml"
+    ],
+    "migration_date": "2026-02-16T06:49:14.613343",
+    "schema_version": "1.0",
+    "quality_score": 0.0
+  }
+}

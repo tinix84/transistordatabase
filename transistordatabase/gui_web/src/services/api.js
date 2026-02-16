@@ -86,15 +86,42 @@ export const transistorApi = {
     return response.data
   },
 
-  // Compare multiple transistors
+  // Compare multiple transistors (basic)
   async compare(transistorIds) {
     const response = await api.post('/api/transistors/compare', transistorIds)
+    return response.data
+  },
+
+  // Advanced comparison with 9 plot types and configuration
+  async compareAdvanced(transistorIds, config) {
+    const response = await api.post('/api/comparison/advanced', {
+      transistor_ids: transistorIds,
+      config: config || {}
+    })
     return response.data
   },
 
   // Export transistor in specified format
   async export(id, format) {
     const response = await api.post(`/api/transistors/${id}/export/${format}`, {}, {
+      responseType: 'blob'
+    })
+    return response.data
+  },
+
+  // Preview export before downloading
+  async exportPreview(id, format) {
+    const response = await api.get(`/api/transistors/${id}/export/${format}/preview`)
+    return response.data
+  },
+
+  // Batch export multiple transistors
+  async batchExport(transistorIds, format, options = {}) {
+    const response = await api.post('/api/transistors/batch_export', {
+      transistor_ids: transistorIds,
+      format: format,
+      options: options
+    }, {
       responseType: 'blob'
     })
     return response.data
@@ -109,6 +136,112 @@ export const transistorApi = {
         'Content-Type': 'multipart/form-data',
       },
     })
+    return response.data
+  },
+
+  // Get all curves for a transistor
+  async getCurves(id) {
+    const response = await api.get(`/api/transistors/${id}/curves`)
+    return response.data
+  },
+
+  // Add channel curve
+  async addChannelCurve(id, curveData, component = 'switch') {
+    const response = await api.post(
+      `/api/transistors/${id}/curves/channel?component=${component}`,
+      curveData
+    )
+    return response.data
+  },
+
+  // Add switching loss curve (e_on, e_off, e_rr)
+  async addSwitchingLossCurve(id, lossType, curveData) {
+    const response = await api.post(
+      `/api/transistors/${id}/curves/switching/${lossType}`,
+      curveData
+    )
+    return response.data
+  },
+
+  // Add gate charge curve
+  async addGateChargeCurve(id, curveData) {
+    const response = await api.post(
+      `/api/transistors/${id}/curves/gate_charge`,
+      curveData
+    )
+    return response.data
+  },
+
+  // Add SOA curve
+  async addSOACurve(id, curveData) {
+    const response = await api.post(
+      `/api/transistors/${id}/curves/soa`,
+      curveData
+    )
+    return response.data
+  },
+
+  // Add capacitance curve
+  async addCapacitanceCurve(id, capType, curveData) {
+    const response = await api.post(
+      `/api/transistors/${id}/curves/capacitance/${capType}`,
+      curveData
+    )
+    return response.data
+  },
+
+  // Delete curve
+  async deleteCurve(id, component, curveType, index) {
+    const response = await api.delete(
+      `/api/transistors/${id}/curves/${component}/${curveType}/${index}`
+    )
+    return response.data
+  },
+
+  // Validate curves
+  async validateCurves(id) {
+    const response = await api.post(`/api/transistors/${id}/curves/validate`)
+    return response.data
+  },
+
+  // ==================== Phase 6: Archive Integration ====================
+
+  // PLECS Import
+  async importPLECS(file) {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await api.post('/api/import/plecs', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    return response.data
+  },
+
+  // Analytical Models
+  async calculateBiela(params) {
+    const response = await api.post('/api/analytical/biela', params)
+    return response.data
+  },
+
+  async calculateGateCharge(params) {
+    const response = await api.post('/api/analytical/gate_charge', params)
+    return response.data
+  },
+
+  // DPT (Double Pulse Test)
+  async generateDPTNetlist(transistorId, config) {
+    const response = await api.post('/api/dpt/generate_netlist', config, {
+      params: { transistor_id: transistorId }
+    })
+    return response.data
+  },
+
+  async getDPTData(transistorId) {
+    const response = await api.get(`/api/transistors/${transistorId}/dpt_data`)
+    return response.data
+  },
+
+  async validateDPTData(transistorId) {
+    const response = await api.post(`/api/transistors/${transistorId}/dpt_validate`)
     return response.data
   }
 }

@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "name": "C2M0080120D_idvgs25",
+    "type": "MOSFET",
+    "manufacturer": "Unknown",
+    "housing_type": "unknown",
+    "import_source": "csv:C2M0080120D_idvgs25.csv",
+    "import_date": "2026-02-15T15:46:32.339068"
+  },
+  "electrical_ratings": {
+    "v_abs_max": 0.0,
+    "i_abs_max": 0.0,
+    "i_cont": 0.0,
+    "t_j_max": 175.0
+  },
+  "thermal_properties": {
+    "housing_area": 0.0,
+    "cooling_area": 0.0,
+    "r_th_jc": 0.0,
+    "r_th_cs": 0.0
+  },
+  "switch": {
+    "channel_data": [],
+    "e_on_data": [],
+    "e_off_data": [],
+    "gate_charge_curves": [],
+    "soa": []
+  },
+  "diode": {
+    "channel_data": [],
+    "e_rr_data": []
+  },
+  "c_oss": [],
+  "c_iss": [],
+  "c_rss": []
+}

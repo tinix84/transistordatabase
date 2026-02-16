@@ -1,0 +1,222 @@
+{
+  "pair_id": "ST_STTH60RQ06WY_diode__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ST_STTH60RQ06WY_diode",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "ST STTH60RQ06WY Si Diode 600V 60A 150C",
+      "type": "mosfet",
+      "manufacturer": "ST",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 0.93,
+      "weight": 0.0044
+    },
+    "electrical_ratings": {
+      "v_abs_max": 600.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.38,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -2.2813627049934704,
+            -2.106156480652656,
+            -1.8765240055991712,
+            -1.6214510933071795,
+            -1.3612767227693479,
+            -1.201713538785207,
+            -1.0738603480500173,
+            -0.9649483707570787,
+            -0.8702423035458271,
+            -0.7850068430557016,
+            -0.7139772926472627,
+            -0.6476830455993873,
+            -0.5766534951909487,
+            -0.5245651582247607,
+            -0.4819474279796975,
+            -0.4345943943740718,
+            -0.3919766641290087,
+            -0.3635648439656333,
+            -0.32211253948185425,
+            0.0,
+            0.0
+          ],
+          "on_state_current": [
+            -99.94575228706583,
+            -81.69101061285981,
+            -62.252126293101725,
+            -40.47789899457605,
+            -25.056337752555088,
+            -17.0633036051379,
+            -12.096083032392048,
+            -8.373782687344596,
+            -5.936128959859113,
+            -4.10941738584306,
+            -2.844835643777862,
+            -2.0407564559973363,
+            -1.1276473898538857,
+            -0.6770518970917904,
+            -0.40171517934450407,
+            -0.2499332026982157,
+            -0.16305686761555743,
+            -0.09674652578169529,
+            -1e-06,
+            1e-06,
+            1e+100
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "ST_STTH60RQ06WY_diode",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "ST_STTH60RQ06WY_diode_150C_Max.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 1.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        1e+100
+      ],
+      "voltage_axis": [
+        1.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        1e+100
+      ],
+      "voltage_axis": [
+        1.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "ST_STTH60RQ06WY_diode_150C_Max.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.804155",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

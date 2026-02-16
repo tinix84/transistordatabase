@@ -1,0 +1,278 @@
+{
+  "pair_id": "infineon-ikw40n65es5",
+  "pair_type": "diode_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "infineon-ikw40n65es5",
+    "count": 1,
+    "role": "diode",
+    "metadata": {
+      "name": "IKW40N65ES5",
+      "type": "Diode",
+      "manufacturer": "Infineon",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "foster",
+        "elements": []
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        25.0,
+        175.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            0.61,
+            0.89,
+            1.05,
+            1.23,
+            1.45,
+            1.82,
+            2.3
+          ],
+          "on_state_current": [
+            0.0,
+            4.0,
+            10.0,
+            20.0,
+            40.0,
+            80.0,
+            160.0
+          ]
+        },
+        {
+          "t_j": 175.0,
+          "on_state_voltage": [
+            0.36,
+            0.69,
+            0.88,
+            1.1,
+            1.39,
+            1.87,
+            2.51
+          ],
+          "on_state_current": [
+            0.0,
+            4.0,
+            10.0,
+            20.0,
+            40.0,
+            80.0,
+            160.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "infineon-ikw40n65es5",
+    "count": 1,
+    "role": "diode",
+    "metadata": {
+      "name": "IKW40N65ES5",
+      "type": "Diode",
+      "manufacturer": "Infineon",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": {
+        "type": "foster",
+        "elements": []
+      }
+    },
+    "conduction": {
+      "temperatures": [
+        25.0,
+        175.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            0.61,
+            0.89,
+            1.05,
+            1.23,
+            1.45,
+            1.82,
+            2.3
+          ],
+          "on_state_current": [
+            0.0,
+            4.0,
+            10.0,
+            20.0,
+            40.0,
+            80.0,
+            160.0
+          ]
+        },
+        {
+          "t_j": 175.0,
+          "on_state_voltage": [
+            0.36,
+            0.69,
+            0.88,
+            1.1,
+            1.39,
+            1.87,
+            2.51
+          ],
+          "on_state_current": [
+            0.0,
+            4.0,
+            10.0,
+            20.0,
+            40.0,
+            80.0,
+            160.0
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "plecs_model",
+    "source_details": {},
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 0.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        0.0
+      ],
+      "voltage_axis": [
+        0.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0,
+        175.0
+      ],
+      "current_axis": [
+        0.0,
+        4.0,
+        10.0,
+        20.0,
+        40.0,
+        80.0,
+        160.0
+      ],
+      "voltage_axis": [
+        -400.0,
+        0.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          5.87e-05,
+          0.0001,
+          0.00015,
+          0.000225,
+          0.000337,
+          0.000504
+        ],
+        "175.0": [
+          0.0,
+          0.000199,
+          0.000313,
+          0.000442,
+          0.000623,
+          0.000878,
+          0.00124
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N65ES5_Diode.xml",
+      "plecs:/home/tinix/claude_wsl/archive_ntbees2/sc/db/plecs/Infineon_IGBT/IKW40N65ES5_IGBT.xml"
+    ],
+    "migration_date": "2026-02-16T06:49:14.545712",
+    "schema_version": "1.0",
+    "quality_score": 0.0
+  }
+}

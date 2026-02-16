@@ -1,0 +1,264 @@
+{
+  "pair_id": "Infineon_IPW65R048CFDA__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "Infineon_IPW65R048CFDA",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "Infineon IPW65R048CFDA",
+      "type": "mosfet",
+      "manufacturer": "Infineon",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 3.31,
+      "weight": 0.05
+    },
+    "electrical_ratings": {
+      "v_abs_max": 650.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.25,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -0.8396694214876034,
+            -0.7206611570247933,
+            -0.6413223140495867,
+            -0.5305785123966941,
+            -0.40991735537190077,
+            -0.27768595041322314,
+            -0.2546015363054749,
+            0.03367011268237763,
+            1.1111111111111092,
+            2.3905723905723884,
+            4.040404040404038,
+            6.060606060606056,
+            7.912457912457907,
+            9.966329966329958,
+            14.074074074074074,
+            19.96632996632997
+          ],
+          "on_state_current": [
+            -33.05885699493681,
+            -18.05828728639829,
+            -10.17228214693477,
+            -3.2277662568287218,
+            -0.6797421700493772,
+            -0.10103015948821799,
+            -1e-06,
+            1e-06,
+            13.636363636363644,
+            27.818181818181817,
+            45.272727272727266,
+            63.81818181818179,
+            78.81818181818181,
+            92.72727272727272,
+            116.72727272727272,
+            141.54545454545456
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "Infineon_IPW65R048CFDA",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "Infineon_IPW65R048CFDA.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        5.0,
+        10.0,
+        15.0,
+        20.0,
+        25.0,
+        30.0,
+        35.0,
+        40.0,
+        45.0,
+        50.0,
+        55.0,
+        60.0,
+        65.0,
+        70.0
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          1.2700004020000001e-05,
+          3.28e-05,
+          6.72e-05,
+          0.000114,
+          0.000162,
+          0.000219,
+          0.00029,
+          0.00036,
+          0.000442,
+          0.000537,
+          0.000632,
+          0.000741,
+          0.000859,
+          0.000981,
+          0.00112
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        5.0,
+        10.0,
+        15.0,
+        20.0,
+        25.0,
+        30.0,
+        35.0,
+        40.0,
+        45.0,
+        50.0,
+        55.0,
+        60.0,
+        65.0,
+        70.0
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          4.8100000159999994e-05,
+          4.89e-05,
+          5.05e-05,
+          5.79e-05,
+          9.18e-05,
+          0.000127642,
+          0.000166775,
+          0.000219056,
+          0.00027265,
+          0.00032773,
+          0.000392995,
+          0.00046319,
+          0.000535052,
+          0.000611502,
+          0.000697196
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "Infineon_IPW65R048CFDA.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.483404",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

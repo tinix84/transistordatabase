@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+Last modified: 2026-02-17
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
@@ -102,6 +104,59 @@ transistordatabase/gui/
 - **`helper_functions.py`** — Validation, CSV parsing (headless-safe)
 - **`gui_web/`** — Vue 3 + FastAPI web interface (wired to real services)
 
+## Project Organization
+
+### Directory Structure
+```
+transistordatabase/
+├── examples/              — Jupyter notebooks and example scripts
+│   └── transistordatabase_performance_dashboard.ipynb
+├── scripts/               — Utility scripts for migration, validation, testing
+├── docs/                  — Documentation source files (MkDocs + Sphinx)
+│   ├── archive/           — Historical reports and temporary analysis files
+│   ├── getting-started/   — Installation and quickstart guides
+│   ├── guide/             — User guide documentation
+│   ├── api/               — Auto-generated API reference
+│   └── architecture/      — Architecture documentation
+├── tests/                 — Test suite (pytest)
+├── transistordatabase/    — Main package
+└── .github/workflows/     — GitHub Actions CI/CD
+```
+
+### File Organization Guidelines
+
+**Examples Directory (`examples/`)**
+- Jupyter notebooks demonstrating package features
+- Interactive dashboards and tutorials
+- Example workflows and use cases
+
+**Scripts Directory (`scripts/`)**
+- One-off migration scripts
+- Validation and testing utilities
+- Database maintenance tools
+- NOT part of the installable package
+
+**Documentation Archive (`docs/archive/`)**
+- Historical validation reports
+- Migration documentation
+- Temporary analysis files
+- Excluded from MkDocs build
+- Patterns: `*_REPORT.*`, `*_SUMMARY.*`, `*_EXECUTION_*.*`
+
+### Git Hooks
+
+The repository includes a pre-commit hook (`.git/hooks/pre-commit`) that automatically:
+
+1. **Updates timestamps** in CLAUDE.md, PRD.md, ARCHITECTURE.md when Python files change
+2. **Validates documentation** files for broken links and formatting issues
+3. **Regenerates docs/ARCHITECTURE.md** from codebase structure (class/function names + first-line docstrings)
+4. **Prompts for changelog** entry when `transistordatabase/*.py` files are modified
+
+The hook runs automatically before each commit. To bypass (not recommended):
+```bash
+git commit --no-verify
+```
+
 ## Common Commands
 
 ### Install & Setup
@@ -151,10 +206,29 @@ ruff check transistordatabase/
 - **pycodestyle**: line-length 160, legacy linter. Config in `tox.ini`.
 
 ### Documentation
+
+**Build with MkDocs (recommended):**
+```bash
+pip install mkdocs mkdocs-material mkdocstrings[python]
+mkdocs serve  # Live preview at http://localhost:8000
+mkdocs build  # Build static site to site/
+```
+
+**Build with Sphinx (legacy):**
 ```bash
 pip install sphinx sphinx-multiversion sphinx_rtd_theme sphinxcontrib-email
 cd docs/ && make html
 ```
+
+**Auto-deployment:**
+- Documentation is automatically built and deployed to GitHub Pages on every push to `main`
+- Workflow: `.github/workflows/docs.yml`
+- Deployed site: `https://upb-lea.github.io/transistordatabase/`
+
+**API Reference:**
+- Auto-generated from docstrings using mkdocstrings
+- Source files: `docs/api/**/*.md`
+- Shows class/function names and first-line docstrings only
 
 ## Code Conventions
 

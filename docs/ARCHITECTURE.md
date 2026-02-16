@@ -1,172 +1,157 @@
-# Architecture
+# Architecture Reference
 
-## Overview
+*Auto-generated from codebase structure on 2026-02-17*
 
-The Transistor Database follows a layered clean architecture with `core/` as the domain layer, `backend/` as the application layer, and `frontend/` / `gui_web/` as presentation layers.
+This document provides an overview of the transistordatabase architecture based on the actual code structure.
 
-## Layer Diagram
+## Core Modules
+
+
+### Domain Models (`core/models.py`)
+
+**Classes:**
+
+- `TransistorMetadata` — Core metadata for a transistor.
+- `ElectricalRatings` — Electrical ratings and limits.
+- `ThermalProperties` — Thermal properties of the transistor.
+- `FosterThermalModel` — Foster thermal RC network model for transient thermal behavior.
+- `GateChargeCurve` — Gate charge characteristics of a switch.
+- `SOA` — Safe Operating Area characteristics.
+- `VoltageDependentCapacitance` — Voltage-dependent capacitance data (C_oss, C_iss, C_rss).
+- `EffectiveOutputCapacitance` — Energy-related or time-related effective output capacitance.
+- `TemperatureDependResistance` — Temperature-dependent on-resistance curve.
+- `RawMeasurementData` — RAW measurement data, e.g. from double pulse test.
+- `LinearizedModel` — Linearized Switch/Diode model at a specific operating point.
+- `ChannelCharacteristics` — V-I characteristics for a channel at specific conditions.
+- `SwitchingLossData` — Switching loss characteristics.
+- `ITransistorComponent` — Interface for transistor components (Switch/Diode).
+- `Switch` — Switch component with all switching characteristics.
+- `Diode` — Diode component with reverse characteristics.
+- `Transistor` — Main transistor aggregate containing all components and metadata.
+
+
+### Service Interfaces (`core/services.py`)
+
+**Classes:**
+
+- `ITransistorLoader` — Interface for loading transistor data from various sources.
+- `ICalculationService` — Interface for transistor calculations and analysis.
+- `IExportService` — Interface for exporting transistor data to various formats.
+- `IValidationService` — Interface for validating transistor data.
+- `IPlottingService` — Interface for plotting transistor characteristics.
+- `IComparisonService` — Interface for comparing multiple transistors.
+- `TransistorRepository` — Repository interface for transistor data persistence.
+- `TransistorService` — High-level service for transistor operations.
+
+
+### Data Persistence (`core/repository.py`)
+
+**Classes:**
+
+- `JsonTransistorRepository` — File-based repository using JSON storage.
+- `JsonTransistorLoader` — JSON-based transistor loader.
+- `TransistorFactory` — Factory for creating transistor instances.
+
+**Functions:**
+
+- `_load_data_file()` — Load lines from a data file in the transistordatabase/data/ directory.
+- `_convert_energy_arrays()` — Convert graph arrays to numpy for a list of switching energy dicts.
+- `_convert_arrays_to_numpy()` — Convert JSON list arrays to numpy arrays in-place.
+- `_json_dict_to_legacy_transistor()` — Convert a raw JSON dict to a legacy Transistor object.
+
+
+### Legacy Bridge (`core/adapters.py`)
+
+**Functions:**
+
+- `_np()` — Convert a value to a numpy array, or return None.
+- `_list_or_none()` — Convert numpy array to list, pass through lists, return None for None.
+- `_convert_foster_legacy_to_core()` — Convert a legacy FosterThermalModel to a core FosterThermalModel.
+- `_convert_channel_legacy_to_core()` — Convert a legacy ChannelData to a core ChannelCharacteristics.
+- `_convert_switching_legacy_to_core()` — Convert a legacy SwitchEnergyData to a core SwitchingLossData.
+- `_convert_linearized_legacy_to_core()` — Convert a legacy LinearizedModel to a core LinearizedModel.
+- `_convert_gate_charge_legacy_to_core()` — Convert a legacy GateChargeCurve to a core GateChargeCurve.
+- `_convert_soa_legacy_to_core()` — Convert a legacy SOA to a core SOA.
+- `_convert_temp_resist_legacy_to_core()` — Convert a legacy TemperatureDependResistance to core.
+- `_convert_raw_meas_legacy_to_core()` — Convert a legacy RawMeasurementData to core.
+- `_convert_vdc_legacy_to_core()` — Convert a legacy VoltageDependentCapacitance to core.
+- `_convert_eoc_legacy_to_core()` — Convert a legacy EffectiveOutputCapacitance to core.
+- `legacy_to_core()` — Convert a legacy ``transistor.Transistor`` to a ``core.models.Transistor``.
+- `_convert_foster_core_to_dict()` — Convert a core FosterThermalModel to a dict for legacy construction.
+- `_convert_channel_core_to_dict()` — Convert a core ChannelCharacteristics to dict for legacy ChannelData.
+- `_convert_switching_core_to_dict()` — Convert a core SwitchingLossData to dict for legacy SwitchEnergyData.
+- `_convert_linearized_core_to_dict()` — Convert a core LinearizedModel to dict for legacy construction.
+- `_convert_gate_charge_core_to_dict()` — Convert a core GateChargeCurve to dict for legacy construction.
+- `_convert_soa_core_to_dict()` — Convert a core SOA to dict for legacy construction.
+- `_convert_temp_resist_core_to_dict()` — Convert a core TemperatureDependResistance to dict for legacy.
+- `_convert_vdc_core_to_dict()` — Convert a core VoltageDependentCapacitance to dict for legacy.
+- `_convert_eoc_core_to_dict()` — Convert a core EffectiveOutputCapacitance to dict for legacy.
+- `core_to_legacy_dicts()` — Convert a core Transistor to the 3 dicts needed by the legacy constructor.
+
+
+### Backend Services (`backend/concrete_services.py`)
+
+**Service Implementations:**
+
+- `PlottingService` — Matplotlib-based plotting service returning structured plot data.
+- `CalculationService` — Transistor calculation and analysis service.
+- `ExportService` — Service for exporting transistor data to various formats.
+- `ComparisonService` — Service for comparing transistors with advanced plot generation.
+- `ValidationService` — Service for validating transistor data.
+- `ConcreteServiceFactory` — Factory for creating concrete service implementations.
+
+
+### Analytical Models (`analytical_models.py`)
+
+**Models:**
+
+- `GateChargeModelParams` — Parameters for gate charge switching time model.
+- `GateChargeModel` — Gate charge based switching time estimation model.
+- `IgbtModelParams` — Parameters for IGBT turn-off tail current model.
+- `IgbtModel` — IGBT-specific model accounting for minority carrier tail current.
+- `HalfBridgeParams` — Operating conditions and circuit parameters for half-bridge switching.
+- `TransconductanceParams` — Transconductance model parameters from transfer characteristic fit.
+- `ReverseRecoveryParams` — Body diode reverse recovery time constants.
+- `SwitchingEnergyResult` — Detailed switching energy breakdown from Christen-Biela model.
+- `ChristenBielaModel` — Full Christen-Biela analytical switching loss model for half-bridge MOSFETs.
+
+
+## Module Dependencies
 
 ```
-┌───────────────────────────────────────────────────────────┐
-│  Presentation Layer                                       │
-│  ┌─────────────────┐  ┌───────────────────────────────┐  │
-│  │ gui/ (PyQt5)    │  │ gui_web/ (Vue 3 + FastAPI)    │  │
-│  │ - MainWindow    │  │ - Vue components              │  │
-│  │   (8 mixins)    │  │ - FastAPI endpoints           │  │
-│  │ - api_client    │  │                               │  │
-│  │ - _widgets      │  │                               │  │
-│  └────────┬────────┘  └──────────────┬────────────────┘  │
-│           │                          │                    │
-│  ┌────────┴──────────────────────────┴────────────────┐  │
-│  │ frontend/ (controllers + widget interfaces)        │  │
-│  │ - PlotController, TransistorController             │  │
-│  │ - IPlotWidget, ITransistorView, IMainWindow        │  │
-│  └────────────────────────┬───────────────────────────┘  │
-└───────────────────────────┼───────────────────────────────┘
-                            │
-┌───────────────────────────┼───────────────────────────────┐
-│  Application Layer        │                               │
-│  ┌────────────────────────┴───────────────────────────┐  │
-│  │ backend/concrete_services.py                       │  │
-│  │ - PlottingService (matplotlib)                     │  │
-│  │ - CalculationService (numpy/scipy)                 │  │
-│  │ - ExportService (JSON, CSV, SPICE)                 │  │
-│  │ - ComparisonService                                │  │
-│  │ - ValidationService                                │  │
-│  │ - ConcreteServiceFactory                           │  │
-│  └────────────────────────┬───────────────────────────┘  │
-└───────────────────────────┼───────────────────────────────┘
-                            │
-┌───────────────────────────┼───────────────────────────────┐
-│  Domain Layer (core/)     │                               │
-│  ┌────────────────────────┴───────────────────────────┐  │
-│  │ core/services.py — ABC interfaces                  │  │
-│  │ ICalculationService, IExportService,               │  │
-│  │ IValidationService, IPlottingService,              │  │
-│  │ IComparisonService, TransistorRepository           │  │
-│  └────────────────────────┬───────────────────────────┘  │
-│  ┌────────────────────────┴───────────────────────────┐  │
-│  │ core/models.py — Domain entities                   │  │
-│  │ Transistor, Switch, Diode, TransistorMetadata,     │  │
-│  │ ChannelCharacteristics, SwitchingLossData,         │  │
-│  │ FosterThermalModel, GateChargeCurve, SOA,          │  │
-│  │ LinearizedModel, VoltageDependentCapacitance, ...  │  │
-│  └────────────────────────┬───────────────────────────┘  │
-│  ┌────────────────────────┴───────────────────────────┐  │
-│  │ core/repository.py — Persistence                   │  │
-│  │ JsonTransistorRepository, JsonTransistorLoader     │  │
-│  └────────────────────────────────────────────────────┘  │
-└───────────────────────────────────────────────────────────┘
+transistordatabase/
+├── core/                  # Domain layer (models, interfaces)
+│   ├── models.py         # Transistor, Switch, Diode entities
+│   ├── services.py       # ABC interfaces for all services
+│   ├── repository.py     # JSON persistence
+│   └── adapters.py       # Legacy ↔ core converters
+├── backend/              # Service implementations
+│   └── concrete_services.py
+├── frontend/             # UI layer
+│   ├── interfaces.py     # UI widget ABCs
+│   └── pyqt5_impl.py     # PyQt5 implementations
+├── gui/                  # PyQt5 GUI (mixin-based)
+│   └── mixins/           # 8 mixin modules
+├── gui_web/              # Vue 3 + FastAPI web interface
+│   ├── backend/          # FastAPI REST API
+│   └── src/              # Vue 3 frontend
+└── analytical_models.py  # Switching loss models
 ```
 
-## Domain Model
+## Key Patterns
 
-### Transistor Aggregate
+### Repository Pattern
+`JsonTransistorRepository` provides CRUD operations for transistor data persistence.
 
-The `Transistor` class is the root aggregate. It owns:
+### Adapter Pattern
+`legacy_to_core()` and `core_to_legacy_dicts()` bridge legacy and core models.
 
-- **TransistorMetadata** — identity and descriptive data
-- **ElectricalRatings** — absolute maximum ratings
-- **ThermalProperties** — thermal characteristics of the package
-- **Switch** — MOSFET/IGBT switching element with:
-  - Channel V-I curves (`ChannelCharacteristics`)
-  - Switching energy data (`SwitchingLossData`)
-  - Thermal model (`FosterThermalModel`)
-  - Gate charge curves (`GateChargeCurve`)
-  - Safe operating area (`SOA`)
-  - Temperature-dependent resistance (`TemperatureDependResistance`)
-  - Linearized model at operating point (`LinearizedModel`)
-- **Diode** — body/freewheeling diode with similar structure
-- **Voltage-dependent capacitances** — C_oss, C_iss, C_rss
+### Service Layer
+All business logic is behind ABC interfaces in `core/services.py`, implemented in `backend/concrete_services.py`.
 
-### Key Operations
+### Mixin Architecture (GUI)
+PyQt5 MainWindow uses multiple inheritance from 8 mixins for modularity.
 
-1. **Linearization**: `Switch.linearize_at_operating_point(t_j, v_g, i_channel)` returns a `LinearizedModel` with `v0_channel` and `r_channel` for conduction loss calculation.
+---
 
-2. **Resistance calculation**: `ChannelCharacteristics.get_resistance_at_current(i)` interpolates the V-I curve.
-
-3. **Loss calculation**: `CalculationService.calculate_losses()` combines conduction and switching losses.
-
-4. **Thermal impedance**: `FosterThermalModel.get_thermal_impedance(t)` evaluates the Foster RC network.
-
-## Service Interfaces
-
-All ABCs are defined in `core/services.py`. Backend provides concrete implementations.
-
-| Interface | Purpose | Backend Implementation |
-|---|---|---|
-| `ICalculationService` | Loss/thermal calculations | `CalculationService` |
-| `IExportService` | File format export | `ExportService` |
-| `IValidationService` | Data validation | `ValidationService` |
-| `IPlottingService` | Plot data generation | `PlottingService` |
-| `IComparisonService` | Multi-transistor comparison | `ComparisonService` |
-| `TransistorRepository` | Data persistence | `JsonTransistorRepository` |
-| `ITransistorLoader` | File I/O | `JsonTransistorLoader` |
-
-## Data Flow
-
-```
-JSON file / MongoDB
-       │
-       ▼
-JsonTransistorLoader.load_from_json()
-       │
-       ▼
-Transistor (core/models.py)  ◄─── Source of truth
-       │
-       ├──► CalculationService.calculate_losses()
-       ├──► PlottingService.plot_channel_characteristics()
-       ├──► ExportService.export_to_json() / export_to_plecs()
-       └──► ValidationService.validate_transistor()
-```
-
-## GUI Refactoring (v0.6.0)
-
-The PyQt5 GUI was refactored from a 5,958-line monolithic `MainWindow` class into 8 mixin modules:
-
-| Mixin | LOC | Methods | Responsibility |
-|-------|-----|---------|----------------|
-| `UtilitiesMixin` | 100 | 10 | Popup messages, file dialogs, browser integration |
-| `SettingsMixin` | 569 | 6 | Settings save/load/export (JSON) |
-| `SearchDatabaseMixin` | 910 | 10 | Database search, filtering, transistor loading |
-| `TransistorCreationMixin` | 532 | 11 | Transistor creation/editing forms |
-| `CurveManagementMixin` | 1,053 | 54 | Curve add/view/delete (switch/diode/capacitance) |
-| `ExportToolsMixin` | 116 | 6 | Export to PLECS, GeckoCIRCUITS, MATLAB, etc. |
-| `ComparisonToolsMixin` | 600 | 17 | Multi-transistor comparison plots |
-| `TopologyCalculatorMixin` | 1,061 | 20 | Buck/boost/buck-boost converter loss analysis |
-
-**MainWindow** (950 LOC) inherits from all 8 mixins via multiple inheritance. It contains only:
-- `__init__` (signal connections, widget setup)
-- `closeEvent`, `__del__` (Qt lifecycle methods)
-- Helper classes (`CurveCheckerWindow`, `InformationWindow`) that reference the MainWindow singleton
-
-**Design patterns:**
-- Mixins inherit from `object` only (no `__init__`)
-- Cross-mixin dependencies resolved at runtime via `self`
-- Independent widgets moved to `_widgets.py` (MatplotlibWidget, PopOutPlotWindow, ViewCurveWindow)
-- Circular imports avoided via deferred imports for dependent classes
-
-## Legacy Migration Path
-
-The legacy modules (`transistor.py`, `data_classes.py`, `switch.py`, `diode.py`) are bridged to `core/` via `core/adapters.py`:
-
-- New features go into `core/` + `backend/`
-- Legacy code remains functional via bidirectional adapters
-- `DatabaseManager.load_transistor_core()` returns core models directly
-- Export services use: core → adapters → legacy → export methods
-
-## File Organization
-
-| Directory | Purpose |
-|---|---|
-| `core/` | Domain models, service ABCs, repository, adapters |
-| `backend/` | Concrete service implementations |
-| `frontend/` | UI abstractions and controllers |
-| `gui/` | PyQt5 desktop application (refactored into mixins) |
-| `gui/mixins/` | 8 mixin modules for MainWindow functionality |
-| `gui_web/` | Vue 3 + FastAPI web interface |
-| `templates/` | Jinja2 templates for PLECS and datasheets |
-| `data/` | Static reference data (housing types, manufacturers) |
-| `examples/` | Example transistor JSON files |
-| `tests/` | pytest test suite (292 tests) |
-| `topologies/` | Converter topology analyzers (Buck, Boost, Buck-Boost) |
+*This file is auto-generated by the pre-commit hook. Manual edits will be overwritten.*

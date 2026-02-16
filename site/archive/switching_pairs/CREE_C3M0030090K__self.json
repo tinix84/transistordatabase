@@ -1,0 +1,256 @@
+{
+  "pair_id": "CREE_C3M0030090K__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "CREE_C3M0030090K",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "C3M0030090K reverse on",
+      "type": "mosfet",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 22.22,
+      "weight": 0.05
+    },
+    "electrical_ratings": {
+      "v_abs_max": 900.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -11.73566732208177,
+            -10.457188085277782,
+            -9.125438880273627,
+            -7.767054691169392,
+            -6.435305486165238,
+            -5.103556281161086,
+            -4.0115219330576775,
+            -2.839582632654023,
+            -1.667643332250367,
+            -0.7354188887474584,
+            0.036995650154950065,
+            0.04325740829670407,
+            -0.04325740829670407,
+            -0.036995650154950065,
+            0.7354188887474584,
+            1.667643332250367,
+            2.839582632654023,
+            4.0115219330576775,
+            5.103556281161086,
+            6.435305486165238,
+            7.767054691169392,
+            9.125438880273627,
+            10.457188085277782,
+            11.73566732208177
+          ],
+          "on_state_current": [
+            -198.84982944297948,
+            -188.62022725084796,
+            -175.24305515344525,
+            -158.7183131507713,
+            -140.22633995730286,
+            -117.40645814408644,
+            -96.16036128350564,
+            -70.58635580317693,
+            -43.438565370212565,
+            -19.831791080678368,
+            -0.15947917273318266,
+            -1e-06,
+            1e-06,
+            0.15947917273318266,
+            19.831791080678368,
+            43.438565370212565,
+            70.58635580317693,
+            96.16036128350564,
+            117.40645814408644,
+            140.22633995730286,
+            158.7183131507713,
+            175.24305515344525,
+            188.62022725084796,
+            198.84982944297948
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "CREE_C3M0030090K",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "CREE_C3M0030090K_reverse_on.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        1.9068221491495227,
+        9.09501143452551,
+        15.946254347149493,
+        25.94233007212547,
+        35.93840579710146,
+        46.720689725165435,
+        58.6261282290694,
+        72.10398313914936
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          6.502333359965554e-05,
+          7.150068128328992e-05,
+          9.59184937445805e-05,
+          0.00012033630620587132,
+          0.00015632045088566812,
+          0.0001974451876625788,
+          0.0002385699244394895,
+          0.0002938312894834632,
+          0.0003516629505759939
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        9.022463772916874,
+        20.29879434703195,
+        29.964220553416318,
+        39.62964675980067,
+        48.05591576023832,
+        55.8626061577026,
+        63.54538083457223,
+        71.72381839382054
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          1.4058298815568792e-05,
+          2.3107649166128944e-05,
+          3.4417584003456155e-05,
+          5.1382486259446964e-05,
+          7.541609778876725e-05,
+          0.00010369093488208527,
+          0.00013479325568473504,
+          0.00016872306019671666,
+          0.0002068940902726959
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "CREE_C3M0030090K_reverse_on.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.274599",
+    "schema_version": "1.0",
+    "quality_score": 57.14285714285714
+  }
+}

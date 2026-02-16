@@ -1,0 +1,258 @@
+{
+  "pair_id": "ST_STTH30RQ06DY___with___Infineon_IPW65R048CFDA",
+  "pair_type": "combination",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ST_STTH30RQ06DY",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "ST STTH30RQ06DY with Infineon IPW65R048CFDA",
+      "type": "mosfet",
+      "manufacturer": "ST",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 0.87,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 600.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -1.8664795509222136,
+            -1.6531676022453894,
+            -1.3444266238973543,
+            -1.1535685645549325,
+            -0.9851643945469127,
+            -0.8027265437048919,
+            -0.620288692862871,
+            -0.516439454691259,
+            -0.4238171611868483,
+            -0.33961507618283887,
+            -0.2974061855810849,
+            0.0,
+            0.0
+          ],
+          "on_state_current": [
+            -60.738570566306905,
+            -43.43054463316705,
+            -24.533741190056336,
+            -15.312262655783618,
+            -9.55685420431254,
+            -4.712250253345564,
+            -1.7702373354606733,
+            -0.7972137913610308,
+            -0.29948698433609244,
+            -0.1,
+            -1e-06,
+            1e-06,
+            1e+100
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "Infineon_IPW65R048CFDA",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "ST_STTH30RQ06DY_with_Infineon_IPW65R048CFDA.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -70.0,
+        -65.0,
+        -60.0,
+        -55.0,
+        -50.0,
+        -45.0,
+        -40.0,
+        -35.0,
+        -30.0,
+        -25.0,
+        -20.0,
+        -15.0,
+        -10.0,
+        -5.0,
+        -1e-06,
+        1e-06,
+        1e+100
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          7.98e-05,
+          7.06e-05,
+          6.18e-05,
+          5.36e-05,
+          4.64e-05,
+          3.92e-05,
+          3.19e-05,
+          2.57e-05,
+          2.01e-05,
+          1.49e-05,
+          1.04e-05,
+          6.23e-06,
+          2.63e-06,
+          -4.02e-07,
+          5.2499185499999995e-09,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -70.0,
+        -65.0,
+        -60.0,
+        -55.0,
+        -50.0,
+        -45.0,
+        -40.0,
+        -35.0,
+        -30.0,
+        -25.0,
+        -20.0,
+        -15.0,
+        -10.0,
+        -5.0,
+        -1e-06,
+        1e-06,
+        1e+100
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          2e-05,
+          1.54e-05,
+          1.39e-05,
+          1.43e-05,
+          1.19e-05,
+          1.29e-05,
+          1.16e-05,
+          1.02e-05,
+          7.11e-06,
+          8.18e-06,
+          4.81e-06,
+          5.98e-06,
+          3.87e-06,
+          3.3e-06,
+          4.160659168e-09,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "ST_STTH30RQ06DY_with_Infineon_IPW65R048CFDA.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.796115",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

@@ -1,0 +1,240 @@
+{
+  "pair_id": "ON_Semiconductor_FGY120T65S_F085__self",
+  "pair_type": "mosfet_self",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "ON_Semiconductor_FGY120T65S_F085",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "ON Semiconductor FGY120T65S F085",
+      "type": "mosfet",
+      "manufacturer": "ON Semiconductor",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 6.42,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 650.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.17,
+      "r_th_cs": 0.32,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -1.8693107932379716,
+            -1.55071521456437,
+            -1.1638491547464245,
+            -0.7997399219765934,
+            -0.568920676202861,
+            -0.42587776332899896,
+            -0.34460338101430443,
+            -0.27958387516254907,
+            -0.2578010896452928,
+            0.37957960833834065,
+            0.41081081081081167,
+            0.6918918918918918,
+            0.91891891891892,
+            1.2648648648648648,
+            2.0648648648648646,
+            2.7891891891891896,
+            3.762162162162163
+          ],
+          "on_state_current": [
+            -335.36057293633934,
+            -232.50257336534884,
+            -114.425491261074,
+            -32.31659340375179,
+            -7.827365564030254,
+            -1.5508361525090577,
+            -0.4227401100479922,
+            -0.10608616455843929,
+            -1e-06,
+            1e-06,
+            1.0859728506786892,
+            10.859728506787292,
+            25.520361990950214,
+            62.443438914027126,
+            156.92307692307685,
+            249.7737556561086,
+            358.3710407239819
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "ON_Semiconductor_FGY120T65S_F085",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "ON_Semiconductor_FGY120T65S_F085.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 400.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        20.178343949044578,
+        37.60509554140126,
+        51.515923566878975,
+        70.01273885350317,
+        88.35668789808918,
+        100.28025477707007,
+        118.47133757961782
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.00011812398552344923,
+          0.0011198434222298482,
+          0.001984964796804584,
+          0.003255670538128519,
+          0.0051365811928280585,
+          0.006871928808870363,
+          0.007948421673015798,
+          0.0096505165932219
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        19.770114942528735,
+        34.17624521072798,
+        46.4367816091954,
+        60.99616858237547,
+        78.31417624521072,
+        92.41379310344827,
+        104.98084291187739,
+        119.08045977011494
+      ],
+      "voltage_axis": [
+        400.0
+      ],
+      "energy": {
+        "25.0": [
+          -0.0,
+          -0.0,
+          0.0006196656447168621,
+          0.0011242100350620874,
+          0.0014918625551503348,
+          0.0018490521181766689,
+          0.0023369211966894413,
+          0.002868316813342012,
+          0.0032245905452963977,
+          0.003625117049988535,
+          0.003996638937983085
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "ON_Semiconductor_FGY120T65S_F085.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.556069",
+    "schema_version": "1.0",
+    "quality_score": 71.42857142857143
+  }
+}

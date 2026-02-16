@@ -1,0 +1,228 @@
+{
+  "pair_id": "Infineon_IHW40N120R5___with___Infineon_IHW40N120R5",
+  "pair_type": "combination",
+  "topology": "half_bridge",
+  "high_side": {
+    "device_id": "Infineon_IHW40N120R5",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "Infineon IHW40N120R5 with Infineon IHW40N120R5",
+      "type": "mosfet",
+      "manufacturer": "Infineon",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": 0.0,
+      "weight": 0.0
+    },
+    "electrical_ratings": {
+      "v_abs_max": 1200.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [
+        25.0
+      ],
+      "curves": [
+        {
+          "t_j": 25.0,
+          "on_state_voltage": [
+            -4.362549800796813,
+            -2.6494023904382473,
+            -2.1015936254980074,
+            -1.7430278884462147,
+            -1.4840637450199197,
+            -1.2549800796812742,
+            -1.0159362549800794,
+            -0.8366533864541825,
+            -0.5577689243027881,
+            -0.48804800659860353,
+            0.3968255478395056,
+            0.4761904761904767,
+            0.7142857142857143,
+            0.8630952380952385,
+            0.9821428571428572,
+            1.1210317460317465,
+            1.2400793650793653,
+            1.398809523809524,
+            1.646825396825397,
+            2.341269841269841,
+            3.511904761904762
+          ],
+          "on_state_current": [
+            -119.47136563876653,
+            -50.044052863436114,
+            -31.013215859030822,
+            -19.911894273127743,
+            -13.039647577092495,
+            -7.929515418502208,
+            -3.8766519823788563,
+            -1.7621145374449323,
+            -0.35242290748899185,
+            -1e-06,
+            1e-06,
+            0.5255474452554797,
+            2.102189781021893,
+            4.379562043795629,
+            7.007299270073002,
+            10.335766423357672,
+            14.014598540145991,
+            19.620437956204388,
+            28.90510948905111,
+            60.08759124087591,
+            119.2992700729927
+          ]
+        }
+      ]
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "low_side": {
+    "device_id": "Infineon_IHW40N120R5",
+    "count": 1,
+    "role": "switch",
+    "metadata": {
+      "name": "",
+      "type": "",
+      "manufacturer": "",
+      "housing_type": "",
+      "datasheet_hyperlink": "",
+      "datasheet_date": "",
+      "datasheet_version": "",
+      "cost": null,
+      "weight": null
+    },
+    "electrical_ratings": {
+      "v_abs_max": 0.0,
+      "i_abs_max": 0.0,
+      "i_cont": 0.0,
+      "t_j_max": 175.0
+    },
+    "thermal_properties": {
+      "r_th_jc": 0.0,
+      "r_th_cs": 0.0,
+      "r_th_common": 0.0,
+      "housing_area": 0.0,
+      "cooling_area": 0.0,
+      "interface_area_forward": 0.0,
+      "interface_area_reverse": 0.0,
+      "thermal_model": null
+    },
+    "conduction": {
+      "temperatures": [],
+      "curves": []
+    },
+    "capacitance": {
+      "c_oss": [],
+      "c_iss": [],
+      "c_rss": []
+    },
+    "gate_charge": [],
+    "soa": []
+  },
+  "switching_data": {
+    "source": "datasheet",
+    "source_details": {
+      "mat_file": "Infineon_IHW40N120R5_with_Infineon_IHW40N120R5.mat"
+    },
+    "test_conditions": {
+      "gate_resistance_on": 0.0,
+      "gate_resistance_off": 0.0,
+      "gate_voltage_on": 15.0,
+      "gate_voltage_off": -5.0,
+      "dc_bus_voltage": 1.0,
+      "dead_time": 0.0,
+      "parasitic_inductance": 0.0
+    },
+    "turn_on": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        1e+100
+      ],
+      "voltage_axis": [
+        1.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "turn_off": {
+      "temperatures": [
+        25.0
+      ],
+      "current_axis": [
+        -1e+100,
+        -1e-06,
+        1e-06,
+        5.021645021645033,
+        18.008658008658017,
+        40.51948051948053,
+        79.4805194805195
+      ],
+      "voltage_axis": [
+        600.0
+      ],
+      "energy": {
+        "25.0": [
+          0.0,
+          0.0,
+          -3.632103186496593e-05,
+          0.00033492822966507175,
+          0.0012950558213716099,
+          0.0029696969696969694,
+          0.006039872408293461
+        ]
+      }
+    },
+    "reverse_recovery": {
+      "temperatures": [],
+      "current_axis": [],
+      "voltage_axis": [],
+      "energy": {}
+    }
+  },
+  "traces": {},
+  "plecs_model": {
+    "turn_on_formula": null,
+    "turn_off_formula": null,
+    "conduction_formula": null
+  },
+  "migration": {
+    "source_files": [
+      "Infineon_IHW40N120R5_with_Infineon_IHW40N120R5.mat"
+    ],
+    "migration_date": "2026-02-16T05:49:05.439841",
+    "schema_version": "1.0",
+    "quality_score": 64.28571428571429
+  }
+}

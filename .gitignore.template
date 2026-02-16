@@ -1,0 +1,103 @@
+# .gitignore.template
+# Template for project .gitignore patterns with explanations for contributors
+
+# Python artifacts
+__pycache__/              # Compiled Python bytecode cache
+*.pyc                     # Compiled Python files
+*.pyo                     # Optimized Python bytecode
+*.egg-info/               # Package metadata
+.eggs/                    # setuptools eggs directory
+build/                    # Build artifacts
+dist/                     # Distribution packages
+
+# IDE and editor files
+.idea/                    # PyCharm/IntelliJ IDEA
+.vscode/                  # Visual Studio Code
+*.swp                     # Vim swap files
+*.swo                     # Vim swap files
+*~                        # Backup files
+
+# Virtual environments
+.venv/                    # Python virtual environment
+venv/                     # Alternative venv name
+env/                      # Alternative venv name
+
+# Documentation build artifacts
+docs/_build               # Sphinx build output
+docs/archive/             # Archived temporary reports
+
+# Temporary reports and analysis files
+*_REPORT.*                # Validation, test, migration reports
+*_SUMMARY.*               # Summary documents
+*_EXECUTION_*.txt         # Execution logs
+*_EXECUTION_*.md          # Execution reports
+
+# Jupyter notebook artifacts
+*.ipynb_checkpoints       # Jupyter checkpoint directories
+.ipynb_checkpoints/       # Alternative checkpoint location
+
+# Data and output directories
+database/                 # Local database copies (use transistors_merged/ instead)
+output/                   # Temporary output files
+
+# PDF documentation (checked in selectively via git add -f)
+*.pdf
+
+# Project-specific exclusions
+transistordatabase/database
+transistordatabase/cloned_repo_TDB_File_Exchange
+transistordatabase/tdb_example_downloaded
+template_example/template_trials.py
+Test-Transistor_S1.mat
+dictionary.dic
+
+# Git-related
+gpgit/                    # GPG signing tools
+
+## Usage Notes for Contributors
+
+### Adding New Patterns
+When adding new ignore patterns, follow these guidelines:
+
+1. **Group related patterns** under descriptive comments
+2. **Use wildcards wisely**:
+   - `*_REPORT.*` matches all report files regardless of extension
+   - `*.ipynb_checkpoints` matches checkpoint directories anywhere
+3. **Document project-specific patterns** with inline comments
+4. **Test patterns** before committing using `git check-ignore -v <file>`
+
+### Common Scenarios
+
+#### Temporary Analysis Files
+If you create temporary analysis scripts or reports:
+- Name them with _REPORT, _SUMMARY, or _EXECUTION suffixes
+- They'll be automatically ignored
+- Example: `christen_biela_VALIDATION_REPORT.md`
+
+#### Local Data Files
+- Use `transistors_merged/` for checked-in transistor data
+- Use `database/` or `output/` for local-only files
+
+#### Jupyter Notebooks
+- Example notebooks should go in `examples/` (tracked)
+- Checkpoint directories are automatically ignored
+
+### Checking Ignore Status
+```bash
+# Check if a file would be ignored
+git check-ignore -v path/to/file
+
+# List all ignored files
+git status --ignored
+
+# Force-add an ignored file (e.g., documentation PDFs)
+git add -f docs/important_reference.pdf
+```
+
+### Pattern Precedence
+Git processes .gitignore patterns in this order:
+1. Patterns in the same directory as the file
+2. Parent directory patterns (higher precedence over lower)
+3. Repository root .gitignore (this file)
+
+Negation patterns (starting with `!`) can override earlier ignore rules.
