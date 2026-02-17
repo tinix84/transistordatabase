@@ -51,13 +51,17 @@ git push origin main v1.0.1
 
 ---
 
-## v1.1.0 — Christen-Biela Analytical Switching Loss Model
+## v1.1.0 — Christen-Biela Analytical Switching Loss Model ✅ SHIPPED in v0.6.0
 
-**Theme**: Replace the simplified `BielaModel` with a full physics-based half-bridge MOSFET
-loss model from the IEEE TPEL 2019 paper (Christen / Biela).
+> **Status**: Already implemented and tagged. No separate release required.
+> Audit confirmed: `ChristenBielaModel`, all dataclasses, `from_transistor()`,
+> `calc_switching_loss_curve()`, 23 tests passing. `BielaModel` removed.
+>
+> **Sprint file**: `docs/SPRINT_CHRISTEN_BIELA.md` — tasks CB.1–CB.11 complete.
 
-**Sprint file**: `docs/SPRINT_CHRISTEN_BIELA.md`
-**Target**: Q2 2026
+**Theme (completed)**: Full IEEE TPEL 2019 half-bridge MOSFET physics-based loss model.
+
+**Target**: ~~Q2 2026~~ Delivered in v0.6.0
 
 ### Why this release
 
@@ -229,7 +233,7 @@ With:
 | Phase 3 | Legacy migration, GUI mixin refactor | ✅ Complete | v1.0.0 |
 | Phase 4 | LTSpice DPT, Digikey catalog importer, docs | ✅ Complete | v1.0.0 |
 | Phase 5 | Distribution packaging, release automation | ✅ Complete | **v1.0.1** |
-| Phase 6 | Christen-Biela physics model | Planned | **v1.1.0** |
+| Phase 6 | Christen-Biela physics model | ✅ Complete | v0.6.0 |
 | Phase 7 | Web GUI parity | Planned | **v1.2.0** |
 | Phase 8 | Data ecosystem & integrations | Planned | **v1.3.0** |
 | Phase 9 | Platform evolution (community, multi-user) | Future | **v2.0.0** |
@@ -238,11 +242,11 @@ With:
 
 ## Non-Functional Targets by Release
 
-| Metric | v1.0.1 (now) | v1.1.0 | v1.2.0 | v1.3.0 |
-|--------|-------------|--------|--------|--------|
-| Test coverage (pytest) | ~85% | ≥87% | ≥90% | ≥90% |
-| Ruff violations | 0 | 0 | 0 | 0 |
-| Import time | <2s | <2s | <2s | <2s |
-| JSON load | <100ms | <100ms | <100ms | <100ms |
-| REST API tests | 31 pass | 31+ pass | 50+ pass | 60+ pass |
-| Playwright E2E | 5 scenarios | 5 | 15 | 20 |
+| Metric | v1.0.1 (now) | v1.2.0 | v1.3.0 |
+|--------|-------------|--------|--------|
+| Test coverage (pytest) | ~85% (388 tests) | ≥90% | ≥90% |
+| Ruff violations | 0 | 0 | 0 |
+| Import time | <2s | <2s | <2s |
+| JSON load | <100ms | <100ms | <100ms |
+| REST API tests | 31 pass | 50+ pass | 60+ pass |
+| Playwright E2E | 5 scenarios | 15 | 20 |
