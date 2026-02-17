@@ -1,5 +1,5 @@
 """Transistor database package file."""
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 from transistordatabase.constants import *
 from transistordatabase.mongodb_handling import *
 from transistordatabase.checker_functions import *

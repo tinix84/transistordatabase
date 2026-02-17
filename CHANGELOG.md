@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.0.1] - 2026-02-17
+
+### Fixed
+- **REST API create/update transistors**: `dict_to_transistor()` now reads `r_th_switch_cs` and `r_th_diode_cs` from
+  request bodies (both nested and flat formats), enabling full save/load roundtrip through the adapter bridge.
+  Removes 4 previously-skipped `test_rest_api.py` tests — all 31 REST API tests now pass.
+
+### Updated
+- **GeckoCIRCUITS non-linear capacitance export**: `export_geckocircuits_coss()` applies a configurable
+  `margin_factor` (default 1.2 = 20 % margin) when interpolating C_oss vs. voltage curves.
+
+---
+
 ## [1.0.0] - 2026-02-14
 ### Breaking Changes
 - **Removed advanced topology modules**: Bridgeless PFC, DAB, LLC, SRC-ZVS topologies removed from the package. Simple PWM topologies (Buck, Boost, Buck-Boost) remain in `topologies/converter_common.py`.
@@ -65,11 +78,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `docs/ARCHITECTURE.md` with clean architecture overview
 - Added `docs/PRD.md` with product requirements
 - Updated `CLAUDE.md` with core architecture guidance
-
-## [Unreleased] - Date
-### Updated
-- Add marging for non-linear capacitance file export for GeckoCIRCUITS
-
 
 ## [0.5.1] - 2024-06-22
 ### Fixed
@@ -310,7 +318,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the database
 - Matlab-Exporter
 
-[Unreleased]: https://github.com/upb-lea/transistordatabase/compare/0.5.1...HEAD
+[Unreleased]: https://github.com/upb-lea/transistordatabase/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/upb-lea/transistordatabase/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/upb-lea/transistordatabase/compare/v0.6.0...v1.0.0
+[0.6.0]: https://github.com/upb-lea/transistordatabase/compare/0.5.1...v0.6.0
 [0.5.1]: https://github.com/upb-lea/transistordatabase/compare/0.5.0...0.5.1
 [0.5.0]: https://github.com/upb-lea/transistordatabase/compare/0.4.1...0.5.0
 [0.4.1]: https://github.com/upb-lea/transistordatabase/compare/0.4.0...0.4.1

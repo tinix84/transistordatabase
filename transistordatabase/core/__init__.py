@@ -5,7 +5,7 @@ This package contains the core business models, services, and interfaces
 that define the domain logic separated from presentation and infrastructure concerns.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 from .models import (
     Transistor,
@@ -86,4 +86,4 @@ __all__ = [
     'core_to_legacy_dicts',
 ]
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'

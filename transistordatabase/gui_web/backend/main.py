@@ -185,6 +185,8 @@ def dict_to_transistor(data: Dict[str, Any]) -> Transistor:
         )
         thermal = ThermalProperties(
             r_th_cs=data["thermal"]["r_th_cs"],
+            r_th_switch_cs=data["thermal"].get("r_th_switch_cs"),
+            r_th_diode_cs=data["thermal"].get("r_th_diode_cs"),
             housing_area=data["thermal"]["housing_area"],
             cooling_area=data["thermal"]["cooling_area"],
         )
@@ -208,6 +210,8 @@ def dict_to_transistor(data: Dict[str, Any]) -> Transistor:
         )
         thermal = ThermalProperties(
             r_th_cs=data.get("r_th_cs", 0),
+            r_th_switch_cs=data.get("r_th_switch_cs"),
+            r_th_diode_cs=data.get("r_th_diode_cs"),
             housing_area=data.get("housing_area", 0),
             cooling_area=data.get("cooling_area", 0),
         )
@@ -1788,3 +1792,27 @@ async def export_pairs_csv(
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
+
+
+# ---------------------------------------------------------------------------
+# Static file serving for the Vue 3 frontend (webgui flavour)
+# ---------------------------------------------------------------------------
+
+def _frontend_dist() -> Path | None:
+    """Locate the Vue 3 dist/ directory (works in-source and PyInstaller).
+
+    :return: Path to the dist/ directory, or None if not found.
+    """
+    import sys
+    if getattr(sys, "frozen", False):
+        # PyInstaller onefile: files are extracted to sys._MEIPASS
+        candidate = Path(sys._MEIPASS) / "transistordatabase" / "gui_web" / "dist"
+    else:
+        candidate = Path(__file__).parent.parent / "dist"
+    return candidate if candidate.exists() else None
+
+
+_dist = _frontend_dist()
+if _dist is not None:
+    from fastapi.staticfiles import StaticFiles
+    app.mount("/", StaticFiles(directory=_dist, html=True), name="frontend")

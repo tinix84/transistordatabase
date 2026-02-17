@@ -43,16 +43,36 @@ setup(
         'setuptools>=49.2.1',
         'pymongo>=3.11.3',
         'matplotlib>=3.3.4',
-        'Jinja2 >= 3.0.1',
+        'Jinja2>=3.0.1',
         'packaging>=20.9',
         'Pillow>=8.3.1',
-        'pytest>=6.2.4',
-        'PyQt5',
-        'PyQtWebEngine',
-        'mongomock',
         'requests',
         'deepdiff',
-        'xmltodict'],
+        'xmltodict',
+    ],
+    extras_require={
+        'webgui': [
+            'fastapi>=0.100',
+            'uvicorn[standard]>=0.20',
+            'httpx>=0.24',
+            'python-multipart>=0.0.5',
+        ],
+        'pyqt': [
+            'PyQt5>=5.15',
+            'PyQtWebEngine>=5.15',
+        ],
+        'dev': [
+            'pytest>=6.2.4',
+            'mongomock',
+        ],
+    },
+    entry_points={
+        'console_scripts': [
+            'tdb-backend=transistordatabase.scripts.tdb_backend:main',
+            'tdb-webgui=transistordatabase.scripts.tdb_webgui:main',
+            'tdb-pyqt=transistordatabase.scripts.tdb_pyqt:main',
+        ],
+    },
     license="GNU General Public License v3",
     long_description=readme + '\n\n' + history,
     long_description_content_type="text/markdown",
@@ -63,13 +83,12 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    extras_require={},
     url='https://github.com/upb-lea/transistordatabase',
     project_urls={
         "Documentation": "https://upb-lea.github.io/transistordatabase/main/transistordatabase.html",
         "Source Code": "https://github.com/upb-lea/transistordatabase",
     },
-    version='1.0.0',
+    version='1.0.1',
     zip_safe=False,
     data_files=[('', ['CHANGELOG.md'])]
 )
