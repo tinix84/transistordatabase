@@ -27,27 +27,15 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Function to find Python executable in UV venv
-find_python_in_venv() {
-    local venv_path="$1"
-    if [ -f "$venv_path/bin/python" ]; then
-        echo "$venv_path/bin/python"
-    elif [ -f "$venv_path/Scripts/python.exe" ]; then
-        echo "$venv_path/Scripts/python.exe"
-    else
-        echo ""
-    fi
-}
-
 # Check required tools
 echo ""
 echo "🔍 Checking requirements..."
 
-if ! command_exists uv; then
-    echo -e "${RED}❌ UV not found. Please install UV: https://docs.astral.sh/uv/getting-started/installation/${NC}"
+if ! command_exists conda; then
+    echo -e "${RED}❌ Conda not found. Configure the repository's ntbees2 environment first.${NC}"
     exit 1
 fi
-echo -e "${GREEN}✅ UV found: $(uv --version)${NC}"
+echo -e "${GREEN}✅ Conda found${NC}"
 
 if ! command_exists node; then
     echo -e "${RED}❌ Node.js not found. Please install Node.js 16+${NC}"
@@ -61,78 +49,15 @@ if ! command_exists npm; then
 fi
 echo -e "${GREEN}✅ npm found: $(npm --version)${NC}"
 
-# Setup Python virtual environment with UV
-echo ""
-echo "🐍 Setting up Python environment with UV..."
-
-cd "$PROJECT_ROOT"
-
-# Check if venv already exists
-VENV_PATH="$PROJECT_ROOT/.venv"
-if [ ! -d "$VENV_PATH" ]; then
-    echo -e "${YELLOW}📦 Creating virtual environment...${NC}"
-    uv venv
-else
-    echo -e "${GREEN}✅ Virtual environment already exists${NC}"
-fi
-
-# Find Python executable
-PYTHON_EXEC=$(find_python_in_venv "$VENV_PATH")
-if [ -z "$PYTHON_EXEC" ]; then
-    echo -e "${RED}❌ Could not find Python in virtual environment${NC}"
-    exit 1
-fi
-
-echo -e "${GREEN}✅ Python executable: $PYTHON_EXEC${NC}"
-
-# Install backend dependencies
-echo ""
-echo "📦 Installing backend dependencies..."
-cd "$SCRIPT_DIR/backend"
-
-if [ -f "requirements.txt" ]; then
-    echo -e "${YELLOW}Installing Python packages with UV...${NC}"
-    uv pip install -r requirements.txt
-    echo -e "${GREEN}✅ Backend dependencies installed${NC}"
-else
-    echo -e "${YELLOW}⚠️  requirements.txt not found, installing minimal dependencies...${NC}"
-    uv pip install fastapi uvicorn python-multipart
-fi
-
-# Install frontend dependencies
-echo ""
-echo "📦 Installing frontend dependencies..."
-cd "$SCRIPT_DIR"
-
-if [ -f "package.json" ]; then
-    echo -e "${YELLOW}Installing npm packages...${NC}"
-    npm install
-    echo -e "${GREEN}✅ Frontend dependencies installed${NC}"
-else
-    echo -e "${RED}❌ package.json not found in gui_web directory${NC}"
-    exit 1
-fi
-
 # Function to start backend
 start_backend() {
     echo -e "${BLUE}🚀 Starting FastAPI backend...${NC}"
-    cd "$SCRIPT_DIR/backend"
-    
-    # Check which backend file to use
-    if [ -f "main_simple.py" ]; then
-        BACKEND_FILE="main_simple.py"
-    elif [ -f "main.py" ]; then
-        BACKEND_FILE="main.py"
-    else
-        echo -e "${RED}❌ No backend file found (main_simple.py or main.py)${NC}"
-        return 1
-    fi
+    cd "$PROJECT_ROOT"
     
     echo -e "${YELLOW}📍 Backend running at: http://localhost:8002${NC}"
     echo -e "${YELLOW}📖 API docs at: http://localhost:8002/docs${NC}"
     
-    # Use UV to run Python with the virtual environment
-    uv run python "$BACKEND_FILE"
+    conda run -n ntbees2 python -m uvicorn transistordatabase.gui_web.backend.main:app --host 127.0.0.1 --port 8002
 }
 
 # Function to start frontend
@@ -179,14 +104,9 @@ elif [ "$1" = "frontend" ] || [ "$1" = "web" ] || [ "$1" = "ui" ]; then
     start_frontend
     
 elif [ "$1" = "install" ] || [ "$1" = "setup" ]; then
-    # Just run installation
     echo ""
-    echo -e "${GREEN}✅ Installation complete!${NC}"
-    echo ""
-    echo "🎯 Next steps:"
-    echo "  • Run './dev-server.sh' to start both servers"
-    echo "  • Run './dev-server.sh backend' to start only backend"
-    echo "  • Run './dev-server.sh frontend' to start only frontend"
+    echo "The launcher does not create environments or install dependencies."
+    echo "Use the repository's ntbees2 Conda environment and install frontend dependencies separately."
     
 elif [ "$1" = "help" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo ""
@@ -196,7 +116,7 @@ elif [ "$1" = "help" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo "  (no args)         Start both backend and frontend"
     echo "  backend|api       Start only the FastAPI backend"
     echo "  frontend|web|ui   Start only the Vue.js frontend"
-    echo "  install|setup     Install dependencies only"
+    echo "  install|setup     Show environment setup guidance"
     echo "  help              Show this help message"
     echo ""
     echo "URLs:"

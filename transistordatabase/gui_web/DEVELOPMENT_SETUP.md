@@ -1,8 +1,8 @@
-# 🛠️ Development Environment Setup Complete!
+# 🛠️ Web GUI Development Launch
 
-## ✅ Scripts Created
+## Development Scripts
 
-I've created a complete set of development scripts for your Transistor Database project that handle UV virtual environments, proper directory navigation, and both backend/frontend management.
+The development launchers use the repository's `ntbees2` Conda environment for Python and run the frontend from the existing Node environment. They do not create Python environments or install dependencies.
 
 ### 📁 Location
 All scripts are in: `/transistordatabase/gui_web/`
@@ -20,33 +20,25 @@ All scripts are in: `/transistordatabase/gui_web/`
 # Start only frontend (Vue.js on port 5174)
 ./dev-server.sh frontend
 
-# Install dependencies only
+# Show environment setup guidance
 ./dev-server.sh setup
 
 # Show help
 ./dev-server.sh help
 ```
 
-**Features:**
-- ✅ Automatically activates UV virtual environment
-- ✅ Installs Python dependencies with UV
-- ✅ Installs npm dependencies
-- ✅ Runs both servers in parallel with proper cleanup
-- ✅ Smart directory navigation and error handling
+**Behavior:**
+- Runs the full FastAPI app `transistordatabase.gui_web.backend.main:app` on port 8002, including topology routes
+- Runs Vite on port 5174
+- Uses `conda run -n ntbees2` for the backend
+- Does not create environments or install dependencies
+- The Windows launcher uses `pushd` for directory changes, including UNC checkout paths
 
 #### 2. **`dev-server.bat`** - Windows Version
 Same functionality as the shell script but for Windows users.
 
-#### 3. **`test-env.sh`** - Environment Verification
-```bash
-./test-env.sh
-```
-Tests everything before you start development:
-- UV installation and virtual environment creation
-- Python package installation
-- Node.js and npm versions
-- Required project files
-- Frontend build process
+#### 3. **`test-env.sh`** - Legacy Environment Verification
+This older helper checks a UV-based environment and is not part of the recommended Conda development launch.
 
 #### 4. **`production.sh`** - Production Build
 ```bash
@@ -64,10 +56,9 @@ Tests everything before you start development:
 
 ## 🎯 How Everything Works
 
-### UV Virtual Environment Management
-- Automatically detects existing `.venv` or creates new one with `uv venv`
-- Uses `uv pip install` for faster, more reliable Python package installation
-- Finds Python executable automatically (works on Linux/macOS/Windows)
+### Python Environment
+- The backend runs in the documented `ntbees2` Conda environment.
+- Install or update Python and frontend dependencies separately from the launcher.
 
 ### Smart Directory Navigation
 - Scripts auto-detect their location and navigate correctly
@@ -90,8 +81,8 @@ Tests everything before you start development:
 1. **First time setup:**
    ```bash
    cd transistordatabase/gui_web
-   ./test-env.sh          # Verify everything works
-   ./dev-server.sh setup  # Install all dependencies
+   conda activate ntbees2
+   # Ensure frontend dependencies are available separately.
    ```
 
 2. **Daily development:**
@@ -117,30 +108,17 @@ Tests everything before you start development:
 ## 🔧 What The Scripts Handle Automatically
 
 ### Backend Setup:
-- Activates UV virtual environment
-- Installs FastAPI, uvicorn, python-multipart
-- Navigates to backend directory
-- Starts uvicorn server with correct Python executable
+- Runs the full `transistordatabase.gui_web.backend.main:app` FastAPI application using `ntbees2`.
+- Does not install packages or create an environment.
 
 ### Frontend Setup:
-- Navigates to gui_web directory
-- Installs Vue.js, Vite, Chart.js dependencies
-- Starts Vite dev server
-- Handles build process for production
+- Navigates to the `gui_web` directory.
+- Starts the Vite dev server with existing npm dependencies.
 
 ### Environment Management:
-- Creates virtual environment if missing
-- Uses UV for Python package management (faster than pip)
-- Handles cross-platform differences
-- Proper path resolution and directory navigation
+- Uses the documented `ntbees2` Conda environment for the backend.
+- Handles cross-platform differences and directory navigation.
 
 ## 📊 Status Check
 
-✅ **All scripts tested and working**
-✅ **UV virtual environment integration**
-✅ **Cross-platform compatibility (Linux/macOS/Windows)**
-✅ **Error handling and cleanup**
-✅ **Production build testing**
-✅ **Vercel deployment preparation**
-
-Your development environment is now fully automated and ready to use! 🎉
+The launchers were updated to select the full FastAPI application so the Vite topology workflow reaches its API routes. Their runtime behavior was not exercised as part of that source change.

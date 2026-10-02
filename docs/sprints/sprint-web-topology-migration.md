@@ -1,0 +1,110 @@
+# Local web topology migration plan
+
+Prepared on 2026-10-02 following [the accepted migration decision](../adr/0001-local-web-gui-replaces-qt.md). This plan starts full desktop capability replacement with the topology workflow in the local web GUI. Qt contributes screenshots only. A verified Python/FastAPI calculation slice and Vue workflow are implemented; completeness and unverified behavior are tracked below.
+
+## Verified starting point
+
+- `transistordatabase/scripts/tdb_webgui.py` starts `gui_web.backend.main:app` on `127.0.0.1:8000` and opens a browser.
+- `transistordatabase/gui_web/src/components/TopologyCalculator.vue`, in `calculate()`, computes results locally. Frequency is converted from kHz to Hz, inductance from microhenries and capacitance from microfarads within formulas.
+- `transistordatabase/gui_web/backend/main.py` already exposes `/api/topology/calculate` and `/api/topology/compare`.
+- `transistordatabase/gui_web/backend/schemas.py` defines a request with frequency in Hz, one transistor identifier and optional gate conditions. It lacks the browser's inductance and output-capacitance fields and a complete two-device sweep description.
+- Vue uses `buck_boost`; Python uses `buck-boost`. Their boost input-current formulas differ: Vue computes `(p_out / v_out) / (1 - duty)`; the Python implementation computes `p_out / v_in / (1 - duty)`.
+- `transistordatabase/gui_web/backend/topology_service.py` reads gate conditions without using them in its calculations and includes fallback estimates for missing device data. Routing the browser to this implementation unchanged would not establish numerical correctness or parity.
+- `transistordatabase/topologies/converter_common.py` contains Buck, Boost and BuckBoost calculations, including vector/mesh losses and thermal results. Its interfaces and transistor assumptions need verification before reuse.
+- `transistordatabase/gui_web/api/topology.py` is another calculation path. Determine its callers and deployment role before changing compatibility behavior.
+
+These findings were static planning observations made before implementation.
+
+## Intended ownership
+
+Browser inputs and plots → FastAPI adapter → reusable Python topology module → validated headless calculation implementations.
+
+A future MCP adapter can call the same Python operations. FastAPI handles request validation and response serialization; scientific validity checks also belong in Python so another adapter cannot bypass them. The browser may format values and convert display units, but must not independently calculate scientific outputs or silently substitute estimates.
+
+## Compatibility boundary with the ntbees2 goal
+
+TDB remains a complementary intended ntbees2 library; its integration is incomplete, and the converter that turns valid nonzero TDB curves into zero-valued loss parameters remains a serious known bug outside this sprint. This topology work must not change ntbees2 interfaces, adapters/converters, TDB persistence, import/export semantics, or device data. It reads existing core TDB objects without mutation and carries selected device names, measured curve conditions, and available commutation/testbench provenance into results. The new equal-current-sharing parallel model is local to this operation; parity with Octave parallel-device scaling is not established. No fix or integration-completion claim is made for the separate converter bug.
+
+## Delivery steps
+
+### 1 Establish capability coverage and numerical expectations
+
+Create a coverage checklist from existing product documentation, available screenshots and headless calculation capabilities. Include Buck, Boost, Buck-Boost and Flyback operating points; CCM/DCM regimes; transistor selection; parallel-device configurations; gate conditions; losses; temperatures; line and contour sweeps; result comparison; and result export. Confirm each item's documented behavior rather than assuming this preliminary list is exhaustive. Record missing screenshot evidence explicitly; do not launch Qt to obtain it.
+
+Trace the current web route used by each operation. Define canonical topology names, SI transport units, supported conduction regimes, current definitions and output polarity conventions. Separate ideal estimates from calculations using device curves. Resolve missing-data behavior before implementation rather than silently retaining fallbacks.
+
+Validation: independently derived operating-point fixtures, documented model assumptions and a traceable capability checklist. For example, an ideal 100 V to 200 V boost at 1000 W has 10 A average input current and 5 A average output current; losses require a separately defined power balance. This fixture and ideal DCM power/current equations are covered by focused tests. Flyback assumes an ideal transformer and requires an explicit primary-to-secondary turns ratio.
+
+### 2 Implement authoritative Python operating point calculations
+
+Reuse verified headless implementations where appropriate and concentrate orchestration in the core calculation area, consistent with repository guidance. Keep HTTP objects and Qt imports outside it. Preserve existing core interface conventions; do not add an ABC solely for a hypothetical future MCP adapter.
+
+Validate finite values, units, topology operating ranges, CCM/DCM boundaries and missing curves. Give outputs explicit model assumptions and actionable errors. Check gate resistance, gate voltage and temperature effects wherever the selected model claims to support them. Do not label simplified estimates as device-accurate results. Keep estimate, channel-conduction-only and detailed partial-loss modes distinct.
+
+Validation: numerical expectations for all four topologies and the DCM-capable cases; energy/current balance; supported parameter sensitivity; missing-data and invalid-domain cases; existing relevant headless regression tests. A Python calculation must run without importing PyQt5.
+
+### 3 Connect the local web workflow through FastAPI
+
+Extend the existing request/response contract to cover the agreed operating-point fields and result needs. Connect the Vue calculation action to the endpoint; retain display-unit conversion at a clearly defined location. Move scientific device requirements and ranking calculations to Python where they affect results. Display backend errors and assumptions, and prevent stale requests from replacing newer results.
+
+Validation: endpoint results agree with direct Python results; explicit unit and topology-name mapping; browser tests verify meaningful numeric output and error states. Run the local web workflow in an environment without Qt. Preserve compatibility for existing web callers or document intentional migrations.
+
+### 4 Complete topology sweeps and result workflows
+
+Add the agreed line/contour sweeps, device combinations, parallel configurations, loss and thermal metrics, comparison and export behavior. Keep sweep generation and calculations in Python; browser plotting consumes returned data. Establish sweep limits based on measured local performance rather than adding a job system speculatively.
+
+Validation: scalar/vector/mesh consistency; axis units and array shapes; reproducible exported results; device-data cases; meaningful browser interaction tests. Every item in the topology coverage checklist needs evidence or an explicitly unresolved gap before topology is declared complete.
+
+### 5 Continue full web capability replacement
+
+Use the same checklist and vertical-workflow approach for database search, creation/editing, curve management, comparison, import/export, settings and all other documented desktop capabilities. The order after topology remains open. Do not treat completion of the current Vue feature set as proof of full desktop coverage.
+
+## Topology coverage status (2026-10-03)
+
+| Capability | Current evidence | Status and remaining limit |
+|---|---|---|
+| Buck, Boost, inverting Buck-Boost, and Flyback operating points | Reusable SI-unit Python operation; independent CCM/DCM current and power fixtures, ripple, polarity, voltage stress, Flyback ratio, and domain tests | Implemented as ideal averaged CCM/DCM operating points. Flyback uses an ideal transformer model with explicit Np/Ns; leakage, winding, core, and clamp effects are excluded. DCM channel-loss calculations are supported; detailed DCM Eon lookup can reject zero turn-on current when the measured energy curve does not include it. |
+| Estimate, conduction-only, and detailed modes | Explicit request mode; tests cover ideal estimate labeling, missing-curve rejection, channel-only scope flags, and detailed curve lookup | Implemented. Estimate mode gives ideal electrical quantities only. Curve-mode average input current is labeled as the ideal lossless operating-point current. Input power and efficiency are partial-loss estimates based on that point; loss feedback is not iterated. |
+| Device selection and combinations | API and Vue select separate switch/diode TDB devices; curve modes read core TDB objects without mutation | Implemented in code. Browser execution remains unverified. Eon/Eoff commutation-device strings and testbench provenance are preserved; matching a recorded name to the selected diode name is only a name comparison, and unknown or conflicting measurement context remains a labeled compatibility limitation. |
+| Parallel devices | Separate switch and diode counts; tests verify current sharing and loss scaling while source curves remain unchanged | Implemented with identical devices and equal current sharing. Exact Octave semantics are not established. |
+| Gate conditions | Curve modes require exact junction temperature and switch gate voltage. Gate-conditioned diode curves require an explicit exact `diode_v_g`; diode curves with `v_g=None` remain selectable without it. Detailed mode also selects exact turn-off gate voltage and gate resistance when supplied | Implemented without nearest-condition substitution or extrapolation. Missing diode gate selection reports the available TDB gate conditions; current values outside recorded curve ranges are rejected. |
+| Device losses | Conduction-only integrates switch/diode channel curves; detailed additionally interpolates switch turn-on/turn-off energy within recorded current ranges. A duplicate-zero regression and the local CREE C3M0060065J 25 °C / 0 V diode curve verify the maximum-voltage envelope behavior. | Partial. Duplicate channel-current samples use the maximum recorded voltage at that current as a conservative loss-screening envelope. Machine-readable loss scope and inclusion booleans identify excluded switching, recovery, gate-drive, passive and magnetic terms. Detailed energy data require exact voltage/gate/temperature conditions; no extrapolation. Reported input power and efficiency add included device losses to the ideal output point; they are not a self-consistent loss-adjusted solution. |
+| Temperatures | Uses recorded Foster junction-to-case resistance, case-to-sink resistance, and an explicitly supplied fixed case/sink temperature | Partial steady-state estimate only when both resistances are finite and positive. Zero/nonpositive TDB sentinel values report the device temperature as unavailable. No shared heatsink network or electrothermal iteration; it uses the included per-device partial loss. |
+| Line and contour sweeps | Python generates line or 2-D results for voltage, power, frequency, inductance, or capacitance axes; tests verify units, shapes, limits, and unsupported-point errors | Implemented in the API contract, bounded to 2,500 contour points. Browser plotting is present; the current E2E checks the scalar waveform chart, while sweep-chart interaction remains unverified. |
+| Comparison | Endpoint returns per-topology calculations, unsupported-condition errors, ranking availability, and loss scope | Implemented. Estimate mode is not ranked; conduction-only and detailed rankings apply only to the included partial losses and must not be read as total efficiency. Flyback comparison needs an Np/Ns value. |
+| Result export and stale-result handling | Vue downloads the saved backend request/result, assumptions, and conditions as JSON; changing an operating input or topology invalidates displayed results and pending requests | Chromium E2E verifies that changed inputs invalidate stale results and that the downloaded JSON contains the topology, request, and result mode. |
+| Semiconductor Pareto example | `examples/topology_semiconductor_pareto.ipynb` loads the checked-in CREE and Infineon TDB records and compares one fixed 100 V → 200 V, 1 kW, 20 kHz Boost boundary by channel-conduction loss, package-body volume, and one-unit cost | Executed and saved with outputs. All three screened candidates are non-dominated. Costs are a dated U.S. DigiKey snapshot; volume is summed package-body bounding-box volume. Losses exclude switching/recovery and passive/magnetic terms, and thermal values are unavailable where TDB resistance sentinels are nonpositive. This is a screening example, not a finished design recommendation. |
+| Vite development launch | `dev-server.sh` and UNC-safe `dev-server.bat` launch `transistordatabase.gui_web.backend.main:app` on port 8002 using `ntbees2`; Vite is fixed to port 5174, and `api.js` calls port 8002 directly with FastAPI CORS allowing the Vite origin. There is no Vite proxy. | Implemented in scripts/config/docs. Launchers were not executed. |
+| Screenshot evidence | No migration-approved Qt reference screenshot set was available in the inspected docs | Open. Qt was not launched or used as a dependency. The notebook Pareto plot is generated from the new Python operation and is not legacy parity evidence. |
+
+The ntbees2 compatibility boundary is preserved: this complementary TDB operation consumes core transistor models read-only; no ntbees2 interfaces, adapters, converters, persisted device records, or converter outputs were changed.
+
+The focused headless Python/API suite passes 47 tests in the configured WSL `ntbees2` environment with the repository's Qt `conftest.py` bypassed; Ruff and Python syntax checks pass. The two focused topology Vue suites pass 53 tests, and the Vite production build passes with a chunk-size warning. The Chromium browser suite passes two workflows: a Boost estimate with stale-result invalidation and JSON download-content checks, and a DCM boundary error. The Pareto notebook executed successfully and saved its table and plot outputs. The broader frontend unit folder still has 6 failing test files and 19 failed tests (220 passed, 16 unhandled errors); both topology Vue suites pass. Missing runtime/test packages were installed into the existing WSL `ntbees2` Conda environment; project dependency declarations were not changed, and no Qt package or runtime was used. Screenshot evidence remains open because no accepted legacy reference set was available. Full semiconductor loss and thermal coverage also remain open: the selected TDB records lack matched switching/recovery curves and usable positive interface thermal resistances, so the example reports channel-conduction losses only and marks temperature unavailable instead of extrapolating or fabricating data.
+
+## Completion criteria
+
+- Topology results originate in tested Python operations exposed by FastAPI.
+- No Qt runtime, Qt test or Qt implementation is needed to deliver or validate the new workflow.
+- All confirmed topology capabilities work through the local browser with explicit units, model assumptions and errors.
+- Numerical fixtures, endpoint checks and browser behavior checks provide evidence for parity.
+- Existing transistor data and exports remain compatible where promised.
+- MCP implementation, shared hosting and filesystem deletion are outside this migration step.
+
+## Accepted missing data behavior
+
+Detailed calculations must fail clearly when required device curves are missing, identifying the missing data. Do not silently substitute constants, zero losses or an estimate. Estimates are available only through an explicitly selected estimate mode, and results must identify that mode and its assumptions. Enforce this in reusable Python operations so FastAPI and future MCP callers receive the same behavior.
+
+Validation must cover missing-curve rejection in detailed mode, explicit estimate-mode selection and labeled estimate results.
+
+## Accepted operating regime behavior
+
+Calculations must reject unsupported operating regimes with a clear error identifying the unsupported condition and explaining the supported range or regime. Do not silently extrapolate beyond a model's validity. Apply this validation in the reusable Python calculation module, including estimate mode according to that mode's own supported range.
+
+Validation must exercise supported limits and out-of-range requests, checking that failures explain the relevant range rather than returning plausible-looking numerical results.
+
+## Decisions still required before dependent implementation
+
+- Exact model scope and numerical tolerances, to be established from calculation documentation and independent reference cases.
+- Any capability ambiguity that documentation and screenshots cannot resolve.
+
+These are focused follow-up decisions, not reasons to restart the agreed architecture discussion.

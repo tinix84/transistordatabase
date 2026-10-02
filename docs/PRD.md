@@ -1,6 +1,8 @@
 # Product Requirements Document (PRD)
 
-## Product: Transistor Database v1.0
+<!-- Last modified: 2026-10-03
+
+## Product: Transistor Database v1.0.1
 
 ### Vision
 
@@ -79,7 +81,14 @@ See `docs/ARCHITECTURE.md` for the full domain model. Key entities:
 | Phase 2 | Waveform losses, topology analysis | ✅ Complete |
 | Phase 3 | Legacy migration, GUI refactor (mixin architecture) | ✅ Complete |
 | Phase 4 | LTSpice DPT, Digikey catalog, docs | ✅ Complete |
-| Phase 5 | Testing gate, v1.0 release | In Progress |
+| Phase 5 | Testing gate, v1.0 release | ✅ Complete |
+| Phase 6 | v1.0.1: pip extras, CLI entry points, PyInstaller, CI/CD release | ✅ Complete |
+
+**v1.0.1 Achievements (2026-Q1):**
+- Package distribution: pip extras, CLI entry points, PyInstaller standalone builds
+- GitHub Actions release workflow
+- Repository cleanup: removed stale docs, empty directories, venv from tracking
+- README converted from RST to Markdown with badges and current architecture
 
 **v0.6.0 Achievements (2024-Q1):**
 - Core/backend/frontend separation complete with adapters

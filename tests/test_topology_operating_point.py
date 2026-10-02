@@ -1,0 +1,617 @@
+"""Independent fixtures for the web topology calculation core."""
+from __future__ import annotations
+
+import numpy as np
+import pytest
+
+from transistordatabase.core.models import (
+    ChannelCharacteristics,
+    ElectricalRatings,
+    FosterThermalModel,
+    SwitchingLossData,
+    ThermalProperties,
+    Transistor,
+    TransistorMetadata,
+)
+from transistordatabase.topologies.operating_point import (
+    calculate_topology_operating_point,
+    calculate_topology_sweep,
+)
+
+
+def point(**overrides):
+    """Return one independent baseline CCM case with overrides."""
+    values = {
+        "mode": "estimate",
+        "v_in": 100.0,
+        "v_out": 50.0,
+        "p_out": 500.0,
+        "f_sw": 10_000.0,
+        "l_value": 200e-6,
+        "c_out": 100e-6,
+    }
+    values.update(overrides)
+    return values
+
+
+def device(name="curve-device", *, max_current=100.0):
+    """Build exact-condition switch, diode, and switching curves for tests."""
+    transistor = Transistor(
+        TransistorMetadata(name, "MOSFET", "test", "vendor", "package"),
+        ElectricalRatings(1200, 100, 50, 175),
+        ThermalProperties(0.001, 0.001, r_th_switch_cs=0.2, r_th_diode_cs=0.2),
+    )
+    currents = np.array([0.1, max_current])
+    transistor.switch.channel_data.append(
+        ChannelCharacteristics(25, np.array([[0.01, 10.0], currents]), 15)
+    )
+    transistor.diode.channel_data.append(
+        ChannelCharacteristics(25, np.array([[0.4, 5.4], currents]), None)
+    )
+    transistor.switch.e_on_data.append(SwitchingLossData(
+        "graph_i_e", 25, 100, 15, r_g=10, v_g_off=-5,
+        graph_i_e=np.array([[0.1, max_current], [0.0001, 0.1]]),
+        commutation_device="fixture-diode", measurement_testbench="independent-fixture",
+    ))
+    transistor.switch.e_off_data.append(SwitchingLossData(
+        "graph_i_e", 25, 100, 15, r_g=10, v_g_off=-5,
+        graph_i_e=np.array([[0.1, max_current], [0.0002, 0.2]]),
+        commutation_device="fixture-diode", measurement_testbench="independent-fixture",
+    ))
+    return transistor
+
+
+@pytest.mark.parametrize(
+    ("topology", "values", "duty", "i_in", "i_out"),
+    [
+        ("buck", point(), 0.5, 5.0, 10.0),
+        (
+            "boost",
+            point(v_in=100, v_out=200, p_out=1000, l_value=1e-3, f_sw=20_000),
+            0.5,
+            10.0,
+            5.0,
+        ),
+        (
+            "buck-boost",
+            point(v_in=100, v_out=200, p_out=1000, l_value=1e-3, f_sw=20_000),
+            2 / 3,
+            10.0,
+            5.0,
+        ),
+    ],
+)
+def test_ideal_operating_points_match_independent_power_balance(
+    topology, values, duty, i_in, i_out
+):
+    """Match independently calculated duty and ideal input/output currents."""
+    result = calculate_topology_operating_point(topology, values)
+    calculated = result["calculated"]
+    assert calculated["duty_cycle"] == pytest.approx(duty)
+    assert calculated["i_in_avg_a"] == pytest.approx(i_in)
+    assert calculated["i_out_avg_a"] == pytest.approx(i_out)
+    assert values["v_in"] * calculated["i_in_avg_a"] == pytest.approx(values["p_out"])
+    assert values["v_out"] * calculated["i_out_avg_a"] == pytest.approx(values["p_out"])
+    assert result["losses"] is None
+    assert result["performance"]["efficiency_percent"] is None
+
+
+def test_buck_ripple_matches_independently_derived_fixture():
+    """Match the buck inductor and capacitor ripple equations."""
+    result = calculate_topology_operating_point("buck", point())
+    assert result["calculated"]["i_l_ripple_pp_a"] == pytest.approx(12.5)
+    assert result["calculated"]["v_out_ripple_pp_v"] == pytest.approx(1.5625)
+    assert result["calculated"]["i_l_avg_a"] == pytest.approx(10.0)
+
+
+def test_inverting_buck_boost_reports_output_polarity():
+    """Report the conventional inverting output sign separately from magnitude."""
+    result = calculate_topology_operating_point(
+        "buck-boost", point(v_in=100, v_out=200, p_out=1000, l_value=1e-3, f_sw=20_000)
+    )
+    assert result["model"]["output_polarity"] == -1
+    assert result["calculated"]["v_out_signed_v"] == -200
+    assert result["calculated"]["i_l_avg_a"] == pytest.approx(15)
+
+
+def test_mode_must_be_explicit_and_estimate_is_labeled():
+    """Require and label an ideal estimate request."""
+    with pytest.raises(ValueError, match="mode must be explicitly"):
+        calculate_topology_operating_point("buck", {k: v for k, v in point().items() if k != "mode"})
+    result = calculate_topology_operating_point("buck", point())
+    assert result["model"]["mode"] == "estimate"
+    assert any("does not calculate device" in item for item in result["model"]["assumptions"])
+
+
+@pytest.mark.parametrize(
+    ("topology", "values", "message"),
+    [
+        ("buck", point(v_in=100, v_out=100), "Buck requires 0 < v_out < v_in"),
+        ("boost", point(v_in=100, v_out=90), "Boost requires v_out > v_in"),
+        ("buck", point(l_value=1e-9), "Requested CCM point reaches zero inductor current; use DCM"),
+    ],
+)
+def test_invalid_topologies_and_ccm_boundary_fail_with_supported_conditions(topology, values, message):
+    """Explain topology-ratio and requested-CCM boundary errors."""
+    with pytest.raises(ValueError, match=message):
+        calculate_topology_operating_point(topology, values)
+
+
+def test_flyback_requires_a_positive_primary_to_secondary_turns_ratio():
+    """Require transformer ratio rather than assuming a winding convention."""
+    with pytest.raises(ValueError, match="Flyback requires a positive turns_ratio_nps"):
+        calculate_topology_operating_point("flyback", point())
+
+
+@pytest.mark.parametrize(
+    ("topology", "values", "duty", "diode_fraction", "peak", "i_in", "i_out"),
+    [
+        (
+            "buck", point(v_out=50, p_out=100, l_value=100e-6, f_sw=20_000, c_out=1e-3, conduction_regime="DCM"),
+            0.2828427125, 0.2828427125, 7.071067812, 1.0, 2.0,
+        ),
+        (
+            "boost", point(v_in=100, v_out=200, p_out=100, l_value=100e-6, f_sw=20_000, c_out=1e-3, conduction_regime="DCM"),
+            0.1414213562, 0.1414213562, 7.071067812, 1.0, 0.5,
+        ),
+        (
+            "buck-boost", point(v_in=100, v_out=50, p_out=100, l_value=100e-6, f_sw=20_000, c_out=1e-3, conduction_regime="DCM"),
+            0.2, 0.4, 10.0, 1.0, 2.0,
+        ),
+    ],
+)
+def test_dcm_operating_points_match_independent_energy_and_current_fixtures(
+    topology, values, duty, diode_fraction, peak, i_in, i_out
+):
+    """Check analytical DCM duties, current triangles, idle interval, and power balance."""
+    result = calculate_topology_operating_point(topology, values)
+    calculated = result["calculated"]
+    assert result["model"]["conduction_regime"] == "DCM"
+    assert calculated["duty_cycle"] == pytest.approx(duty)
+    assert calculated["diode_conduction_fraction"] == pytest.approx(diode_fraction)
+    assert calculated["i_l_valley_a"] == 0
+    assert calculated["i_l_peak_a"] == pytest.approx(peak)
+    assert calculated["i_in_avg_a"] == pytest.approx(i_in)
+    assert calculated["i_out_avg_a"] == pytest.approx(i_out)
+    assert values["v_in"] * calculated["i_in_avg_a"] == pytest.approx(values["p_out"])
+    assert values["v_out"] * calculated["i_out_avg_a"] == pytest.approx(values["p_out"])
+    assert calculated["idle_fraction"] == pytest.approx(1 - duty - diode_fraction)
+    assert min(result["waveforms"]["inductor_current_a"]) >= 0
+    assert max(result["waveforms"]["inductor_current_a"]) == pytest.approx(peak)
+
+
+def test_dcm_boost_output_ripple_integrates_the_capacitor_current():
+    """Match the analytically integrated output capacitor charge extrema."""
+    values = point(
+        v_in=100, v_out=200, p_out=100, l_value=100e-6,
+        f_sw=20_000, c_out=1e-3, conduction_regime="DCM",
+    )
+    result = calculate_topology_operating_point("boost", values)
+    duty = np.sqrt(0.02)
+    peak = np.sqrt(50.0)
+    output_current = 0.5
+    positive_charge_area = duty * (peak - output_current) ** 2 / (2 * peak)
+    phase_charge = positive_charge_area - output_current * duty
+    expected_ripple = (phase_charge + output_current * duty) / (20_000 * 1e-3)
+    assert result["calculated"]["v_out_ripple_pp_v"] == pytest.approx(expected_ripple, rel=1e-4)
+
+
+def test_dcm_request_at_or_past_boundary_explains_ccm_selection():
+    """Do not return a DCM solution after the two conduction intervals overlap."""
+    with pytest.raises(ValueError, match="at or above the CCM boundary.*select CCM"):
+        calculate_topology_operating_point(
+            "boost",
+            point(v_in=100, v_out=200, p_out=1000, l_value=1e-3,
+                  f_sw=20_000, conduction_regime="DCM"),
+        )
+
+
+def test_flyback_ccm_uses_explicit_turns_ratio_and_reports_voltage_stress():
+    """Verify primary current, secondary current, and winding-referred stresses."""
+    result = calculate_topology_operating_point(
+        "flyback",
+        point(v_in=100, v_out=50, p_out=100, l_value=1e-3,
+              f_sw=20_000, c_out=1e-3, turns_ratio_nps=2),
+    )
+    calculated = result["calculated"]
+    assert calculated["duty_cycle"] == pytest.approx(0.5)
+    assert any(
+        "ideal transformer with no leakage" in item
+        for item in result["model"]["assumptions"]
+    )
+    assert calculated["i_in_avg_a"] == pytest.approx(1)
+    assert calculated["i_out_avg_a"] == pytest.approx(2)
+    assert calculated["i_l_avg_a"] == pytest.approx(2)
+    assert calculated["i_diode_avg_a"] == pytest.approx(2)
+    assert calculated["v_switch_block_v"] == pytest.approx(200)
+    assert calculated["v_diode_block_v"] == pytest.approx(100)
+    assert result["parameters"]["turns_ratio_nps"] == 2
+
+
+def test_flyback_dcm_uses_secondary_current_and_discontinuous_intervals():
+    """Check Flyback DCM current reflection and transformer duty boundary."""
+    result = calculate_topology_operating_point(
+        "flyback",
+        point(v_in=100, v_out=50, p_out=100, l_value=100e-6,
+              f_sw=20_000, c_out=1e-3, turns_ratio_nps=2,
+              conduction_regime="DCM"),
+    )
+    calculated = result["calculated"]
+    assert calculated["duty_cycle"] == pytest.approx(0.2)
+    assert calculated["diode_conduction_fraction"] == pytest.approx(0.2)
+    assert calculated["i_l_peak_a"] == pytest.approx(10)
+    assert calculated["i_diode_peak_a"] == pytest.approx(20)
+    assert calculated["i_in_avg_a"] == pytest.approx(1)
+    assert calculated["i_out_avg_a"] == pytest.approx(2)
+    assert calculated["idle_fraction"] == pytest.approx(0.6)
+
+
+def test_detailed_mode_rejects_missing_required_curves():
+    """Fail detailed mode when its switch channel curve is missing."""
+    missing_curves = device()
+    missing_curves.switch.channel_data.clear()
+    with pytest.raises(ValueError, match="Missing required switch channel curve"):
+        calculate_topology_operating_point(
+            "buck", point(mode="detailed", t_j=25, v_g=15), missing_curves, device()
+        )
+
+
+def test_detailed_mode_uses_curves_read_only_and_records_provenance():
+    """Calculate curve-backed partial losses without mutating source curves."""
+    transistor = device()
+    before = transistor.switch.e_on_data[0].graph_i_e.copy()
+    result = calculate_topology_operating_point(
+        "buck",
+        point(mode="detailed", t_j=25, t_case=30, v_g=15, v_g_off=-5, r_g_on=10, r_g_off=10),
+        transistor,
+        transistor,
+    )
+    assert result["losses"]["conduction_switch_w"] > 0
+    assert result["losses"]["conduction_diode_w"] > 0
+    assert result["losses"]["switching_on_w"] > 0
+    assert result["losses"]["switching_off_w"] > 0
+    assert result["performance"]["p_in_w"] == pytest.approx(
+        result["performance"]["p_out_w"] + result["losses"]["total_w"]
+    )
+    assert "ideal lossless operating point" in result["performance"]["efficiency_scope"]
+    assert "loss feedback is not iterated" in result["performance"]["input_power_scope"]
+    assert any(
+        "calculated at the ideal lossless operating point" in item
+        for item in result["model"]["assumptions"]
+    )
+    assert any(
+        "Commutation-device metadata is recorded provenance" in item
+        for item in result["model"]["assumptions"]
+    )
+    assert result["model"]["curve_conditions"]["e_on"]["commutation_device"] == "fixture-diode"
+    assert result["model"]["curve_conditions"]["e_on"]["commutation_device_status"] == "unverified"
+    assert result["model"]["curve_conditions"]["e_on"]["measurement_testbench"] == "independent-fixture"
+    np.testing.assert_array_equal(transistor.switch.e_on_data[0].graph_i_e, before)
+
+
+def test_conduction_only_mode_needs_channel_curves_but_not_switching_energy_curves():
+    """Allow exact measured channel losses while keeping switching loss excluded."""
+    transistor = device()
+    transistor.switch.e_on_data.clear()
+    transistor.switch.e_off_data.clear()
+    result = calculate_topology_operating_point(
+        "buck",
+        point(mode="conduction-only", t_j=25, t_case=30, v_g=15),
+        transistor,
+        transistor,
+    )
+    assert result["losses"]["conduction_switch_w"] > 0
+    assert result["losses"]["conduction_diode_w"] > 0
+    assert result["losses"]["switching_on_w"] == 0
+    assert result["losses"]["switching_off_w"] == 0
+    assert result["losses"]["loss_scope"] == "channel_conduction_only"
+    assert result["losses"]["switching_losses_included"] is False
+    assert result["losses"]["reverse_recovery_losses_included"] is False
+    assert result["losses"]["gate_drive_losses_included"] is False
+    assert result["model"]["curve_conditions"]["diode_channel"]["v_g"] is None
+    assert any(
+        "not recalculated from device losses" in item
+        for item in result["model"]["assumptions"]
+    )
+    assert "e_on" not in result["model"]["curve_conditions"]
+
+
+def test_duplicate_zero_current_channel_points_use_the_upper_voltage_envelope():
+    """Conservatively retain the higher diode voltage at duplicated zero current."""
+    transistor = device()
+    transistor.diode.channel_data[0].graph_v_i = np.array([
+        [0.0, 1.44, 2.0],
+        [0.0, 0.0, 100.0],
+    ])
+
+    result = calculate_topology_operating_point(
+        "buck",
+        point(mode="conduction-only", t_j=25, v_g=15),
+        transistor,
+        transistor,
+    )
+
+    average_current = 10.0
+    ripple = 12.5
+    expected_average_diode_power = (
+        1.44 * average_current
+        + 0.0056 * (average_current**2 + ripple**2 / 12)
+    )
+    assert result["losses"]["conduction_diode_w"] == pytest.approx(
+        0.5 * expected_average_diode_power, rel=1e-5
+    )
+    assert any(
+        "maximum recorded voltage at each current" in assumption
+        for assumption in result["model"]["assumptions"]
+    )
+
+
+def test_conduction_only_mode_calculates_dcm_channel_losses_when_curves_cover_zero_current():
+    """Use exact channel curves for the switch/diode ramps in explicit DCM."""
+    transistor = device()
+    for curve in transistor.switch.channel_data + transistor.diode.channel_data:
+        curve.graph_v_i[1, 0] = 0.0
+
+    result = calculate_topology_operating_point(
+        "buck",
+        point(
+            mode="conduction-only", t_j=25, v_g=15, v_in=100, v_out=50,
+            p_out=100, l_value=100e-6, f_sw=20_000, c_out=1e-3,
+            conduction_regime="DCM",
+        ),
+        transistor,
+        transistor,
+    )
+
+    assert result["model"]["conduction_regime"] == "DCM"
+    assert result["calculated"]["i_l_valley_a"] == 0
+    assert result["losses"]["conduction_switch_w"] > 0
+    assert result["losses"]["conduction_diode_w"] > 0
+    assert result["losses"]["switching_losses_included"] is False
+
+
+def test_flyback_dcm_channel_losses_use_secondary_referred_diode_current():
+    """Use Np/Ns to select the Flyback rectifier's exact current range."""
+    transistor = device()
+    for curve in transistor.switch.channel_data + transistor.diode.channel_data:
+        curve.graph_v_i[1, 0] = 0.0
+
+    result = calculate_topology_operating_point(
+        "flyback",
+        point(
+            mode="conduction-only", t_j=25, v_g=15,
+            v_in=100, v_out=50, p_out=100, l_value=100e-6,
+            f_sw=20_000, c_out=1e-3, turns_ratio_nps=2,
+            conduction_regime="DCM",
+        ),
+        transistor,
+        transistor,
+    )
+
+    assert result["calculated"]["i_l_peak_a"] == pytest.approx(10)
+    assert result["calculated"]["i_diode_peak_a"] == pytest.approx(20)
+    assert result["losses"]["conduction_switch_w"] > 0
+    assert result["losses"]["conduction_diode_w"] > 0
+    assert result["losses"]["loss_scope"] == "channel_conduction_only"
+
+
+def test_conduction_only_mode_rejects_missing_required_channel_curves():
+    """Do not silently substitute a channel estimate in the Pareto mode."""
+    transistor = device()
+    transistor.diode.channel_data.clear()
+    with pytest.raises(ValueError, match="Missing required diode channel curve"):
+        calculate_topology_operating_point(
+            "boost", point(
+                mode="conduction-only", t_j=25, v_g=15,
+                v_in=100, v_out=200, p_out=100, l_value=1e-3, f_sw=20_000,
+                conduction_regime="DCM",
+            ),
+            transistor, transistor,
+        )
+
+
+def test_gate_conditioned_diode_curves_require_explicit_diode_gate_voltage():
+    """Explain missing diode gate selection and preserve selected curve provenance."""
+    transistor = device()
+    transistor.diode.channel_data.clear()
+    graph = np.array([[0.4, 5.4], [0.0, 100.0]])
+    for gate_voltage in (0.0, -2.0, -4.0):
+        transistor.diode.channel_data.append(
+            ChannelCharacteristics(25, graph.copy(), gate_voltage)
+        )
+
+    parameters = point(mode="conduction-only", t_j=25, v_g=15)
+    with pytest.raises(
+        ValueError,
+        match=r"gate-conditioned; provide diode_v_g \(available: -4 V, -2 V, 0 V\)",
+    ):
+        calculate_topology_operating_point("buck", parameters, transistor, transistor)
+
+    selected = calculate_topology_operating_point(
+        "buck", {**parameters, "diode_v_g": 0}, transistor, transistor
+    )
+    assert selected["model"]["curve_conditions"]["diode_channel"] == {
+        "t_j": 25,
+        "v_g": 0,
+    }
+
+
+def test_ungated_diode_curve_is_selected_when_mixed_with_gate_conditioned_curves():
+    """Keep the exact ungated diode curve selectable when other gates exist."""
+    transistor = device()
+    transistor.diode.channel_data.append(
+        ChannelCharacteristics(
+            25,
+            np.array([[0.5, 5.5], [0.1, 100.0]]),
+            -4.0,
+        )
+    )
+
+    result = calculate_topology_operating_point(
+        "buck",
+        point(mode="conduction-only", t_j=25, v_g=15),
+        transistor,
+        transistor,
+    )
+
+    assert result["model"]["curve_conditions"]["diode_channel"] == {
+        "t_j": 25,
+        "v_g": None,
+    }
+
+
+def test_detailed_mode_rejects_negative_voltage_anywhere_in_channel_curve():
+    """Reject interior negative voltage samples rather than checking only endpoints."""
+    transistor = device()
+    transistor.switch.channel_data[0].graph_v_i[0, 1] = -0.1
+    with pytest.raises(ValueError, match="switch channel curve must use non-negative current and voltage"):
+        calculate_topology_operating_point(
+            "buck",
+            point(mode="detailed", t_j=25, v_g=15, r_g_on=10, r_g_off=10),
+            transistor,
+            device(),
+        )
+
+
+def test_detailed_mode_matches_and_records_turn_off_voltage_for_both_switching_curves():
+    """Use the requested off-state gate condition for Eon as well as Eoff."""
+    transistor = device()
+    transistor.switch.e_on_data.append(SwitchingLossData(
+        "graph_i_e", 25, 100, 15, r_g=10, v_g_off=-10,
+        graph_i_e=np.array([[0.1, 100.0], [0.0003, 0.3]]),
+        commutation_device="fixture-diode", measurement_testbench="independent-fixture",
+    ))
+    transistor.switch.e_off_data.append(SwitchingLossData(
+        "graph_i_e", 25, 100, 15, r_g=10, v_g_off=-10,
+        graph_i_e=np.array([[0.1, 100.0], [0.0004, 0.4]]),
+        commutation_device="fixture-diode", measurement_testbench="independent-fixture",
+    ))
+
+    result = calculate_topology_operating_point(
+        "buck",
+        point(mode="detailed", t_j=25, v_g=15, v_g_off=-10, r_g_on=10, r_g_off=10),
+        transistor,
+        device(),
+    )
+
+    assert result["model"]["curve_conditions"]["e_on"]["v_g_off"] == -10
+    assert result["model"]["curve_conditions"]["e_off"]["v_g_off"] == -10
+
+
+def test_parallel_device_loss_uses_even_current_sharing_without_curve_scaling():
+    """Scale per-device current while preserving the original curve samples."""
+    transistor = device()
+    parameters = point(mode="detailed", t_j=25, v_g=15, v_g_off=-5, r_g_on=10, r_g_off=10)
+    single = calculate_topology_operating_point("buck", parameters, transistor, transistor)
+    parallel = calculate_topology_operating_point(
+        "buck", {**parameters, "parallel_switches": 2, "parallel_diodes": 2}, transistor, transistor
+    )
+    assert parallel["losses"]["conduction_switch_w"] < single["losses"]["conduction_switch_w"]
+    assert parallel["losses"]["conduction_diode_w"] < single["losses"]["conduction_diode_w"]
+    assert parallel["model"]["parallel_switches"] == 2
+
+
+def test_detailed_mode_rejects_current_outside_device_curve_range():
+    """Reject current values outside recorded channel data."""
+    transistor = device(max_current=10)
+    with pytest.raises(ValueError, match="switch channel curve supports"):
+        calculate_topology_operating_point(
+            "buck", point(mode="detailed", t_j=25, v_g=15, r_g_on=10, r_g_off=10),
+            transistor, transistor,
+        )
+
+
+def test_detailed_mode_does_not_select_a_nearby_gate_condition():
+    """Require an exact gate condition instead of selecting a nearby curve."""
+    transistor = device()
+    with pytest.raises(ValueError, match="Missing required switch channel curve at t_j=25 C, v_g=10 V"):
+        calculate_topology_operating_point(
+            "buck", point(mode="detailed", t_j=25, v_g=10, r_g_on=10, r_g_off=10),
+            transistor, transistor,
+        )
+
+
+def test_steady_state_temperatures_use_per_device_loss_and_tdb_thermal_resistance():
+    """Use per-device losses and recorded thermal resistances for temperatures."""
+    transistor = device()
+    transistor.switch.thermal_foster = FosterThermalModel(r_th_total=1.0)
+    transistor.diode.thermal_foster = FosterThermalModel(r_th_total=2.0)
+    result = calculate_topology_operating_point(
+        "buck",
+        point(mode="detailed", t_j=25, t_case=30, v_g=15, v_g_off=-5, r_g_on=10, r_g_off=10),
+        transistor,
+        transistor,
+    )
+    assert result["temperatures"]["switch_c"] == pytest.approx(
+        30 + result["losses"]["per_switch_device_w"] * 1.2
+    )
+    assert result["temperatures"]["diode_c"] == pytest.approx(
+        30 + result["losses"]["per_diode_device_w"] * 2.2
+    )
+
+
+def test_nonpositive_tdb_thermal_resistance_is_reported_as_unavailable():
+    """Treat TDB zero sentinels as missing rather than a zero-rise path."""
+    transistor = device()
+    transistor.switch.thermal_foster = FosterThermalModel(r_th_total=1.0)
+    transistor.diode.thermal_foster = FosterThermalModel(r_th_total=0.0)
+    transistor.thermal_properties.r_th_diode_cs = 0.0
+
+    result = calculate_topology_operating_point(
+        "buck",
+        point(
+            mode="conduction-only", t_j=25, t_case=30, v_g=15,
+        ),
+        transistor,
+        transistor,
+    )
+
+    assert result["temperatures"]["switch_c"] is not None
+    assert result["temperatures"]["diode_c"] is None
+    assert "must be finite and greater than zero" in result["temperatures"]["diode_unavailable_reason"]
+
+
+def test_line_and_contour_sweeps_have_documented_axis_shapes_and_units():
+    """Generate line and contour arrays with stable shapes and SI units."""
+    line = calculate_topology_sweep(
+        "buck", point(),
+        {"x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000, "x_points": 3, "metric": "i_l_ripple_pp_a"},
+    )
+    assert line["kind"] == "line"
+    assert line["x_unit"] == "Hz"
+    assert len(line["values"]) == len(line["x_values"]) == 3
+    assert line["values"][0] > line["values"][-1]
+
+    contour = calculate_topology_sweep(
+        "buck", point(),
+        {
+            "x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000, "x_points": 3,
+            "y_axis": "l_value", "y_min": 200e-6, "y_max": 400e-6, "y_points": 2,
+            "metric": "i_l_ripple_pp_a",
+        },
+    )
+    assert contour["kind"] == "contour"
+    assert len(contour["values"]) == 2
+    assert all(len(row) == 3 for row in contour["values"])
+
+
+def test_sweep_does_not_silently_skip_an_unsupported_operating_point():
+    """Fail a sweep with the coordinate of its first unsupported point."""
+    with pytest.raises(ValueError, match="Sweep point .* is unsupported: Boost requires"):
+        calculate_topology_sweep(
+            "boost", point(v_in=100, v_out=150),
+            {"x_axis": "v_out", "x_min": 90, "x_max": 110, "x_points": 2, "metric": "duty_cycle"},
+        )
+
+
+def test_contour_sweep_enforces_work_limit():
+    """Bound contour work before calculating any grid points."""
+    with pytest.raises(ValueError, match="limited to 2500 operating points"):
+        calculate_topology_sweep(
+            "buck", point(),
+            {
+                "x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000, "x_points": 51,
+                "y_axis": "l_value", "y_min": 200e-6, "y_max": 400e-6, "y_points": 51,
+                "metric": "i_l_ripple_pp_a",
+            },
+        )
