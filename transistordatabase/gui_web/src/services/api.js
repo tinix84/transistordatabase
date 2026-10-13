@@ -5,7 +5,12 @@ const getBaseURL = () => {
   if (typeof window !== 'undefined') {
     // Browser environment
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return 'http://localhost:8002'
+      // The bundled desktop-replacement app is served by FastAPI on port 8000.
+      // Vite's development server remains on 5173/5174 and uses backend port 8002.
+      if (['5173', '5174'].includes(window.location.port)) {
+        return `http://${window.location.hostname}:8002`
+      }
+      return ''
     } else {
       // Production (Vercel) - use relative paths
       return ''
@@ -224,6 +229,17 @@ export const transistorApi = {
 
   async calculateGateCharge(params) {
     const response = await api.post('/api/analytical/gate_charge', params)
+    return response.data
+  },
+
+  // Topology calculations and Python-generated sweeps
+  async calculateTopology(params) {
+    const response = await api.post('/api/topology/calculate', params)
+    return response.data
+  },
+
+  async compareTopologies(params) {
+    const response = await api.post('/api/topology/compare', params)
     return response.data
   },
 

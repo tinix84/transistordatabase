@@ -83,7 +83,7 @@ uvicorn transistordatabase.gui_web.backend.main:app --port 8002
 cd transistordatabase/gui_web
 npm run dev
 
-# Open: http://localhost:5173
+# Open: http://localhost:5174
 ```
 
 ### Which version should I use - desktop or web?
@@ -473,16 +473,16 @@ Currently only CCM (Continuous Conduction Mode) is supported. The calculator che
    lsof -i:8002
    ```
 
-2. Check frontend is on port 5173:
+2. Check frontend is on port 5174:
    ```bash
-   lsof -i:5173
+   lsof -i:5174
    ```
 
 3. Verify backend URL in browser console (F12):
    - Should call `http://localhost:8002/api/transistors`
 
 4. Check CORS settings in backend:
-   - Must allow origin `http://localhost:5173`
+   - Must allow origin `http://localhost:5174`
 
 5. Hard refresh browser: `Ctrl+Shift+R`
 

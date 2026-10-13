@@ -107,6 +107,9 @@ nav:
       - Analytical Models: api/analytical_models.md
       - Database Manager: api/database_manager.md
       - Helper Functions: api/helper_functions.md
+  - Web GUI Migration:
+      - Accepted Decision: adr/0001-local-web-gui-replaces-qt.md
+      - Topology Migration Sprint: sprints/sprint-web-topology-migration.md
   - Architecture:
       - Overview: architecture/overview.md
       - Core Design: architecture/core-design.md

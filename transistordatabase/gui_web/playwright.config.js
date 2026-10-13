@@ -13,7 +13,7 @@ export default defineConfig({
   reporter: 'html',
 
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5174',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -45,12 +45,12 @@ export default defineConfig({
   webServer: [
     {
       command: 'npm run dev',
-      url: 'http://localhost:5173',
+      url: 'http://localhost:5174',
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
     },
     {
-      command: 'cd ../.. && uv run uvicorn transistordatabase.gui_web.backend.main:app --port 8002',
+      command: 'cd ../.. && conda run -n ntbees2 python -m uvicorn transistordatabase.gui_web.backend.main:app --port 8002',
       url: 'http://localhost:8002',
       reuseExistingServer: !process.env.CI,
       timeout: 120000,

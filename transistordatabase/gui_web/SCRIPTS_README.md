@@ -1,11 +1,11 @@
 # 🚀 Development Scripts
 
-This directory contains helper scripts to easily run the Transistor Database development environment.
+This directory contains helper scripts for the Transistor Database web GUI. The development launchers use the repository's `ntbees2` Conda environment and do not create environments or install dependencies.
 
 ## 📋 Available Scripts
 
 ### 🔧 `dev-server.sh` (Linux/macOS)
-Main development script that handles everything automatically:
+Main development launcher:
 
 ```bash
 # Start both backend and frontend
@@ -17,20 +17,19 @@ Main development script that handles everything automatically:
 # Start only frontend  
 ./dev-server.sh frontend
 
-# Install dependencies only
+# Show environment setup guidance
 ./dev-server.sh install
 
 # Show help
 ./dev-server.sh help
 ```
 
-**Features:**
-- ✅ Automatically detects and uses UV virtual environment
-- ✅ Installs Python dependencies with UV
-- ✅ Installs npm dependencies
-- ✅ Starts FastAPI backend on port 8002
-- ✅ Starts Vue.js frontend on port 5174
-- ✅ Runs both servers in parallel with proper cleanup
+**Behavior:**
+- Starts the full FastAPI app `transistordatabase.gui_web.backend.main:app` on port 8002, including topology routes
+- Starts Vue/Vite on port 5174
+- Uses `conda run -n ntbees2` for the backend
+- Does not create environments or install dependencies
+- The Windows launcher uses `pushd` for directory changes, including UNC checkout paths
 
 ### 🪟 `dev-server.bat` (Windows)
 Windows equivalent with same functionality:
@@ -46,19 +45,8 @@ dev-server.bat backend
 dev-server.bat frontend
 ```
 
-### 🧪 `test-env.sh` (Environment Testing)
-Verifies your development environment:
-
-```bash
-./test-env.sh
-```
-
-**Checks:**
-- UV installation and virtual environment
-- Python package installation capability
-- Node.js and npm versions
-- Required project files
-- Frontend build process
+### 🧪 `test-env.sh` (Legacy Environment Testing)
+This older helper checks a UV-based environment and is not part of the recommended Conda development launch.
 
 ### 🏭 `production.sh` (Production Build)
 Builds and serves production version:
@@ -82,8 +70,8 @@ Verifies Vercel deployment readiness:
 
 1. **First-time setup:**
    ```bash
-   ./test-env.sh          # Verify environment
-   ./dev-server.sh setup  # Install dependencies
+   conda activate ntbees2
+   # Install frontend dependencies separately when needed.
    ```
 
 2. **Daily development:**
@@ -111,18 +99,15 @@ When running locally:
 
 ## 🔧 Requirements
 
-**For Development:**
+For development:
 - Python 3.8+
-- [UV](https://docs.astral.sh/uv/getting-started/installation/) (for Python environment management)
+- Conda environment named `ntbees2`
 - Node.js 16+
 - npm
 
 **Installation Commands:**
 ```bash
-# Install UV (Python package manager)
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install Node.js (via package manager)
+# Install Node.js (via package manager, if needed)
 # Ubuntu/Debian:
 sudo apt install nodejs npm
 
@@ -134,23 +119,9 @@ brew install node
 
 ## 🐛 Troubleshooting
 
-### UV Not Found
-```bash
-# Install UV
-curl -LsSf https://astral.sh/uv/install.sh | sh
-source ~/.bashrc
-```
-
 ### Port Already in Use
 - Frontend (5174): Stop existing Vite dev server
 - Backend (8002): Stop existing FastAPI/uvicorn process
-
-### Virtual Environment Issues
-```bash
-# Clean and recreate
-rm -rf .venv
-./dev-server.sh setup
-```
 
 ### Permission Denied
 ```bash
@@ -160,15 +131,13 @@ chmod +x *.sh
 
 ## 🌟 Script Features
 
-### Smart Environment Detection
-- Automatically finds and creates UV virtual environment
-- Detects existing installations to avoid conflicts
-- Cross-platform path handling
+### Environment Selection
+- Runs Python in the documented `ntbees2` Conda environment.
+- Does not create or remove Python environments.
 
 ### Dependency Management
-- Installs Python packages with UV for faster, reliable installs
-- Handles npm packages with proper error checking
-- Verifies all dependencies before starting servers
+- Dependencies are managed separately from the launchers.
+- The launcher checks for Conda, Node.js, and npm before starting.
 
 ### Process Management
 - Runs backend and frontend in parallel
@@ -181,7 +150,7 @@ chmod +x *.sh
 - Graceful failure with cleanup
 
 ### Development Workflow
-- One-command setup and start
+- One-command launch when the Conda environment and frontend dependencies are already available
 - Separate commands for backend/frontend only
 - Production build testing
 - Deployment preparation
@@ -196,10 +165,10 @@ gui_web/
 ├── production.sh        # Production build & serve
 ├── verify-deployment.sh # Vercel deployment check
 ├── src/                 # Vue.js source code
-├── backend/             # FastAPI backend
+├── backend/             # FastAPI backend package, including main.py
 ├── package.json         # Frontend dependencies
 ├── requirements.txt     # Python dependencies (for Vercel)
 └── vercel.json         # Vercel deployment config
 ```
 
-The scripts automatically handle directory navigation and virtual environment activation, so you can run them from anywhere within the project!
+The launchers handle directory navigation; the Python backend runs with `conda run -n ntbees2`.

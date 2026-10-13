@@ -69,7 +69,7 @@ uvicorn transistordatabase.gui_web.backend.main:app --port 8002
 cd transistordatabase/gui_web
 npm run dev
 
-# Open browser to http://localhost:5173
+# Open browser to http://localhost:5174
 ```
 
 ### Interface Overview

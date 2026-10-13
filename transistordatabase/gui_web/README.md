@@ -16,17 +16,19 @@ This is the modern web interface for the Transistor Database, built with Vue 3 +
 
 ## Quick Start
 
-1. **Start Backend** (from `backend/` directory):
+1. **Start Backend** with the repository's Conda environment (from the repository root):
 ```bash
-cd backend
-python main_simple.py
+conda activate ntbees2
+python -m uvicorn transistordatabase.gui_web.backend.main:app --host 127.0.0.1 --port 8002
 ```
+The backend launcher scripts use this full FastAPI application, including the topology routes. They do not create an environment or install dependencies.
+`dev-server.bat` uses `pushd` for directory changes so the backend and frontend can also start from a UNC checkout.
 
 2. **Start Frontend** (from root `gui_web/` directory):
 ```bash
-npm install
 npm run dev
 ```
+Install the frontend dependencies separately before the first run.
 
 3. **Access Application:**
 - Web Interface: http://localhost:5174
@@ -57,7 +59,7 @@ gui_web/
 │   ├── services/            # API services
 │   ├── App.vue             # Main application
 │   └── main.js             # Application entry
-├── backend/                 # FastAPI backend
-│   └── main_simple.py      # API server
+├── backend/                 # FastAPI backend package
+│   └── main.py             # Full API server, including topology routes
 └── package.json            # Dependencies
 ```

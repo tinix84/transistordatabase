@@ -103,9 +103,10 @@ describe('TopologyCalculator.vue', () => {
       expect(text).toMatch(/output voltage|v_out|vout/i)
     })
 
-    it('should have current field', () => {
+    it('should request output power instead of a user-entered output current', () => {
       const text = wrapper.text()
-      expect(text).toMatch(/current|i_out|iout/i)
+      expect(text).toContain('Output power')
+      expect(text).not.toMatch(/average output current/i)
     })
 
     it('should have frequency field', () => {
@@ -113,9 +114,11 @@ describe('TopologyCalculator.vue', () => {
       expect(text).toMatch(/frequency|f_sw|switching/i)
     })
 
-    it('should have gate resistance field', () => {
-      const text = wrapper.text()
-      expect(text).toMatch(/gate resistance|r_g|rg/i)
+    it('should show gate resistance conditions in detailed mode', async () => {
+      const mode = wrapper.findAll('label.param-item').find(item => item.text().includes('Calculation mode'))
+      await mode.get('select').setValue('detailed')
+      expect(wrapper.text()).toContain('Turn-on gate resistance')
+      expect(wrapper.text()).toContain('Turn-off gate resistance')
     })
 
     it('should validate parameter ranges', () => {
@@ -136,29 +139,27 @@ describe('TopologyCalculator.vue', () => {
       expect(text).toMatch(/loss|conduction|switching|power/i)
     })
 
-    it('should display efficiency', () => {
-      const text = wrapper.text()
-      expect(text).toMatch(/efficiency|η|percent/i)
+    it('should not show efficiency before a backend calculation succeeds', () => {
+      expect(wrapper.find('.results-panel').exists()).toBe(false)
+      expect(wrapper.text()).not.toMatch(/partial efficiency/i)
     })
 
-    it('should display temperature', () => {
-      const text = wrapper.text()
-      expect(text).toMatch(/temperature|t_j|junction/i)
+    it('should expose thermal conditions only for curve-backed modes', async () => {
+      const mode = wrapper.findAll('label.param-item').find(item => item.text().includes('Calculation mode'))
+      await mode.get('select').setValue('conduction-only')
+      expect(wrapper.text()).toContain('Curve and thermal conditions')
     })
 
     it('should display current ripple', () => {
-      const text = wrapper.text()
-      expect(text).toMatch(/ripple|inductor|current/i)
+      expect(wrapper.find('.results-panel').exists()).toBe(false)
+      expect(wrapper.text()).not.toMatch(/inductor current ripple/i)
     })
   })
 
   describe('Charts and Plots', () => {
-    it('should display waveform plots', () => {
-      // Should have canvas or chart containers
-      const hasCanvas = wrapper.findAll('canvas').length > 0
-      const hasChart = wrapper.html().includes('chart')
-
-      expect(hasCanvas || hasChart).toBe(true)
+    it('should wait for a successful backend response before rendering a waveform', () => {
+      expect(wrapper.findAll('canvas')).toHaveLength(0)
+      expect(wrapper.find('.results-panel').exists()).toBe(false)
     })
 
     it('should display loss breakdown chart', () => {
@@ -178,12 +179,14 @@ describe('TopologyCalculator.vue', () => {
     })
   })
 
-  describe('Gate Resistance Slider', () => {
-    it('should have gate resistance slider', () => {
-      const sliders = wrapper.findAll('input[type="range"]')
-      const hasSlider = sliders.length > 0 || wrapper.text().includes('slider')
-
-      expect(hasSlider || wrapper.html().includes('r_g')).toBe(true)
+  describe('Gate Resistance Conditions', () => {
+    it('should use numeric gate conditions instead of a slider', async () => {
+      const mode = wrapper.findAll('label.param-item').find(item => item.text().includes('Calculation mode'))
+      await mode.get('select').setValue('detailed')
+      const labels = wrapper.findAll('label.param-item').map(item => item.text())
+      expect(labels.some(label => label.includes('Turn-on gate resistance (optional)'))).toBe(true)
+      expect(labels.some(label => label.includes('Turn-off gate resistance (optional)'))).toBe(true)
+      expect(wrapper.findAll('input[type="range"]')).toHaveLength(0)
     })
 
     it('should update calculations when slider changes', () => {

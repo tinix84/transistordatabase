@@ -1079,22 +1079,25 @@ async def validate_curves(transistor_id: str) -> CurveValidationResult:
 # ---------------------------------------------------------------------------
 
 @app.post("/api/topology/calculate")
-async def calculate_topology(request: TopologyCalculationRequest) -> Dict[str, Any]:
-    """Calculate converter performance for a specific topology."""
-    transistor = None
-    if request.transistor_id:
-        try:
-            transistor = _get_transistor(request.transistor_id)
-        except HTTPException:
-            pass
-
+def calculate_topology(request: TopologyCalculationRequest) -> Dict[str, Any]:
+    """Calculate a topology point and optional sweep through reusable Python code."""
     try:
+        switch_id = request.switch_transistor_id or request.transistor_id
+        diode_id = request.diode_transistor_id or request.transistor_id
+        switch_transistor = _get_transistor(switch_id) if switch_id else None
+        diode_transistor = _get_transistor(diode_id) if diode_id else None
+        parameters = request.model_dump(exclude={
+            "transistor_id", "switch_transistor_id", "diode_transistor_id",
+        })
         result = _topology_calc.calculate(
             request.topology,
-            request.parameters.dict() if hasattr(request.parameters, 'dict') else request.parameters,
-            transistor
+            parameters,
+            switch_transistor=switch_transistor,
+            diode_transistor=diode_transistor,
         )
         return result
+    except HTTPException:
+        raise
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -1102,21 +1105,24 @@ async def calculate_topology(request: TopologyCalculationRequest) -> Dict[str, A
 
 
 @app.post("/api/topology/compare")
-async def compare_topologies(request: Dict[str, Any]) -> Dict[str, Any]:
-    """Compare all three topologies for given parameters."""
-    parameters = request.get('parameters', {})
-    transistor_id = request.get('transistor_id')
-
-    transistor = None
-    if transistor_id:
-        try:
-            transistor = _get_transistor(transistor_id)
-        except HTTPException:
-            pass
-
+def compare_topologies(request: Dict[str, Any]) -> Dict[str, Any]:
+    """Compare all supported topology formulas for the supplied SI inputs."""
     try:
-        result = _topology_calc.compare_topologies(parameters, transistor)
+        parameters = dict(request.get("parameters", request))
+        switch_id = request.get("switch_transistor_id") or request.get("transistor_id")
+        diode_id = request.get("diode_transistor_id") or request.get("transistor_id")
+        switch_transistor = _get_transistor(switch_id) if switch_id else None
+        diode_transistor = _get_transistor(diode_id) if diode_id else None
+        result = _topology_calc.compare_topologies(
+            parameters,
+            switch_transistor=switch_transistor,
+            diode_transistor=diode_transistor,
+        )
         return result
+    except HTTPException:
+        raise
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Comparison failed: {e!s}")
 
