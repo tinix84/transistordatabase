@@ -22,6 +22,9 @@ const getBaseURL = () => {
 
 const BASE_URL = getBaseURL()
 
+const exactRecordUrl = (name) => `/api/transistor-record?name=${encodeURIComponent(name)}`
+const pathSegment = (value) => encodeURIComponent(value)
+
 // Debug logging
 console.log('[API] Initialized with BASE_URL:', BASE_URL)
 
@@ -63,7 +66,7 @@ export const transistorApi = {
 
   // Get a specific transistor by ID
   async getById(id) {
-    const response = await api.get(`/api/transistors/${id}`)
+    const response = await api.get(exactRecordUrl(id))
     return response.data
   },
 
@@ -75,19 +78,19 @@ export const transistorApi = {
 
   // Update an existing transistor
   async update(id, transistorData) {
-    const response = await api.put(`/api/transistors/${id}`, transistorData)
+    const response = await api.put(exactRecordUrl(id), transistorData)
     return response.data
   },
 
   // Delete a transistor
   async delete(id) {
-    const response = await api.delete(`/api/transistors/${id}`)
+    const response = await api.delete(exactRecordUrl(id))
     return response.data
   },
 
   // Validate a transistor
   async validate(id) {
-    const response = await api.post(`/api/transistors/${id}/validate`)
+    const response = await api.post(`/api/transistors/${pathSegment(id)}/validate`)
     return response.data
   },
 
@@ -108,7 +111,7 @@ export const transistorApi = {
 
   // Export transistor in specified format
   async export(id, format) {
-    const response = await api.post(`/api/transistors/${id}/export/${format}`, {}, {
+    const response = await api.post(`/api/transistors/${pathSegment(id)}/export/${format}`, {}, {
       responseType: 'blob'
     })
     return response.data
@@ -116,7 +119,7 @@ export const transistorApi = {
 
   // Preview export before downloading
   async exportPreview(id, format) {
-    const response = await api.get(`/api/transistors/${id}/export/${format}/preview`)
+    const response = await api.get(`/api/transistors/${pathSegment(id)}/export/${format}/preview`)
     return response.data
   },
 
@@ -146,14 +149,14 @@ export const transistorApi = {
 
   // Get all curves for a transistor
   async getCurves(id) {
-    const response = await api.get(`/api/transistors/${id}/curves`)
+    const response = await api.get(`/api/transistors/${pathSegment(id)}/curves`)
     return response.data
   },
 
   // Add channel curve
   async addChannelCurve(id, curveData, component = 'switch') {
     const response = await api.post(
-      `/api/transistors/${id}/curves/channel?component=${component}`,
+      `/api/transistors/${pathSegment(id)}/curves/channel?component=${component}`,
       curveData
     )
     return response.data
@@ -162,7 +165,7 @@ export const transistorApi = {
   // Add switching loss curve (e_on, e_off, e_rr)
   async addSwitchingLossCurve(id, lossType, curveData) {
     const response = await api.post(
-      `/api/transistors/${id}/curves/switching/${lossType}`,
+      `/api/transistors/${pathSegment(id)}/curves/switching/${lossType}`,
       curveData
     )
     return response.data
@@ -171,7 +174,7 @@ export const transistorApi = {
   // Add gate charge curve
   async addGateChargeCurve(id, curveData) {
     const response = await api.post(
-      `/api/transistors/${id}/curves/gate_charge`,
+      `/api/transistors/${pathSegment(id)}/curves/gate_charge`,
       curveData
     )
     return response.data
@@ -180,7 +183,7 @@ export const transistorApi = {
   // Add SOA curve
   async addSOACurve(id, curveData) {
     const response = await api.post(
-      `/api/transistors/${id}/curves/soa`,
+      `/api/transistors/${pathSegment(id)}/curves/soa`,
       curveData
     )
     return response.data
@@ -189,7 +192,7 @@ export const transistorApi = {
   // Add capacitance curve
   async addCapacitanceCurve(id, capType, curveData) {
     const response = await api.post(
-      `/api/transistors/${id}/curves/capacitance/${capType}`,
+      `/api/transistors/${pathSegment(id)}/curves/capacitance/${capType}`,
       curveData
     )
     return response.data
@@ -198,14 +201,14 @@ export const transistorApi = {
   // Delete curve
   async deleteCurve(id, component, curveType, index) {
     const response = await api.delete(
-      `/api/transistors/${id}/curves/${component}/${curveType}/${index}`
+      `/api/transistors/${pathSegment(id)}/curves/${component}/${curveType}/${index}`
     )
     return response.data
   },
 
   // Validate curves
   async validateCurves(id) {
-    const response = await api.post(`/api/transistors/${id}/curves/validate`)
+    const response = await api.post(`/api/transistors/${pathSegment(id)}/curves/validate`)
     return response.data
   },
 
@@ -252,12 +255,12 @@ export const transistorApi = {
   },
 
   async getDPTData(transistorId) {
-    const response = await api.get(`/api/transistors/${transistorId}/dpt_data`)
+    const response = await api.get(`/api/transistors/${pathSegment(transistorId)}/dpt_data`)
     return response.data
   },
 
   async validateDPTData(transistorId) {
-    const response = await api.post(`/api/transistors/${transistorId}/dpt_validate`)
+    const response = await api.post(`/api/transistors/${pathSegment(transistorId)}/dpt_validate`)
     return response.data
   }
 }

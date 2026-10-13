@@ -59,6 +59,8 @@ Validation: scalar/vector/mesh consistency; axis units and array shapes; reprodu
 
 Use the same checklist and vertical-workflow approach for database search, creation/editing, curve management, comparison, import/export, settings and all other documented desktop capabilities. The order after topology remains open. Do not treat completion of the current Vue feature set as proof of full desktop coverage.
 
+The search-driven general database lifecycle slice is tracked in the [database lifecycle sprint](sprint-web-database-lifecycle.md); it does not close this broader replacement.
+
 ## Topology coverage status (2026-10-13)
 
 | Capability | Current evidence | Status and remaining limit |

@@ -295,7 +295,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="transistor in paginatedTransistors" :key="transistor.metadata.name">
+              <tr
+                v-for="transistor in paginatedTransistors"
+                :key="transistor.metadata.name"
+                data-testid="transistor-row"
+                :data-transistor-name="transistor.metadata.name"
+              >
                 <td class="transistor-name">{{ transistor.metadata.name }}</td>
                 <td>{{ transistor.metadata.manufacturer }}</td>
                 <td>
@@ -315,6 +320,12 @@
                   </button>
                   <button @click="loadToTopology(transistor)" class="btn btn-sm btn-info">
                     🧮 Topology
+                  </button>
+                  <button @click="emit('edit-transistor', transistor)" class="btn btn-sm btn-secondary">
+                    Edit
+                  </button>
+                  <button @click="emit('delete-transistor', transistor)" class="btn btn-sm btn-danger">
+                    Delete
                   </button>
                 </td>
               </tr>
@@ -348,6 +359,8 @@
               v-for="transistor in paginatedTransistors" 
               :key="transistor.metadata.name"
               class="transistor-card"
+              data-testid="transistor-card"
+              :data-transistor-name="transistor.metadata.name"
             >
               <div class="card-header">
                 <h4>{{ transistor.metadata.name }}</h4>
@@ -373,6 +386,12 @@
                   <button @click="loadToTopology(transistor)" class="btn btn-sm btn-info">
                     🧮 Topology
                   </button>
+                  <button @click="emit('edit-transistor', transistor)" class="btn btn-sm btn-secondary">
+                    Edit
+                  </button>
+                  <button @click="emit('delete-transistor', transistor)" class="btn btn-sm btn-danger">
+                    Delete
+                  </button>
                 </div>
               </div>
             </div>
@@ -390,7 +409,13 @@ const props = defineProps({
   transistors: Array
 })
 
-const emit = defineEmits(['load-to-exporting', 'load-to-comparison', 'load-to-topology'])
+const emit = defineEmits([
+  'load-to-exporting',
+  'load-to-comparison',
+  'load-to-topology',
+  'edit-transistor',
+  'delete-transistor'
+])
 
 // Debug logging
 onMounted(() => {

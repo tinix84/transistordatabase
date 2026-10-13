@@ -19,6 +19,8 @@ export const mockTransistor1 = {
   },
   thermal: {
     r_th_cs: 0.24,
+    r_th_switch_cs: 0.12,
+    r_th_diode_cs: 0.18,
     r_th_total: 0.5,
     housing_area: 0.0012,
     cooling_area: 0.0008

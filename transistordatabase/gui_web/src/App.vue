@@ -23,6 +23,7 @@ const selectedForTopology = ref(null)
 const isLoading = ref(false)
 const isDarkTheme = ref(false)
 const showMoreMenu = ref(false)
+const operationMessage = ref(null)
 
 onMounted(async () => {
   console.log('[App.vue] Component mounted, loading transistors...')
@@ -47,6 +48,7 @@ async function loadTransistors() {
     console.log('[loadTransistors] Data length:', data?.length)
     transistors.value = data
     console.log('[loadTransistors] State updated, transistors.value.length:', transistors.value.length)
+    return true
   } catch (error) {
     console.error('[loadTransistors] Error:', error)
     console.error('[loadTransistors] Error details:', {
@@ -54,6 +56,7 @@ async function loadTransistors() {
       response: error.response,
       stack: error.stack
     })
+    return false
   } finally {
     isLoading.value = false
     console.log('[loadTransistors] Finished, isLoading:', isLoading.value)
@@ -79,6 +82,7 @@ function showSearch() {
 }
 
 function showCreate() {
+  operationMessage.value = null
   selectedTransistor.value = null
   currentView.value = 'create'
 }
@@ -116,21 +120,57 @@ function showDPT() {
 }
 
 function showEditForm(transistor) {
+  operationMessage.value = null
+  const name = transistor?.metadata?.name
+  if (typeof name !== 'string' || !name || name.includes('/') || name.includes('\\')) {
+    operationMessage.value = {
+      type: 'error',
+      text: 'Device names containing path separators cannot be edited in the web database.'
+    }
+    return
+  }
   selectedTransistor.value = transistor
   currentView.value = 'create'
 }
 
 async function handleTransistorSaved() {
-  await loadTransistors()
+  const refreshed = await loadTransistors()
   currentView.value = 'search'
+  operationMessage.value = refreshed
+    ? { type: 'success', text: 'Transistor saved successfully.' }
+    : { type: 'error', text: 'Transistor was saved, but the database list could not be refreshed.' }
 }
 
-async function handleTransistorDeleted(transistorId) {
+async function handleTransistorDeleted(transistor) {
+  const transistorId = typeof transistor === 'string'
+    ? transistor
+    : transistor?.metadata?.name
+  if (!transistorId) {
+    operationMessage.value = { type: 'error', text: 'Could not identify the transistor to delete.' }
+    return
+  }
+  if (transistorId.includes('/') || transistorId.includes('\\')) {
+    operationMessage.value = {
+      type: 'error',
+      text: 'Device names containing path separators cannot be deleted in the web database.'
+    }
+    return
+  }
+
+  if (!window.confirm(`Delete ${transistorId}? This cannot be undone.`)) return
+
   try {
     await transistorApi.delete(transistorId)
-    await loadTransistors()
+    const refreshed = await loadTransistors()
+    operationMessage.value = refreshed
+      ? { type: 'success', text: `${transistorId} was deleted.` }
+      : { type: 'error', text: `${transistorId} was deleted, but the database list could not be refreshed.` }
   } catch (error) {
     console.error('Error deleting transistor:', error)
+    operationMessage.value = {
+      type: 'error',
+      text: error.response?.data?.detail || error.message || `Could not delete ${transistorId}.`
+    }
   }
 }
 
@@ -270,6 +310,16 @@ function handleOpenDatabaseSearch() {
       </div>
     </nav>
 
+    <div
+      v-if="operationMessage"
+      class="operation-message"
+      :class="operationMessage.type"
+      :role="operationMessage.type === 'error' ? 'alert' : 'status'"
+      :aria-live="operationMessage.type === 'error' ? 'assertive' : 'polite'"
+    >
+      {{ operationMessage.text }}
+    </div>
+
     <main class="app-main">
       <div v-if="isLoading" class="loading">
         <div class="loading-spinner"></div>
@@ -283,6 +333,8 @@ function handleOpenDatabaseSearch() {
         @load-to-exporting="handleLoadToExporting"
         @load-to-comparison="handleLoadToComparison"
         @load-to-topology="handleLoadToTopology"
+        @edit-transistor="showEditForm"
+        @delete-transistor="handleTransistorDeleted"
       />
       
       <!-- Create/Edit Transistor Form -->
@@ -564,6 +616,22 @@ body {
   max-width: 100%;
   margin: 0;
   background: var(--bg-primary);
+}
+
+.operation-message {
+  margin: 1rem 2rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+}
+
+.operation-message.success {
+  color: #155724;
+  background: #d4edda;
+}
+
+.operation-message.error {
+  color: #721c24;
+  background: #f8d7da;
 }
 
 .loading {

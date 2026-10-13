@@ -1,7 +1,7 @@
 /**
  * Unit tests for App.vue component
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import App from '../../App.vue'
 import { transistorApi } from '../../services/api'
@@ -44,10 +44,16 @@ vi.mock('../../components/TopologyCalculator.vue', () => ({
 describe('App.vue', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.stubGlobal('confirm', vi.fn(() => true))
+    localStorage.getItem.mockReturnValue(null)
     transistorApi.getAll.mockResolvedValue(mockTransistors)
     // Suppress console logs
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
   })
 
   describe('Component Mounting', () => {
@@ -233,6 +239,9 @@ describe('App.vue', () => {
 
       await wrapper.vm.handleTransistorDeleted('CREE_C3M0060065J')
 
+      expect(window.confirm).toHaveBeenCalledWith(
+        'Delete CREE_C3M0060065J? This cannot be undone.'
+      )
       expect(transistorApi.delete).toHaveBeenCalledWith('CREE_C3M0060065J')
       expect(transistorApi.getAll).toHaveBeenCalled()
     })
@@ -257,6 +266,20 @@ describe('App.vue', () => {
 
       expect(wrapper.vm.selectedTransistor).toEqual(transistor)
       expect(wrapper.vm.currentView).toBe('create')
+    })
+
+    it('rejects path-separator identities before opening edit or confirming delete', async () => {
+      const wrapper = mount(App)
+      await flushPromises()
+
+      wrapper.vm.showEditForm({ metadata: { name: 'Unsafe/Device' } })
+      expect(wrapper.vm.currentView).toBe('search')
+      expect(wrapper.vm.operationMessage.text).toContain('path separators')
+
+      window.confirm.mockClear()
+      await wrapper.vm.handleTransistorDeleted('Unsafe\\Device')
+      expect(window.confirm).not.toHaveBeenCalled()
+      expect(transistorApi.delete).not.toHaveBeenCalled()
     })
 
     it('should clear selected transistor when creating new', async () => {

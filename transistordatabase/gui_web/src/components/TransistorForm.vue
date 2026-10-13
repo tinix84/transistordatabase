@@ -5,6 +5,8 @@
       <button @click="$emit('cancel')" class="btn btn-secondary">Cancel</button>
     </div>
 
+    <p v-if="saveError" class="save-error" role="alert">{{ saveError }}</p>
+
     <!-- Section Tabs -->
     <div class="section-tabs">
       <button
@@ -28,9 +30,11 @@
               id="name"
               v-model="formData.metadata.name"
               type="text"
+              :readonly="isEditing"
               required
               placeholder="e.g. IGBT_1200V_100A"
             />
+            <small v-if="isEditing">Device names cannot be changed while editing.</small>
           </div>
 
           <div class="form-group">
@@ -61,12 +65,14 @@
             <label for="housing">Housing Type *</label>
             <select id="housing" v-model="formData.metadata.housing_type" required>
               <option value="">Select housing</option>
-              <option value="TO-247">TO-247</option>
-              <option value="TO-220">TO-220</option>
-              <option value="TO-252">TO-252</option>
-              <option value="SO-8">SO-8</option>
-              <option value="SOT-23">SOT-23</option>
-              <option value="Other">Other</option>
+              <option
+                v-if="formData.metadata.housing_type && !housingTypeOptions.includes(formData.metadata.housing_type)"
+                :value="formData.metadata.housing_type"
+              >{{ formData.metadata.housing_type }}</option>
+              <option value="TO247">TO-247</option>
+              <option value="TO220">TO-220</option>
+              <option value="TO263">TO-263</option>
+              <option value="TO92">TO-92</option>
             </select>
           </div>
 
@@ -165,12 +171,36 @@
           </div>
 
           <div class="form-group">
+            <label for="r_th_switch_cs">R<sub>th,switch-cs</sub> (K/W) *</label>
+            <input
+              id="r_th_switch_cs"
+              v-model.number="formData.thermal.r_th_switch_cs"
+              type="number"
+              step="0.001"
+              min="0"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="r_th_diode_cs">R<sub>th,diode-cs</sub> (K/W) *</label>
+            <input
+              id="r_th_diode_cs"
+              v-model.number="formData.thermal.r_th_diode_cs"
+              type="number"
+              step="0.001"
+              min="0"
+              required
+            />
+          </div>
+
+          <div class="form-group">
             <label for="housing_area">Housing Area (cm²) *</label>
             <input
               id="housing_area"
               v-model.number="formData.thermal.housing_area"
               type="number"
-              step="0.1"
+              step="any"
               min="0"
               required
               placeholder="e.g. 1.0"
@@ -183,7 +213,7 @@
               id="cooling_area"
               v-model.number="formData.thermal.cooling_area"
               type="number"
-              step="0.1"
+              step="any"
               min="0"
               required
               placeholder="e.g. 1.0"
@@ -385,6 +415,7 @@ const emit = defineEmits(['saved', 'cancel'])
 
 const isEditing = ref(false)
 const isSubmitting = ref(false)
+const saveError = ref('')
 const validationResult = ref(null)
 const activeTab = ref('general')
 const curveComponent = ref('switch')
@@ -396,6 +427,7 @@ const curveMessage = ref(null)
 
 const lossTypeLabels = { e_on: 'E_on (Turn-on)', e_off: 'E_off (Turn-off)', e_rr: 'E_rr (Reverse Recovery)' }
 const capTypeLabels = { c_oss: 'C_oss (Output)', c_iss: 'C_iss (Input)', c_rss: 'C_rss (Reverse Transfer)' }
+const housingTypeOptions = ['TO247', 'TO220', 'TO263', 'TO92']
 
 const formData = reactive({
   metadata: {
@@ -414,6 +446,8 @@ const formData = reactive({
   },
   thermal: {
     r_th_cs: 0,
+    r_th_switch_cs: 0,
+    r_th_diode_cs: 0,
     housing_area: 0,
     cooling_area: 0
   }
@@ -448,7 +482,7 @@ const availableTabs = computed(() => {
 
 function getTransistorId() {
   if (!props.transistor) return null
-  return props.transistor.metadata.name.replace(/ /g, '_').replace(/\//g, '_')
+  return props.transistor.metadata.name
 }
 
 onMounted(async () => {
@@ -456,7 +490,10 @@ onMounted(async () => {
     isEditing.value = true
     Object.assign(formData.metadata, props.transistor.metadata)
     Object.assign(formData.electrical, props.transistor.electrical)
-    Object.assign(formData.thermal, props.transistor.thermal)
+    Object.assign(formData.thermal, props.transistor.thermal, {
+      housing_area: squareMetresToSquareCentimetres(props.transistor.thermal.housing_area),
+      cooling_area: squareMetresToSquareCentimetres(props.transistor.thermal.cooling_area)
+    })
     await loadCurves()
   }
 })
@@ -589,6 +626,8 @@ async function validateForm() {
       }
 
       if (formData.thermal.r_th_cs <= 0) errors.push('R_th_cs must be positive')
+      if (formData.thermal.r_th_switch_cs < 0) errors.push('Switch case-to-sink resistance cannot be negative')
+      if (formData.thermal.r_th_diode_cs < 0) errors.push('Diode case-to-sink resistance cannot be negative')
       if (formData.thermal.housing_area <= 0) errors.push('Housing area must be positive')
       if (formData.thermal.cooling_area <= 0) errors.push('Cooling area must be positive')
 
@@ -603,21 +642,42 @@ async function validateForm() {
   }
 }
 
+function squareMetresToSquareCentimetres(area) {
+  return Number((area * 10000).toPrecision(12))
+}
+
+function squareCentimetresToSquareMetres(area) {
+  return Number((area / 10000).toPrecision(12))
+}
+
+function toApiPayload() {
+  return {
+    metadata: { ...formData.metadata },
+    electrical: { ...formData.electrical },
+    thermal: {
+      ...formData.thermal,
+      housing_area: squareCentimetresToSquareMetres(formData.thermal.housing_area),
+      cooling_area: squareCentimetresToSquareMetres(formData.thermal.cooling_area)
+    }
+  }
+}
+
 async function handleSubmit() {
   isSubmitting.value = true
+  saveError.value = ''
 
   try {
     if (isEditing.value) {
       const transistorId = getTransistorId()
-      await transistorApi.update(transistorId, formData)
+      await transistorApi.update(transistorId, toApiPayload())
     } else {
-      await transistorApi.create(formData)
+      await transistorApi.create(toApiPayload())
     }
 
     emit('saved')
   } catch (error) {
     console.error('Save error:', error)
-    alert('Failed to save transistor: ' + error.message)
+    saveError.value = error.response?.data?.detail || error.message || 'Failed to save transistor.'
   } finally {
     isSubmitting.value = false
   }
@@ -632,6 +692,14 @@ async function handleSubmit() {
   border-radius: 8px;
   box-shadow: 0 2px 8px var(--shadow, rgba(0,0,0,0.1));
   overflow: hidden;
+}
+
+.save-error {
+  margin: 1rem 2rem 0;
+  color: #721c24;
+  background: #f8d7da;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
 }
 
 .form-header {
