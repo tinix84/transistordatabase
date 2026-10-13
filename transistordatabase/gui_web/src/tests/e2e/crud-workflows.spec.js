@@ -24,6 +24,8 @@ function fixtureDevice(name = DEVICE_NAME) {
     },
     thermal: {
       r_th_cs: 0.24,
+      r_th_switch_cs: 0.12,
+      r_th_diode_cs: 0.18,
       housing_area: 0.0012,
       cooling_area: 0.0008
     },
@@ -147,6 +149,8 @@ async function fillCreateForm(page, name) {
   await page.locator('#i_cont').fill('50')
   await page.locator('#t_j_max').fill('175')
   await page.locator('#r_th_cs').fill('0.25')
+  await page.locator('#r_th_switch_cs').fill('0.12')
+  await page.locator('#r_th_diode_cs').fill('0.18')
   await page.locator('#housing_area').fill('1')
   await page.locator('#cooling_area').fill('0.5')
 }
@@ -185,6 +189,12 @@ test.describe('Database lifecycle from search results', () => {
     const creation = api.requests.find(request => request.method === 'POST')
     expect(creation.status).toBe(409)
     expect(creation.payload.metadata.name).toBe(DEVICE_NAME)
+    expect(creation.payload.thermal).toMatchObject({
+      r_th_switch_cs: 0.12,
+      r_th_diode_cs: 0.18,
+      housing_area: 0.0001,
+      cooling_area: 0.00005
+    })
   })
 
   test('edits a table result through the update endpoint', async ({ page }) => {
@@ -197,6 +207,8 @@ test.describe('Database lifecycle from search results', () => {
     await expect(page.getByRole('heading', { name: 'Edit Transistor' })).toBeVisible()
     await expect(page.locator('#name')).toHaveAttribute('readonly', '')
     await expect(page.locator('#manufacturer')).toHaveValue('Fixture Semiconductor')
+    await expect(page.locator('#housing_area')).toHaveValue('12')
+    await expect(page.locator('#cooling_area')).toHaveValue('8')
     await page.locator('#manufacturer').fill('Updated Fixture Semiconductor')
     await page.getByRole('button', { name: 'Update', exact: true }).click()
 
@@ -206,6 +218,8 @@ test.describe('Database lifecycle from search results', () => {
     expect(update.path).toBe('/api/transistor-record')
     expect(update.name).toBe(DEVICE_NAME)
     expect(update.payload.metadata.manufacturer).toBe('Updated Fixture Semiconductor')
+    expect(update.payload.thermal.housing_area).toBe(0.0012)
+    expect(update.payload.thermal.cooling_area).toBe(0.0008)
   })
 
   test('shows update errors inline and keeps the edit form open', async ({ page }) => {

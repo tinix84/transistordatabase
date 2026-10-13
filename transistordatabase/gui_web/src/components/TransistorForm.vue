@@ -171,6 +171,30 @@
           </div>
 
           <div class="form-group">
+            <label for="r_th_switch_cs">R<sub>th,switch-cs</sub> (K/W) *</label>
+            <input
+              id="r_th_switch_cs"
+              v-model.number="formData.thermal.r_th_switch_cs"
+              type="number"
+              step="0.001"
+              min="0"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="r_th_diode_cs">R<sub>th,diode-cs</sub> (K/W) *</label>
+            <input
+              id="r_th_diode_cs"
+              v-model.number="formData.thermal.r_th_diode_cs"
+              type="number"
+              step="0.001"
+              min="0"
+              required
+            />
+          </div>
+
+          <div class="form-group">
             <label for="housing_area">Housing Area (cm²) *</label>
             <input
               id="housing_area"
@@ -422,6 +446,8 @@ const formData = reactive({
   },
   thermal: {
     r_th_cs: 0,
+    r_th_switch_cs: 0,
+    r_th_diode_cs: 0,
     housing_area: 0,
     cooling_area: 0
   }
@@ -464,7 +490,10 @@ onMounted(async () => {
     isEditing.value = true
     Object.assign(formData.metadata, props.transistor.metadata)
     Object.assign(formData.electrical, props.transistor.electrical)
-    Object.assign(formData.thermal, props.transistor.thermal)
+    Object.assign(formData.thermal, props.transistor.thermal, {
+      housing_area: squareMetresToSquareCentimetres(props.transistor.thermal.housing_area),
+      cooling_area: squareMetresToSquareCentimetres(props.transistor.thermal.cooling_area)
+    })
     await loadCurves()
   }
 })
@@ -597,6 +626,8 @@ async function validateForm() {
       }
 
       if (formData.thermal.r_th_cs <= 0) errors.push('R_th_cs must be positive')
+      if (formData.thermal.r_th_switch_cs < 0) errors.push('Switch case-to-sink resistance cannot be negative')
+      if (formData.thermal.r_th_diode_cs < 0) errors.push('Diode case-to-sink resistance cannot be negative')
       if (formData.thermal.housing_area <= 0) errors.push('Housing area must be positive')
       if (formData.thermal.cooling_area <= 0) errors.push('Cooling area must be positive')
 
@@ -611,6 +642,26 @@ async function validateForm() {
   }
 }
 
+function squareMetresToSquareCentimetres(area) {
+  return Number((area * 10000).toPrecision(12))
+}
+
+function squareCentimetresToSquareMetres(area) {
+  return Number((area / 10000).toPrecision(12))
+}
+
+function toApiPayload() {
+  return {
+    metadata: { ...formData.metadata },
+    electrical: { ...formData.electrical },
+    thermal: {
+      ...formData.thermal,
+      housing_area: squareCentimetresToSquareMetres(formData.thermal.housing_area),
+      cooling_area: squareCentimetresToSquareMetres(formData.thermal.cooling_area)
+    }
+  }
+}
+
 async function handleSubmit() {
   isSubmitting.value = true
   saveError.value = ''
@@ -618,9 +669,9 @@ async function handleSubmit() {
   try {
     if (isEditing.value) {
       const transistorId = getTransistorId()
-      await transistorApi.update(transistorId, formData)
+      await transistorApi.update(transistorId, toApiPayload())
     } else {
-      await transistorApi.create(formData)
+      await transistorApi.create(toApiPayload())
     }
 
     emit('saved')

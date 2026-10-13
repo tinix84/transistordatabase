@@ -25,16 +25,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: check linting using pycodestyle
-        run: |
-            pip install pycodestyle
-            pip install pytest
-            pycodestyle $(git ls-files '*.py') 
-          
-            pip install ruff
-            ruff check $(git ls-files '*.py')
-
-      # Runs a single command using the runners shell
       - name: install tdb package
         run: |
             pip install -e .
@@ -47,9 +37,19 @@ jobs:
           cd tests/
           pytest test_tdb_classes.py
           pytest test_database_manager.py
-          pytest test_web_database_lifecycle_api.py
+          pytest test_web_database_lifecycle_api.py --noconftest
           echo tests finished.
           
+      - name: check linting using pycodestyle
+        run: |
+            pip install pycodestyle
+            pip install pytest
+            pycodestyle $(git ls-files '*.py')
+
+            pip install ruff
+            ruff check $(git ls-files '*.py')
+
+      # Runs a single command using the runners shell
       - name: Install sphinx and build documentation with sphinx
         run: |
           pip install sphinx sphinx-multiversion sphinx_rtd_theme sphinxcontrib-email

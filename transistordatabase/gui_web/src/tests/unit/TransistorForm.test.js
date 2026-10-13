@@ -12,7 +12,8 @@ vi.mock('../../services/api', () => ({
   transistorApi: {
     create: vi.fn(),
     update: vi.fn(),
-    validate: vi.fn()
+    validate: vi.fn(),
+    getCurves: vi.fn()
   }
 }))
 
@@ -27,6 +28,7 @@ describe('TransistorForm.vue', () => {
     transistorApi.create.mockResolvedValue(mockTransistor1)
     transistorApi.update.mockResolvedValue(mockTransistor1)
     transistorApi.validate.mockResolvedValue({ valid: true, warnings: [], errors: [] })
+    transistorApi.getCurves.mockResolvedValue({ switch: {}, diode: {}, capacitance: {} })
   })
 
   describe('Create Mode', () => {
@@ -43,7 +45,7 @@ describe('TransistorForm.vue', () => {
     })
 
     it('should show create transistor title', () => {
-      expect(wrapper.text()).toContain('Create Transistor')
+      expect(wrapper.text()).toContain('Create New Transistor')
     })
 
     it('should have empty form fields', () => {
@@ -130,7 +132,7 @@ describe('TransistorForm.vue', () => {
         props: { transistor: mockTransistor1 }
       })
 
-      expect(wrapper.html()).toContain('metadata' || 'Metadata' || 'name' || 'manufacturer')
+      expect(wrapper.html()).toMatch(/Metadata|Name|Manufacturer/)
     })
 
     it('should handle electrical ratings section', () => {
@@ -163,6 +165,24 @@ describe('TransistorForm.vue', () => {
       }
     })
 
+    it('converts cm² form areas to SI m² when creating a record', async () => {
+      wrapper = mount(TransistorForm, { props: { transistor: null } })
+      wrapper.vm.formData.thermal.housing_area = 1
+      wrapper.vm.formData.thermal.cooling_area = 0.5
+      wrapper.vm.formData.thermal.r_th_switch_cs = 0.12
+      wrapper.vm.formData.thermal.r_th_diode_cs = 0.18
+
+      await wrapper.vm.handleSubmit()
+
+      expect(transistorApi.create).toHaveBeenCalledWith(expect.objectContaining({
+        thermal: expect.objectContaining({
+          r_th_switch_cs: 0.12,
+          r_th_diode_cs: 0.18,
+          housing_area: 0.0001,
+          cooling_area: 0.00005
+        })
+      }))
+    })
     it('should call update API when saving existing transistor', async () => {
       wrapper = mount(TransistorForm, {
         props: { transistor: mockTransistor1 }
@@ -175,6 +195,27 @@ describe('TransistorForm.vue', () => {
       }
     })
 
+    it('converts loaded SI areas to cm² and back to SI on update', async () => {
+      wrapper = mount(TransistorForm, { props: { transistor: mockTransistor1 } })
+      await flushPromises()
+
+      expect(wrapper.vm.formData.thermal.housing_area).toBe(12)
+      expect(wrapper.vm.formData.thermal.cooling_area).toBe(8)
+
+      await wrapper.vm.handleSubmit()
+
+      expect(transistorApi.update).toHaveBeenCalledWith(
+        mockTransistor1.metadata.name,
+        expect.objectContaining({
+          thermal: expect.objectContaining({
+            housing_area: mockTransistor1.thermal.housing_area,
+            cooling_area: mockTransistor1.thermal.cooling_area,
+            r_th_switch_cs: 0.12,
+            r_th_diode_cs: 0.18
+          })
+        })
+      )
+    })
     it('should handle API errors gracefully', async () => {
       transistorApi.create.mockRejectedValue(new Error('API Error'))
 

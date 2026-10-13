@@ -358,6 +358,8 @@ def _patch_legacy_record_unlocked(name: str, transistor_data: Dict[str, Any]) ->
                 "i_abs_max": updated.electrical_ratings.i_abs_max,
                 "i_cont": updated.electrical_ratings.i_cont,
                 "r_th_cs": updated.thermal_properties.r_th_cs,
+                "r_th_switch_cs": updated.thermal_properties.r_th_switch_cs,
+                "r_th_diode_cs": updated.thermal_properties.r_th_diode_cs,
                 "housing_area": updated.thermal_properties.housing_area,
                 "cooling_area": updated.thermal_properties.cooling_area,
             }
@@ -407,6 +409,192 @@ async def _patch_legacy_record(name: str, transistor_data: Dict[str, Any]) -> No
         _patch_legacy_record_unlocked(name, transistor_data)
 
 
+def _legacy_curve_list(
+    record: Dict[str, Any],
+    path: tuple[Optional[str], str],
+    *,
+    create: bool = False,
+) -> List[Any]:
+    """Return one existing legacy curve list, optionally creating it."""
+    section_name, field = path
+    if section_name is None:
+        section = record
+    else:
+        section = record.get(section_name)
+        if not isinstance(section, dict):
+            raise HTTPException(
+                status_code=409,
+                detail=f"The stored record has no {section_name} section for curve updates.",
+            )
+
+    curves = section.get(field)
+    if curves is None and create:
+        curves = []
+        section[field] = curves
+    if not isinstance(curves, list):
+        raise HTTPException(
+            status_code=409,
+            detail=f"The stored record has an invalid {field} curve list.",
+        )
+    return curves
+
+
+def _legacy_json_default(value: Any) -> Any:
+    """Serialize arrays and timestamps in the legacy JSON record format."""
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    if isinstance(value, np.generic):
+        return value.item()
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
+
+def _write_legacy_record_unlocked(record_path: Path, record: Dict[str, Any]) -> None:
+    """Atomically replace a validated legacy record."""
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{record_path.name}.", suffix=".tmp", dir=record_path.parent
+    )
+    with os.fdopen(descriptor, "w", encoding="utf-8") as record_file:
+        json.dump(
+            record,
+            record_file,
+            indent=2,
+            default=_legacy_json_default,
+        )
+        record_file.flush()
+        os.fsync(record_file.fileno())
+    os.replace(temporary_name, record_path)
+
+
+def _append_legacy_curve_unlocked(
+    name: str,
+    path: tuple[Optional[str], str],
+    curve: Dict[str, Any],
+    expected_count: int,
+) -> int:
+    """Append one curve while retaining every other raw legacy field."""
+    try:
+        record_path = _legacy_record_path(name)
+        with record_path.open("r", encoding="utf-8") as record_file:
+            record = json.load(record_file)
+        if not isinstance(record, dict) or record.get("name") != name:
+            raise HTTPException(
+                status_code=409,
+                detail="The stored record name does not match the requested device name.",
+            )
+        curves = _legacy_curve_list(record, path, create=True)
+        if len(curves) != expected_count:
+            raise HTTPException(
+                status_code=409,
+                detail="The stored curve list changed or cannot be represented safely.",
+            )
+        curves.append(curve)
+        _json_dict_to_legacy_transistor(copy.deepcopy(record))
+        _write_legacy_record_unlocked(record_path, record)
+        return len(curves)
+    except HTTPException:
+        raise
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Transistor '{name}' not found")
+    except (OSError, ValueError, TypeError) as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot update the stored curves for '{name}': {e!s}",
+        )
+
+
+def _delete_legacy_curve_unlocked(
+    name: str,
+    path: tuple[Optional[str], str],
+    index: int,
+    expected_count: int,
+) -> int:
+    """Delete one curve while retaining every other raw legacy field."""
+    try:
+        record_path = _legacy_record_path(name)
+        with record_path.open("r", encoding="utf-8") as record_file:
+            record = json.load(record_file)
+        if not isinstance(record, dict) or record.get("name") != name:
+            raise HTTPException(
+                status_code=409,
+                detail="The stored record name does not match the requested device name.",
+            )
+        curves = _legacy_curve_list(record, path)
+        if len(curves) != expected_count or not 0 <= index < len(curves):
+            raise HTTPException(
+                status_code=409,
+                detail="The stored curve list changed or cannot be represented safely.",
+            )
+        del curves[index]
+        _json_dict_to_legacy_transistor(copy.deepcopy(record))
+        _write_legacy_record_unlocked(record_path, record)
+        return len(curves)
+    except HTTPException:
+        raise
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Transistor '{name}' not found")
+    except (OSError, ValueError, TypeError) as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot update the stored curves for '{name}': {e!s}",
+        )
+
+
+def _serialize_latest_curve(transistor: Transistor, curve_key: str) -> Dict[str, Any]:
+    """Serialize only the newly added curve through the established core adapter."""
+    transistor_args, switch_args, diode_args = core_to_legacy_dicts(transistor)
+    curve_lists = {
+        "switch.channel": switch_args["channel"],
+        "diode.channel": diode_args["channel"],
+        "switch.e_on": switch_args["e_on"],
+        "switch.e_off": switch_args["e_off"],
+        "diode.e_rr": diode_args["e_rr"],
+        "switch.charge_curve": switch_args["charge_curve"],
+        "switch.soa": switch_args["soa"],
+        "c_oss": transistor_args["c_oss"],
+        "c_iss": transistor_args["c_iss"],
+        "c_rss": transistor_args["c_rss"],
+    }
+    curves = curve_lists[curve_key]
+    if not curves:
+        raise HTTPException(status_code=500, detail="The new curve could not be serialized.")
+    return curves[-1]
+
+
+def _core_curve_list(transistor: Transistor, curve_key: str) -> List[Any]:
+    """Resolve the core curve list corresponding to a legacy storage key."""
+    core_lists = {
+        "switch.channel": transistor.switch.channel_data,
+        "diode.channel": transistor.diode.channel_data,
+        "switch.e_on": transistor.switch.e_on_data,
+        "switch.e_off": transistor.switch.e_off_data,
+        "diode.e_rr": transistor.diode.e_rr_data,
+        "switch.charge_curve": transistor.switch.gate_charge_curves,
+        "switch.soa": transistor.switch.soa,
+        "c_oss": transistor.c_oss,
+        "c_iss": transistor.c_iss,
+        "c_rss": transistor.c_rss,
+    }
+    return core_lists[curve_key]
+
+
+def _persist_curve_mutation(
+    transistor_id: str,
+    transistor: Transistor,
+    curve_key: str,
+    path: tuple[Optional[str], str],
+) -> None:
+    """Persist one added curve without rewriting unrelated legacy fields."""
+    curve = _serialize_latest_curve(transistor, curve_key)
+    _append_legacy_curve_unlocked(
+        transistor_id,
+        path,
+        curve,
+        expected_count=len(_core_curve_list(transistor, curve_key)) - 1,
+    )
+
+
 def _serialize_new_transistor(transistor: Transistor) -> str:
     """Serialize a new core record through the repository's legacy loader path."""
     transistor_args, switch_args, diode_args = core_to_legacy_dicts(transistor)
@@ -445,6 +633,8 @@ def transistor_to_dict(transistor: Transistor) -> Dict[str, Any]:
         },
         "thermal": {
             "r_th_cs": transistor.thermal_properties.r_th_cs,
+            "r_th_switch_cs": transistor.thermal_properties.r_th_switch_cs,
+            "r_th_diode_cs": transistor.thermal_properties.r_th_diode_cs,
             "housing_area": transistor.thermal_properties.housing_area,
             "cooling_area": transistor.thermal_properties.cooling_area,
         },
@@ -1170,7 +1360,8 @@ async def add_channel_curve(
         transistor.diode.channel_data.append(new_curve)
 
     # Save transistor
-    _repo.save(transistor)
+    curve_key = f"{component}.channel"
+    _persist_curve_mutation(transistor_id, transistor, curve_key, (component, "channel"))
 
     return {
         "message": f"Channel curve added to {component}",
@@ -1239,7 +1430,12 @@ async def add_switching_loss_curve(
         transistor.diode.e_rr_data.append(new_loss)
 
     # Save transistor
-    _repo.save(transistor)
+    curve_key = "diode.e_rr" if loss_type == "e_rr" else f"switch.{loss_type}"
+    legacy_section = "diode" if loss_type == "e_rr" else "switch"
+    legacy_field = "e_rr" if loss_type == "e_rr" else loss_type
+    _persist_curve_mutation(
+        transistor_id, transistor, curve_key, (legacy_section, legacy_field)
+    )
 
     return {
         "message": f"Switching loss curve ({loss_type}) added",
@@ -1273,7 +1469,9 @@ async def add_gate_charge_curve(
     )
 
     transistor.switch.gate_charge_curves.append(new_curve)
-    _repo.save(transistor)
+    _persist_curve_mutation(
+        transistor_id, transistor, "switch.charge_curve", ("switch", "charge_curve")
+    )
 
     return {
         "message": "Gate charge curve added",
@@ -1301,7 +1499,7 @@ async def add_soa_curve(
     )
 
     transistor.switch.soa.append(new_soa)
-    _repo.save(transistor)
+    _persist_curve_mutation(transistor_id, transistor, "switch.soa", ("switch", "soa"))
 
     return {
         "message": "SOA curve added",
@@ -1342,7 +1540,7 @@ async def add_capacitance_curve(
     else:  # c_rss
         transistor.c_rss.append(new_cap)
 
-    _repo.save(transistor)
+    _persist_curve_mutation(transistor_id, transistor, cap_type, (None, cap_type))
 
     return {
         "message": f"{cap_type.upper()} curve added",
@@ -1406,8 +1604,20 @@ async def delete_curve(
         )
 
     # Delete the curve
+    if component == "capacitance":
+        legacy_path = (None, curve_type)
+    elif component == "switch" and curve_type == "gate_charge":
+        legacy_path = ("switch", "charge_curve")
+    else:
+        legacy_path = (component, curve_type)
+
+    _delete_legacy_curve_unlocked(
+        transistor_id,
+        legacy_path,
+        index,
+        expected_count=len(curve_list),
+    )
     del curve_list[index]
-    _repo.save(transistor)
 
     return {
         "message": f"Curve deleted: {component}.{curve_type}[{index}]",
