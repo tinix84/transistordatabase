@@ -7,13 +7,22 @@ storage instead of in-memory placeholder dicts.
 from __future__ import annotations
 
 import csv
+import asyncio
+import copy
+import ctypes
+import errno
 import io
 import json
 import logging
+import os
+import sys
 import tempfile
+import threading
 import zipfile
+from contextlib import asynccontextmanager
+from functools import wraps
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, AsyncIterator, Callable, Dict, List, Optional
 
 import numpy as np
 from fastapi import FastAPI, HTTPException, UploadFile, File, Query, BackgroundTasks
@@ -38,11 +47,14 @@ from transistordatabase.core.models import (
     SOA,
     VoltageDependentCapacitance,
 )
+from transistordatabase.core.adapters import core_to_legacy_dicts, legacy_to_core
 from transistordatabase.core.pair_repository import JsonPairRepository
 from transistordatabase.core.repository import (
     JsonTransistorRepository,
-    JsonTransistorLoader,
+    _load_data_file,
+    _json_dict_to_legacy_transistor,
 )
+from transistordatabase.transistor import Transistor as LegacyTransistor
 from transistordatabase.gui_web.backend.schemas import (
     ChannelCurveCreate,
     SwitchingLossCreate,
@@ -92,19 +104,158 @@ app.add_middleware(
 
 # Default JSON database directory (sibling of the package root)
 _default_db_dir = Path(__file__).resolve().parent.parent.parent.parent / "database"
-_repo = JsonTransistorRepository(_default_db_dir)
+
+
+class _LazyRepository:
+    """Construct the persistent repository only when a request uses it."""
+
+    def __init__(self, factory: Callable[[], Any]) -> None:
+        self._factory = factory
+        self._instance: Any | None = None
+
+    def __getattr__(self, name: str) -> Any:
+        if self._instance is None:
+            self._instance = self._factory()
+        return getattr(self._instance, name)
+
+
+_repo = _LazyRepository(lambda: JsonTransistorRepository(_default_db_dir))
 
 # Default switching pairs directory
 _default_pairs_dir = Path(__file__).resolve().parent.parent.parent.parent / "switching_pairs"
-_pair_repo = JsonPairRepository(_default_pairs_dir)
+_pair_repo = _LazyRepository(lambda: JsonPairRepository(_default_pairs_dir))
 
 _services = ConcreteServiceFactory.create_all_services()
 _validation: ValidationService = _services['validation']
 _comparison: ComparisonService = _services['comparison']
 _export: ExportService = _services['export']
 _plotting: PlottingService = _services['plotting']
-_loader = JsonTransistorLoader()
 _topology_calc = TopologyCalculatorService()
+_record_mutation_lock = threading.Lock()
+
+
+class _WindowsOverlapped(ctypes.Structure):
+    """Windows OVERLAPPED structure used for blocking file-region locks."""
+
+    _fields_ = [
+        ("internal", ctypes.c_void_p),
+        ("internal_high", ctypes.c_void_p),
+        ("offset", ctypes.c_uint32),
+        ("offset_high", ctypes.c_uint32),
+        ("event", ctypes.c_void_p),
+    ]
+
+
+def _lock_record_file(lock_file: Any) -> Optional[_WindowsOverlapped]:
+    """Acquire the cross-process mutation lock; call from a worker thread."""
+    if os.name == "nt":
+        import msvcrt
+        from ctypes import wintypes
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        lock_file_ex = kernel32.LockFileEx
+        lock_file_ex.argtypes = [
+            wintypes.HANDLE,
+            wintypes.DWORD,
+            wintypes.DWORD,
+            wintypes.DWORD,
+            wintypes.DWORD,
+            ctypes.POINTER(_WindowsOverlapped),
+        ]
+        lock_file_ex.restype = wintypes.BOOL
+        handle = wintypes.HANDLE(msvcrt.get_osfhandle(lock_file.fileno()))
+        overlapped = _WindowsOverlapped()
+        if not lock_file_ex(handle, 0x00000002, 0, 1, 0, ctypes.byref(overlapped)):
+            raise ctypes.WinError(ctypes.get_last_error())
+        return overlapped
+
+    import fcntl
+
+    fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+    return None
+
+
+def _unlock_record_file(
+    lock_file: Any,
+    overlapped: Optional[_WindowsOverlapped],
+) -> None:
+    """Release the cross-process mutation lock; call from a worker thread."""
+    if os.name == "nt":
+        import msvcrt
+        from ctypes import wintypes
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        unlock_file_ex = kernel32.UnlockFileEx
+        unlock_file_ex.argtypes = [
+            wintypes.HANDLE,
+            wintypes.DWORD,
+            wintypes.DWORD,
+            wintypes.DWORD,
+            ctypes.POINTER(_WindowsOverlapped),
+        ]
+        unlock_file_ex.restype = wintypes.BOOL
+        handle = wintypes.HANDLE(msvcrt.get_osfhandle(lock_file.fileno()))
+        if not unlock_file_ex(handle, 0, 1, 0, ctypes.byref(overlapped)):
+            raise ctypes.WinError(ctypes.get_last_error())
+        return
+
+    import fcntl
+
+    fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+
+
+async def _acquire_blocking_lock(
+    acquire: Callable[[], Any],
+    release: Callable[[Any], None],
+) -> Any:
+    """Acquire a blocking lock off-loop and release it if cancelled while waiting."""
+    acquire_task = asyncio.create_task(asyncio.to_thread(acquire))
+    try:
+        return await asyncio.shield(acquire_task)
+    except asyncio.CancelledError:
+        try:
+            acquired_value = await acquire_task
+        except Exception:
+            raise
+        await asyncio.to_thread(release, acquired_value)
+        raise
+
+
+@asynccontextmanager
+async def _record_mutation() -> AsyncIterator[None]:
+    """Serialize record mutations without blocking an async event loop."""
+    await _acquire_blocking_lock(
+        _record_mutation_lock.acquire,
+        lambda _acquired: _record_mutation_lock.release(),
+    )
+    try:
+        lock_file = (Path(_repo.data_directory) / ".web-record-mutations.lock").open("a+b")
+    except BaseException:
+        _record_mutation_lock.release()
+        raise
+    overlapped = None
+    try:
+        overlapped = await _acquire_blocking_lock(
+            lambda: _lock_record_file(lock_file),
+            lambda token: _unlock_record_file(lock_file, token),
+        )
+        try:
+            yield
+        finally:
+            await asyncio.to_thread(_unlock_record_file, lock_file, overlapped)
+    finally:
+        await asyncio.to_thread(lock_file.close)
+        _record_mutation_lock.release()
+
+
+def _record_mutation_endpoint(endpoint: Callable[..., Any]) -> Callable[..., Any]:
+    """Hold the database mutation lock across a route's read-modify-write flow."""
+    @wraps(endpoint)
+    async def locked_endpoint(*args: Any, **kwargs: Any) -> Any:
+        async with _record_mutation():
+            return await endpoint(*args, **kwargs)
+
+    return locked_endpoint
 
 
 def _get_transistor(name: str) -> Transistor:
@@ -113,6 +264,162 @@ def _get_transistor(name: str) -> Transistor:
     if t is None:
         raise HTTPException(status_code=404, detail=f"Transistor '{name}' not found")
     return t
+
+
+def _validate_web_record_name(name: str) -> None:
+    """Reject names that the JSON repository cannot address as one file."""
+    if not name or "/" in name or "\\" in name:
+        raise HTTPException(
+            status_code=400,
+            detail="Device names must be non-empty and cannot contain path separators.",
+        )
+
+
+def _legacy_record_path(name: str) -> Path:
+    """Resolve a repository record path without interpreting a name as a path."""
+    _validate_web_record_name(name)
+    data_directory = getattr(_repo, "data_directory", None)
+    if data_directory is None:
+        raise HTTPException(
+            status_code=500,
+            detail="The configured repository does not expose its JSON record directory.",
+        )
+    return Path(data_directory) / f"{name}.json"
+
+
+def _rename_noreplace(source: Path, destination: Path) -> None:
+    """Publish a completed record atomically without replacing an existing one."""
+    if os.name == "nt":
+        # Windows rename refuses to replace an existing destination.
+        os.rename(source, destination)
+        return
+
+    if sys.platform.startswith("linux"):
+        libc = ctypes.CDLL(None, use_errno=True)
+        renameat2 = getattr(libc, "renameat2", None)
+        if renameat2 is None:
+            raise OSError(errno.ENOTSUP, "renameat2 is unavailable on this Linux system")
+        renameat2.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint]
+        renameat2.restype = ctypes.c_int
+        result = renameat2(
+            -100,
+            os.fsencode(source),
+            -100,
+            os.fsencode(destination),
+            1,  # RENAME_NOREPLACE
+        )
+        if result == 0:
+            return
+        error_number = ctypes.get_errno()
+        if error_number == errno.EEXIST:
+            raise FileExistsError(error_number, os.strerror(error_number), destination)
+        raise OSError(error_number, os.strerror(error_number), destination)
+
+    raise OSError(
+        errno.ENOTSUP,
+        "Atomic no-overwrite record publication is supported only on Windows and Linux",
+    )
+
+
+def _patch_legacy_record_unlocked(name: str, transistor_data: Dict[str, Any]) -> None:
+    """Patch only general-form fields in the stored legacy JSON record.
+
+    Saving a web-created core model through the core-to-legacy adapter drops
+    legacy-only values. The web form owns only these general fields, so retain
+    the original JSON document and replace just those values.
+    """
+    try:
+        updated = dict_to_transistor(transistor_data)
+        if updated.metadata.name != name:
+            raise HTTPException(
+                status_code=400,
+                detail="Transistor names cannot be changed through the edit form.",
+            )
+
+        record_path = _legacy_record_path(name)
+        with record_path.open("r", encoding="utf-8") as record_file:
+            record = json.load(record_file)
+        if not isinstance(record, dict) or record.get("name") != name:
+            raise HTTPException(
+                status_code=409,
+                detail="The stored record name does not match the requested device name.",
+            )
+
+        # Copy exactly the general fields represented by the web form. Curves,
+        # measured data, recommendations, and unknown legacy keys are retained.
+        record.update(
+            {
+                "type": updated.metadata.type,
+                "manufacturer": updated.metadata.manufacturer,
+                "housing_type": updated.metadata.housing_type,
+                "author": updated.metadata.author,
+                "comment": updated.metadata.comment,
+                "v_abs_max": updated.electrical_ratings.v_abs_max,
+                "i_abs_max": updated.electrical_ratings.i_abs_max,
+                "i_cont": updated.electrical_ratings.i_cont,
+                "r_th_cs": updated.thermal_properties.r_th_cs,
+                "housing_area": updated.thermal_properties.housing_area,
+                "cooling_area": updated.thermal_properties.cooling_area,
+            }
+        )
+        switch_record = record.get("switch")
+        if not isinstance(switch_record, dict):
+            raise HTTPException(
+                status_code=409,
+                detail="The stored record has no switch section for its junction temperature limit.",
+            )
+        switch_record["t_j_max"] = updated.electrical_ratings.t_j_max
+
+        # Run the same legacy constructor used by JsonTransistorLoader before
+        # persisting. It enforces manufacturer/housing catalogs and legacy
+        # record constraints while the deep copy prevents array conversion
+        # from changing the raw JSON object we intend to write.
+        validated_legacy = _json_dict_to_legacy_transistor(copy.deepcopy(record))
+        record["manufacturer"] = validated_legacy.manufacturer
+        record["housing_type"] = validated_legacy.housing_type
+        # Replace the populated record atomically so an interrupted write or a
+        # concurrent reader never observes a truncated JSON file.
+        descriptor, temporary_name = tempfile.mkstemp(
+            prefix=f".{record_path.name}.", suffix=".tmp", dir=record_path.parent
+        )
+        temporary_path = Path(temporary_name)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as record_file:
+            json.dump(record, record_file, indent=2)
+            record_file.flush()
+            os.fsync(record_file.fileno())
+        os.replace(temporary_path, record_path)
+    except HTTPException:
+        raise
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Transistor '{name}' not found")
+    except (OSError, ValueError) as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot update the stored record for '{name}': {e!s}",
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid transistor data: {e!s}")
+
+
+async def _patch_legacy_record(name: str, transistor_data: Dict[str, Any]) -> None:
+    """Serialize web record mutations across threads and server workers."""
+    async with _record_mutation():
+        _patch_legacy_record_unlocked(name, transistor_data)
+
+
+def _serialize_new_transistor(transistor: Transistor) -> str:
+    """Serialize a new core record through the repository's legacy loader path."""
+    transistor_args, switch_args, diode_args = core_to_legacy_dicts(transistor)
+    legacy_transistor = LegacyTransistor(
+        transistor_args,
+        switch_args,
+        diode_args,
+        _load_data_file("housing_types.txt"),
+        _load_data_file("module_manufacturers.txt"),
+    )
+    legacy_record = legacy_transistor.convert_to_dict()
+    legacy_record.pop("_id", None)
+    return json.dumps(legacy_record, indent=2)
 
 
 # ---------------------------------------------------------------------------
@@ -247,34 +554,105 @@ async def get_transistor(transistor_id: str) -> Dict[str, Any]:
     return transistor_to_dict(_get_transistor(transistor_id))
 
 
+@app.get("/api/transistor-record")
+async def get_transistor_record(name: str = Query(...)) -> Dict[str, Any]:
+    """Get a transistor by its exact, query-encoded repository name."""
+    _validate_web_record_name(name)
+    return transistor_to_dict(_get_transistor(name))
+
+
 @app.post("/api/transistors")
 async def create_transistor(transistor_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a new transistor."""
-    try:
-        transistor = dict_to_transistor(transistor_data)
-        _repo.save(transistor)
-        return {"id": transistor.metadata.name, "message": "Transistor created successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Invalid transistor data: {e!s}")
+    async with _record_mutation():
+        try:
+            metadata = transistor_data.get("metadata")
+            requested_name = (
+                metadata.get("name")
+                if isinstance(metadata, dict)
+                else transistor_data.get("name")
+            )
+            if isinstance(requested_name, str) and requested_name:
+                _validate_web_record_name(requested_name)
+                requested_path = _legacy_record_path(requested_name)
+                if requested_path.exists():
+                    raise HTTPException(
+                        status_code=409,
+                        detail=f"Transistor '{requested_name}' already exists.",
+                    )
+
+            transistor = dict_to_transistor(transistor_data)
+            _validate_web_record_name(transistor.metadata.name)
+            record_path = _legacy_record_path(transistor.metadata.name)
+            serialized_record = _serialize_new_transistor(transistor)
+            descriptor, temporary_name = tempfile.mkstemp(
+                prefix=f".{record_path.name}.",
+                suffix=".tmp",
+                dir=record_path.parent,
+            )
+            temporary_path = Path(temporary_name)
+            with os.fdopen(descriptor, "w", encoding="utf-8") as record_file:
+                record_file.write(serialized_record)
+                record_file.flush()
+                os.fsync(record_file.fileno())
+            try:
+                # Publish only a complete record and refuse to replace a name
+                # created by another worker or process during serialization.
+                _rename_noreplace(temporary_path, record_path)
+            except FileExistsError:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"Transistor '{transistor.metadata.name}' already exists.",
+                )
+            return {
+                "id": transistor.metadata.name,
+                "message": "Transistor created successfully",
+            }
+        except HTTPException:
+            raise
+        except OSError as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Cannot safely create the transistor record: {e!s}",
+            )
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Invalid transistor data: {e!s}")
 
 
 @app.put("/api/transistors/{transistor_id}")
 async def update_transistor(transistor_id: str, transistor_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Update an existing transistor."""
-    _get_transistor(transistor_id)  # Verify it exists
-    try:
-        transistor = dict_to_transistor(transistor_data)
-        _repo.save(transistor)
-        return {"message": "Transistor updated successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Invalid transistor data: {e!s}")
+    """Update an existing transistor by its path-safe legacy identity."""
+    await _patch_legacy_record(transistor_id, transistor_data)
+    return {"message": "Transistor updated successfully"}
+
+
+@app.put("/api/transistor-record")
+async def update_transistor_record(
+    transistor_data: Dict[str, Any],
+    name: str = Query(...),
+) -> Dict[str, Any]:
+    """Update by exact query name so URL-reserved characters stay in identity."""
+    await _patch_legacy_record(name, transistor_data)
+    return {"message": "Transistor updated successfully"}
 
 
 @app.delete("/api/transistors/{transistor_id}")
 async def delete_transistor(transistor_id: str) -> Dict[str, Any]:
     """Delete a transistor."""
-    if not _repo.delete(transistor_id):
-        raise HTTPException(status_code=404, detail="Transistor not found")
+    _validate_web_record_name(transistor_id)
+    async with _record_mutation():
+        if not _repo.delete(transistor_id):
+            raise HTTPException(status_code=404, detail="Transistor not found")
+    return {"message": "Transistor deleted successfully"}
+
+
+@app.delete("/api/transistor-record")
+async def delete_transistor_record(name: str = Query(...)) -> Dict[str, Any]:
+    """Delete by exact query name; slash identities are rejected explicitly."""
+    _validate_web_record_name(name)
+    async with _record_mutation():
+        if not _repo.delete(name):
+            raise HTTPException(status_code=404, detail=f"Transistor '{name}' not found")
     return {"message": "Transistor deleted successfully"}
 
 
@@ -583,13 +961,10 @@ async def upload_transistor(file: UploadFile = File(...)) -> Dict[str, Any]:
 
     try:
         content = await file.read()
-        # Write to temp file, load through the loader (which does numpy conversion)
-        tmp = Path(tempfile.mktemp(suffix='.json'))
-        tmp.write_bytes(content)
-        transistor = _loader.load_from_json(tmp)
-        tmp.unlink(missing_ok=True)
-
-        _repo.save(transistor)
+        record = json.loads(content)
+        transistor = legacy_to_core(_json_dict_to_legacy_transistor(record))
+        async with _record_mutation():
+            _repo.save(transistor)
         return {
             "id": transistor.metadata.name,
             "message": "Transistor uploaded successfully",
@@ -764,6 +1139,7 @@ async def get_all_curves(transistor_id: str) -> Dict[str, Any]:
 
 
 @app.post("/api/transistors/{transistor_id}/curves/channel")
+@_record_mutation_endpoint
 async def add_channel_curve(
     transistor_id: str,
     curve_data: ChannelCurveCreate,
@@ -806,6 +1182,7 @@ async def add_channel_curve(
 
 
 @app.post("/api/transistors/{transistor_id}/curves/switching/{loss_type}")
+@_record_mutation_endpoint
 async def add_switching_loss_curve(
     transistor_id: str,
     loss_type: str,
@@ -875,6 +1252,7 @@ async def add_switching_loss_curve(
 
 
 @app.post("/api/transistors/{transistor_id}/curves/gate_charge")
+@_record_mutation_endpoint
 async def add_gate_charge_curve(
     transistor_id: str,
     curve_data: GateChargeCurveCreate,
@@ -904,6 +1282,7 @@ async def add_gate_charge_curve(
 
 
 @app.post("/api/transistors/{transistor_id}/curves/soa")
+@_record_mutation_endpoint
 async def add_soa_curve(
     transistor_id: str,
     curve_data: SOACreate,
@@ -931,6 +1310,7 @@ async def add_soa_curve(
 
 
 @app.post("/api/transistors/{transistor_id}/curves/capacitance/{cap_type}")
+@_record_mutation_endpoint
 async def add_capacitance_curve(
     transistor_id: str,
     cap_type: str,
@@ -975,6 +1355,7 @@ async def add_capacitance_curve(
 
 
 @app.delete("/api/transistors/{transistor_id}/curves/{component}/{curve_type}/{index}")
+@_record_mutation_endpoint
 async def delete_curve(
     transistor_id: str,
     component: str,
@@ -1313,16 +1694,14 @@ async def import_plecs(file: UploadFile) -> PLECSImportResponse:
     :return: Import results with transistor IDs
     """
     from transistordatabase.plecs_importer import import_plecs_xml
-    import tempfile
-
     errors = []
     warnings = []
     transistor_ids = []
 
     try:
+        content = await file.read()
         # Save uploaded file to temp location
         with tempfile.NamedTemporaryFile(delete=False, suffix='.xml') as tmp:
-            content = await file.read()
             tmp.write(content)
             tmp.flush()
 
@@ -1330,12 +1709,13 @@ async def import_plecs(file: UploadFile) -> PLECSImportResponse:
             transistors = import_plecs_xml(tmp.name)
 
             # Save to repository
-            for transistor in transistors:
-                try:
-                    _repo.save(transistor)
-                    transistor_ids.append(transistor.metadata.name)
-                except Exception as e:
-                    errors.append(f"Failed to save {transistor.metadata.name}: {str(e)}")
+            async with _record_mutation():
+                for transistor in transistors:
+                    try:
+                        _repo.save(transistor)
+                        transistor_ids.append(transistor.metadata.name)
+                    except Exception as e:
+                        errors.append(f"Failed to save {transistor.metadata.name}: {str(e)}")
 
             return PLECSImportResponse(
                 success=len(transistor_ids) > 0,

@@ -38,7 +38,7 @@ jobs:
       - name: install tdb package
         run: |
             pip install -e .
-            pip install pytest
+            pip install pytest httpx fastapi python-multipart
 
       # Runs a set of commands using the runners shell
       - name: Run pytests
@@ -47,6 +47,7 @@ jobs:
           cd tests/
           pytest test_tdb_classes.py
           pytest test_database_manager.py
+          pytest test_web_database_lifecycle_api.py
           echo tests finished.
           
       - name: Install sphinx and build documentation with sphinx

@@ -101,7 +101,7 @@ describe('API Service', () => {
   describe('getById()', () => {
     it('should fetch specific transistor by ID', async () => {
       const name = 'CREE_C3M0060065J'
-      mock.onGet(`/api/transistors/${name}`).reply(200, mockTransistor1)
+      mock.onGet(`/api/transistor-record?name=${encodeURIComponent(name)}`).reply(200, mockTransistor1)
 
       const result = await transistorApi.getById(name)
 
@@ -111,7 +111,7 @@ describe('API Service', () => {
 
     it('should handle 404 for non-existent transistor', async () => {
       const name = 'NonExistent'
-      mock.onGet(`/api/transistors/${name}`).reply(404, { detail: 'Not found' })
+      mock.onGet(`/api/transistor-record?name=${encodeURIComponent(name)}`).reply(404, { detail: 'Not found' })
 
       await expect(transistorApi.getById(name)).rejects.toThrow()
     })
@@ -140,7 +140,7 @@ describe('API Service', () => {
       const name = 'CREE_C3M0060065J'
       const updated = { ...mockTransistor1, metadata: { ...mockTransistor1.metadata, comment: 'Updated' } }
 
-      mock.onPut(`/api/transistors/${name}`).reply(200, updated)
+      mock.onPut(`/api/transistor-record?name=${encodeURIComponent(name)}`).reply(200, updated)
 
       const result = await transistorApi.update(name, updated)
 
@@ -150,7 +150,7 @@ describe('API Service', () => {
 
     it('should handle 404 for non-existent transistor', async () => {
       const name = 'NonExistent'
-      mock.onPut(`/api/transistors/${name}`).reply(404)
+      mock.onPut(`/api/transistor-record?name=${encodeURIComponent(name)}`).reply(404)
 
       await expect(transistorApi.update(name, {})).rejects.toThrow()
     })
@@ -159,7 +159,7 @@ describe('API Service', () => {
   describe('delete()', () => {
     it('should delete transistor', async () => {
       const name = 'CREE_C3M0060065J'
-      mock.onDelete(`/api/transistors/${name}`).reply(200, { message: 'Deleted' })
+      mock.onDelete(`/api/transistor-record?name=${encodeURIComponent(name)}`).reply(200, { message: 'Deleted' })
 
       const result = await transistorApi.delete(name)
 
@@ -168,10 +168,24 @@ describe('API Service', () => {
 
     it('should handle 404 for non-existent transistor', async () => {
       const name = 'NonExistent'
-      mock.onDelete(`/api/transistors/${name}`).reply(404)
+      mock.onDelete(`/api/transistor-record?name=${encodeURIComponent(name)}`).reply(404)
 
       await expect(transistorApi.delete(name)).rejects.toThrow()
     })
+  })
+
+  it('preserves spaced and URL-reserved names in update and delete requests', async () => {
+    const exactName = 'Device #A?review'
+    const encodedName = encodeURIComponent(exactName)
+    mock.onPut(`/api/transistor-record?name=${encodedName}`).reply(200, { message: 'Updated exact record' })
+    mock.onDelete(`/api/transistor-record?name=${encodedName}`).reply(200, { message: 'Deleted exact record' })
+
+    await transistorApi.update(exactName, { metadata: { name: exactName } })
+    await transistorApi.delete(exactName)
+
+    expect(mock.history.put[0].url).toBe(`/api/transistor-record?name=${encodedName}`)
+    expect(mock.history.put[0].data).toContain(exactName)
+    expect(mock.history.delete[0].url).toBe(`/api/transistor-record?name=${encodedName}`)
   })
 
   describe('validate()', () => {
