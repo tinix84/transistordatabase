@@ -208,15 +208,15 @@
 
         <div v-if="results.waveforms" class="charts-section">
           <h4>{{ results.topology === 'flyback' ? 'Primary magnetizing current over one switching period' : 'Inductor current over one switching period' }}</h4>
-          <div class="chart-container"><canvas ref="waveformCanvas"></canvas></div>
+          <div class="chart-container"><canvas ref="waveformCanvas" role="img" :aria-label="`${results.topology === 'flyback' ? 'Primary magnetizing' : 'Inductor'} current over one switching period`"></canvas></div>
         </div>
         <div v-if="results.sweep?.kind === 'line'" class="charts-section">
           <h4>{{ results.sweep.metric }} vs {{ results.sweep.x_axis }}</h4>
-          <div class="chart-container"><canvas ref="sweepCanvas"></canvas></div>
+          <div class="chart-container"><canvas ref="sweepCanvas" role="img" :aria-label="`${results.sweep.metric} vs ${results.sweep.x_axis}`"></canvas></div>
         </div>
         <div v-if="results.sweep?.kind === 'contour'" class="charts-section">
           <h4>{{ results.sweep.metric }} contour</h4>
-          <div class="contour-scroll"><div class="contour-grid" :style="{ gridTemplateColumns: `repeat(${results.sweep.x_values.length}, minmax(18px, 1fr))` }">
+          <div class="contour-scroll"><div class="contour-grid" role="img" :aria-label="`${results.sweep.metric} contour plot`" :style="{ gridTemplateColumns: `repeat(${results.sweep.x_values.length}, minmax(18px, 1fr))` }">
             <span v-for="cell in contourCells" :key="cell.key" :title="cell.title" :style="{ backgroundColor: cell.color }"></span>
           </div></div>
           <p class="hint">X: {{ results.sweep.x_axis }} ({{ results.sweep.x_unit }}); Y: {{ results.sweep.y_axis }} ({{ results.sweep.y_unit }}); color shows {{ results.sweep.metric }} ({{ results.sweep.metric_unit }}).</p>
@@ -833,6 +833,21 @@ onBeforeUnmount(destroyCharts)
 
 .chart-container canvas {
   max-height: 100%;
+}
+
+.contour-scroll {
+  overflow-x: auto;
+}
+
+.contour-grid {
+  display: grid;
+  grid-auto-rows: 24px;
+  gap: 2px;
+}
+
+.contour-grid span {
+  display: block;
+  min-height: 24px;
 }
 
 .btn {

@@ -14,6 +14,13 @@ set "PROJECT_ROOT=%SCRIPT_DIR%..\.."
 echo 📁 Project root: %PROJECT_ROOT%
 echo 📁 GUI web dir: %SCRIPT_DIR%
 
+REM Help and environment guidance do not need runtime dependencies.
+if "%1"=="install" goto install_only
+if "%1"=="setup" goto install_only
+if "%1"=="help" goto show_help
+if "%1"=="-h" goto show_help
+if "%1"=="--help" goto show_help
+
 REM Check required tools
 echo.
 echo 🔍 Checking requirements...
@@ -48,11 +55,6 @@ if "%1"=="api" goto start_backend
 if "%1"=="frontend" goto start_frontend
 if "%1"=="web" goto start_frontend
 if "%1"=="ui" goto start_frontend
-if "%1"=="install" goto install_only
-if "%1"=="setup" goto install_only
-if "%1"=="help" goto show_help
-if "%1"=="-h" goto show_help
-if "%1"=="--help" goto show_help
 if not "%1"=="" goto unknown_command
 
 REM Default: start both

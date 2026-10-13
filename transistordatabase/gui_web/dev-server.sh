@@ -15,6 +15,30 @@ PROJECT_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
 echo "📁 Project root: $PROJECT_ROOT"
 echo "📁 GUI web dir: $SCRIPT_DIR"
 
+# These commands only print guidance and do not need runtime dependencies.
+if [ "$1" = "help" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    echo ""
+    echo "Usage: ./dev-server.sh [command]"
+    echo ""
+    echo "Commands:"
+    echo "  (no args)         Start both backend and frontend"
+    echo "  backend|api       Start only the FastAPI backend"
+    echo "  frontend|web|ui   Start only the Vue.js frontend"
+    echo "  install|setup     Show environment setup guidance"
+    echo "  help              Show this help message"
+    echo ""
+    echo "URLs:"
+    echo "  Frontend:  http://localhost:5174"
+    echo "  Backend:   http://localhost:8002"
+    echo "  API Docs:  http://localhost:8002/docs"
+    exit 0
+elif [ "$1" = "install" ] || [ "$1" = "setup" ]; then
+    echo ""
+    echo "The launcher does not create environments or install dependencies."
+    echo "Use the repository's ntbees2 Conda environment and install frontend dependencies separately."
+    exit 0
+fi
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -102,27 +126,6 @@ elif [ "$1" = "frontend" ] || [ "$1" = "web" ] || [ "$1" = "ui" ]; then
     echo ""
     echo "🚀 Starting frontend only..."
     start_frontend
-    
-elif [ "$1" = "install" ] || [ "$1" = "setup" ]; then
-    echo ""
-    echo "The launcher does not create environments or install dependencies."
-    echo "Use the repository's ntbees2 Conda environment and install frontend dependencies separately."
-    
-elif [ "$1" = "help" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-    echo ""
-    echo "Usage: ./dev-server.sh [command]"
-    echo ""
-    echo "Commands:"
-    echo "  (no args)         Start both backend and frontend"
-    echo "  backend|api       Start only the FastAPI backend"
-    echo "  frontend|web|ui   Start only the Vue.js frontend"
-    echo "  install|setup     Show environment setup guidance"
-    echo "  help              Show this help message"
-    echo ""
-    echo "URLs:"
-    echo "  Frontend:  http://localhost:5174"
-    echo "  Backend:   http://localhost:8002"
-    echo "  API Docs:  http://localhost:8002/docs"
     
 else
     echo -e "${RED}❌ Unknown command: $1${NC}"
