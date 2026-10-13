@@ -110,6 +110,7 @@ nav:
   - Web GUI Migration:
       - Accepted Decision: adr/0001-local-web-gui-replaces-qt.md
       - Topology Migration Sprint: sprints/sprint-web-topology-migration.md
+      - Curve Workflow Sprint: sprints/sprint-web-curve-workflow.md
   - Architecture:
       - Overview: architecture/overview.md
       - Core Design: architecture/core-design.md
