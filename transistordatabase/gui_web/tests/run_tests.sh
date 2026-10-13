@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 BACKEND_PORT=8002
-FRONTEND_PORT=5173
+FRONTEND_PORT=5174
 PROJECT_ROOT="/home/tinix84/ntbees/transistordatabase"
 BACKEND_DIR="$PROJECT_ROOT/transistordatabase/gui_web/backend"
 FRONTEND_DIR="$PROJECT_ROOT/transistordatabase/gui_web"

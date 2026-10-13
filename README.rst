@@ -177,7 +177,7 @@ Quick start:
    npm install  # First time only
    npm run dev
 
-   # Open browser: http://localhost:5173
+   # Open browser: http://localhost:5174
 
 
 ##########################

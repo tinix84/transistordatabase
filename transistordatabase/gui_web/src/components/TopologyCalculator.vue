@@ -4,7 +4,7 @@
       <h2>Topology Calculator</h2>
       <div class="header-actions">
         <button class="btn btn-secondary" type="button" @click="reset">Reset</button>
-        <button class="btn btn-info" type="button" :disabled="!hasResults" @click="saveResults">Download JSON</button>
+        <button class="btn btn-info" type="button" :disabled="!hasExportableResults" @click="saveResults">Download JSON</button>
       </div>
     </div>
 
@@ -287,6 +287,7 @@ const form = reactive({
 const selectedTopology = ref('buck')
 const results = ref(null)
 const comparison = ref(null)
+const comparisonRequest = ref(null)
 const loading = ref(false)
 const errorMessage = ref('')
 const waveformCanvas = ref(null)
@@ -297,6 +298,7 @@ let requestSequence = 0
 
 const transistors = computed(() => props.transistors || [])
 const hasResults = computed(() => results.value !== null)
+const hasExportableResults = computed(() => hasResults.value || comparison.value !== null)
 const modelLabel = computed(() => {
   const mode = results.value?.model?.mode
   if (mode === 'detailed') return 'TDB curve based partial device model'
@@ -389,6 +391,7 @@ async function calculate() {
     if (sequence !== requestSequence) return
     results.value = { request: payload, ...response }
     comparison.value = null
+    comparisonRequest.value = null
     await renderCharts()
   } catch (error) {
     if (sequence !== requestSequence) return
@@ -405,13 +408,15 @@ async function compare() {
   try {
     const payload = buildPayload(false)
     const { topology: ignoredTopology, ...parameters } = payload
-    const response = await transistorApi.compareTopologies({
+    const request = {
       parameters,
       switch_transistor_id: payload.switch_transistor_id,
       diode_transistor_id: payload.diode_transistor_id
-    })
+    }
+    const response = await transistorApi.compareTopologies(request)
     if (sequence !== requestSequence) return
     comparison.value = response
+    comparisonRequest.value = request
   } catch (error) {
     if (sequence === requestSequence) errorMessage.value = error.response?.data?.detail || error.message || 'Topology comparison failed'
   } finally {
@@ -456,18 +461,21 @@ async function renderCharts() {
   }
 }
 function saveResults() {
-  if (!hasResults.value) return
-  const blob = new Blob([JSON.stringify({
-    topology: results.value.topology,
-    request: results.value.request,
+  if (!hasExportableResults.value) return
+  const exportData = {
+    topology: results.value?.topology ?? null,
+    request: results.value?.request ?? comparisonRequest.value,
     result: results.value,
     comparison: comparison.value,
+    comparison_request: comparisonRequest.value,
     exported_at: new Date().toISOString()
-  }, null, 2)], { type: 'application/json' })
+  }
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `topology-${results.value.topology}-${new Date().toISOString().slice(0, 10)}.json`
+  const exportName = results.value?.topology || 'comparison'
+  link.download = `topology-${exportName}-${new Date().toISOString().slice(0, 10)}.json`
   link.click()
   URL.revokeObjectURL(url)
 }
@@ -486,6 +494,7 @@ function reset() {
   })
   results.value = null
   comparison.value = null
+  comparisonRequest.value = null
   errorMessage.value = ''
   loading.value = false
   destroyCharts()
@@ -494,6 +503,7 @@ function invalidateResults() {
   requestSequence += 1
   results.value = null
   comparison.value = null
+  comparisonRequest.value = null
   errorMessage.value = ''
   loading.value = false
   destroyCharts()

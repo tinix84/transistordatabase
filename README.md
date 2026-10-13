@@ -1,4 +1,4 @@
-<!-- Last modified: 2026-10-03 -->
+<!-- Last modified: 2026-10-13 -->
 <!-- Version: 1.0.1 -->
 
 # Transistor Database
@@ -74,7 +74,7 @@ cd transistordatabase/gui_web
 npm install  # First time only
 npm run dev
 
-# Open browser: http://localhost:5173
+# Open browser: http://localhost:5174
 ```
 
 ### Transistor Database File Exchange

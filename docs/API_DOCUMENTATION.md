@@ -884,9 +884,9 @@ For production use, consider:
 ## CORS Configuration
 
 The API has CORS enabled for:
-- `http://localhost:5173` (Vue dev server)
+- `http://localhost:5174` (Vue dev server)
 - `http://localhost:3000`
-- `http://127.0.0.1:5173`
+- `http://127.0.0.1:5174`
 
 For production, update CORS origins in `gui_web/backend/main.py`:
 

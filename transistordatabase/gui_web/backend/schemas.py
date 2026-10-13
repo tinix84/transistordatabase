@@ -203,10 +203,10 @@ class TopologySweepRequest(BaseModel):
     x_min: float = Field(..., gt=0, allow_inf_nan=False)
     x_max: float = Field(..., gt=0, allow_inf_nan=False)
     x_points: int = Field(50, ge=2, le=200)
-    y_axis: Optional[Literal["v_in", "v_out", "p_out", "f_sw", "l_value", "c_out"]] = None
-    y_min: Optional[float] = Field(None, gt=0, allow_inf_nan=False)
-    y_max: Optional[float] = Field(None, gt=0, allow_inf_nan=False)
-    y_points: Optional[int] = Field(None, ge=2, le=200)
+    y_axis: Literal["v_in", "v_out", "p_out", "f_sw", "l_value", "c_out"] | None = None
+    y_min: float | None = Field(None, gt=0, allow_inf_nan=False)
+    y_max: float | None = Field(None, gt=0, allow_inf_nan=False)
+    y_points: int | None = Field(None, ge=2, le=200)
     metric: Literal[
         "duty_cycle", "i_in_avg_a", "i_out_avg_a", "i_l_peak_a",
         "i_l_ripple_pp_a", "v_out_ripple_pp_v", "p_loss_total_w",
@@ -214,7 +214,9 @@ class TopologySweepRequest(BaseModel):
     ] = "i_l_ripple_pp_a"
 
     @model_validator(mode="after")
-    def validate_axis_ranges(self):
+    def validate_axis_ranges(
+        self: TopologySweepRequest,
+    ) -> TopologySweepRequest:
         """Require complete, non-duplicated axes for contour sweeps."""
         if self.x_axis == self.y_axis:
             raise ValueError("x_axis and y_axis must differ")
@@ -240,7 +242,7 @@ class TopologyCalculationRequest(BaseModel):
     conduction_regime: Literal["CCM", "DCM"] = Field(
         "CCM", description="Explicitly select continuous or discontinuous conduction"
     )
-    turns_ratio_nps: Optional[float] = Field(
+    turns_ratio_nps: float | None = Field(
         None, description="Flyback primary-to-secondary turns ratio Np/Ns", gt=0,
         allow_inf_nan=False,
     )
@@ -250,23 +252,23 @@ class TopologyCalculationRequest(BaseModel):
     f_sw: float = Field(..., description="Switching frequency in Hz", gt=0, allow_inf_nan=False)
     l_value: float = Field(..., description="Inductance in H", gt=0, allow_inf_nan=False)
     c_out: float = Field(..., description="Output capacitance in F", gt=0, allow_inf_nan=False)
-    switch_transistor_id: Optional[str] = Field(None, description="TDB device used for the switching leg")
-    diode_transistor_id: Optional[str] = Field(None, description="TDB device used for the diode leg")
-    transistor_id: Optional[str] = Field(None, description="Compatibility alias used for both device legs")
+    switch_transistor_id: str | None = Field(None, description="TDB device used for the switching leg")
+    diode_transistor_id: str | None = Field(None, description="TDB device used for the diode leg")
+    transistor_id: str | None = Field(None, description="Compatibility alias used for both device legs")
     parallel_switches: int = Field(1, ge=1, le=100)
     parallel_diodes: int = Field(1, ge=1, le=100)
-    t_j: Optional[float] = Field(None, description="Exact junction temperature in deg C")
-    t_case: Optional[float] = Field(None, description="Fixed case/sink reference temperature in deg C")
-    v_g: Optional[float] = Field(None, description="Exact switch gate voltage in V")
-    diode_v_g: Optional[float] = Field(
+    t_j: float | None = Field(None, description="Exact junction temperature in deg C")
+    t_case: float | None = Field(None, description="Fixed case/sink reference temperature in deg C")
+    v_g: float | None = Field(None, description="Exact switch gate voltage in V")
+    diode_v_g: float | None = Field(
         None,
         description="Exact diode channel curve gate voltage in V when the TDB curve is gate-conditioned",
         allow_inf_nan=False,
     )
-    v_g_off: Optional[float] = Field(None, description="Exact switch turn-off gate voltage in V")
-    r_g_on: Optional[float] = Field(None, description="Switch turn-on gate resistance in Ohm")
-    r_g_off: Optional[float] = Field(None, description="Switch turn-off gate resistance in Ohm")
-    sweep: Optional[TopologySweepRequest] = None
+    v_g_off: float | None = Field(None, description="Exact switch turn-off gate voltage in V")
+    r_g_on: float | None = Field(None, description="Switch turn-on gate resistance in Ohm")
+    r_g_off: float | None = Field(None, description="Switch turn-off gate resistance in Ohm")
+    sweep: TopologySweepRequest | None = None
 
 
 class AdvancedSearchRequest(BaseModel):

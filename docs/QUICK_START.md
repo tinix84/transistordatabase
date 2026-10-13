@@ -35,7 +35,7 @@ npm install  # First time only
 npm run dev
 
 # Open browser
-# → http://localhost:5173
+# → http://localhost:5174
 ```
 
 #### Option B: Desktop Interface
@@ -206,7 +206,7 @@ lsof -i:8002  # Kill process if needed
 uvicorn transistordatabase.gui_web.backend.main:app --port 8002 &
 cd transistordatabase/gui_web && npm run dev
 
-# 2. In browser (http://localhost:5173):
+# 2. In browser (http://localhost:5174):
 #    - Search Database → Type: IGBT
 #    - Voltage Rating: Min = 1000V, Max = 1400V
 #    - View results

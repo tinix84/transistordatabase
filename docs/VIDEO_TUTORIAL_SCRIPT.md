@@ -22,7 +22,7 @@ Production-ready scripts for creating Transistor Database video tutorials.
 
 **[00:15 - Show homepage]**
 
-> "The Transistor Database comes in two flavors: a desktop PyQt5 interface and a modern web interface. Today we'll use the web interface, which runs on localhost:5173 with a FastAPI backend on port 8002."
+> "The Transistor Database comes in two flavors: a desktop PyQt5 interface and a modern web interface. Today we'll use the web interface, which runs on localhost:5174 with a FastAPI backend on port 8002."
 
 **[00:30 - Show main navigation]**
 

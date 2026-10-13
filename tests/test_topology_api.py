@@ -1,6 +1,8 @@
 """FastAPI contract checks for the new topology workflow."""
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 import numpy as np
 
@@ -14,24 +16,24 @@ from transistordatabase.core.models import (
 
 pytest.importorskip("fastapi")
 pytest.importorskip("httpx")
-from fastapi.testclient import TestClient
+from fastapi.testclient import TestClient  # noqa: E402
 
-import transistordatabase.gui_web.backend.main as backend
+import transistordatabase.gui_web.backend.main as backend  # noqa: E402
 
 
 class InMemoryRepo:
     """Minimal repository stub for the topology API tests."""
 
-    def __init__(self, devices):
+    def __init__(self: InMemoryRepo, devices: dict[str, Transistor]) -> None:
         self.devices = devices
 
-    def get_by_name(self, name):
+    def get_by_name(self: InMemoryRepo, name: str) -> Transistor | None:
         """Return the named fixture device, or ``None`` when absent."""
         return self.devices.get(name)
 
 
 @pytest.fixture
-def client(monkeypatch):
+def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     """Create an API client backed by an in-memory device repository."""
     device = Transistor(
         TransistorMetadata("bare-device", "MOSFET", "test", "vendor", "package"),
@@ -43,7 +45,7 @@ def client(monkeypatch):
 
 
 @pytest.fixture
-def gate_conditioned_client(monkeypatch):
+def gate_conditioned_client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     """Expose exact switch and gate-conditioned diode curves to the API."""
     device = Transistor(
         TransistorMetadata("gated-device", "MOSFET", "test", "vendor", "package"),
@@ -58,7 +60,7 @@ def gate_conditioned_client(monkeypatch):
     return TestClient(backend.app)
 
 
-def payload(**changes):
+def payload(**changes: Any) -> dict[str, Any]:
     """Return a valid baseline SI request with selected overrides."""
     body = {
         "topology": "buck",
@@ -74,7 +76,7 @@ def payload(**changes):
     return body
 
 
-def test_openapi_describes_flyback_as_a_supported_topology(client):
+def test_openapi_describes_flyback_as_a_supported_topology(client: TestClient) -> None:
     """Keep generated API docs aligned with the implemented topology set."""
     response = client.get("/openapi.json")
     assert response.status_code == 200
@@ -87,7 +89,7 @@ def test_openapi_describes_flyback_as_a_supported_topology(client):
     assert "switch turn-on/turn-off losses" in request_schema["mode"]["description"]
 
 
-def test_calculate_endpoint_uses_si_contract_and_matches_core(client):
+def test_calculate_endpoint_uses_si_contract_and_matches_core(client: TestClient) -> None:
     """Return unit-consistent operating values from the API."""
     response = client.post("/api/topology/calculate", json=payload())
     assert response.status_code == 200
@@ -98,7 +100,7 @@ def test_calculate_endpoint_uses_si_contract_and_matches_core(client):
     assert result["model"]["mode"] == "estimate"
 
 
-def test_calculate_endpoint_requires_explicit_mode(client):
+def test_calculate_endpoint_requires_explicit_mode(client: TestClient) -> None:
     """Reject requests that do not explicitly choose a model mode."""
     body = payload()
     body.pop("mode")
@@ -106,7 +108,7 @@ def test_calculate_endpoint_requires_explicit_mode(client):
     assert response.status_code == 422
 
 
-def test_calculate_endpoint_requires_flyback_ratio_and_calculates_when_supplied(client):
+def test_calculate_endpoint_requires_flyback_ratio_and_calculates_when_supplied(client: TestClient) -> None:
     """Require an explicit turns ratio and return the isolated operating point."""
     response = client.post("/api/topology/calculate", json=payload(topology="flyback"))
     assert response.status_code == 400
@@ -121,7 +123,7 @@ def test_calculate_endpoint_requires_flyback_ratio_and_calculates_when_supplied(
     assert response.json()["calculated"]["duty_cycle"] > 0
 
 
-def test_calculate_endpoint_accepts_explicit_dcm_regime(client):
+def test_calculate_endpoint_accepts_explicit_dcm_regime(client: TestClient) -> None:
     """Return supported DCM duty and an idle interval from the reusable core."""
     response = client.post(
         "/api/topology/calculate",
@@ -133,7 +135,7 @@ def test_calculate_endpoint_accepts_explicit_dcm_regime(client):
     assert result["calculated"]["idle_fraction"] > 0
 
 
-def test_detailed_mode_does_not_swallow_missing_curves_or_device_ids(client):
+def test_detailed_mode_does_not_swallow_missing_curves_or_device_ids(client: TestClient) -> None:
     """Reject missing detailed curves and preserve missing-device 404s."""
     response = client.post("/api/topology/calculate", json=payload(
         mode="detailed", t_j=25, v_g=15,
@@ -149,7 +151,7 @@ def test_detailed_mode_does_not_swallow_missing_curves_or_device_ids(client):
     assert "missing-device" in missing_device.json()["detail"]
 
 
-def test_conduction_only_mode_requires_device_channels_at_api_boundary(client):
+def test_conduction_only_mode_requires_device_channels_at_api_boundary(client: TestClient) -> None:
     """Do not allow the curve-backed Pareto mode to fall back to an estimate."""
     response = client.post("/api/topology/calculate", json=payload(
         mode="conduction-only", t_j=25, v_g=15,
@@ -159,7 +161,7 @@ def test_conduction_only_mode_requires_device_channels_at_api_boundary(client):
     assert "Missing required switch channel curve" in response.json()["detail"]
 
 
-def test_api_requires_and_passes_gate_condition_for_diode_channel_curves(gate_conditioned_client):
+def test_api_requires_and_passes_gate_condition_for_diode_channel_curves(gate_conditioned_client: TestClient) -> None:
     """Require explicit diode gate selection and return its curve provenance."""
     request = payload(
         mode="conduction-only", t_j=25, v_g=15,
@@ -180,7 +182,7 @@ def test_api_requires_and_passes_gate_condition_for_diode_channel_curves(gate_co
     }
 
 
-def test_line_sweep_is_generated_and_serialized_by_backend(client):
+def test_line_sweep_is_generated_and_serialized_by_backend(client: TestClient) -> None:
     """Return Python-generated sweep points in the API response."""
     response = client.post("/api/topology/calculate", json=payload(sweep={
         "x_axis": "f_sw", "x_min": 10000, "x_max": 20000,
@@ -194,7 +196,7 @@ def test_line_sweep_is_generated_and_serialized_by_backend(client):
     assert sweep["values"][-1] == pytest.approx(6.25)
 
 
-def test_estimate_comparison_does_not_rank_unmodeled_efficiencies(client):
+def test_estimate_comparison_does_not_rank_unmodeled_efficiencies(client: TestClient) -> None:
     """Do not rank ideal estimates by fabricated efficiency values."""
     response = client.post("/api/topology/compare", json={"parameters": payload()})
     assert response.status_code == 200
@@ -203,7 +205,7 @@ def test_estimate_comparison_does_not_rank_unmodeled_efficiencies(client):
     assert comparison["best_topology"] is None
 
 
-def test_conduction_only_comparison_explains_missing_curves_without_claiming_estimate(client):
+def test_conduction_only_comparison_explains_missing_curves_without_claiming_estimate(client: TestClient) -> None:
     """Report the loss scope and accurate reason when no channel data is available."""
     response = client.post("/api/topology/compare", json={
         "parameters": payload(mode="conduction-only"),

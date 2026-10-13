@@ -22,8 +22,8 @@ class TopologyCalculatorService:
         parameters: Dict[str, Any],
         transistor: Optional[Transistor] = None,
         *,
-        switch_transistor: Optional[Transistor] = None,
-        diode_transistor: Optional[Transistor] = None,
+        switch_transistor: Transistor | None = None,
+        diode_transistor: Transistor | None = None,
     ) -> Dict[str, Any]:
         """Calculate one point and an optional Python-generated sweep.
 
@@ -49,8 +49,8 @@ class TopologyCalculatorService:
         parameters: Dict[str, Any],
         transistor: Optional[Transistor] = None,
         *,
-        switch_transistor: Optional[Transistor] = None,
-        diode_transistor: Optional[Transistor] = None,
+        switch_transistor: Transistor | None = None,
+        diode_transistor: Transistor | None = None,
     ) -> Dict[str, Any]:
         """Compare supported topologies and retain per-topology domain errors."""
         results: Dict[str, Any] = {}
@@ -70,8 +70,7 @@ class TopologyCalculatorService:
         efficiencies = {
             topology: result["performance"]["efficiency_percent"]
             for topology, result in results.items()
-            if "error" not in result
-            and result["performance"].get("efficiency_percent") is not None
+            if "error" not in result and result["performance"].get("efficiency_percent") is not None
         }
         results["comparison"] = {
             "efficiencies_percent": efficiencies,

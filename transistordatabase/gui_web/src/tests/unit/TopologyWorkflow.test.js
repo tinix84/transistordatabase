@@ -58,7 +58,11 @@ describe('TopologyCalculator API workflow', () => {
     })
   })
 
-  afterEach(() => wrapper.unmount())
+  afterEach(() => {
+    wrapper.unmount()
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
 
   it('sends operating inputs in SI and renders backend results', async () => {
     await wrapper.get('button.btn-primary').trigger('click')
@@ -129,6 +133,41 @@ describe('TopologyCalculator API workflow', () => {
     expect(request.parameters.mode).toBe('estimate')
     expect(request.parameters.topology).toBeUndefined()
     expect(request.switch_transistor_id).toBeUndefined()
+  })
+
+  it('downloads compare-only results with the exact comparison request and response', async () => {
+    const comparisonResponse = {
+      comparison: { ranking_available: false },
+      buck: { topology: 'buck', supported: true },
+      boost: { topology: 'boost', supported: true }
+    }
+    let downloadedBlob
+    const createObjectURL = vi.fn(blob => {
+      downloadedBlob = blob
+      return 'blob:comparison-results'
+    })
+    vi.stubGlobal('URL', {
+      createObjectURL,
+      revokeObjectURL: vi.fn()
+    })
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+    compareTopologies.mockResolvedValueOnce(comparisonResponse)
+
+    await wrapper.findAll('button').find(button => button.text().includes('Compare topologies')).trigger('click')
+    await flushPromises()
+
+    const exportButton = wrapper.get('.header-actions button.btn-info')
+    expect(exportButton.element.disabled).toBe(false)
+    await exportButton.trigger('click')
+    expect(createObjectURL).toHaveBeenCalledOnce()
+
+    const exported = JSON.parse(await downloadedBlob.text())
+    const comparisonRequest = JSON.parse(JSON.stringify(compareTopologies.mock.calls[0][0]))
+    expect(exported.topology).toBeNull()
+    expect(exported.request).toEqual(comparisonRequest)
+    expect(exported.result).toBeNull()
+    expect(exported.comparison).toEqual(comparisonResponse)
+    expect(exported.comparison_request).toEqual(comparisonRequest)
   })
 
   it('does not restore comparison results when Reset is clicked during a pending request', async () => {

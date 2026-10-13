@@ -6,13 +6,18 @@ points and reject curve extrapolation. Duplicate channel-current samples use
 the maximum recorded voltage at that current for a conservative loss screen.
 The estimate model is not a device-loss estimate.
 """
+
 from __future__ import annotations
 
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping
 
 import numpy as np
 
-from transistordatabase.core.models import ChannelCharacteristics, SwitchingLossData, Transistor
+from transistordatabase.core.models import (
+    ChannelCharacteristics,
+    SwitchingLossData,
+    Transistor,
+)
 
 
 SUPPORTED_TOPOLOGIES = ("buck", "boost", "buck-boost", "flyback")
@@ -49,7 +54,7 @@ def _finite_positive(parameters: Mapping[str, Any], name: str) -> float:
     return value
 
 
-def _optional_finite(parameters: Mapping[str, Any], name: str) -> Optional[float]:
+def _optional_finite(parameters: Mapping[str, Any], name: str) -> float | None:
     value = parameters.get(name)
     if value is None:
         return None
@@ -61,7 +66,13 @@ def _optional_finite(parameters: Mapping[str, Any], name: str) -> Optional[float
     return value
 
 
-def _same_condition(left: Optional[float], right: Optional[float]) -> bool:
+def _valid_sweep_point_count(value: Any) -> bool:
+    if not isinstance(value, int) or isinstance(value, bool):
+        return False
+    return 2 <= value <= 200
+
+
+def _same_condition(left: float | None, right: float | None) -> bool:
     if left is None or right is None:
         return left is right
     return bool(np.isclose(left, right, rtol=0.0, atol=1e-9))
@@ -96,23 +107,29 @@ def _interpolate_curve(curve: Any, current: float, label: str) -> float:
 
 
 def _channel_curve(
-    curves: list[ChannelCharacteristics], *, t_j: float, v_g: Optional[float], label: str
+    curves: list[ChannelCharacteristics],
+    *,
+    t_j: float,
+    v_g: float | None,
+    label: str,
 ) -> ChannelCharacteristics:
     temperature_matches = [curve for curve in curves if _same_condition(curve.t_j, t_j)]
     if label == "diode" and v_g is None:
         unconditioned_matches = [
             curve for curve in temperature_matches if curve.v_g is None
         ]
-        available_gate_voltages = sorted({
-            float(curve.v_g) for curve in temperature_matches if curve.v_g is not None
-        })
+        available_gate_voltages = sorted(
+            {float(curve.v_g) for curve in temperature_matches if curve.v_g is not None}
+        )
         if not unconditioned_matches and available_gate_voltages:
             available = ", ".join(f"{gate:g} V" for gate in available_gate_voltages)
             raise ValueError(
                 f"Diode channel curves at t_j={t_j:g} C are gate-conditioned; "
                 f"provide diode_v_g (available: {available})"
             )
-    matches = [curve for curve in temperature_matches if _same_condition(curve.v_g, v_g)]
+    matches = [
+        curve for curve in temperature_matches if _same_condition(curve.v_g, v_g)
+    ]
     if not matches:
         condition = f"t_j={t_j:g} C"
         if v_g is not None:
@@ -127,27 +144,88 @@ def _channel_curve(
 
 
 def _switching_curve(
-    curves: list[SwitchingLossData], *, label: str, t_j: float, v_supply: float,
-    v_g: float, v_g_off: Optional[float], r_g: Optional[float],
+    curves: list[SwitchingLossData],
+    *,
+    label: str,
+    t_j: float,
+    v_supply: float,
+    v_g: float,
+    v_g_off: float | None,
+    r_g: float | None,
 ) -> SwitchingLossData:
-    matches = [
-        curve for curve in curves
-        if curve.dataset_type == "graph_i_e"
-        and _same_condition(curve.t_j, t_j)
-        and _same_condition(curve.v_supply, v_supply)
-        and _same_condition(curve.v_g, v_g)
-        and (v_g_off is None or _same_condition(curve.v_g_off, v_g_off))
-        and (r_g is None or _same_condition(curve.r_g, r_g))
-    ]
+    base_matches = []
+    for curve in curves:
+        if curve.dataset_type != "graph_i_e":
+            continue
+        if not _same_condition(curve.t_j, t_j):
+            continue
+        if not _same_condition(curve.v_supply, v_supply):
+            continue
+        if r_g is not None and not _same_condition(curve.r_g, r_g):
+            continue
+        base_matches.append(curve)
+
+    def matches_turn_on_gate(curve: SwitchingLossData) -> bool:
+        if not _same_condition(curve.v_g, v_g):
+            return False
+        if v_g_off is None or curve.v_g_off is None:
+            return True
+        return _same_condition(curve.v_g_off, v_g_off)
+
+    def matches_turn_off_gate(curve: SwitchingLossData) -> bool:
+        if curve.v_g_off is not None:
+            if not _same_condition(curve.v_g, v_g):
+                return False
+            if v_g_off is None:
+                return True
+            return _same_condition(curve.v_g_off, v_g_off)
+        if v_g_off is None:
+            return True
+        return _same_condition(curve.v_g, v_g_off)
+
+    if label == "e_on":
+        # Eon.v_g is the turn-on gate voltage. Older TDB records may not
+        # carry v_g_off on the Eon curve, even when the caller specifies it.
+        matches = [curve for curve in base_matches if matches_turn_on_gate(curve)]
+    else:
+        # Modern Eoff records pair the turn-on and turn-off gates explicitly.
+        # Legacy records store the turn-off gate in v_g and leave v_g_off empty.
+        matches = [curve for curve in base_matches if matches_turn_off_gate(curve)]
+
+    def available_turn_off_gate(curve: SwitchingLossData) -> bool:
+        if label != "e_off":
+            return False
+        return curve.v_g_off is None or _same_condition(curve.v_g, v_g)
+
+    def format_available_turn_off_gates(
+        curves_to_format: list[SwitchingLossData],
+    ) -> str:
+        available_off_gates = sorted(
+            {
+                float(curve.v_g_off if curve.v_g_off is not None else curve.v_g)
+                for curve in curves_to_format
+                if available_turn_off_gate(curve)
+            }
+        )
+        if not available_off_gates or label != "e_off":
+            return ""
+        available_gate_text = ", ".join(
+            f"{gate:g} V" for gate in available_off_gates
+        )
+        return f"; available turn-off gate voltages: {available_gate_text}"
+
     if not matches:
+        available = format_available_turn_off_gates(base_matches)
         raise ValueError(
             f"Missing required {label} graph_i_e curve matching t_j={t_j:g} C, "
-            f"v_supply={v_supply:g} V, v_g={v_g:g} V"
+            f"v_supply={v_supply:g} V, v_g={v_g:g} V{available}"
         )
     if len(matches) != 1:
+        available = format_available_turn_off_gates(matches)
         raise ValueError(
             f"Multiple {label} graph_i_e curves match the requested conditions; "
             "specify gate-resistance and turn-off-voltage conditions to select one"
+            f"{available}"
         )
     return matches[0]
 
@@ -156,14 +234,18 @@ def _energy_at_current(curve: SwitchingLossData, current: float, label: str) -> 
     graph = curve.graph_i_e
     values = np.asarray(graph, dtype=float) if graph is not None else np.empty((0, 0))
     if values.ndim != 2 or values.shape[0] != 2 or values.shape[1] < 2:
-        raise ValueError(f"{label} graph_i_e curve has no usable current-energy samples")
+        raise ValueError(
+            f"{label} graph_i_e curve has no usable current-energy samples"
+        )
     if not np.isfinite(values).all():
         raise ValueError(f"{label} graph_i_e curve contains non-finite samples")
     order = np.argsort(values[0], kind="stable")
     currents = values[0, order]
     energies = values[1, order]
     if np.any(np.diff(currents) <= 0) or np.any(energies < 0):
-        raise ValueError(f"{label} graph_i_e curve must have unique currents and non-negative energy")
+        raise ValueError(
+            f"{label} graph_i_e curve must have unique currents and non-negative energy"
+        )
     if current < currents[0] or current > currents[-1]:
         raise ValueError(
             f"{label} switching curve supports {currents[0]:g} to {currents[-1]:g} A; "
@@ -172,12 +254,16 @@ def _energy_at_current(curve: SwitchingLossData, current: float, label: str) -> 
     return float(np.interp(current, currents, energies))
 
 
-def _mean_conduction_power(curve: ChannelCharacteristics, valley: float, peak: float, label: str) -> float:
+def _mean_conduction_power(
+    curve: ChannelCharacteristics, valley: float, peak: float, label: str
+) -> float:
     if np.isclose(valley, peak):
         voltage = _interpolate_curve(curve, valley, label)
         return voltage * valley
     currents = np.linspace(valley, peak, 65)
-    voltages = np.array([_interpolate_curve(curve, current, label) for current in currents])
+    voltages = np.array(
+        [_interpolate_curve(curve, current, label) for current in currents]
+    )
     power = voltages * currents
     integral = np.sum((power[:-1] + power[1:]) * 0.5 * np.diff(currents))
     return float(integral / (peak - valley))
@@ -210,32 +296,95 @@ def _dcm_output_ripple(
         )
     capacitor_current = output_branch_current - output_current
     phase_step = np.diff(phase)
-    charge = np.concatenate((
-        [0.0],
-        np.cumsum((capacitor_current[:-1] + capacitor_current[1:]) * 0.5
-                  * phase_step / frequency),
-    ))
+    charge_increments = (
+        (capacitor_current[:-1] + capacitor_current[1:]) * 0.5 * phase_step
+    ) / frequency
+    charge = np.concatenate(([0.0], np.cumsum(charge_increments)))
     return float(np.ptp(charge) / capacitance)
 
 
+def _ccm_output_ripple(
+    topology: str,
+    duty: float,
+    valley_current: float,
+    peak_current: float,
+    output_current: float,
+    frequency: float,
+    capacitance: float,
+    diode_current_scale: float = 1.0,
+) -> float:
+    """Integrate CCM capacitor charge exactly across linear current segments."""
+    if topology == "buck":
+        segments = (
+            (duty, valley_current - output_current, peak_current - output_current),
+            (
+                1.0 - duty,
+                peak_current - output_current,
+                valley_current - output_current,
+            ),
+        )
+    else:
+        segments = (
+            (duty, -output_current, -output_current),
+            (
+                1.0 - duty,
+                diode_current_scale * peak_current - output_current,
+                diode_current_scale * valley_current - output_current,
+            ),
+        )
+
+    charge = 0.0
+    extrema = [charge]
+    for fraction, current_start, current_end in segments:
+        duration = fraction / frequency
+        delta_current = current_end - current_start
+        if delta_current != 0.0:
+            zero_fraction = -current_start / delta_current
+            if 0.0 < zero_fraction < 1.0:
+                zero_time = duration * zero_fraction
+                zero_charge = charge + 0.5 * current_start * zero_time
+                extrema.append(zero_charge)
+        charge += 0.5 * (current_start + current_end) * duration
+        extrema.append(charge)
+    return float((max(extrema) - min(extrema)) / capacitance)
+
+
 def _temperature_result(
-    switch_transistor: Transistor, diode_transistor: Transistor,
-    switch_loss_per_device: float, diode_loss_per_device: float, t_case: Optional[float],
+    switch_transistor: Transistor,
+    diode_transistor: Transistor,
+    switch_loss_per_device: float,
+    diode_loss_per_device: float,
+    t_case: float | None,
 ) -> dict[str, Any]:
     result: dict[str, Any] = {"switch_c": None, "diode_c": None, "t_case_c": t_case}
     if t_case is None:
-        result["unavailable_reason"] = "t_case must be supplied for a steady-state temperature estimate"
+        result["unavailable_reason"] = (
+            "t_case must be supplied for a steady-state temperature estimate"
+        )
         return result
     for label, transistor, component, r_cs_name, loss in (
-        ("switch", switch_transistor, switch_transistor.switch, "r_th_switch_cs", switch_loss_per_device),
-        ("diode", diode_transistor, diode_transistor.diode, "r_th_diode_cs", diode_loss_per_device),
+        (
+            "switch",
+            switch_transistor,
+            switch_transistor.switch,
+            "r_th_switch_cs",
+            switch_loss_per_device,
+        ),
+        (
+            "diode",
+            diode_transistor,
+            diode_transistor.diode,
+            "r_th_diode_cs",
+            diode_loss_per_device,
+        ),
     ):
         thermal = getattr(component, "thermal_foster", None)
         r_jc = getattr(thermal, "r_th_total", None)
         r_cs = getattr(transistor.thermal_properties, r_cs_name, None)
         if r_jc is None or r_cs is None:
             result[f"{label}_unavailable_reason"] = (
-                f"{label} junction-to-case and case-to-sink thermal resistances are required"
+                f"{label} junction-to-case and case-to-sink thermal resistances "
+                "are required"
             )
             continue
         try:
@@ -257,8 +406,8 @@ def _temperature_result(
 def calculate_topology_operating_point(
     topology: str,
     parameters: Mapping[str, Any],
-    switch_transistor: Optional[Transistor] = None,
-    diode_transistor: Optional[Transistor] = None,
+    switch_transistor: Transistor | None = None,
+    diode_transistor: Transistor | None = None,
     *,
     include_waveforms: bool = True,
 ) -> dict[str, Any]:
@@ -300,21 +449,28 @@ def calculate_topology_operating_point(
         raise ValueError("Flyback requires a positive turns_ratio_nps (Np/Ns)")
     turns_ratio_nps = (
         _finite_positive(parameters, "turns_ratio_nps")
-        if topology == "flyback" else None
+        if topology == "flyback"
+        else None
     )
     if topology != "flyback" and parameters.get("turns_ratio_nps") is not None:
         raise ValueError("turns_ratio_nps is only supported for Flyback")
     parallel_switches = parameters.get("parallel_switches", 1)
     parallel_diodes = parameters.get("parallel_diodes", 1)
-    if isinstance(parallel_switches, bool) or not isinstance(parallel_switches, int) or parallel_switches < 1:
+    if isinstance(parallel_switches, bool) or not isinstance(parallel_switches, int):
         raise ValueError("parallel_switches must be an integer of at least 1")
-    if isinstance(parallel_diodes, bool) or not isinstance(parallel_diodes, int) or parallel_diodes < 1:
+    if parallel_switches < 1:
+        raise ValueError("parallel_switches must be an integer of at least 1")
+    if isinstance(parallel_diodes, bool) or not isinstance(parallel_diodes, int):
+        raise ValueError("parallel_diodes must be an integer of at least 1")
+    if parallel_diodes < 1:
         raise ValueError("parallel_diodes must be an integer of at least 1")
 
     output_current_scale = 1.0
     if topology == "buck":
         if not v_out < v_in:
-            raise ValueError(f"Buck requires 0 < v_out < v_in; got {v_out:g} V and {v_in:g} V")
+            raise ValueError(
+                f"Buck requires 0 < v_out < v_in; got {v_out:g} V and {v_in:g} V"
+            )
         duty = v_out / v_in
         i_in = p_out / v_in
         i_out = p_out / v_out
@@ -323,7 +479,9 @@ def calculate_topology_operating_point(
         v_block = v_in
     elif topology == "boost":
         if not v_out > v_in:
-            raise ValueError(f"Boost requires v_out > v_in > 0; got {v_out:g} V and {v_in:g} V")
+            raise ValueError(
+                f"Boost requires v_out > v_in > 0; got {v_out:g} V and {v_in:g} V"
+            )
         duty = 1.0 - v_in / v_out
         i_in = p_out / v_in
         i_out = p_out / v_out
@@ -377,9 +535,7 @@ def calculate_topology_operating_point(
             i_l_average = 0.5 * i_l_peak * (duty + diode_fraction)
             v_l_on = v_in - v_out
         elif topology == "boost":
-            duty = np.sqrt(
-                2.0 * l_f * p_out * (v_out - v_in) / (v_out * v_in**2)
-            )
+            duty = np.sqrt(2.0 * l_f * p_out * (v_out - v_in) / (v_out * v_in**2))
             diode_fraction = v_in * duty / (v_out - v_in)
             i_l_peak = v_in * duty / l_f
             i_in = 0.5 * i_l_peak * (duty + diode_fraction)
@@ -426,20 +582,28 @@ def calculate_topology_operating_point(
     )
     if conduction_regime == "DCM":
         v_ripple = _dcm_output_ripple(
-            topology, duty, diode_fraction, i_l_peak, i_out, f_sw, c_out,
+            topology,
+            duty,
+            diode_fraction,
+            i_l_peak,
+            i_out,
+            f_sw,
+            c_out,
             diode_current_scale=output_current_scale,
         )
     else:
-        v_ripple = (
-            i_ripple / (8 * f_sw * c_out)
-            if topology == "buck"
-            else i_out * duty / (f_sw * c_out)
+        v_ripple = _ccm_output_ripple(
+            topology,
+            duty,
+            i_l_valley,
+            i_l_peak,
+            i_out,
+            f_sw,
+            c_out,
+            diode_current_scale=output_current_scale,
         )
     output_polarity = -1 if topology == "buck-boost" else 1
-    diode_block = (
-        v_out + v_in / turns_ratio_nps
-        if topology == "flyback" else v_block
-    )
+    diode_block = v_out + v_in / turns_ratio_nps if topology == "flyback" else v_block
 
     result: dict[str, Any] = {
         "topology": topology,
@@ -447,8 +611,12 @@ def calculate_topology_operating_point(
             "mode": mode,
             "conduction_regime": conduction_regime,
             "output_polarity": output_polarity,
-            "switch_transistor": switch_transistor.metadata.name if switch_transistor else None,
-            "diode_transistor": diode_transistor.metadata.name if diode_transistor else None,
+            "switch_transistor": switch_transistor.metadata.name
+            if switch_transistor
+            else None,
+            "diode_transistor": diode_transistor.metadata.name
+            if diode_transistor
+            else None,
             "parallel_switches": parallel_switches,
             "parallel_diodes": parallel_diodes,
             "assumptions": [
@@ -456,19 +624,30 @@ def calculate_topology_operating_point(
                 (
                     "Triangular inductor current in continuous conduction mode."
                     if conduction_regime == "CCM"
-                    else "Inductor current starts at zero, ramps to a peak, returns to zero, then idles."
+                    else (
+                        "Inductor current starts at zero, ramps to a peak, returns "
+                        "to zero, then idles."
+                    )
                 ),
-                "Output ripple is a calculated peak-to-peak estimate; capacitor ESR and switching ripple are ignored.",
                 (
-                    "Buck-boost is inverting; v_out and i_out are reported as magnitudes."
-                    if topology == "buck-boost" else
-                    "v_out and i_out are positive output magnitudes."
+                    "Output ripple is a calculated peak-to-peak estimate; "
+                    "capacitor ESR and switching ripple are ignored."
+                ),
+                (
+                    "Buck-boost is inverting; v_out and i_out are reported "
+                    "as magnitudes."
+                    if topology == "buck-boost"
+                    else "v_out and i_out are positive output magnitudes."
                 ),
             ],
         },
         "parameters": {
-            "v_in": v_in, "v_out": v_out, "p_out": p_out, "f_sw": f_sw,
-            "l_value": l_value, "c_out": c_out,
+            "v_in": v_in,
+            "v_out": v_out,
+            "p_out": p_out,
+            "f_sw": f_sw,
+            "l_value": l_value,
+            "c_out": c_out,
             "conduction_regime": conduction_regime,
             "turns_ratio_nps": turns_ratio_nps,
         },
@@ -498,21 +677,31 @@ def calculate_topology_operating_point(
 
     if mode == "estimate":
         result["model"]["assumptions"].append(
-            "Estimate mode does not calculate device, gate-drive, magnetic, or thermal losses."
+            "Estimate mode does not calculate device, gate-drive, magnetic, "
+            "or thermal losses."
         )
         if topology == "flyback":
             result["model"]["assumptions"].append(
-                "Flyback assumes an ideal transformer with no leakage, winding copper, core, or clamp losses."
+                "Flyback assumes an ideal transformer with no leakage, winding "
+                "copper, core, or clamp losses."
             )
     else:
         if switch_transistor is None:
-            raise ValueError("Curve-backed mode requires a switch transistor with TDB curves")
+            raise ValueError(
+                "Curve-backed mode requires a switch transistor with TDB curves"
+            )
         if diode_transistor is None:
-            raise ValueError("Curve-backed mode requires a diode transistor with TDB curves")
+            raise ValueError(
+                "Curve-backed mode requires a diode transistor with TDB curves"
+            )
         if t_j is None:
-            raise ValueError("Curve-backed mode requires t_j to select exact device curves")
+            raise ValueError(
+                "Curve-backed mode requires t_j to select exact device curves"
+            )
         if v_g is None:
-            raise ValueError("Curve-backed mode requires v_g to select exact switch curves")
+            raise ValueError(
+                "Curve-backed mode requires v_g to select exact switch curves"
+            )
 
         switch_channel = _channel_curve(
             switch_transistor.switch.channel_data, t_j=t_j, v_g=v_g, label="switch"
@@ -541,12 +730,22 @@ def calculate_topology_operating_point(
         e_off_curve = None
         if mode == "detailed":
             e_on_curve = _switching_curve(
-                switch_transistor.switch.e_on_data, label="e_on", t_j=t_j,
-                v_supply=v_block, v_g=v_g, v_g_off=v_g_off, r_g=r_g_on,
+                switch_transistor.switch.e_on_data,
+                label="e_on",
+                t_j=t_j,
+                v_supply=v_block,
+                v_g=v_g,
+                v_g_off=v_g_off,
+                r_g=r_g_on,
             )
             e_off_curve = _switching_curve(
-                switch_transistor.switch.e_off_data, label="e_off", t_j=t_j,
-                v_supply=v_block, v_g=v_g, v_g_off=v_g_off, r_g=r_g_off,
+                switch_transistor.switch.e_off_data,
+                label="e_off",
+                t_j=t_j,
+                v_supply=v_block,
+                v_g=v_g,
+                v_g_off=v_g_off,
+                r_g=r_g_off,
             )
             e_on = _energy_at_current(e_on_curve, switch_valley, "e_on")
             e_off = _energy_at_current(e_off_curve, switch_peak, "e_off")
@@ -555,34 +754,83 @@ def calculate_topology_operating_point(
         p_total = p_cond_switch + p_cond_diode + p_sw_on + p_sw_off
         p_in = p_out + p_total
 
-        result["model"]["assumptions"].extend([
-            "TDB channel losses use exact-temperature/gate curves with linear interpolation only inside recorded current ranges.",
-            "Duplicate TDB channel-current samples use the maximum recorded voltage at each current as a conservative upper-voltage loss envelope.",
-            "Curve-backed currents and ripple are calculated at the ideal lossless operating point; they are not recalculated from device losses.",
-            "Parallel devices are identical and share current evenly; each branch uses the original per-device TDB curves without modifying curve data.",
-        ])
+        result["model"]["assumptions"].extend(
+            [
+                (
+                    "TDB channel losses use exact-temperature/gate curves with "
+                    "linear interpolation only inside recorded current ranges."
+                ),
+                (
+                    "Duplicate TDB channel-current samples use the maximum "
+                    "recorded voltage at each current as a conservative "
+                    "upper-voltage loss envelope."
+                ),
+                (
+                    "Curve-backed currents and ripple are calculated at the "
+                    "ideal lossless operating point; they are not recalculated "
+                    "from device losses."
+                ),
+                (
+                    "Parallel devices are identical and share current evenly; "
+                    "each branch uses the original per-device TDB curves "
+                    "without modifying curve data."
+                ),
+            ]
+        )
         if topology == "flyback":
             result["model"]["assumptions"].append(
-                "Flyback assumes an ideal transformer with no leakage, winding copper, core, or clamp losses."
+                "Flyback assumes an ideal transformer with no leakage, winding "
+                "copper, core, or clamp losses."
             )
         if mode == "detailed":
-            result["model"]["assumptions"].extend([
-                "Detailed switching mode uses exact-voltage TDB energy curves with linear interpolation only inside recorded current ranges.",
-                "Switching energies use valley current at turn-on and peak current at turn-off.",
-                "Losses include switch/diode channel conduction and switch turn-on/turn-off only; reverse recovery, gate drive, dead time, passive losses, and parasitics are excluded.",
-                "Commutation-device metadata is recorded provenance and is not validated against the selected diode identity; confirm measurement compatibility separately.",
-            ])
+            result["model"]["assumptions"].extend(
+                [
+                    (
+                        "Detailed switching mode uses exact-voltage TDB energy "
+                        "curves with linear interpolation only inside recorded "
+                        "current ranges."
+                    ),
+                    (
+                        "Switching energies use valley current at turn-on and "
+                        "peak current at turn-off."
+                    ),
+                    (
+                        "Losses include switch/diode channel conduction and "
+                        "switch turn-on/turn-off only; reverse recovery, gate "
+                        "drive, dead time, passive losses, and parasitics are "
+                        "excluded."
+                    ),
+                    (
+                        "Commutation-device metadata is recorded provenance "
+                        "and is not validated against the selected diode "
+                        "identity; confirm measurement compatibility "
+                        "separately."
+                    ),
+                ]
+            )
         else:
-            result["model"]["assumptions"].extend([
-                "Conduction-only mode reports TDB switch and diode channel conduction losses; switching, reverse-recovery, gate-drive, passive, and magnetic losses are excluded.",
-                "Conduction-only input power and efficiency are partial-loss estimates based on the ideal lossless operating point.",
-            ])
+            result["model"]["assumptions"].extend(
+                [
+                    (
+                        "Conduction-only mode reports TDB switch and diode "
+                        "channel conduction losses; switching, reverse-recovery, "
+                        "gate-drive, passive, and magnetic losses are excluded."
+                    ),
+                    (
+                        "Conduction-only input power and efficiency are "
+                        "partial-loss estimates based on the ideal lossless "
+                        "operating point."
+                    ),
+                ]
+            )
 
         def commutation_device_status(curve: SwitchingLossData) -> str:
             recorded = curve.commutation_device
             if not isinstance(recorded, str) or not recorded.strip():
                 return "unknown"
-            if recorded.strip().casefold() == diode_transistor.metadata.name.strip().casefold():
+            recorded_name = recorded.strip().casefold()
+            selected_diode_name = diode_transistor.metadata.name.strip().casefold()
+            if recorded_name == selected_diode_name:
                 return "matches_selected_diode_name"
             return "unverified"
 
@@ -592,24 +840,39 @@ def calculate_topology_operating_point(
         }
         if mode == "detailed":
             assert e_on_curve is not None and e_off_curve is not None
-            result["model"]["curve_conditions"].update({
-                "e_on": {
-                    "t_j": e_on_curve.t_j, "v_supply": e_on_curve.v_supply,
-                    "v_g": e_on_curve.v_g, "v_g_off": e_on_curve.v_g_off,
-                    "r_g": e_on_curve.r_g,
-                    "commutation_device": e_on_curve.commutation_device,
-                    "commutation_device_status": commutation_device_status(e_on_curve),
-                    "measurement_testbench": e_on_curve.measurement_testbench,
-                },
-                "e_off": {
-                    "t_j": e_off_curve.t_j, "v_supply": e_off_curve.v_supply,
-                    "v_g": e_off_curve.v_g, "v_g_off": e_off_curve.v_g_off,
-                    "r_g": e_off_curve.r_g,
-                    "commutation_device": e_off_curve.commutation_device,
-                    "commutation_device_status": commutation_device_status(e_off_curve),
-                    "measurement_testbench": e_off_curve.measurement_testbench,
-                },
-            })
+            result["model"]["curve_conditions"].update(
+                {
+                    "e_on": {
+                        "t_j": e_on_curve.t_j,
+                        "v_supply": e_on_curve.v_supply,
+                        "v_g": e_on_curve.v_g,
+                        "v_g_off": e_on_curve.v_g_off,
+                        "r_g": e_on_curve.r_g,
+                        "commutation_device": e_on_curve.commutation_device,
+                        "commutation_device_status": commutation_device_status(
+                            e_on_curve
+                        ),
+                        "measurement_testbench": e_on_curve.measurement_testbench,
+                    },
+                    "e_off": {
+                        "t_j": e_off_curve.t_j,
+                        "v_supply": e_off_curve.v_supply,
+                        "v_g": e_off_curve.v_g,
+                        "v_g_off": e_off_curve.v_g_off,
+                        "r_g": e_off_curve.r_g,
+                        "commutation_device": e_off_curve.commutation_device,
+                        "commutation_device_status": commutation_device_status(
+                            e_off_curve
+                        ),
+                        "measurement_testbench": e_off_curve.measurement_testbench,
+                    },
+                }
+            )
+        per_switch_device_loss = sum((
+            p_cond_switch_per_device,
+            p_sw_on / parallel_switches,
+            p_sw_off / parallel_switches,
+        ))
         result["losses"] = {
             "conduction_switch_w": p_cond_switch,
             "conduction_diode_w": p_cond_diode,
@@ -617,39 +880,57 @@ def calculate_topology_operating_point(
             "switching_off_w": p_sw_off,
             "total_w": p_total,
             "scope": (
-                "included channel conduction and switching losses only; excludes reverse recovery, gate drive, passive, and magnetic losses"
+                "included channel conduction and switching losses only; "
+                "excludes reverse recovery, gate drive, passive, and magnetic "
+                "losses"
                 if mode == "detailed"
-                else "included switch and diode channel conduction only; excludes switching, reverse recovery, gate drive, passive, and magnetic losses"
+                else (
+                    "included switch and diode channel conduction only; "
+                    "excludes switching, reverse recovery, gate drive, passive, "
+                    "and magnetic losses"
+                )
             ),
             "loss_scope": (
                 "channel_conduction_and_switch_turn_on_turn_off"
-                if mode == "detailed" else "channel_conduction_only"
+                if mode == "detailed"
+                else "channel_conduction_only"
             ),
             "switching_losses_included": mode == "detailed",
             "reverse_recovery_losses_included": False,
             "gate_drive_losses_included": False,
-            "per_switch_device_w": p_cond_switch_per_device + p_sw_on / parallel_switches + p_sw_off / parallel_switches,
+            "per_switch_device_w": per_switch_device_loss,
             "per_diode_device_w": p_cond_diode_per_device,
         }
         result["temperatures"] = _temperature_result(
-            switch_transistor, diode_transistor,
-            result["losses"]["per_switch_device_w"], p_cond_diode_per_device, t_case,
+            switch_transistor,
+            diode_transistor,
+            result["losses"]["per_switch_device_w"],
+            p_cond_diode_per_device,
+            t_case,
         )
         result["performance"] = {
             "p_out_w": p_out,
             "p_in_w": p_in,
             "efficiency_percent": 100 * p_out / p_in,
             "input_power_scope": (
-                "ideal operating point plus included partial device losses; loss feedback is not iterated"
+                "ideal operating point plus included partial device losses; "
+                "loss feedback is not iterated"
             ),
-            "efficiency_scope": "partial-loss estimate based on the ideal lossless operating point",
+            "efficiency_scope": (
+                "partial-loss estimate based on the ideal lossless operating "
+                "point"
+            ),
         }
 
     if include_waveforms:
-        phase = np.unique(np.concatenate((
-            np.linspace(0.0, 1.0, 201),
-            np.array([duty, duty + diode_fraction]),
-        )))
+        phase = np.unique(
+            np.concatenate(
+                (
+                    np.linspace(0.0, 1.0, 201),
+                    np.array([duty, duty + diode_fraction]),
+                )
+            )
+        )
         if conduction_regime == "CCM":
             current = np.where(
                 phase <= duty,
@@ -661,9 +942,7 @@ def calculate_topology_operating_point(
             on = phase < duty
             diode = (phase >= duty) & (phase < duty + diode_fraction)
             current[on] = i_l_peak * phase[on] / duty
-            current[diode] = i_l_peak * (
-                1.0 - (phase[diode] - duty) / diode_fraction
-            )
+            current[diode] = i_l_peak * (1.0 - (phase[diode] - duty) / diode_fraction)
         result["waveforms"] = {
             "time_s": (phase / f_sw).tolist(),
             "inductor_current_a": current.tolist(),
@@ -679,8 +958,8 @@ def calculate_topology_sweep(
     topology: str,
     parameters: Mapping[str, Any],
     sweep: Mapping[str, Any],
-    switch_transistor: Optional[Transistor] = None,
-    diode_transistor: Optional[Transistor] = None,
+    switch_transistor: Transistor | None = None,
+    diode_transistor: Transistor | None = None,
 ) -> dict[str, Any]:
     """Generate a Python-side line or contour sweep of one supported metric."""
     x_axis = sweep.get("x_axis")
@@ -697,7 +976,7 @@ def calculate_topology_sweep(
     x_min = _finite_positive(sweep, "x_min")
     x_max = _finite_positive(sweep, "x_max")
     x_points = sweep.get("x_points", 0)
-    if x_min >= x_max or isinstance(x_points, bool) or not isinstance(x_points, int) or not 2 <= x_points <= 200:
+    if x_min >= x_max or not _valid_sweep_point_count(x_points):
         raise ValueError("x sweep requires x_min < x_max and 2 to 200 points")
     x_values = np.linspace(x_min, x_max, x_points)
     y_values = None
@@ -705,20 +984,24 @@ def calculate_topology_sweep(
         y_min = _finite_positive(sweep, "y_min")
         y_max = _finite_positive(sweep, "y_max")
         y_points = sweep.get("y_points", 0)
-        if y_min >= y_max or isinstance(y_points, bool) or not isinstance(y_points, int) or not 2 <= y_points <= 200:
+        if y_min >= y_max or not _valid_sweep_point_count(y_points):
             raise ValueError("y sweep requires y_min < y_max and 2 to 200 points")
         if x_points * y_points > 2500:
             raise ValueError("Contour sweeps are limited to 2500 operating points")
         y_values = np.linspace(y_min, y_max, y_points)
 
-    def evaluate(x_value: float, y_value: Optional[float]) -> float:
+    def evaluate(x_value: float, y_value: float | None) -> float:
         changed = dict(parameters)
         changed[_SWEEP_AXES[x_axis][0]] = float(x_value)
         if y_axis is not None and y_value is not None:
             changed[_SWEEP_AXES[y_axis][0]] = float(y_value)
         try:
             point = calculate_topology_operating_point(
-                topology, changed, switch_transistor, diode_transistor, include_waveforms=False
+                topology,
+                changed,
+                switch_transistor,
+                diode_transistor,
+                include_waveforms=False,
             )
         except ValueError as exc:
             location = f"x={x_value:g} {_SWEEP_AXES[x_axis][1]}"
@@ -728,16 +1011,16 @@ def calculate_topology_sweep(
         section, key, _ = _SWEEP_METRICS[metric]
         value = point[section]
         if value is None or value.get(key) is None:
-            raise ValueError(f"Sweep metric '{metric}' is unavailable in {parameters.get('mode')} mode")
+            raise ValueError(
+                f"Sweep metric '{metric}' is unavailable in "
+                f"{parameters.get('mode')} mode"
+            )
         return float(value[key])
 
     if y_values is None:
         values: Any = [evaluate(float(x), None) for x in x_values]
     else:
-        values = [
-            [evaluate(float(x), float(y)) for x in x_values]
-            for y in y_values
-        ]
+        values = [[evaluate(float(x), float(y)) for x in x_values] for y in y_values]
     return {
         "kind": "line" if y_values is None else "contour",
         "x_axis": x_axis,
