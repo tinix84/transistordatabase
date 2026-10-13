@@ -61,6 +61,8 @@ Use the same checklist and vertical-workflow approach for database search, creat
 
 The search-driven general database lifecycle slice is tracked in the [database lifecycle sprint](sprint-web-database-lifecycle.md); it does not close this broader replacement.
 
+Curve loading, plotting, and the existing add/delete browser routes are tracked in the [web curve workflow sprint](sprint-web-curve-workflow.md). That slice leaves the wider migration open; saved-curve editing, transient thermal curves, DPT measurement handling, and other desktop capabilities still need separate parity evidence.
+
 ## Topology coverage status (2026-10-13)
 
 | Capability | Current evidence | Status and remaining limit |

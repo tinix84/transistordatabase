@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+
+### Fixed
+- **Web transistor curves**: Saved curves now load in the browser and open in an in-app plot with the displayed units, including gate-charge conversion from C to nC. Removed the unsupported Edit action.
+
+
 ## [1.0.1] - 2026-02-17
 
 ### Fixed
