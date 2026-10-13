@@ -259,7 +259,6 @@
         @view="viewCurve('channel', $event)"
         @delete="deleteCurve('channel', $event)"
       />
-
       <CurveEditor
         v-if="showEditor && editorCurveType === 'channel'"
         curveType="channel"
@@ -289,7 +288,6 @@
         @view="viewCurve('switching_loss', $event)"
         @delete="deleteCurve('switching_loss', $event)"
       />
-
       <CurveEditor
         v-if="showEditor && editorCurveType === 'switching_loss'"
         curveType="switching_loss"
@@ -311,7 +309,6 @@
         @view="viewCurve('gate_charge', $event)"
         @delete="deleteCurve('gate_charge', $event)"
       />
-
       <CurveEditor
         v-if="showEditor && editorCurveType === 'gate_charge'"
         curveType="gate_charge"
@@ -332,7 +329,6 @@
         @view="viewCurve('soa', $event)"
         @delete="deleteCurve('soa', $event)"
       />
-
       <CurveEditor
         v-if="showEditor && editorCurveType === 'soa'"
         curveType="soa"
@@ -361,7 +357,6 @@
         @view="viewCurve('capacitance', $event)"
         @delete="deleteCurve('capacitance', $event)"
       />
-
       <CurveEditor
         v-if="showEditor && editorCurveType === 'capacitance'"
         curveType="capacitance"
@@ -371,6 +366,24 @@
       />
     </div>
 
+    <div v-if="selectedCurve" class="curve-viewer" data-testid="curve-viewer" role="region" aria-label="Curve detail">
+      <div class="curve-viewer-header">
+        <h4>{{ selectedCurve.title }}</h4>
+        <button type="button" class="btn btn-secondary" aria-label="Close curve view" @click="selectedCurve = null">
+          Close
+        </button>
+      </div>
+      <CurvePlotter
+        v-if="selectedCurvePlot"
+        :title="selectedCurve.title"
+        :datasets="[selectedCurvePlot.dataset]"
+        :x-label="selectedCurvePlot.xLabel"
+        :y-label="selectedCurvePlot.yLabel"
+        :x-log-scale="selectedCurvePlot.xLogScale"
+        :y-log-scale="selectedCurvePlot.yLogScale"
+      />
+      <p v-else class="curve-viewer-empty" role="status">This curve has no supported graph data to plot.</p>
+    </div>
     <!-- Validation Results (shown on any tab) -->
     <div v-if="validationResult" class="validation-section">
       <h3>Validation Results</h3>
@@ -403,6 +416,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { transistorApi } from '../services/api.js'
 import CurveEditor from './CurveEditor.vue'
 import CurveList from './CurveList.vue'
+import CurvePlotter from './CurvePlotter.vue'
 
 const props = defineProps({
   transistor: {
@@ -424,6 +438,7 @@ const activeCapType = ref('c_oss')
 const showEditor = ref(false)
 const editorCurveType = ref(null)
 const curveMessage = ref(null)
+const selectedCurve = ref(null)
 
 const lossTypeLabels = { e_on: 'E_on (Turn-on)', e_off: 'E_off (Turn-off)', e_rr: 'E_rr (Reverse Recovery)' }
 const capTypeLabels = { c_oss: 'C_oss (Output)', c_iss: 'C_iss (Input)', c_rss: 'C_rss (Reverse Transfer)' }
@@ -466,6 +481,57 @@ const curves = reactive({
   capacitance_c_rss: [],
 })
 
+const curveWorkflow = {
+  channel: {
+    series: () => curveComponent.value === 'switch' ? curves.switch_channel : curves.diode_channel,
+    title: () => `${curveComponent.value === 'switch' ? 'Switch' : 'Diode'} channel`,
+    plot: curve => ({ graph: curve?.graph_v_i, xLabel: 'Voltage (V)', yLabel: 'Current (A)' }),
+    add: (id, curve) => transistorApi.addChannelCurve(id, curve, curveComponent.value),
+    deleteRoute: () => ({ component: curveComponent.value, type: 'channel' })
+  },
+  switching_loss: {
+    series: () => curves[`switching_${activeLossType.value}`],
+    title: () => lossTypeLabels[activeLossType.value],
+    plot: curve => {
+      if (curve?.graph_i_e) return { graph: curve.graph_i_e, xLabel: 'Current (A)', yLabel: 'Switching energy (J)' }
+      if (curve?.graph_r_e) return { graph: curve.graph_r_e, xLabel: 'Gate resistance (Ω)', yLabel: 'Switching energy (J)' }
+      return { graph: null, xLabel: 'Current (A)', yLabel: 'Switching energy (J)' }
+    },
+    add: (id, curve) => transistorApi.addSwitchingLossCurve(id, activeLossType.value, curve),
+    deleteRoute: () => ({
+      component: activeLossType.value === 'e_rr' ? 'diode' : 'switch',
+      type: activeLossType.value
+    })
+  },
+  gate_charge: {
+    series: () => curves.gate_charge,
+    title: () => 'Gate charge',
+    plot: curve => ({
+      graph: curve?.graph_q_v,
+      // Stored graph_q_v charges are in C; present them in nC for the plot axis.
+      xScale: 1e9,
+      xLabel: 'Gate charge (nC)',
+      yLabel: 'Gate voltage (V)'
+    }),
+    add: (id, curve) => transistorApi.addGateChargeCurve(id, curve),
+    deleteRoute: () => ({ component: 'switch', type: 'gate_charge' })
+  },
+  soa: {
+    series: () => curves.soa,
+    title: () => 'SOA',
+    plot: curve => ({ graph: curve?.graph_i_v, xLabel: 'Voltage (V)', yLabel: 'Current (A)' }),
+    add: (id, curve) => transistorApi.addSOACurve(id, curve),
+    deleteRoute: () => ({ component: 'switch', type: 'soa' })
+  },
+  capacitance: {
+    series: () => curves[`capacitance_${activeCapType.value}`],
+    title: () => capTypeLabels[activeCapType.value],
+    plot: curve => ({ graph: curve?.graph_v_c, xLabel: 'Voltage (V)', yLabel: 'Capacitance (F)' }),
+    add: (id, curve) => transistorApi.addCapacitanceCurve(id, activeCapType.value, curve),
+    deleteRoute: () => ({ component: 'capacitance', type: activeCapType.value })
+  }
+}
+
 const availableTabs = computed(() => {
   const tabs = [{ key: 'general', label: 'General Info' }]
   if (isEditing.value) {
@@ -503,23 +569,16 @@ async function loadCurves() {
   if (!id) return
   try {
     const data = await transistorApi.getCurves(id)
-    // Map backend response to local state
-    if (data.switch) {
-      curves.switch_channel = data.switch.channel || []
-      curves.switching_e_on = data.switch.e_on || []
-      curves.switching_e_off = data.switch.e_off || []
-    }
-    if (data.diode) {
-      curves.diode_channel = data.diode.channel || []
-      curves.switching_e_rr = data.diode.e_rr || []
-    }
-    curves.gate_charge = data.switch?.gate_charge || []
+    curves.switch_channel = data.switch?.channel_data || []
+    curves.switching_e_on = data.switch?.e_on_data || []
+    curves.switching_e_off = data.switch?.e_off_data || []
+    curves.diode_channel = data.diode?.channel_data || []
+    curves.switching_e_rr = data.diode?.e_rr_data || []
+    curves.gate_charge = data.switch?.gate_charge_curves || []
     curves.soa = data.switch?.soa || []
-    if (data.capacitance) {
-      curves.capacitance_c_oss = data.capacitance.c_oss || []
-      curves.capacitance_c_iss = data.capacitance.c_iss || []
-      curves.capacitance_c_rss = data.capacitance.c_rss || []
-    }
+    curves.capacitance_c_oss = data.capacitances?.c_oss || []
+    curves.capacitance_c_iss = data.capacitances?.c_iss || []
+    curves.capacitance_c_rss = data.capacitances?.c_rss || []
   } catch (error) {
     console.error('Failed to load curves:', error)
   }
@@ -545,19 +604,11 @@ async function handleCurveSubmit(curveData) {
   if (!id) return
 
   try {
-    const type = editorCurveType.value
-    if (type === 'channel') {
-      await transistorApi.addChannelCurve(id, curveData, curveComponent.value)
-    } else if (type === 'switching_loss') {
-      await transistorApi.addSwitchingLossCurve(id, activeLossType.value, curveData)
-    } else if (type === 'gate_charge') {
-      await transistorApi.addGateChargeCurve(id, curveData)
-    } else if (type === 'soa') {
-      await transistorApi.addSOACurve(id, curveData)
-    } else if (type === 'capacitance') {
-      await transistorApi.addCapacitanceCurve(id, activeCapType.value, curveData)
-    }
+    const workflow = curveWorkflow[editorCurveType.value]
+    if (!workflow) return
+    await workflow.add(id, curveData)
     showNotification('Curve added successfully')
+    selectedCurve.value = null
     closeEditor()
     await loadCurves()
   } catch (error) {
@@ -570,27 +621,13 @@ async function deleteCurve(curveType, index) {
   const id = getTransistorId()
   if (!id) return
 
-  let component, type
-  if (curveType === 'channel') {
-    component = curveComponent.value
-    type = 'channel'
-  } else if (curveType === 'switching_loss') {
-    component = activeLossType.value === 'e_rr' ? 'diode' : 'switch'
-    type = activeLossType.value
-  } else if (curveType === 'gate_charge') {
-    component = 'switch'
-    type = 'gate_charge'
-  } else if (curveType === 'soa') {
-    component = 'switch'
-    type = 'soa'
-  } else if (curveType === 'capacitance') {
-    component = 'capacitance'
-    type = activeCapType.value
-  }
+  const route = curveWorkflow[curveType]?.deleteRoute()
+  if (!route) return
 
   try {
-    await transistorApi.deleteCurve(id, component, type, index)
+    await transistorApi.deleteCurve(id, route.component, route.type, index)
     showNotification('Curve deleted')
+    selectedCurve.value = null
     await loadCurves()
   } catch (error) {
     console.error('Failed to delete curve:', error)
@@ -599,9 +636,38 @@ async function deleteCurve(curveType, index) {
 }
 
 function viewCurve(curveType, index) {
-  // For now, selecting a curve in the list highlights it
-  // CurvePlotter can be integrated here for detailed view
-  console.log('View curve:', curveType, index)
+  let xLogScale = false
+  let yLogScale = false
+  const workflow = curveWorkflow[curveType]
+  const curve = workflow?.series()?.[index]
+  if (!curve) return
+
+  const plot = workflow.plot(curve)
+  const points = graphToPoints(plot.graph, plot.xScale)
+  selectedCurve.value = {
+    title: `${workflow.title(curve)} curve #${index + 1}`,
+    plot: points.length > 0 ? { points, xLabel: plot.xLabel, yLabel: plot.yLabel, xLogScale, yLogScale } : null
+  }
+}
+
+const selectedCurvePlot = computed(() => {
+  if (!selectedCurve.value?.plot) return null
+  return {
+    ...selectedCurve.value.plot,
+    dataset: {
+      label: selectedCurve.value.title,
+      data: selectedCurve.value.plot.points
+    }
+  }
+})
+
+function graphToPoints(graph, xScale = 1) {
+  if (!Array.isArray(graph) || graph.length !== 2 || !Array.isArray(graph[0]) || !Array.isArray(graph[1])) {
+    return []
+  }
+  if (graph[0].length !== graph[1].length) return []
+  if (graph[0].some(value => !Number.isFinite(value)) || graph[1].some(value => !Number.isFinite(value))) return []
+  return graph[0].map((x, index) => ({ x: x * xScale, y: graph[1][index] }))
 }
 
 async function validateForm() {
@@ -876,6 +942,29 @@ async function handleSubmit() {
   background: #3498db;
   color: white;
   border-color: #3498db;
+}
+
+.curve-viewer {
+  padding: 1rem 2rem 1.5rem;
+  border-top: 1px solid var(--border-color, #ddd);
+  background: var(--bg-secondary, #fff);
+}
+
+.curve-viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.curve-viewer-header h4 {
+  margin: 0;
+  color: var(--text-primary, #333);
+}
+
+.curve-viewer-empty {
+  color: var(--text-secondary, #666);
 }
 
 /* Validation and notification */

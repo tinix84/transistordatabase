@@ -33,13 +33,6 @@
               👁️
             </button>
             <button
-              @click.stop="$emit('edit', index)"
-              class="btn-icon"
-              title="Edit"
-            >
-              ✏️
-            </button>
-            <button
               @click.stop="confirmDelete(index)"
               class="btn-icon btn-danger"
               title="Delete"
@@ -108,7 +101,7 @@ export default {
       default: true
     }
   },
-  emits: ['add', 'edit', 'view', 'delete', 'select'],
+  emits: ['add', 'view', 'delete', 'select'],
   data() {
     return {
       selectedIndex: null,
