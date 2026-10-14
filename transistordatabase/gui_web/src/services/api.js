@@ -334,6 +334,22 @@ export const transistorApi = {
   async validateDPTData(transistorId) {
     const response = await api.post(`/api/transistors/${pathSegment(transistorId)}/dpt_validate`)
     return response.data
+  },
+
+  async previewDPTEnergy(transistorId, request) {
+    const response = await api.post(
+      `/api/transistors/${pathSegment(transistorId)}/dpt_energy/preview`,
+      request
+    )
+    return response.data
+  },
+
+  async saveDPTEnergy(transistorId, request) {
+    const response = await api.post(
+      `/api/transistors/${pathSegment(transistorId)}/dpt_energy/save`,
+      request
+    )
+    return response.data
   }
 }
 

@@ -8,7 +8,9 @@ const {
   validateDPTData,
   previewDPTRawImport,
   previewDPTRawTraces,
-  importDPTRawMeasurement
+  importDPTRawMeasurement,
+  previewDPTEnergy,
+  saveDPTEnergy
 } = vi.hoisted(() => ({
   getAll: vi.fn(),
   getDPTData: vi.fn(),
@@ -16,7 +18,9 @@ const {
   validateDPTData: vi.fn(),
   previewDPTRawImport: vi.fn(),
   previewDPTRawTraces: vi.fn(),
-  importDPTRawMeasurement: vi.fn()
+  importDPTRawMeasurement: vi.fn(),
+  previewDPTEnergy: vi.fn(),
+  saveDPTEnergy: vi.fn()
 }))
 
 vi.mock('../../services/api.js', () => ({
@@ -27,7 +31,9 @@ vi.mock('../../services/api.js', () => ({
     validateDPTData,
     previewDPTRawImport,
     previewDPTRawTraces,
-    importDPTRawMeasurement
+    importDPTRawMeasurement,
+    previewDPTEnergy,
+    saveDPTEnergy
   }
 }))
 
@@ -179,6 +185,40 @@ describe('DPTManager raw waveform viewing', () => {
     importDPTRawMeasurement.mockReset().mockResolvedValue({
       on_sample_count: 3, off_sample_count: 4
     })
+    previewDPTEnergy.mockReset().mockResolvedValue({
+      loss_type: 'e_on',
+      event: 'turn_on',
+      points: [
+        {
+          measurement_index: 0, acquisition_index: 0, i_x: 10, energy_j: 0.0014,
+          start_s: 0, end_s: 2e-6, sample_count: 3, vds_sign: 1, id_sign: -1
+        },
+        {
+          measurement_index: 0, acquisition_index: 1, i_x: 20, energy_j: 0.0028,
+          start_s: 1e-6, end_s: 3e-6, sample_count: 4, vds_sign: -1, id_sign: 1
+        }
+      ],
+      graph_i_e: [[10, 20], [0.0014, 0.0028]],
+      conditions: {
+        t_j: 25, v_supply: 400, v_g: 15, v_g_off: -5, r_g: 10, r_g_off: 12
+      },
+      integration: {
+        quantity: 'raw-window switching energy',
+        formula: 'E = sum of signed trapezoids',
+        power_formula: 'p(t) = (Vds_sign * Vds) * (Id_sign * Id)',
+        interval: 'exact stored first-to-last event sample time',
+        boundary_detection: 'none; imported user-selected windows are used as stored'
+      },
+      save_action: 'add',
+      existing_curve_index: null,
+      target_curve_count: 0,
+      target_edit_token: null,
+      source_token: 'a'.repeat(64),
+      request_token: 'b'.repeat(64)
+    })
+    saveDPTEnergy.mockReset().mockResolvedValue({
+      action: 'added', loss_type: 'e_on', curve_index: 0, point_count: 2
+    })
     wrapper = mount(DPTManager, {
       global: { stubs: { CurvePlotter: CurvePlotterStub } }
     })
@@ -227,6 +267,107 @@ describe('DPTManager raw waveform viewing', () => {
       wrapper.find('.curve-plotter-stub[data-title="Turn-on Vds"] output').text()
     )[0]
     expect(waveformDataset.pointRadius).toBe(0)
+  })
+
+  it('previews exact event intervals and requires explicit confirmation before saving', async () => {
+    const section = wrapper.get('[data-testid="dpt-energy-derivation"]')
+    await section.get('[data-testid="dpt-energy-record-0"]').setValue('0')
+    await section.get('[data-testid="dpt-energy-acquisition-0"]').setValue('0')
+    await section.get('[data-testid="dpt-energy-current-0"]').setValue('10')
+    await section.get('[data-testid="dpt-energy-vds-sign-0"]').setValue('1')
+    await section.get('[data-testid="dpt-energy-id-sign-0"]').setValue('-1')
+    await section.get('[data-testid="dpt-energy-record-1"]').setValue('0')
+    await section.get('[data-testid="dpt-energy-acquisition-1"]').setValue('1')
+    await section.get('[data-testid="dpt-energy-current-1"]').setValue('20')
+    await section.get('[data-testid="dpt-energy-vds-sign-1"]').setValue('-1')
+    await section.get('[data-testid="dpt-energy-id-sign-1"]').setValue('1')
+    await section.get('[data-testid="dpt-energy-preview"]').trigger('click')
+    await flushPromises()
+
+    expect(previewDPTEnergy).toHaveBeenCalledWith('Waveform Device', {
+      loss_type: 'e_on',
+      points: [
+        { measurement_index: 0, acquisition_index: 0, i_x: 10, vds_sign: 1, id_sign: -1 },
+        { measurement_index: 0, acquisition_index: 1, i_x: 20, vds_sign: -1, id_sign: 1 }
+      ]
+    })
+    expect(section.get('[data-testid="dpt-energy-preview-result"]').text())
+      .toContain('Create a new curve')
+    expect(section.get('[data-testid="dpt-energy-preview-result"]').text())
+      .toContain('exact stored first-to-last event sample time')
+    expect(section.get('[data-testid="dpt-energy-preview-result"]').text())
+      .toContain('[0, 0.000002]')
+    expect(section.text()).toContain('0.0014')
+    expect(section.find('[data-testid="dpt-energy-save"]').exists()).toBe(true)
+
+    await section.get('[data-testid="dpt-energy-confirm"]').setValue(true)
+    expect(section.get('[data-testid="dpt-energy-save"]').element.disabled).toBe(false)
+    await section.get('[data-testid="dpt-energy-save"]').trigger('click')
+    await flushPromises()
+
+    expect(saveDPTEnergy).toHaveBeenCalledWith('Waveform Device', {
+      loss_type: 'e_on',
+      points: [
+        { measurement_index: 0, acquisition_index: 0, i_x: 10, vds_sign: 1, id_sign: -1 },
+        { measurement_index: 0, acquisition_index: 1, i_x: 20, vds_sign: -1, id_sign: 1 }
+      ],
+      source_token: 'a'.repeat(64),
+      request_token: 'b'.repeat(64),
+      save_action: 'add',
+      existing_curve_index: null,
+      target_curve_count: 0,
+      target_edit_token: null
+    })
+    expect(getDPTData).toHaveBeenCalledTimes(2)
+    expect(section.text()).toContain('Added E_on curve #1 with 2 measured points.')
+  })
+
+  it('invalidates a reviewed energy preview when a source selection changes', async () => {
+    const section = wrapper.get('[data-testid="dpt-energy-derivation"]')
+    for (const index of [0, 1]) {
+      await section.get(`[data-testid="dpt-energy-record-${index}"]`).setValue('0')
+      await section.get(`[data-testid="dpt-energy-acquisition-${index}"]`).setValue(String(index))
+      await section.get(`[data-testid="dpt-energy-current-${index}"]`).setValue(String((index + 1) * 10))
+      await section.get(`[data-testid="dpt-energy-vds-sign-${index}"]`).setValue('1')
+      await section.get(`[data-testid="dpt-energy-id-sign-${index}"]`).setValue('1')
+    }
+    await section.get('[data-testid="dpt-energy-preview"]').trigger('click')
+    await flushPromises()
+    expect(section.find('[data-testid="dpt-energy-preview-result"]').exists()).toBe(true)
+    expect(section.find('[data-testid="dpt-energy-save"]').exists()).toBe(true)
+    await section.get('[data-testid="dpt-energy-current-0"]').setValue('11')
+    expect(section.find('[data-testid="dpt-energy-preview-result"]').exists()).toBe(false)
+    expect(section.find('[data-testid="dpt-energy-save"]').exists()).toBe(false)
+  })
+
+  it('invalidates the reviewed energy preview after a stale-target save conflict', async () => {
+    const section = wrapper.get('[data-testid="dpt-energy-derivation"]')
+    for (const index of [0, 1]) {
+      await section.get(`[data-testid="dpt-energy-record-${index}"]`).setValue('0')
+      await section.get(`[data-testid="dpt-energy-acquisition-${index}"]`).setValue(String(index))
+      await section.get(`[data-testid="dpt-energy-current-${index}"]`).setValue(String((index + 1) * 10))
+      await section.get(`[data-testid="dpt-energy-vds-sign-${index}"]`).setValue('1')
+      await section.get(`[data-testid="dpt-energy-id-sign-${index}"]`).setValue('1')
+    }
+    await section.get('[data-testid="dpt-energy-preview"]').trigger('click')
+    await flushPromises()
+    await section.get('[data-testid="dpt-energy-confirm"]').setValue(true)
+    expect(section.find('[data-testid="dpt-energy-preview-result"]').exists()).toBe(true)
+
+    saveDPTEnergy.mockRejectedValueOnce({
+      response: {
+        status: 409,
+        data: { detail: 'The switching curve target changed after preview.' }
+      }
+    })
+    await section.get('[data-testid="dpt-energy-save"]').trigger('click')
+    await flushPromises()
+
+    expect(section.find('[data-testid="dpt-energy-preview-result"]').exists()).toBe(false)
+    expect(section.find('[data-testid="dpt-energy-save"]').exists()).toBe(false)
+    expect(section.get('[role="alert"]').text()).toContain(
+      'The switching curve target changed after preview.'
+    )
   })
 
   it('ignores a DPT response that completes after switching devices', async () => {

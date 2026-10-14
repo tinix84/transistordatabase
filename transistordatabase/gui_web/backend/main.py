@@ -78,6 +78,8 @@ from transistordatabase.gui_web.backend.schemas import (
     DPTConfigRequest,
     DptRawImportRequest,
     DptRawTraceSelectionRequest,
+    DptEnergyDerivationRequest,
+    DptEnergySaveRequest,
     PLECSImportResponse,
 )
 from transistordatabase.gui_web.backend.dpt_raw_import import (
@@ -89,6 +91,14 @@ from transistordatabase.gui_web.backend.dpt_raw_import import (
     make_trace_preview,
     parse_ltspice_raw,
     select_event_samples,
+)
+from transistordatabase.gui_web.backend.dpt_energy import (
+    DptEnergyDerivationError,
+    derive_dpt_energy,
+    derivation_comment,
+    normalize_raw_measurements,
+    request_token as dpt_energy_request_token,
+    source_token as dpt_energy_source_token,
 )
 from transistordatabase.gui_web.backend.topology_service import TopologyCalculatorService
 
@@ -3419,6 +3429,536 @@ async def get_dpt_data(
         }
 
     return dpt_data
+
+
+def _read_dpt_energy_sources_unlocked(transistor_id: str) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """Read bounded full-fidelity raw DPT data while the caller holds the lock."""
+    raw_record = _read_legacy_record_unlocked(
+        transistor_id,
+        max_file_bytes=MAX_DPT_LEGACY_RECORD_FILE_BYTES,
+    )
+    raw_measurements_value = raw_record.get("raw_measurement_data")
+    raw_payload_size = _encoded_json_size_up_to(
+        raw_measurements_value,
+        MAX_DPT_RAW_MEASUREMENT_BYTES,
+    )
+    if raw_payload_size > MAX_DPT_RAW_MEASUREMENT_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=(
+                "The stored raw DPT payload exceeds the full-fidelity energy "
+                f"derivation limit of {_format_byte_limit(MAX_DPT_RAW_MEASUREMENT_BYTES)}. "
+                "Shorten the imported event windows or reduce stored raw data."
+            ),
+        )
+    try:
+        raw_measurements = normalize_raw_measurements(raw_measurements_value)
+    except DptEnergyDerivationError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+    return raw_record, raw_measurements
+
+
+def _dpt_energy_preview_result(
+    raw_measurements: list[dict[str, Any]],
+    request: DptEnergyDerivationRequest,
+) -> tuple[dict[str, Any], str]:
+    """Derive exact event energy and source digest."""
+    request_data = request.model_dump(mode="json")
+    try:
+        result = derive_dpt_energy(
+            raw_measurements,
+            request.loss_type,
+            request_data["points"],
+        )
+    except DptEnergyDerivationError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    source_sha256 = dpt_energy_source_token(
+        raw_measurements,
+        [point["measurement_index"] for point in request_data["points"]],
+    )
+    return result, source_sha256
+
+
+def _same_switching_condition(left: float | None, right: float | None) -> bool:
+    """Match the 1e-9 absolute condition tolerance used by TDB topology lookup."""
+    if left is None or right is None:
+        return left is right
+    return bool(np.isclose(left, right, rtol=0.0, atol=1e-9))
+
+
+def _switching_curve_matches_dpt_context(
+    curve: SwitchingLossData,
+    loss_type: str,
+    conditions: dict[str, Any],
+) -> bool:
+    """Mirror topology lookup conditions for one derived E_on/E_off curve."""
+    if curve.dataset_type != "graph_i_e":
+        return False
+    if not _same_switching_condition(curve.t_j, conditions["t_j"]):
+        return False
+    if not _same_switching_condition(curve.v_supply, conditions["v_supply"]):
+        return False
+    if not _same_switching_condition(curve.r_g, conditions["r_g"]):
+        return False
+    if loss_type == "e_on":
+        return _same_switching_condition(curve.v_g, conditions["v_g"]) and (
+            curve.v_g_off is None
+            or _same_switching_condition(curve.v_g_off, conditions["v_g_off"])
+        )
+    if curve.v_g_off is not None:
+        return (
+            _same_switching_condition(curve.v_g, conditions["v_g"])
+            and _same_switching_condition(curve.v_g_off, conditions["v_g_off"])
+        )
+    return _same_switching_condition(curve.v_g, conditions["v_g_off"])
+
+
+def _dpt_energy_provenances_from_comment(comment: Any) -> list[dict[str, Any]] | None:
+    marker = "DPT-ENERGY-PROVENANCE: "
+    if not isinstance(comment, str):
+        return None
+    values: list[dict[str, Any]] = []
+    for line in reversed(comment.splitlines()):
+        if line.startswith(marker):
+            try:
+                value = json.loads(line[len(marker):])
+            except json.JSONDecodeError:
+                return None
+            if not isinstance(value, dict):
+                return None
+            values.append(value)
+    return values or None
+
+
+def _dpt_energy_source_acquisitions(
+    provenances: list[dict[str, Any]],
+) -> set[tuple[int, int]] | None:
+    """Return every source acquisition already represented by provenance."""
+    identities: set[tuple[int, int]] = set()
+    for provenance in provenances:
+        points = provenance.get("points")
+        if not isinstance(points, list) or not points:
+            return None
+        for point in points:
+            if not isinstance(point, dict):
+                return None
+            measurement_index = point.get("measurement_index")
+            acquisition_index = point.get("acquisition_index")
+            if (
+                isinstance(measurement_index, bool)
+                or not isinstance(measurement_index, int)
+                or measurement_index < 0
+                or isinstance(acquisition_index, bool)
+                or not isinstance(acquisition_index, int)
+                or acquisition_index < 0
+            ):
+                return None
+            identity = (measurement_index, acquisition_index)
+            if identity in identities:
+                return None
+            identities.add(identity)
+    return identities
+
+
+def _dpt_energy_graph_matches_provenance(
+    provenances: list[dict[str, Any]],
+    graph: Any,
+) -> bool:
+    """Require every persisted point to match a source point in the markers."""
+    expected_points: list[tuple[float, float]] = []
+    try:
+        for provenance in provenances:
+            for point in provenance["points"]:
+                current = point["i_x"]
+                energy = point["energy_j"]
+                if (
+                    isinstance(current, bool)
+                    or not isinstance(current, (int, float))
+                    or isinstance(energy, bool)
+                    or not isinstance(energy, (int, float))
+                    or not math.isfinite(float(current))
+                    or not math.isfinite(float(energy))
+                    or current <= 0
+                    or energy <= 0
+                ):
+                    return False
+                expected_points.append((float(current), float(energy)))
+        expected = np.asarray(expected_points, dtype=np.float64).T
+        actual = np.asarray(graph, dtype=np.float64)
+    except (KeyError, TypeError, ValueError):
+        return False
+    if (
+        expected.ndim != 2
+        or expected.shape[0] != 2
+        or actual.ndim != 2
+        or actual.shape[0] != 2
+        or actual.shape[1] != expected.shape[1]
+        or not np.isfinite(actual).all()
+    ):
+        return False
+    expected = expected[:, np.argsort(expected[0], kind="stable")]
+    actual = actual[:, np.argsort(actual[0], kind="stable")]
+    return bool(np.array_equal(actual, expected))
+
+
+def _dpt_energy_curve_conditions_match(
+    curve: SwitchingLossData,
+    conditions: dict[str, Any],
+) -> bool:
+    """Check stored curve fields against the provenance condition snapshot."""
+    numeric_fields = (
+        "t_j",
+        "v_supply",
+        "v_g",
+        "v_g_off",
+        "r_g",
+        "load_inductance",
+        "commutation_inductance",
+    )
+    if any(getattr(curve, field) != conditions.get(field) for field in numeric_fields):
+        return False
+    return all(
+        getattr(curve, field) == conditions.get(field)
+        for field in ("commutation_device", "measurement_testbench")
+    )
+
+
+def _find_dpt_energy_curve_target(
+    transistor: Transistor,
+    loss_type: str,
+    result: dict[str, Any],
+) -> int | None:
+    """Find one safe same-context graph to extend, or reject ambiguity."""
+    curves = (
+        transistor.switch.e_on_data if loss_type == "e_on"
+        else transistor.switch.e_off_data
+    )
+    matching_indices = [
+        index
+        for index, curve in enumerate(curves)
+        if _switching_curve_matches_dpt_context(
+            curve, loss_type, result["conditions"]
+        )
+    ]
+    if len(matching_indices) > 1:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"Multiple existing {loss_type} graph_i_e curves match the TDB "
+                "temperature, voltage, gate, and resistance lookup conditions. "
+                "Resolve that ambiguity before saving a derived curve."
+            ),
+        )
+    if not matching_indices:
+        return None
+
+    curve_index = matching_indices[0]
+    existing = curves[curve_index]
+    provenance = _dpt_energy_provenances_from_comment(existing.comment)
+    if provenance is None:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"An existing {loss_type} graph_i_e curve matches the TDB lookup "
+                "conditions, but its commutation/test-bench context cannot be "
+                "verified. It was left unchanged to avoid an ambiguous curve."
+            ),
+        )
+    used_acquisitions = _dpt_energy_source_acquisitions(provenance)
+    if (
+        used_acquisitions is None
+        or any(
+            entry.get("version") != 1
+            or entry.get("method") != "raw_window_signed_trapezoid"
+            or entry.get("loss_type") != loss_type
+            or entry.get("conditions") != result["conditions"]
+            for entry in provenance
+        )
+        or not _dpt_energy_curve_conditions_match(existing, result["conditions"])
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"An existing {loss_type} curve matches the TDB lookup conditions, "
+                "but its saved condition fields diverge from or cannot be verified "
+                "against the DPT provenance. Restore the recorded conditions or "
+                "create a separate curve."
+            ),
+        )
+    if not _dpt_energy_graph_matches_provenance(provenance, existing.graph_i_e):
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"The existing {loss_type} graph samples do not exactly match the "
+                "i_x and energy values in its DPT provenance. Restore the recorded "
+                "graph or create a separate curve."
+            ),
+        )
+    requested_acquisitions = {
+        (point["measurement_index"], point["acquisition_index"])
+        for point in result["points"]
+    }
+    if used_acquisitions & requested_acquisitions:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "A selected DPT acquisition is already represented in the matching "
+                "curve. Each stored event window can be used only once per curve."
+            ),
+        )
+    _curve_graph_for_dpt_merge(existing, result["graph_i_e"])
+    return curve_index
+
+
+def _curve_graph_for_dpt_merge(
+    curve: SwitchingLossData,
+    new_graph: list[list[float]],
+) -> list[list[float]]:
+    """Merge unique new current points into an exact-context graph."""
+    try:
+        existing_graph = np.asarray(curve.graph_i_e, dtype=np.float64)
+    except (TypeError, ValueError) as error:
+        raise HTTPException(
+            status_code=409,
+            detail="The existing same-context graph_i_e curve is not numeric.",
+        ) from error
+    if (
+        existing_graph.ndim != 2
+        or existing_graph.shape[0] != 2
+        or existing_graph.shape[1] < 2
+        or not np.isfinite(existing_graph).all()
+        or np.any(np.diff(np.sort(existing_graph[0])) <= 0)
+        or np.any(existing_graph[0] <= 0)
+        or np.any(existing_graph[1] <= 0)
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "The existing same-context graph_i_e curve has invalid or "
+                "ambiguous current-energy samples and was left unchanged."
+            ),
+        )
+    added_graph = np.asarray(new_graph, dtype=np.float64)
+    if np.intersect1d(existing_graph[0], added_graph[0]).size:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "A derived i_x duplicates a current already in the matching curve. "
+                "Choose new distinct measured current values."
+            ),
+        )
+    merged = np.concatenate((existing_graph, added_graph), axis=1)
+    if merged.shape[1] > 50:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "The merged switching-energy curve would exceed the 50-window "
+                "maximum. Save this context in separate curves."
+            ),
+        )
+    merged = merged[:, np.argsort(merged[0], kind="stable")]
+    return merged.tolist()
+
+
+def _dpt_energy_target_snapshot(
+    raw_record: dict[str, Any],
+    loss_type: str,
+    curve_index: int | None,
+) -> dict[str, Any]:
+    """Capture the reviewed add/extend target and its optimistic edit token."""
+    curves = _legacy_curve_list(raw_record, ("switch", loss_type))
+    if curve_index is None:
+        return {
+            "save_action": "add",
+            "existing_curve_index": None,
+            "target_curve_count": len(curves),
+            "target_edit_token": None,
+        }
+    if not 0 <= curve_index < len(curves) or not isinstance(curves[curve_index], dict):
+        raise HTTPException(
+            status_code=409,
+            detail="The matching switching curve changed; reload and preview again.",
+        )
+    return {
+        "save_action": "extend",
+        "existing_curve_index": curve_index,
+        "target_curve_count": len(curves),
+        "target_edit_token": _curve_edit_token(curves[curve_index]),
+    }
+
+
+@app.post("/api/transistors/{transistor_id}/dpt_energy/preview")
+async def preview_dpt_energy_curve(
+    transistor_id: str,
+    request: DptEnergyDerivationRequest,
+) -> dict[str, Any]:
+    """Preview a raw-window E_on/E_off curve without changing stored data."""
+    async with _record_mutation():
+        raw_record, raw_measurements = _read_dpt_energy_sources_unlocked(transistor_id)
+        result, source_sha256 = _dpt_energy_preview_result(
+            raw_measurements, request
+        )
+        transistor = _get_transistor(transistor_id)
+        curve_index = _find_dpt_energy_curve_target(
+            transistor, request.loss_type, result
+        )
+        target_snapshot = _dpt_energy_target_snapshot(
+            raw_record, request.loss_type, curve_index
+        )
+        reviewed_request_sha256 = dpt_energy_request_token({
+            **request.model_dump(mode="json"),
+            **target_snapshot,
+        })
+    result["source_token"] = source_sha256
+    result["request_token"] = reviewed_request_sha256
+    result.update(target_snapshot)
+    return result
+
+
+@app.post("/api/transistors/{transistor_id}/dpt_energy/save")
+@_record_mutation_endpoint
+async def save_dpt_energy_curve(
+    transistor_id: str,
+    request: DptEnergySaveRequest,
+) -> dict[str, Any]:
+    """Save a confirmed, current preview while preserving all raw DPT records."""
+    raw_record, raw_measurements = _read_dpt_energy_sources_unlocked(transistor_id)
+    request_data = request.model_dump(mode="json")
+    reviewed_request_sha256 = dpt_energy_request_token(request_data)
+    if reviewed_request_sha256 != request.request_token:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "The derivation inputs changed after preview. Preview the current "
+                "event selections, current-axis values, and polarity choices again."
+            ),
+        )
+    measurement_indices = [
+        point["measurement_index"] for point in request_data["points"]
+    ]
+    if any(index >= len(raw_measurements) for index in measurement_indices):
+        raise HTTPException(
+            status_code=400,
+            detail="A selected stored DPT measurement no longer exists.",
+        )
+    source_sha256 = dpt_energy_source_token(
+        raw_measurements,
+        measurement_indices,
+    )
+    if source_sha256 != request.source_token:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "The selected raw DPT source data changed after preview. Review the "
+                "current stored waveforms and preview the derivation again."
+            ),
+        )
+    try:
+        result = derive_dpt_energy(
+            raw_measurements,
+            request.loss_type,
+            request_data["points"],
+        )
+    except DptEnergyDerivationError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+
+    transistor = _get_transistor(transistor_id)
+    curve_index = _find_dpt_energy_curve_target(
+        transistor, request.loss_type, result
+    )
+    current_target_snapshot = _dpt_energy_target_snapshot(
+        raw_record, request.loss_type, curve_index
+    )
+    requested_target_snapshot = {
+        "save_action": request.save_action,
+        "existing_curve_index": request.existing_curve_index,
+        "target_curve_count": request.target_curve_count,
+        "target_edit_token": request.target_edit_token,
+    }
+    if current_target_snapshot != requested_target_snapshot:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "The switching curve target changed after preview. Reload the curve "
+                "list and preview the derivation again."
+            ),
+        )
+    curve_comment = derivation_comment(result, source_sha256)
+    curve_list = _core_curve_list(transistor, f"switch.{request.loss_type}")
+    path = ("switch", request.loss_type)
+    if curve_index is None:
+        conditions = result["conditions"]
+        new_curve = SwitchingLossData(
+            dataset_type="graph_i_e",
+            t_j=conditions["t_j"],
+            v_supply=conditions["v_supply"],
+            v_g=conditions["v_g"],
+            v_g_off=conditions["v_g_off"],
+            r_g=conditions["r_g"],
+            graph_i_e=np.asarray(result["graph_i_e"], dtype=np.float64),
+            comment=curve_comment,
+            measurement_testbench=conditions["measurement_testbench"],
+            commutation_device=conditions["commutation_device"],
+            load_inductance=conditions["load_inductance"],
+            commutation_inductance=conditions["commutation_inductance"],
+        )
+        curve_list.append(new_curve)
+        _persist_curve_mutation(
+            transistor_id,
+            transistor,
+            f"switch.{request.loss_type}",
+            path,
+        )
+        saved_index = len(curve_list) - 1
+        action = "added"
+    else:
+        if len(curve_list) != len(
+            _legacy_curve_list(raw_record, path)
+        ):
+            raise HTTPException(
+                status_code=409,
+                detail="The stored switching curve list changed; reload and preview again.",
+            )
+        raw_curves = _legacy_curve_list(raw_record, path)
+        if not 0 <= curve_index < len(raw_curves):
+            raise HTTPException(
+                status_code=409,
+                detail="The matching switching curve changed; reload and preview again.",
+            )
+        existing_comment = raw_curves[curve_index].get("comment") or ""
+        updated_comment = (
+            f"{existing_comment}\n\n{curve_comment}" if existing_comment else curve_comment
+        )
+        merged_graph = _curve_graph_for_dpt_merge(
+            curve_list[curve_index], result["graph_i_e"]
+        )
+        _update_legacy_curve_unlocked(
+            transistor_id,
+            "switch",
+            request.loss_type,
+            curve_index,
+            CurveUpdateRequest(
+                expected_count=len(raw_curves),
+                expected_token=_curve_edit_token(raw_curves[curve_index]),
+                curve={"graph_i_e": merged_graph, "comment": updated_comment},
+            ),
+        )
+        saved_index = curve_index
+        action = "extended"
+
+    saved_curve_count = len(
+        transistor.switch.e_on_data if request.loss_type == "e_on"
+        else transistor.switch.e_off_data
+    )
+    return {
+        "success": True,
+        "loss_type": request.loss_type,
+        "action": action,
+        "curve_index": saved_index,
+        "curve_count": saved_curve_count,
+        "point_count": len(result["graph_i_e"][0]),
+        "graph_i_e": result["graph_i_e"],
+    }
 
 
 @app.post("/api/transistors/{transistor_id}/dpt_validate")
