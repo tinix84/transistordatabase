@@ -1,6 +1,6 @@
 # Sprint: Buck DCM channel-loss feedback
 
-Status: implementation complete; Sol review pending.
+Status: implementation complete; Sol review passed; PR pending.
 
 ## Goal
 
