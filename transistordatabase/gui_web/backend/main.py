@@ -2661,6 +2661,84 @@ async def generate_dpt_netlist(
     }
 
 
+_DPT_RAW_WAVEFORM_FIELDS = (
+    "dpt_on_vds",
+    "dpt_on_id",
+    "dpt_off_vds",
+    "dpt_off_id",
+)
+def _json_safe_dpt_value(value: Any) -> Any:
+    """Convert raw DPT values into strict JSON values without mutating them."""
+    if isinstance(value, np.ndarray):
+        return _json_safe_dpt_value(value.tolist())
+    if isinstance(value, np.generic):
+        return _json_safe_dpt_value(value.item())
+    if isinstance(value, float) and not math.isfinite(value):
+        if math.isnan(value):
+            return "NaN"
+        return "Infinity" if value > 0 else "-Infinity"
+    if isinstance(value, dict):
+        return {key: _json_safe_dpt_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe_dpt_value(item) for item in value]
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+    return value
+
+
+def _is_dpt_sample_pair(value: Any) -> bool:
+    """Return whether a sequence looks like one ``[time, value]`` sample."""
+    if not isinstance(value, (list, tuple, np.ndarray)) or len(value) != 2:
+        return False
+    return all(
+        not isinstance(item, (list, tuple, np.ndarray, dict))
+        for item in value
+    )
+
+
+def _serialize_dpt_waveform_acquisitions(value: Any) -> list[Any]:
+    """Serialize stored waveform acquisitions, preserving each sample order."""
+    if value is None:
+        return []
+    if isinstance(value, np.ndarray):
+        if value.ndim == 2:
+            acquisitions = [value]
+        elif value.ndim == 3:
+            acquisitions = list(value)
+        else:
+            return []
+    elif isinstance(value, (list, tuple)):
+        if not value:
+            return []
+        if all(_is_dpt_sample_pair(sample) for sample in value):
+            acquisitions = [value]
+        else:
+            acquisitions = list(value)
+    else:
+        return []
+    return [_json_safe_dpt_value(acquisition) for acquisition in acquisitions]
+
+
+def _serialize_dpt_raw_measurement(record: Any) -> dict[str, Any]:
+    """Project one raw DPT record into a JSON-safe read-only response."""
+    if isinstance(record, dict):
+        source = record
+    else:
+        source = vars(record)
+    metadata = {
+        key: _json_safe_dpt_value(source[key])
+        for key in source
+        if key not in _DPT_RAW_WAVEFORM_FIELDS
+    }
+    return {
+        "metadata": metadata,
+        **{
+            field: _serialize_dpt_waveform_acquisitions(source.get(field))
+            for field in _DPT_RAW_WAVEFORM_FIELDS
+        },
+    }
+
+
 @app.get("/api/transistors/{transistor_id}/dpt_data")
 async def get_dpt_data(transistor_id: str) -> Dict[str, Any]:
     """Get DPT measurement data for a transistor.
@@ -2668,7 +2746,21 @@ async def get_dpt_data(transistor_id: str) -> Dict[str, Any]:
     :param transistor_id: Transistor ID
     :return: DPT data if available
     """
-    transistor = _get_transistor(transistor_id)
+    async with _record_mutation():
+        raw_record = _read_legacy_record_unlocked(transistor_id)
+        raw_measurements = raw_record.get("raw_measurement_data")
+        if isinstance(raw_measurements, dict):
+            # The legacy loader expects an iterable of measurement objects,
+            # while older records can store one object directly. That field
+            # is not used by the core DPT summary, so omit it only from the
+            # in-memory projection passed through the existing adapter.
+            model_record = copy.deepcopy(raw_record)
+            model_record["raw_measurement_data"] = []
+            transistor = legacy_to_core(
+                _json_dict_to_legacy_transistor(model_record)
+            )
+        else:
+            transistor = _get_transistor(transistor_id)
 
     # Extract DPT data from switching loss data
     dpt_data = {
@@ -2687,6 +2779,15 @@ async def get_dpt_data(transistor_id: str) -> Dict[str, Any]:
             'r_g': first.r_g,
             'comment': first.comment or '',
         }
+
+    raw_measurements = raw_record.get("raw_measurement_data")
+    if isinstance(raw_measurements, dict):
+        raw_measurements = [raw_measurements]
+    dpt_data["raw_measurement_data"] = [
+        _serialize_dpt_raw_measurement(record)
+        for record in raw_measurements
+        if isinstance(record, dict)
+    ] if isinstance(raw_measurements, list) else []
 
     return dpt_data
 
