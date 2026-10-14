@@ -32,7 +32,7 @@ const dptResponse = {
         measurement_testbench: 'Local test bench'
       },
       dpt_on_vds: [
-        [[0, 400], [1e-6, 210]],
+        [[-7.9605e-8, 450], [-7.9445e-8, 460], [0, 400], [1e-6, 210]],
         [[0, 390], [1e-6, 200]]
       ],
       dpt_on_id: [
@@ -56,9 +56,15 @@ const dptResponse = {
 }
 
 const CurvePlotterStub = {
-  props: ['title', 'datasets', 'xLabel', 'yLabel', 'showLegend'],
+  props: ['title', 'datasets', 'xLabel', 'xValueDecimals', 'yLabel', 'showLegend'],
   template: `
-    <div class="curve-plotter-stub" :data-title="title" :data-x-label="xLabel" :data-y-label="yLabel">
+    <div
+      class="curve-plotter-stub"
+      :data-title="title"
+      :data-x-label="xLabel"
+      :data-x-decimals="xValueDecimals"
+      :data-y-label="yLabel"
+    >
       <span>{{ title }}</span>
       <output>{{ JSON.stringify(datasets[0].data) }}</output>
     </div>
@@ -99,8 +105,15 @@ describe('DPTManager raw waveform viewing', () => {
     expect(wrapper.findAll('.curve-plotter-stub').every(
       chart => chart.attributes('data-x-label') === 'Time [µs]'
     )).toBe(true)
-    expect(wrapper.find('.curve-plotter-stub[data-title="Turn-on Vds"]').text())
-      .toContain('{"x":1,"y":210}')
+    expect(wrapper.findAll('.curve-plotter-stub').every(
+      chart => chart.attributes('data-x-decimals') === '6'
+    )).toBe(true)
+    const plottedSamples = JSON.parse(
+      wrapper.find('.curve-plotter-stub[data-title="Turn-on Vds"] output').text()
+    )
+    expect(plottedSamples[0].x).toBeCloseTo(-0.079605, 12)
+    expect(plottedSamples[1].x).toBeCloseTo(-0.079445, 12)
+    expect(plottedSamples[3].x).toBe(1)
     expect(wrapper.find('[data-testid="dpt-waveform-off-vds"] [role="status"]').text())
       .toContain('Turn-off Vds')
     expect(wrapper.text()).toContain('Non-finite raw samples are preserved and shown as gaps.')

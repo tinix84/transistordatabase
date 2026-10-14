@@ -35,6 +35,7 @@ describe('CurvePlotter tooltip formatting', () => {
           borderColor: '#2563eb'
         }],
         xLabel: 'Time [µs]',
+        xValueDecimals: 6,
         yLabel: 'Vds [V]',
         showLegend: false
       }
@@ -42,9 +43,14 @@ describe('CurvePlotter tooltip formatting', () => {
 
     const options = MockChart.mock.calls[0][1].options
     expect(options.scales.x.title.text).toBe('Time [µs]')
-    expect(options.plugins.tooltip.callbacks.label({
+    const formatLabel = options.plugins.tooltip.callbacks.label
+    expect(formatLabel({
       dataset: { label: 'Turn-on Vds' },
-      parsed: { x: 1, y: 210 }
-    })).toBe('Turn-on Vds: (1.000, 210.000)')
+      parsed: { x: -0.079605, y: 450 }
+    })).toBe('Turn-on Vds: (-0.079605, 450.000)')
+    expect(formatLabel({
+      dataset: { label: 'Turn-on Vds' },
+      parsed: { x: -0.079445, y: 460 }
+    })).toBe('Turn-on Vds: (-0.079445, 460.000)')
   })
 })

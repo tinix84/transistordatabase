@@ -172,6 +172,7 @@
                       :title="plot.title"
                       :datasets="[{ label: plot.title, data: plot.data, borderColor: plot.color }]"
                       x-label="Time [µs]"
+                      :x-value-decimals="6"
                       :y-label="plot.yLabel"
                       :show-legend="false"
                     />
