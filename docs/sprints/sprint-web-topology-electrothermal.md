@@ -56,6 +56,11 @@ Review status: corrective implementation and focused validation are complete; So
 Focused validation on the corrective branch:
 
 - `conda run --no-capture-output -n ntbees2 python -m pytest tests/test_topology_operating_point.py tests/test_topology_api.py -q` — 93 passed.
-- `npm run test:run -- src/tests/unit/TopologyWorkflow.test.js src/tests/unit/TopologyCalculator.test.js` — 59 passed across 2 files.
+- `npm run test:run -- src/tests/unit/TopologyWorkflow.test.js src/tests/unit/TopologyCalculator.test.js` — 60 passed across 2 files.
 - `conda run --no-capture-output -n ntbees2 ruff check tests/test_topology_operating_point.py` — passed.
 - `npm run build` — passed. Vite reported the existing >500 kB chunk advisory.
+
+Full-suite validation status from the prior validation attempt (not rerun for this follow-up):
+
+- `pytest tests/ -q` failed during collection because same-basename `test_api` modules conflict under pytest's default import mode.
+- `pytest --import-mode=importlib tests/ -q` completed with 546 passed, 10 failed, 6 skipped, 64 errors, and 2 warnings. The non-passing tests concern legacy Qt/Playwright coverage and a DPT RAW asynchronous test issue; they are unrelated to the four files touched by this follow-up. The full suite is not green.

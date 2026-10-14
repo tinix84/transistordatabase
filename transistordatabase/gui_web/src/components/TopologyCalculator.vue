@@ -265,11 +265,11 @@
             </div>
             <p v-else>Thermal data not reported.</p>
             <div class="comparison-limitations">
-              <strong>Model limitations</strong>
-              <ul v-if="lossBalancedLimitations(comparison[name]).length">
-                <li v-for="limitation in lossBalancedLimitations(comparison[name])" :key="limitation">{{ limitation }}</li>
+              <strong>Model assumptions and limitations</strong>
+              <ul v-if="lossBalancedAssumptions(comparison[name]).length">
+                <li v-for="assumption in lossBalancedAssumptions(comparison[name])" :key="assumption">{{ assumption }}</li>
               </ul>
-              <p v-else>Model limitations are not reported in this response.</p>
+              <p v-else>No model assumptions or limitations were reported in this response.</p>
             </div>
           </div>
         </div>
@@ -382,13 +382,11 @@ function isLossBalancedCcmComparison(result) {
     && !result.error
     && result.supported !== false
 }
-function lossBalancedLimitations(result) {
+function lossBalancedAssumptions(result) {
   const assumptions = result?.model?.assumptions
   if (!Array.isArray(assumptions)) return []
-  return assumptions.filter(assumption => typeof assumption === 'string' && (
-    assumption.startsWith('Only switch and diode channel conduction losses are included')
-    || assumption.startsWith('Thermal output is a one-pass estimate')
-    || assumption.startsWith('CCM power and averaged volt-second residuals can differ')
+  return assumptions.filter(assumption => (
+    typeof assumption === 'string' && assumption.trim().length > 0
   ))
 }
 function axisUnit(axis) {

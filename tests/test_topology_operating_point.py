@@ -942,17 +942,7 @@ def test_loss_balanced_boost_dcm_rejects_exact_boundary_but_accepts_below() -> N
 
 
 @pytest.mark.parametrize(
-    (
-        "topology",
-        "parameters",
-        "expected_duty",
-        "expected_i_l",
-        "expected_i_in",
-        "expected_i_diode",
-        "expected_switch_loss",
-        "expected_diode_loss",
-        "expected_v_out_signed",
-    ),
+    ("topology", "parameters", "expected_result"),
     [
         (
             "buck",
@@ -960,13 +950,16 @@ def test_loss_balanced_boost_dcm_rejects_exact_boundary_but_accepts_below() -> N
                 mode="loss-balanced", v_in=100, v_out=50, p_out=500,
                 l_value=1e-3, f_sw=20_000,
             ),
-            52 / 101,
-            10,
-            520 / 101,
-            490 / 101,
-            520 / 101,
-            980 / 101,
-            50,
+            {
+                "duty_cycle": 52 / 101,
+                "i_l_avg_a": 10,
+                "i_in_avg_a": 520 / 101,
+                "i_out_avg_a": 10,
+                "i_diode_avg_a": 490 / 101,
+                "conduction_switch_w": 520 / 101,
+                "conduction_diode_w": 980 / 101,
+                "v_out_signed_v": 50,
+            },
         ),
         (
             "buck-boost",
@@ -974,13 +967,16 @@ def test_loss_balanced_boost_dcm_rejects_exact_boundary_but_accepts_below() -> N
                 mode="loss-balanced", v_in=100, v_out=50, p_out=500,
                 l_value=1e-3, f_sw=20_000,
             ),
-            52 / 151,
-            1510 / 99,
-            520 / 99,
-            10,
-            520 / 99,
-            20,
-            -50,
+            {
+                "duty_cycle": 52 / 151,
+                "i_l_avg_a": 1510 / 99,
+                "i_in_avg_a": 520 / 99,
+                "i_out_avg_a": 10,
+                "i_diode_avg_a": 10,
+                "conduction_switch_w": 520 / 99,
+                "conduction_diode_w": 20,
+                "v_out_signed_v": -50,
+            },
         ),
         (
             "flyback",
@@ -988,26 +984,23 @@ def test_loss_balanced_boost_dcm_rejects_exact_boundary_but_accepts_below() -> N
                 mode="loss-balanced", v_in=100, v_out=50, p_out=500,
                 turns_ratio_nps=2, l_value=1e-3, f_sw=20_000,
             ),
-            104 / 203,
-            1015 / 99,
-            520 / 99,
-            10,
-            520 / 99,
-            20,
-            50,
+            {
+                "duty_cycle": 104 / 203,
+                "i_l_avg_a": 1015 / 99,
+                "i_in_avg_a": 520 / 99,
+                "i_out_avg_a": 10,
+                "i_diode_avg_a": 10,
+                "conduction_switch_w": 520 / 99,
+                "conduction_diode_w": 20,
+                "v_out_signed_v": 50,
+            },
         ),
     ],
 )
 def test_loss_balanced_ccm_topologies_match_independent_constant_drop_balance(
     topology: str,
     parameters: dict[str, Any],
-    expected_duty: float,
-    expected_i_l: float,
-    expected_i_in: float,
-    expected_i_diode: float,
-    expected_switch_loss: float,
-    expected_diode_loss: float,
-    expected_v_out_signed: float,
+    expected_result: dict[str, float],
 ) -> None:
     """Check independent flat-drop currents, losses, and balance equations."""
     # One device in each leg, exact 25 C / 15 V switch data, and flat 1 V / 2 V
@@ -1025,6 +1018,11 @@ def test_loss_balanced_ccm_topologies_match_independent_constant_drop_balance(
     # Pout/(Vout*(Np/Ns)*(1-D)) for Flyback. Their table values also set
     # Iin=D*I_l and the diode's full-period average with each topology's scale.
     # Derive interval losses and signed volt-seconds from those expected values.
+    expected_duty = expected_result["duty_cycle"]
+    expected_i_l = expected_result["i_l_avg_a"]
+    expected_i_in = expected_result["i_in_avg_a"]
+    expected_switch_loss = expected_result["conduction_switch_w"]
+    expected_diode_loss = expected_result["conduction_diode_w"]
     if topology == "buck":
         expected_switch_loss_from_equation = (
             expected_duty * switch_drop * expected_i_l
@@ -1073,6 +1071,7 @@ def test_loss_balanced_ccm_topologies_match_independent_constant_drop_balance(
     assert expected_diode_loss_from_equation == pytest.approx(expected_diode_loss)
     assert expected_power_balance_residual == pytest.approx(0, abs=1e-10)
     assert expected_volt_second_residual == pytest.approx(0, abs=1e-12)
+    assert expected_result["i_out_avg_a"] == pytest.approx(p_out / v_out, rel=1e-8)
 
     transistor = device()
     transistor.switch.channel_data[0].graph_v_i[0] = switch_drop
@@ -1091,8 +1090,15 @@ def test_loss_balanced_ccm_topologies_match_independent_constant_drop_balance(
     assert calculated["i_l_avg_a"] == pytest.approx(expected_i_l, rel=1e-8)
     assert calculated["i_in_avg_a"] == pytest.approx(expected_i_in, rel=1e-8)
     assert calculated["i_out_avg_a"] == pytest.approx(p_out / v_out, rel=1e-8)
-    assert calculated["i_diode_avg_a"] == pytest.approx(expected_i_diode, rel=1e-8)
-    assert calculated["v_out_signed_v"] == pytest.approx(expected_v_out_signed)
+    assert calculated["i_out_avg_a"] == pytest.approx(
+        expected_result["i_out_avg_a"], rel=1e-8
+    )
+    assert calculated["i_diode_avg_a"] == pytest.approx(
+        expected_result["i_diode_avg_a"], rel=1e-8
+    )
+    assert calculated["v_out_signed_v"] == pytest.approx(
+        expected_result["v_out_signed_v"]
+    )
     assert losses["conduction_switch_w"] == pytest.approx(
         expected_switch_loss, rel=1e-8
     )
