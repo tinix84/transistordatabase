@@ -134,20 +134,32 @@ describe('TopologyCalculator API workflow', () => {
     expect(comparisonButton.element.disabled).toBe(false)
   })
 
-  it('disables sweep controls and omits an enabled sweep in loss-balanced mode', async () => {
-    await setSelect('Calculation mode', 'detailed')
-    await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
+  it('sends loss-balanced sweep and renders its scope and voltage-law caveat', async () => {
+    calculateTopology.mockResolvedValueOnce({
+      ...estimateResponse,
+      model: { ...estimateResponse.model, mode: 'loss-balanced' },
+      sweep: {
+        kind: 'line', x_axis: 'f_sw', x_unit: 'Hz', x_values: [50000, 100000],
+        metric: 'p_loss_total_w', metric_unit: 'W', values: [8, 10],
+        voltage_law_residual_values_v: [0.01, 0.02],
+        loss_scope: 'channel_conduction_only',
+        voltage_law_note: 'Each point reports its averaged inductor volt-second residual.'
+      }
+    })
     await setSelect('Calculation mode', 'loss-balanced')
-    await flushPromises()
-
     const sweepToggle = wrapper.findAll('input[type="checkbox"]')[0]
-    expect(sweepToggle.element.disabled).toBe(true)
-    expect(sweepToggle.element.checked).toBe(false)
-    expect(wrapper.text()).toContain('Line and contour sweeps are unavailable in loss-balanced mode')
-
+    expect(sweepToggle.element.disabled).toBe(false)
+    await sweepToggle.setValue(true)
     await wrapper.get('button.btn-primary').trigger('click')
     await flushPromises()
-    expect(calculateTopology.mock.calls[0][0].sweep).toBeUndefined()
+
+    expect(calculateTopology.mock.calls[0][0]).toMatchObject({
+      mode: 'loss-balanced',
+      sweep: { x_axis: 'f_sw', metric: 'i_l_ripple_pp_a' }
+    })
+    expect(wrapper.text()).toContain('Sweep scope: channel_conduction_only')
+    expect(wrapper.text()).toContain('Each point reports its averaged inductor volt-second residual.')
+    expect(wrapper.text()).toContain('Hover a point to inspect its averaged volt-second residual')
   })
 
   it('disables topology comparison for unsupported loss-balanced DCM', async () => {

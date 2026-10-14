@@ -35,11 +35,6 @@ class TopologyCalculatorService:
             diode_transistor = diode_transistor or transistor
         values = dict(parameters)
         sweep = values.pop("sweep", None)
-        if sweep is not None and values.get("mode") == "loss-balanced":
-            raise ValueError(
-                "Topology sweeps are not supported in loss-balanced mode; "
-                "calculate a single CCM operating point"
-            )
         result = calculate_topology_operating_point(
             topology, values, switch_transistor, diode_transistor
         )
