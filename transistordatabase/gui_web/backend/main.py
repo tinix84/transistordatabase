@@ -11,6 +11,7 @@ import asyncio
 import copy
 import ctypes
 import errno
+import hashlib
 import io
 import json
 import logging
@@ -62,6 +63,7 @@ from transistordatabase.gui_web.backend.schemas import (
     GateChargeCurveCreate,
     SOACreate,
     CapacitanceCurveCreate,
+    CurveUpdateRequest,
     CurveValidationResult,
     PLECSExportOptions,
     MATLABExportOptions,
@@ -637,11 +639,11 @@ async def _patch_legacy_record(name: str, transistor_data: Dict[str, Any]) -> No
 
 
 def _legacy_curve_list(
-    record: Dict[str, Any],
-    path: tuple[Optional[str], str],
+    record: dict[str, Any],
+    path: tuple[str | None, str],
     *,
     create: bool = False,
-) -> List[Any]:
+) -> list[Any]:
     """Return one existing legacy curve list, optionally creating it."""
     section_name, field = path
     if section_name is None:
@@ -664,6 +666,156 @@ def _legacy_curve_list(
             detail=f"The stored record has an invalid {field} curve list.",
         )
     return curves
+
+
+_CURVE_STORAGE_PATHS: dict[tuple[str, str], tuple[str | None, str]] = {
+    ("switch", "channel"): ("switch", "channel"),
+    ("diode", "channel"): ("diode", "channel"),
+    ("switch", "e_on"): ("switch", "e_on"),
+    ("switch", "e_off"): ("switch", "e_off"),
+    ("diode", "e_rr"): ("diode", "e_rr"),
+    ("switch", "gate_charge"): ("switch", "charge_curve"),
+    ("switch", "soa"): ("switch", "soa"),
+    ("capacitance", "c_oss"): (None, "c_oss"),
+    ("capacitance", "c_iss"): (None, "c_iss"),
+    ("capacitance", "c_rss"): (None, "c_rss"),
+}
+
+_SWITCHING_ENERGY_PATCH_FIELDS = frozenset({
+    "dataset_type", "t_j", "v_supply", "v_g", "v_g_off", "r_g", "i_x", "e_x",
+    "graph_i_e", "graph_r_e", "graph_t_e", "comment", "measurement_date",
+    "measurement_testbench", "commutation_device", "load_inductance", "commutation_inductance",
+})
+
+_CURVE_PATCH_FIELDS: dict[tuple[str, str], set[str] | frozenset[str]] = {
+    ("switch", "channel"): {"t_j", "v_g", "graph_v_i"},
+    ("diode", "channel"): {"t_j", "graph_v_i"},
+    ("switch", "e_on"): _SWITCHING_ENERGY_PATCH_FIELDS,
+    ("switch", "e_off"): _SWITCHING_ENERGY_PATCH_FIELDS,
+    ("diode", "e_rr"): _SWITCHING_ENERGY_PATCH_FIELDS,
+    ("switch", "gate_charge"): {"v_supply", "t_j", "i_channel", "i_g", "graph_q_v"},
+    ("switch", "soa"): {"t_c", "time_pulse", "graph_i_v"},
+    ("capacitance", "c_oss"): {"t_j", "graph_v_c"},
+    ("capacitance", "c_iss"): {"t_j", "graph_v_c"},
+    ("capacitance", "c_rss"): {"t_j", "graph_v_c"},
+}
+
+
+def _curve_storage_path(component: str, curve_type: str) -> tuple[str | None, str]:
+    """Resolve a browser curve category to its legacy JSON list."""
+    try:
+        return _CURVE_STORAGE_PATHS[(component, curve_type)]
+    except KeyError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported curve category '{component}.{curve_type}'.",
+        ) from error
+
+
+def _curve_edit_token(curve: dict[str, Any]) -> str:
+    """Return a stable precondition token for one raw curve entry."""
+    # Legacy records can contain Infinity sentinels in curve values; hash the
+    # same Python JSON representation accepted by JsonTransistorLoader.
+    encoded = json.dumps(curve, sort_keys=True, separators=(",", ":"), allow_nan=True)
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def _read_legacy_record_unlocked(name: str) -> dict[str, Any]:
+    """Read a named raw record while the caller holds the mutation lock."""
+    record_path = _legacy_record_path(name)
+    try:
+        # The legacy loader accepts Python's non-finite JSON constants (used by
+        # some checked-in DPT samples), so preserve them in raw records. Keep
+        # duplicate-key rejection while matching its numeric parsing behavior.
+        record = json.loads(record_path.read_bytes(), object_pairs_hook=_unique_json_object)
+    except FileNotFoundError as error:
+        raise HTTPException(status_code=404, detail=f"Transistor '{name}' not found") from error
+    if not isinstance(record, dict) or record.get("name") != name:
+        raise HTTPException(
+            status_code=409,
+            detail="The stored record name does not match the requested device name.",
+        )
+    return record
+
+
+def _with_curve_edit_tokens(
+    curves: list[dict[str, Any]],
+    record: dict[str, Any],
+    path: tuple[str | None, str],
+) -> list[dict[str, Any]]:
+    """Pair API curve projections with tokens for their exact raw entries."""
+    raw_curves = _legacy_curve_list(record, path, create=True)
+    if len(curves) != len(raw_curves) or any(not isinstance(curve, dict) for curve in raw_curves):
+        raise HTTPException(
+            status_code=409,
+            detail="The stored curve list cannot be mapped safely to the current reader.",
+        )
+    return [
+        {**curve, "_edit_token": _curve_edit_token(raw_curve)}
+        for curve, raw_curve in zip(curves, raw_curves)
+    ]
+
+
+def _update_legacy_curve_unlocked(
+    name: str,
+    component: str,
+    curve_type: str,
+    index: int,
+    request: CurveUpdateRequest,
+) -> None:
+    """Patch and validate one curve while preserving the raw enclosing record."""
+    path = _curve_storage_path(component, curve_type)
+    patch = request.curve
+    allowed_fields = _CURVE_PATCH_FIELDS[(component, curve_type)]
+    unexpected_fields = set(patch) - allowed_fields
+    if unexpected_fields:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported fields for {component}.{curve_type}: {', '.join(sorted(unexpected_fields))}.",
+        )
+    try:
+        json.dumps(patch, allow_nan=False)
+    except (TypeError, ValueError) as error:
+        raise HTTPException(
+            status_code=400,
+            detail="Curve patches must contain only finite JSON numbers.",
+        ) from error
+
+    record_path = _legacy_record_path(name)
+    record = _read_legacy_record_unlocked(name)
+    curves = _legacy_curve_list(record, path)
+    if len(curves) != request.expected_count or not 0 <= index < len(curves):
+        raise HTTPException(
+            status_code=409,
+            detail="The stored curve list changed; reload the device before editing this curve.",
+        )
+    original_curve = curves[index]
+    if not isinstance(original_curve, dict) or _curve_edit_token(original_curve) != request.expected_token:
+        raise HTTPException(
+            status_code=409,
+            detail="This curve changed since it was loaded; reload the device before editing it.",
+        )
+
+    updated_curve = dict(original_curve)
+    updated_curve.update(patch)
+    curves[index] = updated_curve
+    try:
+        # Keep the whole legacy reader as the final authority for record and
+        # curve constraints, but serialize only the raw candidate copy.
+        # Unrelated legacy fields may contain non-finite sentinel values that
+        # the legacy reader accepts. Patch values were checked separately.
+        json.dumps(record, allow_nan=True)
+        _json_dict_to_legacy_transistor(copy.deepcopy(record))
+        _write_legacy_record_unlocked(record_path, record)
+    except HTTPException:
+        raise
+    except FileNotFoundError as error:
+        raise HTTPException(status_code=404, detail=f"Transistor '{name}' not found") from error
+    except Exception as error:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot update {component}.{curve_type} curve: {error!s}",
+        ) from error
 
 
 def _legacy_json_default(value: Any) -> Any:
@@ -1571,7 +1723,9 @@ async def plot_gate_charge(transistor_id: str) -> Dict[str, Any]:
 @app.get("/api/transistors/{transistor_id}/curves")
 async def get_all_curves(transistor_id: str) -> Dict[str, Any]:
     """Get all curves for a transistor."""
-    transistor = _get_transistor(transistor_id)
+    async with _record_mutation():
+        transistor = _get_transistor(transistor_id)
+        raw_record = _read_legacy_record_unlocked(transistor_id)
 
     def array_to_list(arr):
         """Convert numpy array to nested list for JSON."""
@@ -1579,7 +1733,7 @@ async def get_all_curves(transistor_id: str) -> Dict[str, Any]:
             return None
         return arr.tolist() if hasattr(arr, 'tolist') else arr
 
-    return {
+    result = {
         "switch": {
             "channel_data": [
                 {
@@ -1595,9 +1749,13 @@ async def get_all_curves(transistor_id: str) -> Dict[str, Any]:
                     "t_j": e.t_j,
                     "v_supply": e.v_supply,
                     "v_g": e.v_g,
+                    "v_g_off": e.v_g_off,
                     "r_g": e.r_g,
+                    "i_x": e.i_x,
+                    "e_x": e.e_x,
                     "graph_i_e": array_to_list(e.graph_i_e),
                     "graph_r_e": array_to_list(e.graph_r_e),
+                    "graph_t_e": array_to_list(e.graph_t_e),
                 }
                 for e in transistor.switch.e_on_data
             ],
@@ -1607,9 +1765,13 @@ async def get_all_curves(transistor_id: str) -> Dict[str, Any]:
                     "t_j": e.t_j,
                     "v_supply": e.v_supply,
                     "v_g": e.v_g,
+                    "v_g_off": e.v_g_off,
                     "r_g": e.r_g,
+                    "i_x": e.i_x,
+                    "e_x": e.e_x,
                     "graph_i_e": array_to_list(e.graph_i_e),
                     "graph_r_e": array_to_list(e.graph_r_e),
+                    "graph_t_e": array_to_list(e.graph_t_e),
                 }
                 for e in transistor.switch.e_off_data
             ],
@@ -1646,8 +1808,13 @@ async def get_all_curves(transistor_id: str) -> Dict[str, Any]:
                     "t_j": e.t_j,
                     "v_supply": e.v_supply,
                     "v_g": e.v_g,
+                    "v_g_off": e.v_g_off,
                     "r_g": e.r_g,
+                    "i_x": e.i_x,
+                    "e_x": e.e_x,
                     "graph_i_e": array_to_list(e.graph_i_e),
+                    "graph_r_e": array_to_list(e.graph_r_e),
+                    "graph_t_e": array_to_list(e.graph_t_e),
                 }
                 for e in transistor.diode.e_rr_data
             ],
@@ -1676,6 +1843,32 @@ async def get_all_curves(transistor_id: str) -> Dict[str, Any]:
             ],
         },
     }
+    result["switch"]["channel_data"] = _with_curve_edit_tokens(
+        result["switch"]["channel_data"], raw_record, ("switch", "channel")
+    )
+    result["switch"]["e_on_data"] = _with_curve_edit_tokens(
+        result["switch"]["e_on_data"], raw_record, ("switch", "e_on")
+    )
+    result["switch"]["e_off_data"] = _with_curve_edit_tokens(
+        result["switch"]["e_off_data"], raw_record, ("switch", "e_off")
+    )
+    result["switch"]["gate_charge_curves"] = _with_curve_edit_tokens(
+        result["switch"]["gate_charge_curves"], raw_record, ("switch", "charge_curve")
+    )
+    result["switch"]["soa"] = _with_curve_edit_tokens(
+        result["switch"]["soa"], raw_record, ("switch", "soa")
+    )
+    result["diode"]["channel_data"] = _with_curve_edit_tokens(
+        result["diode"]["channel_data"], raw_record, ("diode", "channel")
+    )
+    result["diode"]["e_rr_data"] = _with_curve_edit_tokens(
+        result["diode"]["e_rr_data"], raw_record, ("diode", "e_rr")
+    )
+    for curve_type in ("c_oss", "c_iss", "c_rss"):
+        result["capacitances"][curve_type] = _with_curve_edit_tokens(
+            result["capacitances"][curve_type], raw_record, (None, curve_type)
+        )
+    return result
 
 
 @app.post("/api/transistors/{transistor_id}/curves/channel")
@@ -1899,6 +2092,30 @@ async def add_capacitance_curve(
             else transistor.c_iss if cap_type == "c_iss"
             else transistor.c_rss
         ),
+    }
+
+
+@app.put("/api/transistors/{transistor_id}/curves/{component}/{curve_type}/{index}")
+@_record_mutation_endpoint
+async def update_curve(
+    transistor_id: str,
+    component: str,
+    curve_type: str,
+    index: int,
+    request: CurveUpdateRequest,
+) -> dict[str, Any]:
+    """Update one existing raw curve without rewriting unrelated curve data."""
+    _update_legacy_curve_unlocked(
+        transistor_id,
+        component,
+        curve_type,
+        index,
+        request,
+    )
+    return {
+        "message": f"Curve updated: {component}.{curve_type}[{index}]",
+        "updated_index": index,
+        "curve_count": request.expected_count,
     }
 
 

@@ -153,6 +153,14 @@ class CapacitanceCurveCreate(BaseModel):
         return v
 
 
+class CurveUpdateRequest(BaseModel):
+    """Optimistic concurrency preconditions and one raw curve patch."""
+
+    expected_count: int = Field(..., ge=1)
+    expected_token: str = Field(..., min_length=64, max_length=64, pattern="^[a-f0-9]{64}$")
+    curve: dict[str, Any]
+
+
 class CurveValidationResult(BaseModel):
     """Response schema for curve validation."""
 

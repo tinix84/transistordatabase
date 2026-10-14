@@ -112,6 +112,7 @@ nav:
       - Topology Migration Sprint: sprints/sprint-web-topology-migration.md
       - Database Backup Sprint: sprints/sprint-web-database-backup.md
       - Curve Workflow Sprint: sprints/sprint-web-curve-workflow.md
+      - Saved Curve Editing Sprint: sprints/sprint-web-saved-curve-editing.md
   - Architecture:
       - Overview: architecture/overview.md
       - Core Design: architecture/core-design.md

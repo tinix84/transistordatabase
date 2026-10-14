@@ -61,7 +61,7 @@ Use the same checklist and vertical-workflow approach for database search, creat
 
 The search-driven general database lifecycle slice is tracked in the [database lifecycle sprint](sprint-web-database-lifecycle.md); it does not close this broader replacement. Full-database raw JSON backup/restore and create-only single-record upload are tracked in the [database backup sprint](sprint-web-database-backup.md); other import/export capabilities remain open.
 
-Curve loading, plotting, and the existing add/delete browser routes are tracked in the [web curve workflow sprint](sprint-web-curve-workflow.md). That slice leaves the wider migration open; saved-curve editing, transient thermal curves, DPT measurement handling, and other desktop capabilities still need separate parity evidence.
+Curve loading, plotting, and add/delete browser routes are tracked in the [web curve workflow sprint](sprint-web-curve-workflow.md). Saved-curve editing for the currently supported categories is tracked in the [saved-curve editing sprint](sprint-web-saved-curve-editing.md). These slices leave the wider migration open; transient thermal curves, DPT measurement handling, and other desktop capabilities still need separate parity evidence.
 
 ## Topology coverage status (2026-10-13)
 

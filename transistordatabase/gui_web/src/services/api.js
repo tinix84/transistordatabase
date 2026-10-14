@@ -230,6 +230,15 @@ export const transistorApi = {
     return response.data
   },
 
+  // Update one curve with list-count and raw-entry concurrency preconditions
+  async updateCurve(id, component, curveType, index, update) {
+    const response = await api.put(
+      `/api/transistors/${pathSegment(id)}/curves/${component}/${curveType}/${index}`,
+      update
+    )
+    return response.data
+  },
+
   // Validate curves
   async validateCurves(id) {
     const response = await api.post(`/api/transistors/${pathSegment(id)}/curves/validate`)
