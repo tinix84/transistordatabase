@@ -194,16 +194,85 @@ def test_loss_balanced_boost_api_returns_power_closed_channel_result(
     )
 
 
-def test_loss_balanced_api_rejects_unsupported_flyback_dcm(client: TestClient) -> None:
-    """Return a clear client error for unsupported Flyback DCM feedback."""
-    response = client.post(
+def test_loss_balanced_flyback_dcm_api_exposes_primary_and_secondary_currents(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Return the ratio-scaled scalar Flyback DCM result through FastAPI."""
+    response = gate_conditioned_client.post(
         "/api/topology/calculate",
         json=payload(
-            topology="flyback", mode="loss-balanced", conduction_regime="DCM"
+            topology="flyback", mode="loss-balanced", conduction_regime="DCM",
+            turns_ratio_nps=2, v_in=100, v_out=50, p_out=10, f_sw=20_000,
+            l_value=0.001, c_out=0.001, t_j=25, v_g=15, diode_v_g=0,
+            switch_transistor_id="gated-device", diode_transistor_id="gated-device",
         ),
     )
-    assert response.status_code == 400
-    assert "Buck, Boost, and Buck-Boost only" in response.json()["detail"]
+    assert response.status_code == 200
+    result = response.json()
+    calculated = result["calculated"]
+    assert result["topology"] == "flyback"
+    assert result["model"]["conduction_regime"] == "DCM"
+    assert calculated["i_diode_peak_a"] == pytest.approx(
+        2 * calculated["i_l_peak_a"]
+    )
+    assert calculated["i_diode_avg_a"] == pytest.approx(
+        calculated["i_out_avg_a"], rel=1e-8
+    )
+    assert calculated["idle_fraction"] > 0
+    assert abs(calculated["inductor_volt_second_residual_v"]) < 1e-7
+    assert abs(calculated["power_balance_residual_w"]) < 1e-6
+    assert result["losses"]["loss_scope"] == "channel_conduction_only"
+
+
+def test_loss_balanced_flyback_dcm_api_rejects_missing_ratio_and_curve_condition(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Return actionable errors for a missing ratio or exact TDB curve."""
+    missing_ratio = gate_conditioned_client.post(
+        "/api/topology/calculate",
+        json=payload(
+            topology="flyback", mode="loss-balanced", conduction_regime="DCM",
+            v_in=100, v_out=50, p_out=10, f_sw=20_000,
+            l_value=0.001, c_out=0.001, t_j=25, v_g=15, diode_v_g=0,
+            switch_transistor_id="gated-device", diode_transistor_id="gated-device",
+        ),
+    )
+    assert missing_ratio.status_code == 400
+    assert "Flyback requires a positive turns_ratio_nps" in missing_ratio.json()["detail"]
+    wrong_condition = gate_conditioned_client.post(
+        "/api/topology/calculate",
+        json=payload(
+            topology="flyback", mode="loss-balanced", conduction_regime="DCM",
+            turns_ratio_nps=2, v_in=100, v_out=50, p_out=10, f_sw=20_000,
+            l_value=0.001, c_out=0.001, t_j=25, v_g=14, diode_v_g=0,
+            switch_transistor_id="gated-device", diode_transistor_id="gated-device",
+        ),
+    )
+    assert wrong_condition.status_code == 400
+    assert "Missing required switch channel curve" in wrong_condition.json()["detail"]
+
+
+def test_loss_balanced_flyback_dcm_api_rejects_sweep_and_invalid_ratio(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Reject invalid ratios and keep Flyback DCM feedback scalar-only."""
+    request = payload(
+        topology="flyback", mode="loss-balanced", conduction_regime="DCM",
+        turns_ratio_nps=2, v_in=100, v_out=50, p_out=10, f_sw=20_000,
+        l_value=0.001, c_out=0.001, t_j=25, v_g=15, diode_v_g=0,
+        switch_transistor_id="gated-device", diode_transistor_id="gated-device",
+        sweep={
+            "x_axis": "f_sw", "x_min": 20_000, "x_max": 30_000,
+            "x_points": 2, "metric": "efficiency_percent",
+        },
+    )
+    sweep_response = gate_conditioned_client.post("/api/topology/calculate", json=request)
+    assert sweep_response.status_code == 400
+    assert "Loss-balanced topology sweeps support CCM only" in sweep_response.json()["detail"]
+    request.pop("sweep")
+    request["turns_ratio_nps"] = 0
+    invalid_ratio = gate_conditioned_client.post("/api/topology/calculate", json=request)
+    assert invalid_ratio.status_code == 422
 
 
 def test_loss_balanced_buck_boost_dcm_api_exposes_inverting_scalar_result(
@@ -549,7 +618,7 @@ def test_loss_balanced_dcm_topology_comparison_is_rejected(
     )
     assert response.status_code == 400
     assert "does not support loss-balanced DCM" in response.json()["detail"]
-    assert "Buck-Boost DCM operating points are supported" in response.json()["detail"]
+    assert "Flyback DCM operating points are supported individually" in response.json()["detail"]
 
 
 def test_estimate_comparison_does_not_rank_unmodeled_efficiencies(client: TestClient) -> None:
