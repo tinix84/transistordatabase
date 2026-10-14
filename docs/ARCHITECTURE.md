@@ -1,6 +1,6 @@
 # Architecture Reference
 
-*Auto-generated from codebase structure on 2026-10-15*
+*Auto-generated from codebase structure on 2026-10-14*
 
 This document provides an overview of the transistordatabase architecture based on the actual code structure.
 
