@@ -145,12 +145,15 @@
                 </p>
               </div>
 
-              <div
-                v-if="!comparisonMode && filteredMeasurementRecords.length"
-                class="waveform-selectors"
-              >
-                <label for="dpt-measurement-select">Measurement record:</label>
+              <div v-if="!comparisonMode" class="waveform-selectors">
+                <label
+                  v-if="filteredMeasurementRecords.length"
+                  for="dpt-measurement-select"
+                >
+                  Measurement record:
+                </label>
                 <select
+                  v-if="filteredMeasurementRecords.length"
                   id="dpt-measurement-select"
                   data-testid="dpt-measurement-select"
                   v-model.number="selectedMeasurementIndex"
