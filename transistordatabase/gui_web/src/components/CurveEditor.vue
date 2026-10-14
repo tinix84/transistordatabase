@@ -10,7 +10,7 @@
       <div class="section parameters-section">
         <h4>📋 Curve Parameters</h4>
         <div class="form-grid">
-          <div class="form-group">
+          <div v-if="requiresTj" class="form-group">
             <label>Junction Temperature (T_j) *</label>
             <div class="input-with-unit">
               <input
@@ -45,6 +45,22 @@
                 step="1"
                 required
               />
+              <span class="unit">V</span>
+            </div>
+          </div>
+
+          <div v-if="curveType === 'switching_loss'" class="form-group">
+            <label>Gate Voltage (V_g) *</label>
+            <div class="input-with-unit">
+              <input v-model.number="formData.v_g" type="number" step="0.1" required />
+              <span class="unit">V</span>
+            </div>
+          </div>
+
+          <div v-if="curveType === 'switching_loss' && initialData?.dataset_type === 'graph_r_e'" class="form-group">
+            <label>Turn-off Gate Voltage (V_g,off)</label>
+            <div class="input-with-unit">
+              <input v-model.number="formData.v_g_off" type="number" step="0.1" />
               <span class="unit">V</span>
             </div>
           </div>
@@ -110,11 +126,27 @@
               <span class="unit">s</span>
             </div>
           </div>
+
+          <div v-if="isSingleSwitchingEdit" class="form-group">
+            <label>Measured Current (I_x) *</label>
+            <div class="input-with-unit">
+              <input v-model.number="formData.i_x" type="number" step="any" required />
+              <span class="unit">A</span>
+            </div>
+          </div>
+
+          <div v-if="isSingleSwitchingEdit" class="form-group">
+            <label>Measured Energy (E_x) *</label>
+            <div class="input-with-unit">
+              <input v-model.number="formData.e_x" type="number" step="any" required />
+              <span class="unit">J</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Data Input Method Selection -->
-      <div class="section data-method-section">
+      <div v-if="!isSingleSwitchingEdit" class="section data-method-section">
         <h4>📊 Data Input Method</h4>
         <div class="method-tabs">
           <button
@@ -190,7 +222,7 @@
       </div>
 
       <!-- Live Preview -->
-      <div v-if="hasValidData" class="section preview-section">
+      <div v-if="hasValidData && !isSingleSwitchingEdit" class="section preview-section">
         <h4>📈 Live Preview</h4>
         <CurvePlotter
           :title="`${curveTypeLabel} Preview`"
@@ -272,7 +304,11 @@ export default {
         r_g: null,
         i_channel: null,
         t_c: null,
-        time_pulse: null
+        time_pulse: null,
+        i_g: null,
+        v_g_off: null,
+        i_x: null,
+        e_x: null
       },
       manualDataPoints: [],
       uploadedData: null,
@@ -296,10 +332,23 @@ export default {
       return this.curveType === 'channel' && this.component === 'switch'
     },
 
+    requiresTj() {
+      return !(this.curveType === 'switching_loss'
+        && this.editMode
+        && this.initialData?.dataset_type === 'graph_t_e')
+    },
+
+    isSingleSwitchingEdit() {
+      return this.editMode && this.curveType === 'switching_loss' && this.initialData?.dataset_type === 'single'
+    },
+
     xAxisLabel() {
       if (this.curveType === 'gate_charge') return 'Charge (Q_g)'
       if (this.curveType === 'soa') return 'Voltage (V_ds)'
       if (this.curveType === 'capacitance') return 'Voltage (V_ds)'
+      if (this.curveType === 'switching_loss' && this.initialData?.dataset_type === 'graph_r_e') return 'Gate resistance (R_g)'
+      if (this.curveType === 'switching_loss' && this.initialData?.dataset_type === 'graph_t_e') return 'Temperature (T_j)'
+      if (this.curveType === 'switching_loss') return 'Current (I)'
       return 'Voltage (V)'
     },
 
@@ -307,6 +356,7 @@ export default {
       if (this.curveType === 'gate_charge') return 'Voltage (V_gs)'
       if (this.curveType === 'soa') return 'Current (I_d)'
       if (this.curveType === 'capacitance') return 'Capacitance (C)'
+      if (this.curveType === 'switching_loss') return 'Switching energy (E)'
       return 'Current (I)'
     },
 
@@ -314,12 +364,16 @@ export default {
       if (this.curveType === 'gate_charge') return 'C'
       if (this.curveType === 'capacitance') return 'V'
       if (this.curveType === 'soa') return 'V'
+      if (this.curveType === 'switching_loss' && this.initialData?.dataset_type === 'graph_r_e') return 'Ω'
+      if (this.curveType === 'switching_loss' && this.initialData?.dataset_type === 'graph_t_e') return '°C'
+      if (this.curveType === 'switching_loss') return 'A'
       return 'V'
     },
 
     yUnit() {
       if (this.curveType === 'gate_charge') return 'V'
       if (this.curveType === 'capacitance') return 'F'
+      if (this.curveType === 'switching_loss') return 'J'
       return 'A'
     },
 
@@ -353,10 +407,12 @@ export default {
     },
 
     canSubmit() {
-      if (!this.hasValidData) return false
-      if (this.formData.t_j === null) return false
+      if (!this.isSingleSwitchingEdit && !this.hasValidData) return false
+      if (this.requiresTj && this.formData.t_j === null) return false
       if (this.requiresVg && this.formData.v_g === null) return false
       if (this.curveType === 'switching_loss' && this.formData.v_supply === null) return false
+      if (this.curveType === 'switching_loss' && !this.editMode && this.formData.v_g === null) return false
+      if (this.isSingleSwitchingEdit && (this.formData.i_x === null || this.formData.e_x === null)) return false
       if (this.curveType === 'gate_charge') {
         if (this.formData.i_channel === null) return false
         if (this.formData.v_supply === null) return false
@@ -389,6 +445,11 @@ export default {
     },
 
     validateData() {
+      if (this.isSingleSwitchingEdit) {
+        this.validationMessage = 'Single measurement values are ready to update'
+        this.validationClass = 'success'
+        return true
+      }
       if (this.currentData.length < 2) {
         this.validationMessage = '⚠️ At least 2 data points required'
         this.validationClass = 'warning'
@@ -412,6 +473,12 @@ export default {
 
     submitCurve() {
       if (!this.validateData()) return
+
+      if (this.editMode) {
+        const curvePatch = this.buildRawCurvePatch()
+        this.$emit('submit', curvePatch)
+        return
+      }
 
       const curveData = {
         t_j: this.formData.t_j,
@@ -449,8 +516,68 @@ export default {
     },
 
     loadInitialData() {
-      // Load initial data for edit mode
       Object.assign(this.formData, this.initialData)
+      const graph = this.initialGraphData()
+      if (graph && graph.length === 2 && Array.isArray(graph[0]) && Array.isArray(graph[1])) {
+        this.dataInputMethod = 'manual'
+        this.manualDataPoints = graph[0].map((x, index) => ({ x, y: graph[1][index] }))
+        this.validateData()
+      }
+    },
+
+    initialGraphData() {
+      if (!this.initialData) return null
+      if (this.curveType === 'channel') return this.initialData.graph_v_i
+      if (this.curveType === 'switching_loss') {
+        const type = this.initialData.dataset_type
+        return type === 'graph_i_e' || type === 'graph_r_e' || type === 'graph_t_e'
+          ? this.initialData[type]
+          : null
+      }
+      if (this.curveType === 'gate_charge') return this.initialData.graph_q_v
+      if (this.curveType === 'soa') return this.initialData.graph_i_v
+      if (this.curveType === 'capacitance') return this.initialData.graph_v_c
+      return null
+    },
+
+    buildRawCurvePatch() {
+      const xValues = this.currentData.map(([x]) => x)
+      const yValues = this.currentData.map(([, y]) => y)
+      const changedFields = keys => Object.fromEntries(
+        keys
+          .filter(key => Object.prototype.hasOwnProperty.call(this.initialData || {}, key)
+            ? this.formData[key] !== this.initialData[key]
+            : this.formData[key] !== null && this.formData[key] !== undefined)
+          .map(key => [key, this.formData[key]])
+      )
+      if (this.curveType === 'channel') {
+        return {
+          ...changedFields(this.component === 'switch' ? ['t_j', 'v_g'] : ['t_j']),
+          graph_v_i: [xValues, yValues]
+        }
+      }
+      if (this.curveType === 'switching_loss') {
+        const datasetType = this.initialData?.dataset_type || 'graph_i_e'
+        const patch = {
+          ...changedFields(['t_j', 'v_supply', 'v_g', 'v_g_off', 'r_g'])
+        }
+        if (datasetType === 'single') {
+          Object.assign(patch, changedFields(['i_x', 'e_x']))
+        } else {
+          patch[datasetType] = [xValues, yValues]
+        }
+        return patch
+      }
+      if (this.curveType === 'gate_charge') {
+        return {
+          ...changedFields(['t_j', 'v_supply', 'i_channel', 'i_g']),
+          graph_q_v: [xValues, yValues]
+        }
+      }
+      if (this.curveType === 'soa') {
+        return { ...changedFields(['t_c', 'time_pulse']), graph_i_v: [xValues, yValues] }
+      }
+      return { ...changedFields(['t_j']), graph_v_c: [xValues, yValues] }
     }
   }
 }

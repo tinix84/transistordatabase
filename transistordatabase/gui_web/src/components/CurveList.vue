@@ -26,6 +26,14 @@
           </div>
           <div class="card-actions">
             <button
+              @click.stop="$emit('edit', index)"
+              class="btn-icon"
+              title="Edit"
+              aria-label="Edit Curve"
+            >
+              ✏️
+            </button>
+            <button
               @click.stop="$emit('view', index)"
               class="btn-icon"
               title="View Curve"
@@ -101,7 +109,7 @@ export default {
       default: true
     }
   },
-  emits: ['add', 'view', 'delete', 'select'],
+  emits: ['add', 'edit', 'view', 'delete', 'select'],
   data() {
     return {
       selectedIndex: null,
@@ -137,7 +145,7 @@ export default {
 
       // Extract relevant fields (exclude graph data)
       for (const [key, value] of Object.entries(curve)) {
-        if (!key.startsWith('graph_') && value !== null && value !== undefined) {
+        if (!key.startsWith('graph_') && !key.startsWith('_') && value !== null && value !== undefined) {
           info[key] = value
         }
       }

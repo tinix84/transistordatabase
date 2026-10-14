@@ -20,38 +20,43 @@ vi.mock('../../services/api', () => ({
     addGateChargeCurve: vi.fn(),
     addSOACurve: vi.fn(),
     addCapacitanceCurve: vi.fn(),
-    deleteCurve: vi.fn()
+    deleteCurve: vi.fn(),
+    updateCurve: vi.fn()
   }
 }))
 
 const curveApiResponse = {
   switch: {
-    channel_data: [{ t_j: 25, v_g: 15, graph_v_i: [[0, 10, 20], [0, 2, 4]] }],
+    channel_data: [{ _edit_token: 'a'.repeat(64), t_j: 25, v_g: 15, graph_v_i: [[0, 10, 20], [0, 2, 4]] }],
     e_on_data: [{
+      _edit_token: 'b'.repeat(64),
       dataset_type: 'graph_i_e', t_j: 25, v_supply: 400, v_g: 15, r_g: 2.5,
       graph_i_e: [[0, 10, 20], [0, 0.001, 0.002]], graph_r_e: null
     }],
     e_off_data: [{
+      _edit_token: 'c'.repeat(64),
       dataset_type: 'graph_r_e', t_j: 25, v_supply: 400, v_g: -4, r_g: null,
-      graph_i_e: null, graph_r_e: [[1, 5, 10], [0.001, 0.0008, 0.0006]]
+      v_g_off: -4, graph_i_e: null, graph_r_e: [[1, 5, 10], [0.001, 0.0008, 0.0006]]
     }],
     gate_charge_curves: [{
+      _edit_token: 'd'.repeat(64),
       v_supply: 400, t_j: 25, i_channel: 10, i_g: null,
       graph_q_v: [[0, 25e-9, 50e-9], [0, 8, 15]]
     }],
-    soa: [{ t_c: 25, time_pulse: 0.01, graph_i_v: [[0, 100, 600], [100, 20, 1]] }]
+    soa: [{ _edit_token: 'e'.repeat(64), t_c: 25, time_pulse: 0.01, graph_i_v: [[0, 100, 600], [100, 20, 1]] }]
   },
   diode: {
-    channel_data: [{ t_j: 25, graph_v_i: [[0, 1, 2], [0, 10, 20]] }],
+    channel_data: [{ _edit_token: 'f'.repeat(64), t_j: 25, graph_v_i: [[0, 1, 2], [0, 10, 20]] }],
     e_rr_data: [{
+      _edit_token: '0'.repeat(64),
       dataset_type: 'graph_i_e', t_j: 25, v_supply: 400, v_g: 0, r_g: 2.5,
       graph_i_e: [[0, 10, 20], [0, 0.0005, 0.001]], graph_r_e: null
     }]
   },
   capacitances: {
-    c_oss: [{ t_j: 25, graph_v_c: [[0, 50, 100], [0.00001, 0.000002, 0.000001]] }],
-    c_iss: [],
-    c_rss: []
+    c_oss: [{ _edit_token: '1'.repeat(64), t_j: 25, graph_v_c: [[0, 50, 100], [0.00001, 0.000002, 0.000001]] }],
+    c_iss: [{ _edit_token: '2'.repeat(64), t_j: 25, graph_v_c: [[0, 50], [0.00002, 0.00001]] }],
+    c_rss: [{ _edit_token: '3'.repeat(64), t_j: 25, graph_v_c: [[0, 50], [0.00003, 0.000015]] }]
   }
 }
 
@@ -109,37 +114,52 @@ const mutationCases = [
   {
     name: 'switch channel', tab: 'Channel Curves', curveTypeLabel: 'Channel', componentButton: 'Switch',
     addMethod: 'addChannelCurve', addArgs: (id, data) => [id, data, 'switch'],
-    deleteRoute: { component: 'switch', type: 'channel' }
+    curveRoute: { component: 'switch', type: 'channel' }
   },
   {
     name: 'diode channel', tab: 'Channel Curves', curveTypeLabel: 'Channel', componentButton: 'Diode',
     addMethod: 'addChannelCurve', addArgs: (id, data) => [id, data, 'diode'],
-    deleteRoute: { component: 'diode', type: 'channel' }
+    curveRoute: { component: 'diode', type: 'channel' }
   },
   {
     name: 'turn-on switching loss', tab: 'Switching Losses', curveTypeLabel: 'Switching Loss', subTabPrefix: 'E_on',
     addMethod: 'addSwitchingLossCurve', addArgs: (id, data) => [id, 'e_on', data],
-    deleteRoute: { component: 'switch', type: 'e_on' }
+    curveRoute: { component: 'switch', type: 'e_on' }
+  },
+  {
+    name: 'turn-off switching loss', tab: 'Switching Losses', curveTypeLabel: 'Switching Loss', subTabPrefix: 'E_off',
+    addMethod: 'addSwitchingLossCurve', addArgs: (id, data) => [id, 'e_off', data],
+    curveRoute: { component: 'switch', type: 'e_off' }
   },
   {
     name: 'reverse-recovery switching loss', tab: 'Switching Losses', curveTypeLabel: 'Switching Loss', subTabPrefix: 'E_rr',
     addMethod: 'addSwitchingLossCurve', addArgs: (id, data) => [id, 'e_rr', data],
-    deleteRoute: { component: 'diode', type: 'e_rr' }
+    curveRoute: { component: 'diode', type: 'e_rr' }
   },
   {
     name: 'gate charge', tab: 'Gate Charge', curveTypeLabel: 'Gate Charge',
     addMethod: 'addGateChargeCurve', addArgs: (id, data) => [id, data],
-    deleteRoute: { component: 'switch', type: 'gate_charge' }
+    curveRoute: { component: 'switch', type: 'gate_charge' }
   },
   {
     name: 'SOA', tab: 'SOA', curveTypeLabel: 'SOA',
     addMethod: 'addSOACurve', addArgs: (id, data) => [id, data],
-    deleteRoute: { component: 'switch', type: 'soa' }
+    curveRoute: { component: 'switch', type: 'soa' }
   },
   {
-    name: 'output capacitance', tab: 'Capacitance', curveTypeLabel: 'Capacitance',
+    name: 'output capacitance', tab: 'Capacitance', curveTypeLabel: 'Capacitance', capSubTabPrefix: 'C_oss', capType: 'c_oss',
     addMethod: 'addCapacitanceCurve', addArgs: (id, data) => [id, 'c_oss', data],
-    deleteRoute: { component: 'capacitance', type: 'c_oss' }
+    curveRoute: { component: 'capacitance', type: 'c_oss' }
+  },
+  {
+    name: 'input capacitance', tab: 'Capacitance', curveTypeLabel: 'Capacitance', capSubTabPrefix: 'C_iss', capType: 'c_iss',
+    addMethod: 'addCapacitanceCurve', addArgs: (id, data) => [id, 'c_iss', data],
+    curveRoute: { component: 'capacitance', type: 'c_iss' }
+  },
+  {
+    name: 'reverse-transfer capacitance', tab: 'Capacitance', curveTypeLabel: 'Capacitance', capSubTabPrefix: 'C_rss', capType: 'c_rss',
+    addMethod: 'addCapacitanceCurve', addArgs: (id, data) => [id, 'c_rss', data],
+    curveRoute: { component: 'capacitance', type: 'c_rss' }
   }
 ]
 
@@ -166,6 +186,9 @@ async function selectMutationCurveTab(wrapper, mutationCase) {
   }
   if (mutationCase.subTabPrefix) {
     await curveTab.findAll('.sub-tab-btn').find(button => button.text().startsWith(mutationCase.subTabPrefix)).trigger('click')
+  }
+  if (mutationCase.capSubTabPrefix) {
+    await curveTab.findAll('.sub-tab-btn').find(button => button.text().startsWith(mutationCase.capSubTabPrefix)).trigger('click')
   }
   return activeCurveTab(wrapper)
 }
@@ -410,12 +433,13 @@ describe('TransistorForm.vue', () => {
     it('loads curve arrays with the exact selected transistor identity', async () => {
       const transistor = structuredClone(mockTransistor1)
       transistor.metadata.name = 'Curve #Device ?'
+      transistorApi.getCurves.mockResolvedValue(curveApiResponse)
       wrapper = mountForm(transistor)
 
       await flushPromises()
 
       expect(transistorApi.getCurves).toHaveBeenCalledWith('Curve #Device ?')
-      expect(wrapper.findAll('[title="Edit"]')).toHaveLength(0)
+      expect(wrapper.findAll('[title="Edit"]').length).toBeGreaterThan(0)
     })
 
     it.each(mutationCases)('preserves the exact device identity and $name curve routes', async (mutationCase) => {
@@ -433,12 +457,28 @@ describe('TransistorForm.vue', () => {
       expect(transistorApi[mutationCase.addMethod]).toHaveBeenCalledWith(...mutationCase.addArgs('Curve #Device ?', mutationCurveData))
 
       curveTab = activeCurveTab(wrapper)
+      await curveTab.find('[title="Edit"]').trigger('click')
+      const editor = wrapper.findComponent({ name: 'CurveEditor' })
+      expect(editor.props('editMode')).toBe(true)
+      expect(editor.props('initialData')._edit_token).toBeTruthy()
+      await editor.vm.$emit('submit', mutationCurveData)
+      await flushPromises()
+      expect(transistorApi.updateCurve).toHaveBeenCalledWith(
+        'Curve #Device ?', mutationCase.curveRoute.component, mutationCase.curveRoute.type, 0,
+        expect.objectContaining({
+          expected_count: 1,
+          expected_token: expect.any(String),
+          curve: mutationCurveData
+        })
+      )
+
+      curveTab = activeCurveTab(wrapper)
       await curveTab.find('[title="Delete"]').trigger('click')
       await activeCurveTab(wrapper).find('.modal-actions .btn-danger').trigger('click')
       await flushPromises()
 
       expect(transistorApi.deleteCurve).toHaveBeenCalledWith(
-        'Curve #Device ?', mutationCase.deleteRoute.component, mutationCase.deleteRoute.type, 0
+        'Curve #Device ?', mutationCase.curveRoute.component, mutationCase.curveRoute.type, 0
       )
     })
 

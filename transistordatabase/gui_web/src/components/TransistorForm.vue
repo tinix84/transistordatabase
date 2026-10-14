@@ -256,13 +256,17 @@
         :title="curveComponent === 'switch' ? 'Switch Channel Curves' : 'Diode Channel Curves'"
         curveType="Channel"
         @add="openCurveEditor('channel')"
+        @edit="editCurve('channel', $event)"
         @view="viewCurve('channel', $event)"
         @delete="deleteCurve('channel', $event)"
       />
       <CurveEditor
         v-if="showEditor && editorCurveType === 'channel'"
+        :key="curveEditorKey('channel')"
         curveType="channel"
-        :component="curveComponent"
+        :component="editingCurve?.route.component || curveComponent"
+        :edit-mode="Boolean(editingCurve)"
+        :initial-data="editingCurve?.initialData || null"
         @submit="handleCurveSubmit"
         @cancel="closeEditor"
       />
@@ -285,13 +289,17 @@
         :title="lossTypeLabels[activeLossType]"
         curveType="Switching Loss"
         @add="openCurveEditor('switching_loss')"
+        @edit="editCurve('switching_loss', $event)"
         @view="viewCurve('switching_loss', $event)"
         @delete="deleteCurve('switching_loss', $event)"
       />
       <CurveEditor
         v-if="showEditor && editorCurveType === 'switching_loss'"
+        :key="curveEditorKey('switching_loss')"
         curveType="switching_loss"
-        :lossType="activeLossType"
+        :lossType="editingCurve?.route.type || activeLossType"
+        :edit-mode="Boolean(editingCurve)"
+        :initial-data="editingCurve?.initialData || null"
         @submit="handleCurveSubmit"
         @cancel="closeEditor"
       />
@@ -306,12 +314,16 @@
         title="Gate Charge Curves"
         curveType="Gate Charge"
         @add="openCurveEditor('gate_charge')"
+        @edit="editCurve('gate_charge', $event)"
         @view="viewCurve('gate_charge', $event)"
         @delete="deleteCurve('gate_charge', $event)"
       />
       <CurveEditor
         v-if="showEditor && editorCurveType === 'gate_charge'"
+        :key="curveEditorKey('gate_charge')"
         curveType="gate_charge"
+        :edit-mode="Boolean(editingCurve)"
+        :initial-data="editingCurve?.initialData || null"
         @submit="handleCurveSubmit"
         @cancel="closeEditor"
       />
@@ -326,12 +338,16 @@
         title="SOA Curves"
         curveType="SOA"
         @add="openCurveEditor('soa')"
+        @edit="editCurve('soa', $event)"
         @view="viewCurve('soa', $event)"
         @delete="deleteCurve('soa', $event)"
       />
       <CurveEditor
         v-if="showEditor && editorCurveType === 'soa'"
+        :key="curveEditorKey('soa')"
         curveType="soa"
+        :edit-mode="Boolean(editingCurve)"
+        :initial-data="editingCurve?.initialData || null"
         @submit="handleCurveSubmit"
         @cancel="closeEditor"
       />
@@ -354,13 +370,17 @@
         :title="capTypeLabels[activeCapType]"
         curveType="Capacitance"
         @add="openCurveEditor('capacitance')"
+        @edit="editCurve('capacitance', $event)"
         @view="viewCurve('capacitance', $event)"
         @delete="deleteCurve('capacitance', $event)"
       />
       <CurveEditor
         v-if="showEditor && editorCurveType === 'capacitance'"
+        :key="curveEditorKey('capacitance')"
         curveType="capacitance"
-        :capType="activeCapType"
+        :capType="editingCurve?.route.type || activeCapType"
+        :edit-mode="Boolean(editingCurve)"
+        :initial-data="editingCurve?.initialData || null"
         @submit="handleCurveSubmit"
         @cancel="closeEditor"
       />
@@ -437,6 +457,7 @@ const activeLossType = ref('e_on')
 const activeCapType = ref('c_oss')
 const showEditor = ref(false)
 const editorCurveType = ref(null)
+const editingCurve = ref(null)
 const curveMessage = ref(null)
 const selectedCurve = ref(null)
 
@@ -487,7 +508,7 @@ const curveWorkflow = {
     title: () => `${curveComponent.value === 'switch' ? 'Switch' : 'Diode'} channel`,
     plot: curve => ({ graph: curve?.graph_v_i, xLabel: 'Voltage (V)', yLabel: 'Current (A)' }),
     add: (id, curve) => transistorApi.addChannelCurve(id, curve, curveComponent.value),
-    deleteRoute: () => ({ component: curveComponent.value, type: 'channel' })
+    curveRoute: () => ({ component: curveComponent.value, type: 'channel' })
   },
   switching_loss: {
     series: () => curves[`switching_${activeLossType.value}`],
@@ -498,7 +519,7 @@ const curveWorkflow = {
       return { graph: null, xLabel: 'Current (A)', yLabel: 'Switching energy (J)' }
     },
     add: (id, curve) => transistorApi.addSwitchingLossCurve(id, activeLossType.value, curve),
-    deleteRoute: () => ({
+    curveRoute: () => ({
       component: activeLossType.value === 'e_rr' ? 'diode' : 'switch',
       type: activeLossType.value
     })
@@ -514,21 +535,21 @@ const curveWorkflow = {
       yLabel: 'Gate voltage (V)'
     }),
     add: (id, curve) => transistorApi.addGateChargeCurve(id, curve),
-    deleteRoute: () => ({ component: 'switch', type: 'gate_charge' })
+    curveRoute: () => ({ component: 'switch', type: 'gate_charge' })
   },
   soa: {
     series: () => curves.soa,
     title: () => 'SOA',
     plot: curve => ({ graph: curve?.graph_i_v, xLabel: 'Voltage (V)', yLabel: 'Current (A)' }),
     add: (id, curve) => transistorApi.addSOACurve(id, curve),
-    deleteRoute: () => ({ component: 'switch', type: 'soa' })
+    curveRoute: () => ({ component: 'switch', type: 'soa' })
   },
   capacitance: {
     series: () => curves[`capacitance_${activeCapType.value}`],
     title: () => capTypeLabels[activeCapType.value],
     plot: curve => ({ graph: curve?.graph_v_c, xLabel: 'Voltage (V)', yLabel: 'Capacitance (F)' }),
     add: (id, curve) => transistorApi.addCapacitanceCurve(id, activeCapType.value, curve),
-    deleteRoute: () => ({ component: 'capacitance', type: activeCapType.value })
+    curveRoute: () => ({ component: 'capacitance', type: activeCapType.value })
   }
 }
 
@@ -585,13 +606,44 @@ async function loadCurves() {
 }
 
 function openCurveEditor(type) {
+  editingCurve.value = null
   editorCurveType.value = type
   showEditor.value = true
+}
+
+function editCurve(type, index) {
+  const workflow = curveWorkflow[type]
+  const series = workflow?.series()
+  const curve = series?.[index]
+  const route = workflow?.curveRoute()
+  if (!curve || !series || !route || typeof curve._edit_token !== 'string') {
+    showNotification('This curve is stale or cannot be edited. Reload the device and try again.', 'error')
+    return
+  }
+  editingCurve.value = {
+    index,
+    expectedCount: series.length,
+    expectedToken: curve._edit_token,
+    route,
+    initialData: { ...curve }
+  }
+  editorCurveType.value = type
+  showEditor.value = true
+}
+
+function curveEditorKey(curveType) {
+  const selection = editingCurve.value
+  const route = selection?.route || curveWorkflow[curveType]?.curveRoute()
+  const mode = selection
+    ? `edit:${selection.index}:${selection.expectedToken}`
+    : 'add'
+  return `${curveType}:${route?.component || ''}:${route?.type || ''}:${mode}`
 }
 
 function closeEditor() {
   showEditor.value = false
   editorCurveType.value = null
+  editingCurve.value = null
 }
 
 function showNotification(text, type = 'success') {
@@ -606,14 +658,25 @@ async function handleCurveSubmit(curveData) {
   try {
     const workflow = curveWorkflow[editorCurveType.value]
     if (!workflow) return
-    await workflow.add(id, curveData)
-    showNotification('Curve added successfully')
+    if (editingCurve.value) {
+      const route = editingCurve.value.route
+      await transistorApi.updateCurve(id, route.component, route.type, editingCurve.value.index, {
+        expected_count: editingCurve.value.expectedCount,
+        expected_token: editingCurve.value.expectedToken,
+        curve: curveData
+      })
+      showNotification('Curve updated successfully')
+    } else {
+      await workflow.add(id, curveData)
+      showNotification('Curve added successfully')
+    }
     selectedCurve.value = null
     closeEditor()
     await loadCurves()
   } catch (error) {
-    console.error('Failed to add curve:', error)
-    showNotification('Failed to add curve: ' + error.message, 'error')
+    console.error(editingCurve.value ? 'Failed to update curve:' : 'Failed to add curve:', error)
+    const detail = error.response?.data?.detail
+    showNotification('Failed to save curve: ' + (typeof detail === 'string' ? detail : error.message), 'error')
   }
 }
 
@@ -621,7 +684,7 @@ async function deleteCurve(curveType, index) {
   const id = getTransistorId()
   if (!id) return
 
-  const route = curveWorkflow[curveType]?.deleteRoute()
+  const route = curveWorkflow[curveType]?.curveRoute()
   if (!route) return
 
   try {

@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- **Web transistor curves**: Saved curves now load in the browser and open in an in-app plot with the displayed units, including gate-charge conversion from C to nC. Removed the unsupported Edit action.
+### Added
+- **Web transistor curves**: Users can edit saved channel, switching-energy, gate-charge, SOA, and capacitance curves in place. Updates target the selected raw curve and preserve unrelated legacy data; stale edits are rejected when the curve changes after it was loaded. Saved curves also open in an in-app plot with displayed units, including gate-charge conversion from C to nC.
 
 
 ## [1.0.1] - 2026-02-17
