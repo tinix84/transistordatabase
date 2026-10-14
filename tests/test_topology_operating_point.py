@@ -672,16 +672,248 @@ def test_loss_balanced_boost_rejects_no_positive_on_interval_voltage() -> None:
         )
 
 
-@pytest.mark.parametrize("topology", ["flyback"])
-def test_loss_balanced_mode_rejects_unsupported_dcm_topologies(topology: str) -> None:
-    """Keep Flyback DCM channel feedback explicitly unsupported."""
-    with pytest.raises(ValueError, match="Buck, Boost, and Buck-Boost only"):
+def test_loss_balanced_flyback_dcm_closes_independent_flat_drop_fixture() -> None:
+    """Check primary and secondary currents with flat Flyback channel drops."""
+    transistor = _flat_dcm_device()
+    values = point(
+        mode="loss-balanced", topology="flyback", conduction_regime="DCM",
+        v_in=100, v_out=50, p_out=38.46153846153846, l_value=1e-3,
+        f_sw=20_000, c_out=1e-3, t_j=25, v_g=15, turns_ratio_nps=2,
+        parallel_switches=2, parallel_diodes=3,
+    )
+    switch_drop = 1.0
+    diode_drop = 2.0
+    n = values["turns_ratio_nps"]
+    on_voltage = values["v_in"] - switch_drop
+    off_voltage_primary = n * (values["v_out"] + diode_drop)
+    period = 1 / values["f_sw"]
+    peak = 2.0
+    on_time = values["l_value"] * peak / on_voltage
+    diode_time = values["l_value"] * peak / off_voltage_primary
+    duty = on_time / period
+    diode_fraction = diode_time / period
+    idle_fraction = 1 - duty - diode_fraction
+    input_current = 0.5 * peak * duty
+    diode_current = n * 0.5 * peak * diode_fraction
+    primary_average = 0.5 * peak * (duty + diode_fraction)
+    switch_rms = np.sqrt(duty * peak**2 / 3)
+    diode_rms = n * np.sqrt(diode_fraction * peak**2 / 3)
+    expected_switch_loss = switch_drop * input_current
+    expected_diode_loss = diode_drop * diode_current
+
+    result = calculate_topology_operating_point(
+        "flyback", values, transistor, transistor
+    )
+
+    calculated = result["calculated"]
+    losses = result["losses"]
+    assert calculated["duty_cycle"] == pytest.approx(duty, rel=1e-8)
+    assert calculated["diode_conduction_fraction"] == pytest.approx(diode_fraction, rel=1e-8)
+    assert calculated["idle_fraction"] == pytest.approx(idle_fraction, rel=1e-8)
+    assert calculated["i_l_peak_a"] == pytest.approx(peak, rel=1e-8)
+    assert calculated["i_l_avg_a"] == pytest.approx(primary_average, rel=1e-8)
+    assert calculated["i_in_avg_a"] == pytest.approx(input_current, rel=1e-8)
+    assert calculated["i_out_avg_a"] == pytest.approx(values["p_out"] / values["v_out"])
+    assert calculated["i_diode_avg_a"] == pytest.approx(diode_current, rel=1e-8)
+    assert calculated["i_diode_peak_a"] == pytest.approx(n * peak)
+    assert calculated["i_switch_rms_a"] == pytest.approx(switch_rms, rel=1e-5)
+    assert calculated["i_diode_rms_a"] == pytest.approx(diode_rms, rel=1e-5)
+    assert losses["conduction_switch_w"] == pytest.approx(expected_switch_loss, rel=1e-8)
+    assert losses["conduction_diode_w"] == pytest.approx(expected_diode_loss, rel=1e-8)
+    assert losses["per_switch_device_w"] == pytest.approx(expected_switch_loss / 2, rel=1e-8)
+    assert losses["per_diode_device_w"] == pytest.approx(expected_diode_loss / 3, rel=1e-8)
+    assert result["performance"]["power_balance_residual_w"] == pytest.approx(0, abs=1e-8)
+    assert calculated["inductor_volt_second_residual_v"] == pytest.approx(0, abs=1e-8)
+    assert calculated["v_out_ripple_pp_v"] > 0
+
+
+def test_loss_balanced_flyback_dcm_matches_independent_nonlinear_ramps() -> None:
+    """Check nonlinear reflected ramps, secondary losses, and capacitor ripple."""
+    transistor = _flat_dcm_device()
+    switch_current = np.array([0.0, 1.0, 2.0, 4.0, 8.0])
+    switch_voltage = np.array([0.8, 0.9, 1.1, 1.6, 2.5])
+    diode_current = np.array([0.0, 1.0, 2.0, 4.0, 8.0])
+    diode_voltage = np.array([1.5, 1.7, 2.0, 2.6, 3.5])
+    transistor.switch.channel_data[0].graph_v_i = np.array(
+        [switch_voltage, switch_current]
+    )
+    transistor.diode.channel_data[0].graph_v_i = np.array(
+        [diode_voltage, diode_current]
+    )
+    values = point(
+        mode="loss-balanced", topology="flyback", conduction_regime="DCM",
+        v_in=100, v_out=50, p_out=20, l_value=1e-3, f_sw=20_000,
+        c_out=1e-3, t_j=25, v_g=15, turns_ratio_nps=2,
+        parallel_switches=2, parallel_diodes=2,
+    )
+    n = values["turns_ratio_nps"]
+    period = 1 / values["f_sw"]
+    l_value = values["l_value"]
+    target_charge = values["p_out"] / values["v_out"] * period
+    result = calculate_topology_operating_point(
+        "flyback", values, transistor, transistor
+    )
+    peak = result["calculated"]["i_l_peak_a"]
+
+    current = np.linspace(0.0, peak, 100_001)
+    switch_drop = np.interp(
+        current / values["parallel_switches"], switch_current, switch_voltage
+    )
+    diode_drop = np.interp(
+        n * current / values["parallel_diodes"], diode_current, diode_voltage
+    )
+    on_voltage = values["v_in"] - switch_drop
+    off_voltage = n * (values["v_out"] + diode_drop)
+
+    def integrate(samples: np.ndarray) -> float:
+        return float(np.trapezoid(samples, current))
+
+    def cumulative_time(voltage: np.ndarray) -> np.ndarray:
+        return np.concatenate(([0.0], np.cumsum(
+            0.5 * (1 / voltage[:-1] + 1 / voltage[1:])
+            * np.diff(current) * l_value
+        )))
+
+    on_time_curve = cumulative_time(on_voltage)
+    off_time_curve = cumulative_time(off_voltage)
+    on_time = float(on_time_curve[-1])
+    off_time = float(off_time_curve[-1])
+    input_charge = l_value * integrate(current / on_voltage)
+    output_charge = n * l_value * integrate(current / off_voltage)
+    switch_energy = l_value * integrate(current * switch_drop / on_voltage)
+    diode_energy = n * l_value * integrate(current * diode_drop / off_voltage)
+    switch_voltage_time = l_value * integrate(switch_drop / on_voltage)
+    diode_voltage_time = l_value * integrate(diode_drop / off_voltage)
+    duty = on_time / period
+    diode_fraction = off_time / period
+    input_current = input_charge / period
+    output_current = output_charge / period
+    switch_loss = switch_energy / period
+    diode_loss = diode_energy / period
+    switch_mean = switch_voltage_time / on_time
+    diode_mean = diode_voltage_time / off_time
+    expected_power_residual = (
+        values["v_in"] * input_current - values["p_out"] - switch_loss - diode_loss
+    )
+    expected_volt_second_residual = (
+        duty * (values["v_in"] - switch_mean)
+        - diode_fraction * n * (values["v_out"] + diode_mean)
+    )
+
+    # Independently integrate capacitor current over dense on, off, and idle
+    # time samples. Primary current is reflected by n only during diode transfer.
+    on_time_dense = on_time_curve
+    off_time_dense = on_time + off_time - off_time_curve[::-1]
+    time = np.concatenate((on_time_dense, off_time_dense[1:], [period]))
+    primary_current = np.concatenate((current, current[-2::-1], [0.0]))
+    capacitor_current = np.full(time.shape, -values["p_out"] / values["v_out"])
+    diode_samples = (time >= on_time) & (time <= on_time + off_time)
+    capacitor_current[diode_samples] += n * primary_current[diode_samples]
+    charge = np.concatenate(([0.0], np.cumsum(
+        0.5 * (capacitor_current[:-1] + capacitor_current[1:]) * np.diff(time)
+    )))
+    expected_ripple = float(np.ptp(charge) / values["c_out"])
+
+    calculated = result["calculated"]
+    assert calculated["duty_cycle"] == pytest.approx(duty, rel=2e-5)
+    assert calculated["diode_conduction_fraction"] == pytest.approx(
+        diode_fraction, rel=2e-5
+    )
+    assert calculated["i_in_avg_a"] == pytest.approx(input_current, rel=2e-5)
+    assert calculated["i_diode_avg_a"] == pytest.approx(output_current, rel=2e-5)
+    assert output_charge == pytest.approx(target_charge, rel=2e-8)
+    assert result["losses"]["conduction_switch_w"] == pytest.approx(
+        switch_loss, rel=2e-5
+    )
+    assert result["losses"]["conduction_diode_w"] == pytest.approx(
+        diode_loss, rel=2e-5
+    )
+    assert result["performance"]["power_balance_residual_w"] == pytest.approx(
+        expected_power_residual, abs=2e-5
+    )
+    assert calculated["inductor_volt_second_residual_v"] == pytest.approx(
+        expected_volt_second_residual, abs=2e-5
+    )
+    assert calculated["v_out_ripple_pp_v"] == pytest.approx(
+        expected_ripple, rel=2e-4
+    )
+
+
+@pytest.mark.parametrize(
+    ("turns_ratio_nps", "expected_error"),
+    [(None, "Flyback requires a positive turns_ratio_nps"),
+     (0.0, "turns_ratio_nps must be a finite positive number")],
+)
+def test_loss_balanced_flyback_dcm_validates_turns_ratio(
+    turns_ratio_nps: float | None, expected_error: str
+) -> None:
+    """Require a positive finite ratio before solving Flyback DCM feedback."""
+    with pytest.raises(ValueError, match=expected_error):
         calculate_topology_operating_point(
-            topology,
-            point(mode="loss-balanced", conduction_regime="DCM"),
-            device(),
-            device(),
+            "flyback",
+            point(
+                mode="loss-balanced", conduction_regime="DCM",
+                turns_ratio_nps=turns_ratio_nps,
+            ),
+            _flat_dcm_device(), _flat_dcm_device(),
         )
+
+
+def test_loss_balanced_flyback_dcm_rejects_curve_range_and_condition_gaps() -> None:
+    """Reject a missing exact condition or branch current beyond curve support."""
+    values = point(
+        mode="loss-balanced", topology="flyback", conduction_regime="DCM",
+        v_in=100, v_out=50, p_out=20, l_value=1e-3, f_sw=20_000,
+        c_out=1e-3, t_j=25, v_g=15, turns_ratio_nps=2,
+    )
+    transistor = _flat_dcm_device(max_current=0.2)
+    with pytest.raises(ValueError, match="exact channel-curve range"):
+        calculate_topology_operating_point(
+            "flyback", values, transistor, transistor
+        )
+    transistor = _flat_dcm_device()
+    values["v_g"] = 14
+    with pytest.raises(ValueError, match="Missing required switch channel curve"):
+        calculate_topology_operating_point(
+            "flyback", values, transistor, transistor
+        )
+    values["v_g"] = 15
+    values["diode_v_g"] = 0
+    with pytest.raises(ValueError, match="Missing required diode channel curve"):
+        calculate_topology_operating_point(
+            "flyback", values, transistor, transistor
+        )
+
+
+def test_loss_balanced_flyback_dcm_rejects_exact_ccm_boundary() -> None:
+    """Reject the power derived independently from full-period ramp time."""
+    transistor = _flat_dcm_device()
+    values = point(
+        mode="loss-balanced", topology="flyback", conduction_regime="DCM",
+        v_in=100, v_out=50, l_value=1e-3, f_sw=20_000, c_out=1e-3,
+        t_j=25, v_g=15, turns_ratio_nps=2,
+    )
+    on_voltage = values["v_in"] - 1.0
+    off_voltage = values["turns_ratio_nps"] * (values["v_out"] + 2.0)
+    period = 1 / values["f_sw"]
+    boundary_peak = period / (
+        values["l_value"] * (1 / on_voltage + 1 / off_voltage)
+    )
+    diode_fraction = values["l_value"] * boundary_peak / off_voltage / period
+    boundary_power = (
+        values["v_out"]
+        * values["turns_ratio_nps"]
+        * 0.5 * boundary_peak * diode_fraction
+    )
+
+    with pytest.raises(ValueError, match="at or above the CCM boundary"):
+        calculate_topology_operating_point(
+            "flyback", {**values, "p_out": boundary_power}, transistor, transistor
+        )
+    below = calculate_topology_operating_point(
+        "flyback", {**values, "p_out": boundary_power * 0.99}, transistor, transistor
+    )
+    assert below["calculated"]["idle_fraction"] > 0
 
 
 def test_loss_balanced_buck_boost_dcm_closes_flat_drop_fixture() -> None:

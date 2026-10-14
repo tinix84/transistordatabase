@@ -284,7 +284,7 @@ test.describe('topology migration browser workflow', () => {
 
     await openTopology(page, 'Inverting buck-boost')
     await expect(page.getByText(
-      'Scalar DCM feedback is supported for Buck, Boost, and inverting Buck-Boost; Flyback DCM feedback is unsupported.'
+      'Scalar DCM feedback is available for Buck, Boost, inverting Buck-Boost, and Flyback.'
     )).toBeVisible()
     await page.locator('label.param-item').filter({ hasText: 'Calculation mode' }).locator('select').selectOption('loss-balanced')
     await page.locator('label.param-item').filter({ hasText: 'Conduction regime' }).locator('select').selectOption('DCM')
@@ -324,6 +324,86 @@ test.describe('topology migration browser workflow', () => {
       topology: 'buck-boost', mode: 'loss-balanced', conduction_regime: 'DCM'
     })
     expect(exported.result.model.output_polarity).toBe(-1)
+    expect(exported.result.losses.loss_scope).toBe('channel_conduction_only')
+  })
+
+  test('submits and exports Flyback DCM with primary and secondary current labels', async ({ page }) => {
+    await page.route('**/api/transistors', route => route.fulfill({ json: [
+      { metadata: { name: 'Flyback DCM Switch' } },
+      { metadata: { name: 'Flyback DCM Rectifier' } }
+    ] }))
+    const response = topologyResult(null, 'loss-balanced')
+    response.topology = 'flyback'
+    response.model.conduction_regime = 'DCM'
+    response.calculated = {
+      ...response.calculated,
+      duty_cycle: 0.404,
+      i_in_avg_a: 0.404,
+      i_out_avg_a: 0.769,
+      i_l_avg_a: 0.789,
+      i_l_peak_a: 2,
+      i_l_ripple_pp_a: 2,
+      i_diode_avg_a: 0.769,
+      i_diode_peak_a: 4,
+      i_diode_rms_a: 1.431,
+      diode_conduction_fraction: 0.385,
+      idle_fraction: 0.211,
+      inductor_volt_second_residual_v: 1e-10,
+      power_balance_residual_w: 2e-10
+    }
+    response.losses = {
+      conduction_switch_w: 0.404,
+      conduction_diode_w: 1.538,
+      total_w: 1.942,
+      scope: 'included switch and diode channel conduction only',
+      loss_scope: 'channel_conduction_only'
+    }
+    response.performance = {
+      p_out_w: 38.462,
+      p_in_w: 40.404,
+      efficiency_percent: 95.2,
+      power_balance_residual_w: 2e-10
+    }
+    const capturedRequest = await mockTopologyCalculation(page, response)
+
+    await openTopology(page, 'Flyback')
+    await page.locator('label.param-item').filter({ hasText: 'Calculation mode' }).locator('select').selectOption('loss-balanced')
+    await page.locator('label.param-item').filter({ hasText: 'Conduction regime' }).locator('select').selectOption('DCM')
+    await expect(page.locator('.sweep-toggle input')).toBeDisabled()
+    await expect(page.getByRole('button', { name: 'Compare topologies' })).toBeDisabled()
+    await page.locator('label.param-item').filter({ hasText: 'Switch transistor' }).locator('select').selectOption('Flyback DCM Switch')
+    await page.locator('label.param-item').filter({ hasText: 'Diode transistor' }).locator('select').selectOption('Flyback DCM Rectifier')
+    await setParameter(page, 'Flyback turns ratio (Np/Ns)', 2)
+    await setParameter(page, 'Input voltage', 100)
+    await setParameter(page, 'Output voltage magnitude', 50)
+    await setParameter(page, 'Output power', 38.46)
+    await setParameter(page, 'Switching frequency', 20)
+    await setParameter(page, 'Inductance', 1000)
+    await setParameter(page, 'Junction temperature', 25)
+    await setParameter(page, 'Switch gate voltage', 15)
+    await page.getByRole('button', { name: 'Calculate', exact: true }).click()
+
+    await expect(page.locator('.model-label')).toHaveText('Flyback DCM TDB channel loss-balanced averaged model')
+    await expect(page.locator('.result-item').filter({ hasText: 'Average primary magnetizing current' })).toContainText('0.789 A')
+    await expect(page.locator('.result-item').filter({ hasText: 'Peak primary magnetizing current' })).toContainText('2.000 A')
+    await expect(page.locator('.result-item').filter({ hasText: 'Average secondary diode current' })).toContainText('0.769 A')
+    await expect(page.locator('.result-item').filter({ hasText: 'Peak secondary diode current' })).toContainText('4.000 A')
+    await expect(page.locator('.result-item').filter({ hasText: 'RMS secondary diode current' })).toContainText('1.431 A')
+    await expect(page.locator('.results-panel')).toContainText('Power-balance residual: 0.00000000 W')
+    expect(capturedRequest()).toMatchObject({
+      topology: 'flyback', mode: 'loss-balanced', conduction_regime: 'DCM',
+      turns_ratio_nps: 2, switch_transistor_id: 'Flyback DCM Switch',
+      diode_transistor_id: 'Flyback DCM Rectifier'
+    })
+
+    const downloadPromise = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Download JSON' }).click()
+    const exported = JSON.parse(await readFile(await (await downloadPromise).path(), 'utf8'))
+    expect(exported.request).toMatchObject({
+      topology: 'flyback', mode: 'loss-balanced', conduction_regime: 'DCM',
+      turns_ratio_nps: 2
+    })
+    expect(exported.result.calculated.i_diode_peak_a).toBe(4)
     expect(exported.result.losses.loss_scope).toBe('channel_conduction_only')
   })
 

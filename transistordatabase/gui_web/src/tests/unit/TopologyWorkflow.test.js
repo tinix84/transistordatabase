@@ -204,7 +204,7 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Averaged inductor volt-second residual: 0.00000000 V')
     const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
     expect(comparisonButton.element.disabled).toBe(true)
-    expect(wrapper.text()).toContain('Only scalar Buck, Boost, and Buck-Boost DCM feedback is supported')
+    expect(wrapper.text()).toContain('Topology comparison is unavailable for loss-balanced DCM')
   })
 
   it('runs scalar Buck DCM loss-balanced mode and displays its solved metrics', async () => {
@@ -255,7 +255,7 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Averaged inductor volt-second residual: 0.00000000 V')
     const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
     expect(comparisonButton.element.disabled).toBe(true)
-    expect(wrapper.text()).toContain('Only scalar Buck, Boost, and Buck-Boost DCM feedback is supported')
+    expect(wrapper.text()).toContain('Topology comparison is unavailable for loss-balanced DCM')
   })
 
   it('runs scalar inverting Buck-Boost DCM and disables sweep/comparison', async () => {
@@ -301,7 +301,7 @@ describe('TopologyCalculator API workflow', () => {
     await setSelect('Calculation mode', 'loss-balanced')
     await setSelect('Conduction regime', 'DCM')
     expect(wrapper.text()).toContain(
-      'Scalar DCM feedback is supported for Buck, Boost, and inverting Buck-Boost; Flyback DCM feedback is unsupported.'
+      'Scalar DCM feedback is available for Buck, Boost, inverting Buck-Boost, and Flyback.'
     )
 
     const sweepToggle = wrapper.find('.sweep-toggle input')
@@ -336,21 +336,53 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).not.toContain('12.500 A')
   })
 
-  it('sends explicit Flyback ratio and DCM regime', async () => {
+  it('renders Flyback DCM primary magnetizing and secondary diode currents', async () => {
     calculateTopology.mockResolvedValueOnce({
       ...estimateResponse,
       topology: 'flyback',
-      model: { ...estimateResponse.model, conduction_regime: 'DCM' }
+      model: { ...estimateResponse.model, mode: 'loss-balanced', conduction_regime: 'DCM' },
+      calculated: {
+        ...estimateResponse.calculated,
+        i_l_avg_a: 0.8,
+        i_l_peak_a: 2,
+        i_l_ripple_pp_a: 2,
+        i_diode_avg_a: 0.77,
+        i_diode_peak_a: 4,
+        i_diode_rms_a: 1.43,
+        idle_fraction: 0.21,
+        inductor_volt_second_residual_v: 1e-10,
+        power_balance_residual_w: 2e-10
+      },
+      losses: {
+        conduction_switch_w: 0.4,
+        conduction_diode_w: 1.5,
+        total_w: 1.9,
+        scope: 'channel conduction only',
+        loss_scope: 'channel_conduction_only'
+      },
+      performance: {
+        p_out_w: 38.46, p_in_w: 40.36, efficiency_percent: 95.3,
+        power_balance_residual_w: 2e-10
+      }
     })
     await wrapper.findAll('button.topology-card').find(button => button.text().includes('Flyback')).trigger('click')
     await setInput('Flyback turns ratio (Np/Ns)', '2')
+    await setSelect('Calculation mode', 'loss-balanced')
     await setSelect('Conduction regime', 'DCM')
     await wrapper.get('button.btn-primary').trigger('click')
     await flushPromises()
     expect(calculateTopology.mock.calls[0][0]).toMatchObject({
       topology: 'flyback', turns_ratio_nps: 2, conduction_regime: 'DCM'
     })
-    expect(wrapper.text()).toContain('Ideal DCM operating-point estimate')
+    expect(wrapper.text()).toContain('Flyback DCM TDB channel loss-balanced averaged model')
+    expect(wrapper.text()).toContain('Average primary magnetizing current')
+    expect(wrapper.text()).toContain('Peak primary magnetizing current')
+    expect(wrapper.text()).toContain('Average secondary diode current')
+    expect(wrapper.text()).toContain('Peak secondary diode current')
+    expect(wrapper.text()).toContain('RMS secondary diode current')
+    expect(wrapper.text()).toContain('0.770 A')
+    expect(wrapper.find('.sweep-toggle input').element.disabled).toBe(true)
+    expect(wrapper.findAll('button').find(button => button.text().includes('Compare topologies')).element.disabled).toBe(true)
   })
 
   it('calls the comparison endpoint with device ids separated from operating parameters', async () => {

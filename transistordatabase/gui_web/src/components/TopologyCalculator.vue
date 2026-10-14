@@ -90,7 +90,7 @@
               </select>
             </label>
           </div>
-          <p class="hint">Estimate mode does not use device curves. Conduction-only mode requires exact-condition switch and diode channel curves. Detailed mode also requires exact-condition turn-on and turn-off curves. Loss-balanced mode requires exact-condition switch and diode channel curves. Scalar DCM feedback is supported for Buck, Boost, and inverting Buck-Boost; Flyback DCM feedback is unsupported. All curve extrapolation is rejected.</p>
+          <p class="hint">Estimate mode does not use device curves. Conduction-only mode requires exact-condition switch and diode channel curves. Detailed mode also requires exact-condition turn-on and turn-off curves. Loss-balanced mode requires exact-condition switch and diode channel curves. Scalar DCM feedback is available for Buck, Boost, inverting Buck-Boost, and Flyback. All curve extrapolation is rejected.</p>
         </div>
 
         <div v-if="form.mode !== 'estimate'" class="param-section">
@@ -124,7 +124,7 @@
           <h4>Python generated sweep</h4>
           <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox" :disabled="lossBalancedDcm"> Include line or contour sweep</label>
           <p v-if="form.mode === 'loss-balanced'" class="hint">Loss-balanced sweeps solve each CCM point from exact-condition channel curves. Every point must be supported; no curve extrapolation is used.</p>
-          <p v-if="lossBalancedDcm" class="hint">Loss-balanced sweeps support CCM only. Buck, Boost, and Buck-Boost DCM feedback are available for scalar operating points.</p>
+          <p v-if="lossBalancedDcm" class="hint">Loss-balanced sweeps support CCM only. Buck, Boost, Buck-Boost, and Flyback DCM feedback are available for scalar operating points.</p>
           <div v-if="form.sweep_enabled && !lossBalancedDcm" class="param-grid">
             <label class="param-item">Sweep type
               <select v-model="form.sweep_kind"><option value="line">Line</option><option value="contour">Contour</option></select>
@@ -167,7 +167,7 @@
         <button class="btn btn-secondary" type="button" :disabled="loading || (form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM')" @click="compare">Compare topologies</button>
         </div>
         <div v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</div>
-        <p v-if="lossBalancedDcm" class="hint">Topology comparison is unavailable for loss-balanced DCM. Only scalar Buck, Boost, and Buck-Boost DCM feedback is supported.</p>
+        <p v-if="lossBalancedDcm" class="hint">Topology comparison is unavailable for loss-balanced DCM. Scalar DCM feedback is available for Buck, Boost, Buck-Boost, and Flyback operating points.</p>
       </section>
 
       <section v-if="hasResults" class="results-panel">
@@ -180,9 +180,12 @@
           <div class="result-item"><label>Duty cycle</label><span class="value">{{ format(results.calculated.duty_cycle, 4) }}</span></div>
           <div class="result-item"><label>{{ results.model.mode === 'estimate' ? 'Average input current' : results.model.mode === 'loss-balanced' ? 'Average input current (loss-balanced)' : 'Average input current (ideal lossless point)' }}</label><span class="value">{{ format(results.calculated.i_in_avg_a, 3) }} A</span></div>
           <div class="result-item"><label>Average output current</label><span class="value">{{ format(results.calculated.i_out_avg_a, 3) }} A</span></div>
-          <div class="result-item"><label>Average inductor current</label><span class="value">{{ format(results.calculated.i_l_avg_a, 3) }} A</span></div>
-          <div class="result-item"><label>Peak inductor current</label><span class="value">{{ format(results.calculated.i_l_peak_a, 3) }} A</span></div>
-          <div class="result-item"><label>Inductor current ripple (p-p)</label><span class="value">{{ format(results.calculated.i_l_ripple_pp_a, 3) }} A</span></div>
+          <div class="result-item"><label>{{ results.topology === 'flyback' ? 'Average primary magnetizing current' : 'Average inductor current' }}</label><span class="value">{{ format(results.calculated.i_l_avg_a, 3) }} A</span></div>
+          <div class="result-item"><label>{{ results.topology === 'flyback' ? 'Peak primary magnetizing current' : 'Peak inductor current' }}</label><span class="value">{{ format(results.calculated.i_l_peak_a, 3) }} A</span></div>
+          <div class="result-item"><label>{{ results.topology === 'flyback' ? 'Primary magnetizing current ripple (p-p)' : 'Inductor current ripple (p-p)' }}</label><span class="value">{{ format(results.calculated.i_l_ripple_pp_a, 3) }} A</span></div>
+          <div v-if="results.topology === 'flyback'" class="result-item"><label>Average secondary diode current</label><span class="value">{{ format(results.calculated.i_diode_avg_a, 3) }} A</span></div>
+          <div v-if="results.topology === 'flyback'" class="result-item"><label>Peak secondary diode current</label><span class="value">{{ format(results.calculated.i_diode_peak_a, 3) }} A</span></div>
+          <div v-if="results.topology === 'flyback'" class="result-item"><label>RMS secondary diode current</label><span class="value">{{ format(results.calculated.i_diode_rms_a, 3) }} A</span></div>
           <div class="result-item"><label>Output voltage ripple (p-p)</label><span class="value">{{ format(results.calculated.v_out_ripple_pp_v, 4) }} V</span></div>
           <div class="result-item"><label>Switch blocking voltage</label><span class="value">{{ format(results.calculated.v_switch_block_v, 2) }} V</span></div>
         </div>
@@ -347,7 +350,7 @@ const modelLabel = computed(() => {
   const mode = results.value?.model?.mode
   if (mode === 'loss-balanced') {
     const regime = results.value?.model?.conduction_regime || 'CCM'
-    const dcmNames = { buck: 'Buck', boost: 'Boost', 'buck-boost': 'Buck-Boost' }
+    const dcmNames = { buck: 'Buck', boost: 'Boost', 'buck-boost': 'Buck-Boost', flyback: 'Flyback' }
     const topology = dcmNames[results.value?.topology] && regime === 'DCM'
       ? `${dcmNames[results.value.topology]} DCM`
       : regime
@@ -503,7 +506,7 @@ async function renderCharts() {
     waveformChart = new Chart(waveformCanvas.value, {
       type: 'line',
       data: { labels: results.value.waveforms.time_s, datasets: [{
-        label: 'Inductor current (A)', data: results.value.waveforms.inductor_current_a,
+        label: results.value.topology === 'flyback' ? 'Primary magnetizing current (A)' : 'Inductor current (A)', data: results.value.waveforms.inductor_current_a,
         borderColor: '#0d6efd', pointRadius: 0, borderWidth: 2
       }] },
       options: { responsive: true, plugins: { legend: { display: true } }, scales: {

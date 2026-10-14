@@ -617,19 +617,24 @@ def _loss_balanced_channel_dcm_operating_point(
     parallel_switches: int,
     parallel_diodes: int,
 ) -> dict[str, Any]:
-    """Solve Buck, Boost, or inverting Buck-Boost DCM from exact curves.
+    """Solve supported DCM topologies from exact channel curves.
 
     Integrate each current ramp with its measured current-dependent inductor
-    voltage. The peak current is solved against output charge per period; input
-    charge and channel energy use the same trajectory, so both balances are
-    independently reported. Buck delivers output current during both ramps;
-    Boost and inverting Buck-Boost deliver output current during the diode ramp.
+    voltage. Flyback current is primary-referred; its diode current and
+    reflected off-state voltage use the explicit turns ratio. The peak current
+    is solved against output charge per period; input charge and channel
+    energy use the same trajectory, so both balances are independently reported.
     """
     v_in = _finite_positive(parameters, "v_in")
     v_out = _finite_positive(parameters, "v_out")
     p_out = _finite_positive(parameters, "p_out")
     f_sw = _finite_positive(parameters, "f_sw")
     l_value = _finite_positive(parameters, "l_value")
+    turns_ratio_nps = (
+        _finite_positive(parameters, "turns_ratio_nps")
+        if topology == "flyback"
+        else 1.0
+    )
     if topology == "buck":
         if v_out >= v_in:
             raise ValueError("Buck DCM requires 0 < v_out < v_in")
@@ -640,9 +645,12 @@ def _loss_balanced_channel_dcm_operating_point(
         on_voltage_base = v_in
     elif topology == "buck-boost":
         on_voltage_base = v_in
+    elif topology == "flyback":
+        on_voltage_base = v_in
     else:
         raise ValueError(
-            "Channel-feedback DCM supports Buck, Boost, and Buck-Boost only"
+            "Channel-feedback DCM supports scalar Buck, Boost, Buck-Boost, "
+            "and Flyback operating points only"
         )
 
     switch_i, switch_v = _curve_arrays(switch_curve, "switch channel")
@@ -676,7 +684,7 @@ def _loss_balanced_channel_dcm_operating_point(
 
     current_limit = min(
         float(switch_i[-1] * parallel_switches),
-        float(diode_i[-1] * parallel_diodes),
+        float(diode_i[-1] * parallel_diodes / turns_ratio_nps),
         switch_positive_limit * parallel_switches,
     )
     if current_limit <= 0:
@@ -697,7 +705,8 @@ def _loss_balanced_channel_dcm_operating_point(
         if peak <= 0:
             return {"peak": 0.0, "output_current": 0.0, "occupied": 0.0}
         switch_branch_peak = peak / parallel_switches
-        diode_branch_peak = peak / parallel_diodes
+        diode_current_scale = turns_ratio_nps if topology == "flyback" else 1.0
+        diode_branch_peak = diode_current_scale * peak / parallel_diodes
         if switch_branch_peak > switch_i[-1]:
             raise _CurveRangeError(
                 "switch channel", float(switch_i[0]), float(switch_i[-1]),
@@ -710,7 +719,9 @@ def _loss_balanced_channel_dcm_operating_point(
             )
         current = np.linspace(0.0, peak, 257)
         switch_drop = np.interp(current / parallel_switches, switch_i, switch_v)
-        diode_drop = np.interp(current / parallel_diodes, diode_i, diode_v)
+        diode_drop = np.interp(
+            diode_current_scale * current / parallel_diodes, diode_i, diode_v
+        )
         on_voltage = on_voltage_base - switch_drop
         off_voltage = (
             v_out + diode_drop
@@ -718,7 +729,11 @@ def _loss_balanced_channel_dcm_operating_point(
             else (
                 v_out - v_in + diode_drop
                 if topology == "boost"
-                else v_out + diode_drop
+                else (
+                    turns_ratio_nps * (v_out + diode_drop)
+                    if topology == "flyback"
+                    else v_out + diode_drop
+                )
             )
         )
         if np.any(on_voltage <= 0):
@@ -738,7 +753,7 @@ def _loss_balanced_channel_dcm_operating_point(
             current * switch_drop * inverse_on, current
         )
         diode_energy = l_value * integrate(
-            current * diode_drop * inverse_off, current
+            diode_current_scale * current * diode_drop * inverse_off, current
         )
         switch_voltage_time = l_value * integrate(
             switch_drop * inverse_on, current
@@ -750,11 +765,11 @@ def _loss_balanced_channel_dcm_operating_point(
         diode_fraction = diode_time / period
         occupied = duty + diode_fraction
         input_current = (
-            charge_on / period
-            if topology in ("buck", "buck-boost")
-            else (charge_on + charge_diode) / period
+            (charge_on + charge_diode) / period
+            if topology == "boost"
+            else charge_on / period
         )
-        diode_current = charge_diode / period
+        diode_current = diode_current_scale * charge_diode / period
         output_current = (
             (charge_on + charge_diode) / period
             if topology == "buck"
@@ -762,8 +777,8 @@ def _loss_balanced_channel_dcm_operating_point(
         )
         inductor_average = (
             (charge_on + charge_diode) / period
-            if topology == "buck-boost"
-            else output_current if topology == "buck" else input_current
+            if topology in ("buck", "buck-boost", "flyback")
+            else input_current
         )
         switch_loss = switch_energy / period
         diode_loss = diode_energy / period
@@ -778,6 +793,11 @@ def _loss_balanced_channel_dcm_operating_point(
             volt_second_residual = (
                 duty * (v_in - switch_mean)
                 + diode_fraction * (v_in - v_out - diode_mean)
+            )
+        elif topology == "flyback":
+            volt_second_residual = (
+                duty * (v_in - switch_mean)
+                - diode_fraction * turns_ratio_nps * (v_out + diode_mean)
             )
         else:
             volt_second_residual = (
@@ -808,7 +828,7 @@ def _loss_balanced_channel_dcm_operating_point(
             "switch_rms": np.sqrt(
                 l_value * integrate(current**2 * inverse_on, current) / period
             ),
-            "diode_rms": np.sqrt(
+            "diode_rms": diode_current_scale * np.sqrt(
                 l_value * integrate(current**2 * inverse_off, current) / period
             ),
             "waveform_on_time_s": l_value * cumulative(inverse_on, current),
@@ -945,6 +965,7 @@ def _trajectory_output_ripple(
     output_current: float,
     frequency: float,
     capacitance: float,
+    diode_current_scale: float = 1.0,
 ) -> float:
     """Integrate output-capacitor charge from a solved switching trajectory."""
     cycle_time = 1.0 / frequency
@@ -961,8 +982,12 @@ def _trajectory_output_ripple(
             else duty < midpoint < diode_end
         )
         if carries_output_current:
-            current_start = float(current[index]) - output_current
-            current_end = float(current[index + 1]) - output_current
+            current_start = (
+                float(current[index]) * diode_current_scale - output_current
+            )
+            current_end = (
+                float(current[index + 1]) * diode_current_scale - output_current
+            )
         else:
             current_start = current_end = -output_current
         duration = (phase_end - phase_start) * cycle_time
@@ -1108,14 +1133,9 @@ def calculate_topology_operating_point(
     if (
         mode == "loss-balanced"
         and conduction_regime == "DCM"
-        and topology not in ("buck", "boost", "buck-boost")
+        and topology not in ("buck", "boost", "buck-boost", "flyback")
     ):
-        raise ValueError(
-            "loss-balanced DCM currently supports scalar Buck, Boost, and "
-            "Buck-Boost only; "
-            "use explicit "
-            "estimate, conduction-only, or detailed mode for this topology"
-        )
+        raise ValueError(f"loss-balanced DCM does not support topology '{topology}'")
 
     v_in = _finite_positive(parameters, "v_in")
     v_out = _finite_positive(parameters, "v_out")
@@ -1243,7 +1263,7 @@ def calculate_topology_operating_point(
         occupied_fraction = duty + diode_fraction
         loss_balanced_channel_dcm = (
             mode == "loss-balanced"
-            and topology in ("buck", "boost", "buck-boost")
+            and topology in ("buck", "boost", "buck-boost", "flyback")
             and conduction_regime == "DCM"
         )
         if (
@@ -1281,7 +1301,7 @@ def calculate_topology_operating_point(
         v_ripple = (
             0.0
             if mode == "loss-balanced"
-            and topology in ("buck", "boost", "buck-boost")
+            and topology in ("buck", "boost", "buck-boost", "flyback")
             else _dcm_output_ripple(
                 topology,
                 duty,
@@ -1466,7 +1486,7 @@ def calculate_topology_operating_point(
                 i_l_average = float(solved["average_current"])
                 i_in = float(solved["input_current"])
                 i_diode_valley = 0.0
-                i_diode_peak = i_l_peak
+                i_diode_peak = output_current_scale * i_l_peak
                 i_diode_average = float(solved["diode_current"])
                 i_switch_rms = float(solved["switch_rms"])
                 i_diode_rms = float(solved["diode_rms"])
@@ -1479,6 +1499,7 @@ def calculate_topology_operating_point(
                     output_current=i_out,
                     frequency=f_sw,
                     capacitance=c_out,
+                    diode_current_scale=output_current_scale,
                 )
             else:
                 diode_fraction = 1.0 - duty
