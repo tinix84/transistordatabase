@@ -348,15 +348,20 @@ def _legacy_record_path(name: str) -> Path:
     return record_path
 
 
-def _existing_record_name_keys_casefold_unlocked() -> set[str]:
-    """List existing JSON identities using portable case-insensitive matching."""
+def _record_identity_key(name: str) -> str:
+    """Normalize an identity according to the destination filesystem semantics."""
+    return os.path.normcase(name)
+
+
+def _existing_record_name_keys_unlocked() -> set[str]:
+    """List existing JSON identities using the current filesystem semantics."""
     data_directory = Path(_repo.data_directory)
     try:
         children = data_directory.iterdir()
     except FileNotFoundError:
         return set()
     return {
-        child.stem.casefold()
+        _record_identity_key(child.stem)
         for child in children
         if child.suffix.casefold() == ".json"
     }
@@ -482,9 +487,13 @@ def _parse_backup_document(content: bytes) -> tuple[list[dict[str, Any]], list[d
         name = raw_record.get("name") if isinstance(raw_record, dict) else None
         label = name if isinstance(name, str) else f"record {index + 1}"
         if isinstance(name, str):
-            identity_key = name.casefold()
+            identity_key = _record_identity_key(name)
             if identity_key in seen_names:
-                errors.append({"index": index, "name": name, "error": "Duplicate record identity (case-insensitive)."})
+                errors.append({
+                    "index": index,
+                    "name": name,
+                    "error": "Duplicate record identity under current filesystem path semantics.",
+                })
                 continue
             seen_names.add(identity_key)
         try:
@@ -501,6 +510,7 @@ def _read_database_raw_records_unlocked() -> tuple[list[dict[str, Any]], list[di
     data_directory = Path(_repo.data_directory)
     records: list[dict[str, Any]] = []
     errors: list[dict[str, str]] = []
+    seen_identity_keys: set[str] = set()
     for record_path in sorted(data_directory.glob("*.json"), key=lambda path: path.name.casefold()):
         try:
             _validate_web_record_name(record_path.stem)
@@ -508,6 +518,10 @@ def _read_database_raw_records_unlocked() -> tuple[list[dict[str, Any]], list[di
             if record_path != expected_record_path:
                 raise ValueError("Record path does not match a safe repository filename identity.")
             _ensure_record_path_is_contained(record_path, data_directory)
+            identity_key = _record_identity_key(record_path.stem)
+            if identity_key in seen_identity_keys:
+                raise ValueError("Duplicate record identity under current filesystem path semantics.")
+            seen_identity_keys.add(identity_key)
             record = _strict_json_loads(record_path.read_bytes())
             if not isinstance(record, dict):
                 raise ValueError("Record must be a JSON object.")
@@ -1397,13 +1411,17 @@ async def validate_database_backup(file: UploadFile = File(...)) -> Dict[str, An
 
     async with _record_mutation():
         record_paths = [_legacy_record_path(record["name"]) for record in records]
-        existing_name_keys = _existing_record_name_keys_casefold_unlocked()
+        existing_name_keys = _existing_record_name_keys_unlocked()
         conflicts = []
         for record, record_path in zip(records, record_paths):
-            if record["name"].casefold() in existing_name_keys or record_path.exists():
+            if _record_identity_key(record["name"]) in existing_name_keys or record_path.exists():
                 conflicts.append(record["name"])
-    conflict_keys = {name.casefold() for name in conflicts}
-    restore_names = [record["name"] for record in records if record["name"].casefold() not in conflict_keys]
+    conflict_keys = {_record_identity_key(name) for name in conflicts}
+    restore_names = [
+        record["name"]
+        for record in records
+        if _record_identity_key(record["name"]) not in conflict_keys
+    ]
     return {
         "valid": True,
         "format": _DATABASE_BACKUP_FORMAT,
@@ -1432,10 +1450,10 @@ async def restore_database_backup(file: UploadFile = File(...)) -> Dict[str, Any
     errors: list[dict[str, str]] = []
     async with _record_mutation():
         record_paths = [_legacy_record_path(record["name"]) for record in records]
-        existing_name_keys = _existing_record_name_keys_casefold_unlocked()
+        existing_name_keys = _existing_record_name_keys_unlocked()
         for record, record_path in zip(records, record_paths):
             name = record["name"]
-            name_key = name.casefold()
+            name_key = _record_identity_key(name)
             if name_key in existing_name_keys or record_path.exists():
                 conflicts.append(name)
                 continue
@@ -1469,7 +1487,7 @@ async def upload_transistor(file: UploadFile = File(...)) -> Dict[str, Any]:
         async with _record_mutation():
             record_path = _legacy_record_path(transistor.metadata.name)
             if (
-                transistor.metadata.name.casefold() in _existing_record_name_keys_casefold_unlocked()
+                _record_identity_key(transistor.metadata.name) in _existing_record_name_keys_unlocked()
                 or record_path.exists()
             ):
                 raise HTTPException(

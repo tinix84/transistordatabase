@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import ntpath
+import os
 from pathlib import Path, PureWindowsPath
 from typing import Any
 
@@ -85,6 +87,60 @@ def test_backup_and_restore_preserve_raw_legacy_fields_and_unknown_values(
     assert stored == source_record
 
 
+@pytest.mark.skipif(os.name == "nt", reason="Requires a case-sensitive destination filesystem")
+def test_case_distinct_names_export_and_restore_on_case_sensitive_filesystem(
+    isolated_database: TestClient,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """POSIX export and restore preserve names that differ only by case."""
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    records = [_legacy_record("Device"), _legacy_record("device")]
+    for record in records:
+        (source_dir / f"{record['name']}.json").write_text(json.dumps(record), encoding="utf-8")
+    monkeypatch.setattr(main, "_repo", TemporaryJsonRepository(source_dir))
+
+    exported = isolated_database.get("/api/database/backup")
+
+    assert exported.status_code == 200, exported.text
+    exported_records = exported.json()["records"]
+    assert {record["name"] for record in exported_records} == {"Device", "device"}
+
+    destination_dir = tmp_path / "destination"
+    destination_dir.mkdir()
+    monkeypatch.setattr(main, "_repo", TemporaryJsonRepository(destination_dir))
+    restored = isolated_database.post(
+        "/api/database/backup/restore",
+        files={"file": ("backup.json", exported.content, "application/json")},
+    )
+
+    assert restored.status_code == 200, restored.text
+    assert set(restored.json()["restored"]) == {"Device", "device"}
+    assert json.loads((destination_dir / "Device.json").read_text(encoding="utf-8")) == records[0]
+    assert json.loads((destination_dir / "device.json").read_text(encoding="utf-8")) == records[1]
+
+
+@pytest.mark.skipif(os.name == "nt", reason="The fixture needs two case-distinct directory entries")
+def test_export_reports_case_collisions_using_destination_semantics(
+    isolated_database: TestClient,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Export detects duplicate identities when the target semantics fold case."""
+    for name in ("Device", "device"):
+        (tmp_path / f"{name}.json").write_text(json.dumps(_legacy_record(name)), encoding="utf-8")
+    monkeypatch.setattr(main, "_record_identity_key", ntpath.normcase)
+
+    response = isolated_database.get("/api/database/backup")
+
+    assert response.status_code == 409
+    assert any(
+        "Duplicate record identity" in record["error"]
+        for record in response.json()["detail"]["records"]
+    )
+
+
 def test_backup_reports_corrupt_records_instead_of_omitting_them(
     isolated_database: TestClient,
     tmp_path: Path,
@@ -125,8 +181,10 @@ def test_restore_skips_conflicts_without_changing_existing_bytes(
 def test_case_insensitive_existing_conflicts_match_preview_and_restore(
     isolated_database: TestClient,
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Case-only filename differences are conflicts on every supported OS."""
+    """Windows case-insensitive identity semantics agree across preview and restore."""
+    monkeypatch.setattr(main, "_record_identity_key", ntpath.normcase)
     existing_path = tmp_path / "Existing Device.json"
     existing_path.write_text('{ "name": "do not replace" }\n', encoding="utf-8")
     original_bytes = existing_path.read_bytes()
@@ -210,7 +268,10 @@ def test_case_insensitive_duplicate_identities_are_rejected_consistently(
     isolated_database: TestClient,
     tmp_path: Path,
     endpoint: str,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """Windows path identity semantics reject case-only duplicate input names."""
+    monkeypatch.setattr(main, "_record_identity_key", ntpath.normcase)
     response = _upload_backup(
         isolated_database,
         _backup(_legacy_record("Duplicate Device"), _legacy_record("duplicate device")),
@@ -218,7 +279,7 @@ def test_case_insensitive_duplicate_identities_are_rejected_consistently(
     )
 
     assert response.status_code == 400
-    assert "case-insensitive" in response.json()["detail"]["errors"][0]["error"]
+    assert "current filesystem path semantics" in response.json()["detail"]["errors"][0]["error"]
     assert list(tmp_path.glob("*.json")) == []
 
 
@@ -398,6 +459,7 @@ def test_restore_rejects_duplicate_json_object_keys_before_writes(
 def test_single_record_upload_is_raw_preserving_and_create_only(
     isolated_database: TestClient,
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """The existing upload path shares additive raw-record publication rules."""
     original = _legacy_record("Uploaded Raw Device")
@@ -420,6 +482,7 @@ def test_single_record_upload_is_raw_preserving_and_create_only(
     assert duplicate.status_code == 409
     assert stored_path.read_bytes() == original_bytes
 
+    monkeypatch.setattr(main, "_record_identity_key", ntpath.normcase)
     case_variant = dict(original, name="uploaded raw device")
     case_duplicate = isolated_database.post(
         "/api/transistors/upload",
