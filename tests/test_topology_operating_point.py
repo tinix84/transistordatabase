@@ -451,6 +451,358 @@ def test_conduction_only_mode_rejects_missing_required_channel_curves() -> None:
         )
 
 
+def test_loss_balanced_boost_matches_independent_constant_drop_power_balance() -> None:
+    """Solve duty/current for a regulated Boost with exact flat channel curves."""
+    transistor = device()
+    transistor.switch.channel_data[0].graph_v_i[0] = 1.0
+    transistor.diode.channel_data[0].graph_v_i[0] = 2.0
+    values = point(
+        mode="loss-balanced", topology="boost", v_in=100, v_out=200,
+        p_out=1000, l_value=1e-3, f_sw=20_000, c_out=1e-3,
+        t_j=25, v_g=15, t_case=60,
+    )
+
+    result = calculate_topology_operating_point(
+        "boost", values, transistor, transistor
+    )
+
+    expected_duty = (200 + 2 - 100) / (200 + 1)
+    calculated = result["calculated"]
+    losses = result["losses"]
+    assert calculated["duty_cycle"] == pytest.approx(expected_duty, rel=1e-9)
+    assert calculated["i_l_avg_a"] == pytest.approx(
+        1000 / (200 * (1 - expected_duty)), rel=1e-9
+    )
+    assert calculated["inductor_volt_second_residual_v"] == pytest.approx(0, abs=1e-6)
+    assert result["performance"]["p_in_w"] == pytest.approx(
+        100 * calculated["i_in_avg_a"]
+    )
+    assert result["performance"]["p_in_w"] == pytest.approx(
+        1000 + losses["total_w"], rel=1e-8
+    )
+    assert result["performance"]["power_balance_residual_w"] == pytest.approx(0, abs=1e-6)
+    assert losses["loss_scope"] == "channel_conduction_only"
+    assert losses["switching_losses_included"] is False
+    assert result["model"]["mode"] == "loss-balanced"
+    assert result["model"]["thermal_closure"] == "unavailable"
+    assert result["temperatures"]["thermal_closure"] == "unavailable"
+
+
+def test_loss_balanced_ripple_refines_against_final_nonlinear_switch_drop() -> None:
+    """Use the selected-curve mean drop, not the initial average-current drop."""
+    transistor = device()
+    transistor.switch.channel_data[0].graph_v_i = np.array(
+        [
+            [0.5, 0.55, 0.6, 1.0, 2.0, 4.0, 10.0],
+            [0.1, 8.0, 9.0, 10.0, 11.0, 12.0, 100.0],
+        ]
+    )
+    transistor.diode.channel_data[0].graph_v_i[0] = 2.0
+    values = point(
+        mode="loss-balanced", topology="boost", v_in=100, v_out=200,
+        p_out=1000, l_value=1e-3, f_sw=20_000, c_out=1e-3,
+        t_j=25, v_g=15,
+    )
+
+    result = calculate_topology_operating_point(
+        "boost", values, transistor, transistor
+    )
+    calculated = result["calculated"]
+    curve = transistor.switch.channel_data[0]
+    valley = calculated["i_l_valley_a"]
+    peak = calculated["i_l_peak_a"]
+    currents = np.linspace(valley, peak, 65)
+    voltages = np.interp(currents, curve.graph_v_i[1], curve.graph_v_i[0])
+    mean_curve_drop = np.trapezoid(voltages, currents) / (peak - valley)
+    ripple_from_final_curve_drop = (
+        (values["v_in"] - mean_curve_drop)
+        * calculated["duty_cycle"]
+        / (values["l_value"] * values["f_sw"])
+    )
+    initial_average_drop = np.interp(
+        calculated["i_l_avg_a"], curve.graph_v_i[1], curve.graph_v_i[0]
+    )
+    initial_average_drop_ripple = (
+        (values["v_in"] - initial_average_drop)
+        * calculated["duty_cycle"]
+        / (values["l_value"] * values["f_sw"])
+    )
+
+    assert calculated["i_l_ripple_pp_a"] == pytest.approx(
+        ripple_from_final_curve_drop, rel=1e-9
+    )
+    assert abs(calculated["i_l_ripple_pp_a"] - initial_average_drop_ripple) > 1e-4
+
+
+def test_loss_balanced_boost_can_move_inside_ccm_when_ideal_point_is_on_boundary() -> None:
+    """A loss-adjusted CCM solution may exist when ideal ripple reaches zero valley."""
+    transistor = device()
+    transistor.switch.channel_data[0].graph_v_i[0] = 1.0
+    transistor.diode.channel_data[0].graph_v_i[0] = 2.0
+    values = point(
+        mode="loss-balanced", topology="boost", v_in=100, v_out=200,
+        p_out=1000, l_value=125e-6, f_sw=20_000, c_out=1e-3,
+        t_j=25, v_g=15,
+    )
+
+    result = calculate_topology_operating_point(
+        "boost", values, transistor, transistor
+    )
+
+    calculated = result["calculated"]
+    assert calculated["duty_cycle"] > 0.5
+    assert calculated["i_l_valley_a"] == pytest.approx(0.10, abs=0.01)
+    assert calculated["i_l_valley_a"] > 0
+    assert result["performance"]["power_balance_residual_w"] == pytest.approx(
+        0, abs=1e-6
+    )
+
+
+def test_loss_balanced_boost_advances_past_lower_curve_limit_to_supported_root() -> None:
+    """Skip an unsupported ideal trial when the root remains in curve range."""
+    transistor = device()
+    transistor.switch.channel_data[0].graph_v_i[0] = 1.0
+    transistor.switch.channel_data[0].graph_v_i[1, 0] = 8.8
+    transistor.diode.channel_data[0].graph_v_i[0] = 2.0
+    transistor.diode.channel_data[0].graph_v_i[1, 0] = 8.8
+
+    result = calculate_topology_operating_point(
+        "boost",
+        point(
+            mode="loss-balanced", v_in=100, v_out=200, p_out=1000,
+            f_sw=20_000, l_value=1e-3, c_out=1e-3, t_j=25, v_g=15,
+        ),
+        transistor,
+        transistor,
+    )
+
+    assert result["calculated"]["i_l_valley_a"] == pytest.approx(8.895, abs=0.01)
+    assert result["calculated"]["duty_cycle"] > 0.5
+    assert result["performance"]["power_balance_residual_w"] == pytest.approx(
+        0, abs=1e-6
+    )
+
+
+def test_loss_balanced_boost_refines_first_supported_trial_above_root() -> None:
+    """Bisect a lower curve boundary when its first valid trial overshoots root."""
+    transistor = device()
+    transistor.switch.channel_data[0].graph_v_i[0] = 1.0
+    transistor.switch.channel_data[0].graph_v_i[1, 0] = 8.89
+    transistor.diode.channel_data[0].graph_v_i[0] = 2.0
+    transistor.diode.channel_data[0].graph_v_i[1, 0] = 8.89
+
+    result = calculate_topology_operating_point(
+        "boost",
+        point(
+            mode="loss-balanced", v_in=100, v_out=200, p_out=1000,
+            f_sw=20_000, l_value=1e-3, c_out=1e-3, t_j=25, v_g=15,
+        ),
+        transistor,
+        transistor,
+    )
+
+    assert result["calculated"]["duty_cycle"] == pytest.approx(
+        (200 + 2 - 100) / (200 + 1), abs=1e-5
+    )
+    assert result["calculated"]["i_l_valley_a"] == pytest.approx(8.895, abs=0.01)
+    assert result["performance"]["power_balance_residual_w"] == pytest.approx(
+        0, abs=1e-6
+    )
+
+
+def test_loss_balanced_boost_brackets_root_before_upper_curve_limit() -> None:
+    """Refine a coarse high-duty trial that exceeds the measured curve maximum."""
+    transistor = device(max_current=11.5)
+    transistor.switch.channel_data[0].graph_v_i[0] = 1.0
+    transistor.diode.channel_data[0].graph_v_i[0] = 2.0
+
+    result = calculate_topology_operating_point(
+        "boost",
+        point(
+            mode="loss-balanced", v_in=100, v_out=200, p_out=1000,
+            f_sw=20_000, l_value=1e-3, c_out=1e-3, t_j=25, v_g=15,
+        ),
+        transistor,
+        transistor,
+    )
+
+    assert result["calculated"]["duty_cycle"] == pytest.approx(
+        (200 + 2 - 100) / (200 + 1), rel=1e-8
+    )
+    assert result["calculated"]["i_l_peak_a"] <= 11.5
+    assert result["performance"]["power_balance_residual_w"] == pytest.approx(
+        0, abs=1e-6
+    )
+
+
+def test_loss_balanced_boost_rejects_when_supported_interval_has_no_root() -> None:
+    """Fail clearly when curves start above every CCM power-balanced point."""
+    transistor = device()
+    transistor.switch.channel_data[0].graph_v_i[0] = 1.0
+    transistor.switch.channel_data[0].graph_v_i[1, 0] = 10.5
+    transistor.diode.channel_data[0].graph_v_i[0] = 2.0
+    transistor.diode.channel_data[0].graph_v_i[1, 0] = 10.5
+
+    with pytest.raises(ValueError, match="No loss-balanced solution"):
+        calculate_topology_operating_point(
+            "boost",
+            point(
+                mode="loss-balanced", v_in=100, v_out=200, p_out=1000,
+                f_sw=20_000, l_value=1e-3, c_out=1e-3, t_j=25, v_g=15,
+            ),
+            transistor,
+            transistor,
+        )
+
+
+def test_loss_balanced_boost_rejects_no_positive_on_interval_voltage() -> None:
+    """Reject a case whose measured switch drop leaves no CCM ramp solution."""
+    transistor = device()
+    transistor.switch.channel_data[0].graph_v_i[0] = 100.0
+    with pytest.raises(ValueError, match="no positive inductor-current ramp"):
+        calculate_topology_operating_point(
+            "boost",
+            point(
+                mode="loss-balanced", topology="boost", v_in=100, v_out=200,
+                p_out=1000, l_value=1e-3, f_sw=20_000, t_j=25, v_g=15,
+            ),
+            transistor,
+            transistor,
+        )
+
+
+@pytest.mark.parametrize(
+    "topology",
+    ["buck", "boost", "buck-boost", "flyback"],
+)
+def test_loss_balanced_mode_rejects_dcm_for_all_topologies(topology: str) -> None:
+    """Keep the current measured-curve solve within the explicit CCM domain."""
+    with pytest.raises(ValueError, match="supports CCM only"):
+        calculate_topology_operating_point(
+            topology,
+            point(mode="loss-balanced", conduction_regime="DCM"),
+            device(),
+            device(),
+        )
+
+
+@pytest.mark.parametrize(
+    ("topology", "parameters", "expected_duty"),
+    [
+        (
+            "buck",
+            point(mode="loss-balanced", v_in=100, v_out=50, p_out=500, l_value=1e-3, f_sw=20_000),
+            52 / 101,
+        ),
+        (
+            "buck-boost",
+            point(mode="loss-balanced", v_in=100, v_out=50, p_out=500, l_value=1e-3, f_sw=20_000),
+            52 / 151,
+        ),
+        (
+            "flyback",
+            point(mode="loss-balanced", v_in=100, v_out=50, p_out=500, turns_ratio_nps=2, l_value=1e-3, f_sw=20_000),
+            104 / 203,
+        ),
+    ],
+)
+def test_loss_balanced_ccm_topologies_match_independent_constant_drop_balance(
+    topology: str, parameters: dict[str, Any], expected_duty: float
+) -> None:
+    """Verify buck-derived duty with flat 1 V switch and 2 V diode drops."""
+    transistor = device()
+    transistor.switch.channel_data[0].graph_v_i[0] = 1.0
+    transistor.diode.channel_data[0].graph_v_i[0] = 2.0
+    result = calculate_topology_operating_point(
+        topology,
+        {**parameters, "t_j": 25, "v_g": 15, "diode_v_g": None},
+        transistor,
+        transistor,
+    )
+    assert result["calculated"]["duty_cycle"] == pytest.approx(expected_duty, rel=1e-8)
+    assert result["calculated"]["inductor_volt_second_residual_v"] == pytest.approx(
+        0, abs=1e-6
+    )
+    assert result["performance"]["p_in_w"] == pytest.approx(
+        result["performance"]["p_out_w"] + result["losses"]["total_w"], rel=1e-8
+    )
+    assert result["performance"]["p_in_w"] == pytest.approx(
+        parameters["v_in"] * result["calculated"]["i_in_avg_a"], rel=1e-8
+    )
+
+
+def test_loss_balanced_boost_rejects_channel_curve_extrapolation() -> None:
+    """Reject a feedback point when its converged current exceeds TDB data."""
+    limited = device(max_current=8.0)
+    with pytest.raises(ValueError, match="switch channel curve supports"):
+        calculate_topology_operating_point(
+            "boost",
+            point(
+                mode="loss-balanced", v_in=100, v_out=200, p_out=1000,
+                l_value=1e-3, f_sw=20_000, t_j=25, v_g=15,
+            ),
+            limited,
+            limited,
+        )
+
+
+@pytest.mark.parametrize(
+    ("switch_name", "switch_gate", "parallel_switches"),
+    [
+        ("CREE_C3M0060065J", 15.0, 1),
+        ("Infineon_IPBE65R050CFD7A", 10.0, 1),
+        ("Infineon_IPBE65R050CFD7A", 10.0, 2),
+    ],
+)
+def test_loss_balanced_mode_runs_checked_in_same_boundary_pareto_records(
+    switch_name: str, switch_gate: float, parallel_switches: int
+) -> None:
+    """Exercise the notebook's actual candidate curves at the shared boundary."""
+    records = Path(__file__).parents[1] / "transistordatabase" / "examples" / "tdb_example"
+    loader = JsonTransistorLoader()
+    switch = loader.load_from_json(records / f"{switch_name}.json")
+    diode = loader.load_from_json(records / "CREE_C3M0060065J.json")
+    result = calculate_topology_operating_point(
+        "boost",
+        point(
+            mode="loss-balanced", v_in=100, v_out=200, p_out=1000,
+            f_sw=20_000, l_value=1e-3, c_out=1e-3,
+            t_j=25, t_case=60, v_g=switch_gate, diode_v_g=0,
+            parallel_switches=parallel_switches,
+        ),
+        switch,
+        diode,
+        include_waveforms=False,
+    )
+    assert result["performance"]["p_in_w"] == pytest.approx(
+        1000 + result["losses"]["total_w"], rel=1e-7
+    )
+    assert result["calculated"]["duty_cycle"] > 0.5
+    assert result["model"]["thermal_closure"] == "unavailable"
+
+
+def test_loss_balanced_thermal_output_does_not_claim_temperature_closure() -> None:
+    """Keep fixed-temperature curve results separate from thermal closure."""
+    transistor = device()
+    transistor.switch.thermal_foster = FosterThermalModel(r_th_total=1.0)
+    transistor.diode.thermal_foster = FosterThermalModel(r_th_total=1.0)
+    transistor.thermal_properties.r_th_switch_cs = 0.2
+    transistor.thermal_properties.r_th_diode_cs = 0.2
+    result = calculate_topology_operating_point(
+        "boost",
+        point(
+            mode="loss-balanced", v_in=100, v_out=200, p_out=1000,
+            l_value=1e-3, f_sw=20_000, t_j=25, t_case=25, v_g=15,
+        ),
+        transistor,
+        transistor,
+    )
+    assert result["temperatures"]["switch_c"] > 25
+    assert result["temperatures"]["diode_c"] > 25
+    assert result["model"]["thermal_closure"] == "not_closed"
+    assert "differs from the selected exact curve temperature" in result["temperatures"]["thermal_closure_reason"]
+
+
 def test_gate_conditioned_diode_curves_require_explicit_diode_gate_voltage() -> None:
     """Explain missing diode gate selection and preserve selected curve provenance."""
     transistor = device()
@@ -768,5 +1120,18 @@ def test_contour_sweep_enforces_work_limit() -> None:
                 "x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000, "x_points": 51,
                 "y_axis": "l_value", "y_min": 200e-6, "y_max": 400e-6, "y_points": 51,
                 "metric": "i_l_ripple_pp_a",
+            },
+        )
+
+
+def test_loss_balanced_mode_rejects_sweeps_before_evaluating_points() -> None:
+    """The scalar loss-balanced mode is not silently applied across a sweep."""
+    with pytest.raises(ValueError, match="sweeps are not supported in loss-balanced mode"):
+        calculate_topology_sweep(
+            "boost",
+            point(mode="loss-balanced"),
+            {
+                "x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000,
+                "x_points": 3, "metric": "i_l_ripple_pp_a",
             },
         )

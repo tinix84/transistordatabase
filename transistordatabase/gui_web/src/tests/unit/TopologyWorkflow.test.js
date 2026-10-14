@@ -98,6 +98,66 @@ describe('TopologyCalculator API workflow', () => {
     expect(request.sweep.x_max).toBe(200000)
   })
 
+  it('sends loss-balanced mode and labels its input current correctly', async () => {
+    calculateTopology.mockResolvedValueOnce({
+      ...estimateResponse,
+      topology: 'boost',
+      calculated: { ...estimateResponse.calculated, inductor_volt_second_residual_v: 0 },
+      model: { ...estimateResponse.model, mode: 'loss-balanced' },
+      losses: {
+        conduction_switch_w: 4,
+        conduction_diode_w: 6,
+        total_w: 10,
+        scope: 'channel conduction only',
+        loss_scope: 'channel_conduction_only'
+      },
+      performance: {
+        p_out_w: 500,
+        p_in_w: 510,
+        efficiency_percent: 98.04,
+        power_balance_residual_w: 0
+      }
+    })
+    await wrapper.findAll('button.topology-card').find(button => button.text().includes('Boost')).trigger('click')
+    await setSelect('Calculation mode', 'loss-balanced')
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+
+    expect(calculateTopology.mock.calls[0][0]).toMatchObject({
+      topology: 'boost', mode: 'loss-balanced', conduction_regime: 'CCM'
+    })
+    expect(wrapper.text()).toContain('CCM TDB channel loss-balanced averaged model')
+    expect(wrapper.text()).toContain('Average input current (loss-balanced)')
+    expect(wrapper.text()).toContain('Power-balance residual: 0.00000000 W')
+    expect(wrapper.text()).toContain('Averaged inductor volt-second residual: 0.00000000 V')
+    const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
+    expect(comparisonButton.element.disabled).toBe(false)
+  })
+
+  it('disables sweep controls and omits an enabled sweep in loss-balanced mode', async () => {
+    await setSelect('Calculation mode', 'detailed')
+    await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
+    await setSelect('Calculation mode', 'loss-balanced')
+    await flushPromises()
+
+    const sweepToggle = wrapper.findAll('input[type="checkbox"]')[0]
+    expect(sweepToggle.element.disabled).toBe(true)
+    expect(sweepToggle.element.checked).toBe(false)
+    expect(wrapper.text()).toContain('Line and contour sweeps are unavailable in loss-balanced mode')
+
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+    expect(calculateTopology.mock.calls[0][0].sweep).toBeUndefined()
+  })
+
+  it('disables topology comparison for unsupported loss-balanced DCM', async () => {
+    await setSelect('Calculation mode', 'loss-balanced')
+    await setSelect('Conduction regime', 'DCM')
+    const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
+    expect(comparisonButton.element.disabled).toBe(true)
+    expect(wrapper.text()).toContain('the solver supports CCM only')
+  })
+
   it('shows backend validation errors instead of stale results', async () => {
     calculateTopology.mockRejectedValueOnce({
       response: { data: { detail: 'Boost requires v_out > v_in > 0' } }

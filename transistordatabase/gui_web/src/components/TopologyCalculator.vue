@@ -36,6 +36,7 @@
               <option value="estimate">Ideal operating-point estimate</option>
               <option value="conduction-only">TDB channel conduction only</option>
               <option value="detailed">TDB curve based losses</option>
+              <option value="loss-balanced">CCM loss-balanced channel model</option>
             </select>
           </label>
           <label class="param-item">Conduction regime
@@ -89,7 +90,7 @@
               </select>
             </label>
           </div>
-          <p class="hint">Estimate mode does not use device curves. Conduction-only mode requires exact-condition switch and diode channel curves. Detailed mode also requires exact-condition turn-on and turn-off curves. All curve-backed modes reject extrapolation.</p>
+          <p class="hint">Estimate mode does not use device curves. Conduction-only mode requires exact-condition switch and diode channel curves. Detailed mode also requires exact-condition turn-on and turn-off curves. Loss-balanced mode supports CCM operation with exact-condition switch and diode channel curves; DCM and curve extrapolation are rejected.</p>
         </div>
 
         <div v-if="form.mode !== 'estimate'" class="param-section">
@@ -121,8 +122,9 @@
 
         <div class="param-section">
           <h4>Python generated sweep</h4>
-          <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox"> Include line or contour sweep</label>
-          <div v-if="form.sweep_enabled" class="param-grid">
+          <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox" :disabled="form.mode === 'loss-balanced'"> Include line or contour sweep</label>
+          <p v-if="form.mode === 'loss-balanced'" class="hint">Line and contour sweeps are unavailable in loss-balanced mode. Calculate one CCM operating point.</p>
+          <div v-if="form.sweep_enabled && form.mode !== 'loss-balanced'" class="param-grid">
             <label class="param-item">Sweep type
               <select v-model="form.sweep_kind"><option value="line">Line</option><option value="contour">Contour</option></select>
             </label>
@@ -161,9 +163,10 @@
 
         <div class="calculation-actions">
           <button class="btn btn-primary" type="button" :disabled="loading" @click="calculate">{{ loading ? 'Calculating…' : 'Calculate' }}</button>
-          <button class="btn btn-secondary" type="button" :disabled="loading" @click="compare">Compare topologies</button>
+        <button class="btn btn-secondary" type="button" :disabled="loading || (form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM')" @click="compare">Compare topologies</button>
         </div>
         <div v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</div>
+        <p v-if="form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM'" class="hint">Topology comparison is unavailable for loss-balanced DCM; the solver supports CCM only.</p>
       </section>
 
       <section v-if="hasResults" class="results-panel">
@@ -174,7 +177,7 @@
 
         <div class="results-grid">
           <div class="result-item"><label>Duty cycle</label><span class="value">{{ format(results.calculated.duty_cycle, 4) }}</span></div>
-          <div class="result-item"><label>{{ results.model.mode === 'estimate' ? 'Average input current' : 'Average input current (ideal lossless point)' }}</label><span class="value">{{ format(results.calculated.i_in_avg_a, 3) }} A</span></div>
+          <div class="result-item"><label>{{ results.model.mode === 'estimate' ? 'Average input current' : results.model.mode === 'loss-balanced' ? 'Average input current (loss-balanced)' : 'Average input current (ideal lossless point)' }}</label><span class="value">{{ format(results.calculated.i_in_avg_a, 3) }} A</span></div>
           <div class="result-item"><label>Average output current</label><span class="value">{{ format(results.calculated.i_out_avg_a, 3) }} A</span></div>
           <div class="result-item"><label>Average inductor current</label><span class="value">{{ format(results.calculated.i_l_avg_a, 3) }} A</span></div>
           <div class="result-item"><label>Peak inductor current</label><span class="value">{{ format(results.calculated.i_l_peak_a, 3) }} A</span></div>
@@ -184,16 +187,18 @@
         </div>
 
         <div v-if="results.losses" class="results-section">
-          <h4>Partial device losses</h4>
+          <h4>{{ results.model.mode === 'loss-balanced' ? 'Included device losses' : 'Partial device losses' }}</h4>
           <div class="loss-grid">
             <div class="loss-item"><label>Switch conduction</label><span class="value">{{ format(results.losses.conduction_switch_w, 3) }} W</span></div>
             <div class="loss-item"><label>Diode conduction</label><span class="value">{{ format(results.losses.conduction_diode_w, 3) }} W</span></div>
             <div v-if="results.model.mode === 'detailed'" class="loss-item"><label>Switching on</label><span class="value">{{ format(results.losses.switching_on_w, 3) }} W</span></div>
             <div v-if="results.model.mode === 'detailed'" class="loss-item"><label>Switching off</label><span class="value">{{ format(results.losses.switching_off_w, 3) }} W</span></div>
             <div class="loss-item total"><label>Included partial loss</label><span class="value">{{ format(results.losses.total_w, 3) }} W</span></div>
-            <div class="loss-item"><label>Partial input power estimate</label><span class="value">{{ format(results.performance.p_in_w, 3) }} W</span></div>
-            <div class="loss-item"><label>Partial efficiency estimate</label><span class="value">{{ format(results.performance.efficiency_percent, 3) }}%</span></div>
+            <div class="loss-item"><label>{{ results.model.mode === 'loss-balanced' ? 'Loss-balanced input power' : 'Partial input power estimate' }}</label><span class="value">{{ format(results.performance.p_in_w, 3) }} W</span></div>
+            <div class="loss-item"><label>{{ results.model.mode === 'loss-balanced' ? 'Loss-balanced efficiency' : 'Partial efficiency estimate' }}</label><span class="value">{{ format(results.performance.efficiency_percent, 3) }}%</span></div>
           </div>
+          <p v-if="results.performance.power_balance_residual_w != null" class="hint">Power-balance residual: {{ format(results.performance.power_balance_residual_w, 8) }} W.</p>
+          <p v-if="results.calculated.inductor_volt_second_residual_v != null" class="hint">Averaged inductor volt-second residual: {{ format(results.calculated.inductor_volt_second_residual_v, 8) }} V.</p>
           <p v-if="results.losses.scope" class="hint">{{ results.losses.scope }}.</p>
           <p v-if="results.performance.input_power_scope" class="hint">{{ results.performance.input_power_scope }}.</p>
           <p v-if="results.temperatures?.t_case_c != null" class="hint">
@@ -204,6 +209,7 @@
           <p v-else-if="results.temperatures" class="hint">
             Temperature output unavailable: {{ results.temperatures.unavailable_reason || [results.temperatures.switch_unavailable_reason, results.temperatures.diode_unavailable_reason].filter(Boolean).join('; ') }}
           </p>
+          <p v-if="results.temperatures?.thermal_closure_reason" class="hint">Electrothermal closure: {{ results.temperatures.thermal_closure_reason }}</p>
         </div>
 
         <div v-if="results.waveforms" class="charts-section">
@@ -301,6 +307,7 @@ const hasResults = computed(() => results.value !== null)
 const hasExportableResults = computed(() => hasResults.value || comparison.value !== null)
 const modelLabel = computed(() => {
   const mode = results.value?.model?.mode
+  if (mode === 'loss-balanced') return 'CCM TDB channel loss-balanced averaged model'
   if (mode === 'detailed') return 'TDB curve based partial device model'
   if (mode === 'conduction-only') return 'TDB channel conduction-only partial model'
   return `Ideal ${results.value?.model?.conduction_regime || 'CCM'} operating-point estimate`
@@ -378,7 +385,7 @@ function buildPayload(includeSweep = true) {
     v_g_off: form.mode === 'detailed' ? optionalNumber(form.v_g_off) : undefined,
     r_g_on: form.mode === 'detailed' ? optionalNumber(form.r_g_on) : undefined,
     r_g_off: form.mode === 'detailed' ? optionalNumber(form.r_g_off) : undefined,
-    ...(includeSweep && buildSweep() ? { sweep: buildSweep() } : {})
+    ...(includeSweep && form.mode !== 'loss-balanced' && buildSweep() ? { sweep: buildSweep() } : {})
   }
 }
 async function calculate() {
@@ -509,6 +516,9 @@ function invalidateResults() {
   destroyCharts()
 }
 watch([form, selectedTopology], invalidateResults, { deep: true })
+watch(() => form.mode, mode => {
+  if (mode === 'loss-balanced') form.sweep_enabled = false
+})
 watch(() => form.x_axis, axis => {
   if (form.y_axis === axis) form.y_axis = axes.find(item => item.id !== axis)?.id || 'v_in'
 })
