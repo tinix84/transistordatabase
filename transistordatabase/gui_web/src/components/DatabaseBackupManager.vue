@@ -4,6 +4,7 @@ import { transistorApi } from '../services/api.js'
 
 const emit = defineEmits(['restored'])
 const selectedFile = ref(null)
+const validatedFile = ref(null)
 const validation = ref(null)
 const restoreResult = ref(null)
 const message = ref('')
@@ -35,21 +36,29 @@ async function responseDetail(error) {
 }
 
 function handleFileChange(event) {
+  if (isValidating.value || isRestoring.value) return
   selectedFile.value = event.target.files?.[0] || null
+  validatedFile.value = null
   validation.value = null
   restoreResult.value = null
   message.value = ''
 }
 
 async function validateBackup() {
-  if (!selectedFile.value) return
+  const file = selectedFile.value
+  if (!file || isValidating.value || isRestoring.value) return
+  validatedFile.value = null
   validation.value = null
   restoreResult.value = null
   message.value = ''
   isValidating.value = true
   try {
-    validation.value = await transistorApi.validateDatabaseBackup(selectedFile.value)
+    const result = await transistorApi.validateDatabaseBackup(file)
+    if (selectedFile.value !== file) return
+    validation.value = result
+    validatedFile.value = result.valid ? file : null
   } catch (error) {
+    if (selectedFile.value !== file) return
     validation.value = { valid: false }
     messageType.value = 'error'
     message.value = await responseDetail(error)
@@ -59,18 +68,27 @@ async function validateBackup() {
 }
 
 async function restoreBackup() {
-  if (!selectedFile.value || !validation.value?.valid || validation.value.restore_count < 1) return
-  const count = validation.value.restore_count
+  const file = selectedFile.value
+  const currentValidation = validation.value
+  if (
+    !file ||
+    validatedFile.value !== file ||
+    !currentValidation?.valid ||
+    currentValidation.restore_count < 1 ||
+    isValidating.value ||
+    isRestoring.value
+  ) return
+  const count = currentValidation.restore_count
   const confirmed = window.confirm(
     `Add ${count} transistor record${count === 1 ? '' : 's'} from this backup? Existing records will remain unchanged and name conflicts will be skipped.`
   )
-  if (!confirmed) return
+  if (!confirmed || selectedFile.value !== file || validatedFile.value !== file) return
 
   isRestoring.value = true
   restoreResult.value = null
   message.value = ''
   try {
-    restoreResult.value = await transistorApi.restoreDatabaseBackup(selectedFile.value)
+    restoreResult.value = await transistorApi.restoreDatabaseBackup(file)
     messageType.value = restoreResult.value.errors?.length ? 'error' : 'status'
     message.value = restoreResult.value.errors?.length
       ? 'Restore finished with file publication errors; review the details below.'
@@ -126,6 +144,7 @@ async function downloadBackup() {
         id="database-backup-file"
         type="file"
         accept=".json,application/json"
+        :disabled="isValidating || isRestoring"
         @change="handleFileChange"
       >
       <button
@@ -149,7 +168,7 @@ async function downloadBackup() {
       </ul>
       <button
         class="btn btn-primary"
-        :disabled="validation.restore_count < 1 || isRestoring"
+        :disabled="validation.restore_count < 1 || isValidating || isRestoring"
         @click="restoreBackup"
       >
         {{ isRestoring ? 'Restoring…' : 'Restore new records' }}

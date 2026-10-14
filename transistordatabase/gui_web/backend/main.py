@@ -14,6 +14,7 @@ import errno
 import io
 import json
 import logging
+import math
 import os
 import sys
 import tempfile
@@ -78,6 +79,15 @@ from transistordatabase.gui_web.backend.topology_service import TopologyCalculat
 logger = logging.getLogger(__name__)
 _DATABASE_BACKUP_FORMAT = "transistordatabase.database-backup"
 _DATABASE_BACKUP_VERSION = 1
+_WINDOWS_RESERVED_DEVICE_NAMES = {
+    "aux",
+    "clock$",
+    "con",
+    "conin$",
+    "conout$",
+    "nul",
+    "prn",
+}
 
 # In-memory settings storage (use database in production)
 _user_settings: Dict[str, UserSettings] = {}
@@ -270,25 +280,39 @@ def _get_transistor(name: str) -> Transistor:
 
 def _validate_web_record_name(name: str) -> None:
     """Reject identities unsafe as a filename on either supported platform."""
+    if not isinstance(name, str):
+        raise HTTPException(status_code=400, detail="Device names must be strings.")
     windows_name = PureWindowsPath(name)
+    windows_stem = name.split(".", 1)[0].rstrip(" .").casefold()
+    reserved_windows_device = windows_stem in _WINDOWS_RESERVED_DEVICE_NAMES or (
+        len(windows_stem) == 4
+        and windows_stem[:3] in {"com", "lpt"}
+        and windows_stem[3] in "123456789¹²³"
+    )
     if (
         not name
         or not name.strip()
         or name in {".", ".."}
+        or name.endswith((".", " "))
         or "/" in name
         or "\\" in name
+        or any(character in name for character in '<>"|?*')
         # A drive-relative Windows path (for example ``C:escape``) can
         # override the base directory when joined with a Windows Path.
         or bool(windows_name.drive)
         or bool(windows_name.root)
         # Colons also address NTFS alternate data streams, even on Linux/WSL.
         or ":" in name
+        or reserved_windows_device
         or "\0" in name
         or any(ord(character) < 32 for character in name)
     ):
         raise HTTPException(
             status_code=400,
-            detail="Device names must be non-empty and cannot contain path separators, colons, or control characters.",
+            detail=(
+                "Device names must be valid portable filenames: path separators, reserved Windows device names, "
+                "invalid filename characters, and trailing dots or spaces are not allowed."
+            ),
         )
 
 
@@ -322,6 +346,20 @@ def _legacy_record_path(name: str) -> Path:
     record_path = directory / f"{name}.json"
     _ensure_record_path_is_contained(record_path, directory)
     return record_path
+
+
+def _existing_record_name_keys_casefold_unlocked() -> set[str]:
+    """List existing JSON identities using portable case-insensitive matching."""
+    data_directory = Path(_repo.data_directory)
+    try:
+        children = data_directory.iterdir()
+    except FileNotFoundError:
+        return set()
+    return {
+        child.stem.casefold()
+        for child in children
+        if child.suffix.casefold() == ".json"
+    }
 
 
 def _rename_noreplace(source: Path, destination: Path) -> None:
@@ -373,12 +411,24 @@ def _reject_json_constant(value: str) -> None:
     raise ValueError(f"Invalid JSON numeric constant: {value}")
 
 
+def _parse_finite_json_float(value: str) -> float:
+    """Reject JSON number literals that cannot be represented as finite floats."""
+    parsed = float(value)
+    if not math.isfinite(parsed):
+        raise ValueError(f"JSON number is outside the finite float range: {value}")
+    significand = value.lower().split("e", 1)[0]
+    if parsed == 0.0 and any(character in "123456789" for character in significand):
+        raise ValueError(f"JSON number underflows the finite float range: {value}")
+    return parsed
+
+
 def _strict_json_loads(content: str | bytes) -> Any:
     """Parse strict JSON without collapsing duplicate object keys."""
     return json.loads(
         content,
         object_pairs_hook=_unique_json_object,
         parse_constant=_reject_json_constant,
+        parse_float=_parse_finite_json_float,
     )
 
 
@@ -393,6 +443,11 @@ def _validate_raw_legacy_record(record: Any) -> Transistor:
         _validate_web_record_name(name)
     except HTTPException as error:
         raise ValueError(str(error.detail)) from error
+
+    try:
+        json.dumps(record, ensure_ascii=False, allow_nan=False).encode("utf-8")
+    except (TypeError, ValueError, UnicodeEncodeError) as error:
+        raise ValueError(f"Record cannot be safely serialized as UTF-8 JSON: {error!s}") from error
 
     try:
         transistor = legacy_to_core(_json_dict_to_legacy_transistor(copy.deepcopy(record)))
@@ -427,10 +482,11 @@ def _parse_backup_document(content: bytes) -> tuple[list[dict[str, Any]], list[d
         name = raw_record.get("name") if isinstance(raw_record, dict) else None
         label = name if isinstance(name, str) else f"record {index + 1}"
         if isinstance(name, str):
-            if name in seen_names:
-                errors.append({"index": index, "name": name, "error": "Duplicate record identity."})
+            identity_key = name.casefold()
+            if identity_key in seen_names:
+                errors.append({"index": index, "name": name, "error": "Duplicate record identity (case-insensitive)."})
                 continue
-            seen_names.add(name)
+            seen_names.add(identity_key)
         try:
             _validate_raw_legacy_record(raw_record)
         except Exception as error:
@@ -1340,13 +1396,14 @@ async def validate_database_backup(file: UploadFile = File(...)) -> Dict[str, An
         )
 
     async with _record_mutation():
-        conflicts = [
-            record["name"]
-            for record in records
-            if _legacy_record_path(record["name"]).exists()
-        ]
-    conflict_names = set(conflicts)
-    restore_names = [record["name"] for record in records if record["name"] not in conflict_names]
+        record_paths = [_legacy_record_path(record["name"]) for record in records]
+        existing_name_keys = _existing_record_name_keys_casefold_unlocked()
+        conflicts = []
+        for record, record_path in zip(records, record_paths):
+            if record["name"].casefold() in existing_name_keys or record_path.exists():
+                conflicts.append(record["name"])
+    conflict_keys = {name.casefold() for name in conflicts}
+    restore_names = [record["name"] for record in records if record["name"].casefold() not in conflict_keys]
     return {
         "valid": True,
         "format": _DATABASE_BACKUP_FORMAT,
@@ -1374,17 +1431,21 @@ async def restore_database_backup(file: UploadFile = File(...)) -> Dict[str, Any
     conflicts: list[str] = []
     errors: list[dict[str, str]] = []
     async with _record_mutation():
-        for record in records:
+        record_paths = [_legacy_record_path(record["name"]) for record in records]
+        existing_name_keys = _existing_record_name_keys_casefold_unlocked()
+        for record, record_path in zip(records, record_paths):
             name = record["name"]
-            record_path = _legacy_record_path(name)
-            if record_path.exists():
+            name_key = name.casefold()
+            if name_key in existing_name_keys or record_path.exists():
                 conflicts.append(name)
                 continue
             try:
                 _write_raw_record_create_unlocked(record)
                 restored.append(name)
+                existing_name_keys.add(name_key)
             except FileExistsError:
                 conflicts.append(name)
+                existing_name_keys.add(name_key)
             except OSError as error:
                 errors.append({"name": name, "error": str(error)})
 
@@ -1407,7 +1468,10 @@ async def upload_transistor(file: UploadFile = File(...)) -> Dict[str, Any]:
         transistor = _validate_raw_legacy_record(record)
         async with _record_mutation():
             record_path = _legacy_record_path(transistor.metadata.name)
-            if record_path.exists():
+            if (
+                transistor.metadata.name.casefold() in _existing_record_name_keys_casefold_unlocked()
+                or record_path.exists()
+            ):
                 raise HTTPException(
                     status_code=409,
                     detail=f"Transistor '{transistor.metadata.name}' already exists.",

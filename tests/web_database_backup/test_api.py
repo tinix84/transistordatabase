@@ -122,6 +122,37 @@ def test_restore_skips_conflicts_without_changing_existing_bytes(
     assert json.loads((tmp_path / "New Device.json").read_text(encoding="utf-8")) == addition
 
 
+def test_case_insensitive_existing_conflicts_match_preview_and_restore(
+    isolated_database: TestClient,
+    tmp_path: Path,
+) -> None:
+    """Case-only filename differences are conflicts on every supported OS."""
+    existing_path = tmp_path / "Existing Device.json"
+    existing_path.write_text('{ "name": "do not replace" }\n', encoding="utf-8")
+    original_bytes = existing_path.read_bytes()
+    record = _legacy_record("existing device")
+
+    preview = _upload_backup(
+        isolated_database,
+        _backup(record),
+        "/api/database/backup/validate",
+    )
+    restored = _upload_backup(
+        isolated_database,
+        _backup(record),
+        "/api/database/backup/restore",
+    )
+
+    assert preview.status_code == 200, preview.text
+    assert preview.json()["conflicts"] == ["existing device"]
+    assert preview.json()["restore_count"] == 0
+    assert restored.status_code == 200, restored.text
+    assert restored.json()["restored"] == []
+    assert restored.json()["conflicts"] == ["existing device"]
+    assert existing_path.read_bytes() == original_bytes
+    assert len(list(tmp_path.glob("*.json"))) == 1
+
+
 def test_validate_backup_previews_conflicts_without_writing_records(
     isolated_database: TestClient,
     tmp_path: Path,
@@ -167,6 +198,86 @@ def test_invalid_or_duplicate_backup_is_rejected_before_any_record_write(
     response = _upload_backup(
         isolated_database,
         _backup(*records),
+        "/api/database/backup/restore",
+    )
+
+    assert response.status_code == 400
+    assert list(tmp_path.glob("*.json")) == []
+
+
+@pytest.mark.parametrize("endpoint", ["/api/database/backup/validate", "/api/database/backup/restore"])
+def test_case_insensitive_duplicate_identities_are_rejected_consistently(
+    isolated_database: TestClient,
+    tmp_path: Path,
+    endpoint: str,
+) -> None:
+    response = _upload_backup(
+        isolated_database,
+        _backup(_legacy_record("Duplicate Device"), _legacy_record("duplicate device")),
+        endpoint,
+    )
+
+    assert response.status_code == 400
+    assert "case-insensitive" in response.json()["detail"]["errors"][0]["error"]
+    assert list(tmp_path.glob("*.json")) == []
+
+
+@pytest.mark.parametrize("number_literal", ["1e400", "1e-400"])
+def test_restore_rejects_unrepresentable_number_before_any_record_write(
+    isolated_database: TestClient,
+    tmp_path: Path,
+    number_literal: str,
+) -> None:
+    """An unrepresentable float anywhere in the file blocks every write."""
+    valid = json.dumps(_legacy_record("Valid Before Overflow"))
+    overflow = json.dumps(_legacy_record("Overflow Number"))[:-1] + f',"unknown_number":{number_literal}}}'
+    content = (
+        '{"format":"transistordatabase.database-backup","version":1,"records":'
+        f"[{valid},{overflow}]}}"
+    )
+    response = isolated_database.post(
+        "/api/database/backup/restore",
+        files={"file": ("backup.json", content, "application/json")},
+    )
+
+    assert response.status_code == 400
+    assert "finite float range" in response.json()["detail"]["errors"][0]["error"]
+    assert list(tmp_path.glob("*.json")) == []
+
+
+def test_restore_rejects_unpaired_surrogate_before_any_record_write(
+    isolated_database: TestClient,
+    tmp_path: Path,
+) -> None:
+    """Every raw record must survive UTF-8 encoding before publication starts."""
+    valid = json.dumps(_legacy_record("Valid Before Surrogate"))
+    invalid_utf8 = json.dumps(_legacy_record("Unpaired Surrogate"))[:-1] + r',"unknown_field":"\ud800"}'
+    content = (
+        '{"format":"transistordatabase.database-backup","version":1,"records":'
+        f"[{valid},{invalid_utf8}]}}"
+    )
+    response = isolated_database.post(
+        "/api/database/backup/restore",
+        files={"file": ("backup.json", content, "application/json")},
+    )
+
+    assert response.status_code == 400
+    assert "UTF-8 JSON" in response.json()["detail"]["errors"][0]["error"]
+    assert list(tmp_path.glob("*.json")) == []
+
+
+@pytest.mark.parametrize(
+    "unsafe_name",
+    ["CON", "con.txt", "PRN", "AUX", "NUL", "COM1", "LPT9", "CONIN$", "COM¹", "bad<name", "trailing.", "trailing "],
+)
+def test_restore_rejects_nonportable_windows_filename_identities_before_writes(
+    isolated_database: TestClient,
+    tmp_path: Path,
+    unsafe_name: str,
+) -> None:
+    response = _upload_backup(
+        isolated_database,
+        _backup(_legacy_record(unsafe_name)),
         "/api/database/backup/restore",
     )
 
@@ -309,6 +420,15 @@ def test_single_record_upload_is_raw_preserving_and_create_only(
     assert duplicate.status_code == 409
     assert stored_path.read_bytes() == original_bytes
 
+    case_variant = dict(original, name="uploaded raw device")
+    case_duplicate = isolated_database.post(
+        "/api/transistors/upload",
+        files={"file": ("device.json", json.dumps(case_variant), "application/json")},
+    )
+
+    assert case_duplicate.status_code == 409
+    assert stored_path.read_bytes() == original_bytes
+
 
 @pytest.mark.parametrize("name", ["../outside", r"..\outside"])
 def test_single_upload_rejects_separator_identity(
@@ -326,7 +446,10 @@ def test_single_upload_rejects_separator_identity(
     assert list(tmp_path.glob("*.json")) == []
 
 
-@pytest.mark.parametrize("name", ["C:outside", "Device:stream"])
+@pytest.mark.parametrize(
+    "name",
+    ["C:outside", "Device:stream", "CON", "PRN.txt", "COM2", "LPT³", "bad?name", "trailing."],
+)
 def test_single_upload_rejects_windows_unsafe_identity(
     isolated_database: TestClient,
     tmp_path: Path,

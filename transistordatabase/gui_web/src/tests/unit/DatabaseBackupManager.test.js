@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 
 const { downloadDatabaseBackup, validateDatabaseBackup, restoreDatabaseBackup } = vi.hoisted(() => ({
   downloadDatabaseBackup: vi.fn(),
@@ -92,6 +93,67 @@ describe('DatabaseBackupManager', () => {
     expect(wrapper.get('[role="alert"]').text()).toContain('Unsafe/Device')
     expect(wrapper.find('.backup-validation button').exists()).toBe(false)
     expect(restoreDatabaseBackup).not.toHaveBeenCalled()
+  })
+
+  it('keeps the validated file bound while validation is in flight', async () => {
+    let resolveValidation
+    validateDatabaseBackup.mockImplementationOnce(() => new Promise(resolve => {
+      resolveValidation = resolve
+    }))
+    const input = wrapper.get('input[type="file"]')
+    Object.defineProperty(input.element, 'files', { configurable: true, value: [selectedFile] })
+    await input.trigger('change')
+    await wrapper.get('button.btn-secondary').trigger('click')
+    await nextTick()
+
+    expect(input.element.disabled).toBe(true)
+
+    resolveValidation({
+      valid: true,
+      format: 'transistordatabase.database-backup',
+      version: 1,
+      record_count: 1,
+      restore_count: 1,
+      restore_names: ['New Device'],
+      conflicts: []
+    })
+    await flushPromises()
+    await wrapper.get('.backup-validation button').trigger('click')
+    await flushPromises()
+
+    expect(validateDatabaseBackup).toHaveBeenCalledWith(selectedFile)
+    expect(restoreDatabaseBackup).toHaveBeenCalledWith(selectedFile)
+  })
+
+  it('clears a completed validation when a different file is selected', async () => {
+    await selectBackup()
+    const input = wrapper.get('input[type="file"]')
+    const changedFile = new File(['different'], 'different.json', { type: 'application/json' })
+    Object.defineProperty(input.element, 'files', { configurable: true, value: [changedFile] })
+    await input.trigger('change')
+
+    expect(wrapper.find('.backup-validation').exists()).toBe(false)
+    expect(wrapper.find('.backup-validation button').exists()).toBe(false)
+    expect(restoreDatabaseBackup).not.toHaveBeenCalled()
+  })
+
+  it('keeps the restore file bound while restore is in flight', async () => {
+    let resolveRestore
+    restoreDatabaseBackup.mockImplementationOnce(() => new Promise(resolve => {
+      resolveRestore = resolve
+    }))
+    await selectBackup()
+
+    const input = wrapper.get('input[type="file"]')
+    await wrapper.get('.backup-validation button').trigger('click')
+    await nextTick()
+    expect(input.element.disabled).toBe(true)
+
+    resolveRestore({ restored: ['New Device'], conflicts: [], errors: [] })
+    await flushPromises()
+
+    expect(restoreDatabaseBackup).toHaveBeenCalledWith(selectedFile)
+    expect(wrapper.text()).toContain('1 record added.')
   })
 
   it('downloads the server-generated database backup', async () => {
