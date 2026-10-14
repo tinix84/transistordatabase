@@ -245,7 +245,7 @@ class TopologyCalculationRequest(BaseModel):
         description=(
             "Select an ideal estimate, channel conduction only, channel conduction plus "
             "switch turn-on/turn-off losses, or a channel-loss-balanced CCM solve "
-            "with Boost-only DCM feedback"
+            "with scalar Buck/Boost DCM feedback"
         ),
     )
     conduction_regime: Literal["CCM", "DCM"] = Field(

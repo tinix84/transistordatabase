@@ -672,10 +672,10 @@ def test_loss_balanced_boost_rejects_no_positive_on_interval_voltage() -> None:
         )
 
 
-@pytest.mark.parametrize("topology", ["buck", "buck-boost", "flyback"])
+@pytest.mark.parametrize("topology", ["buck-boost", "flyback"])
 def test_loss_balanced_mode_rejects_unsupported_dcm_topologies(topology: str) -> None:
-    """Keep DCM channel feedback explicitly Boost-only."""
-    with pytest.raises(ValueError, match="Boost only"):
+    """Keep non-Buck/Boost DCM channel feedback explicitly unsupported."""
+    with pytest.raises(ValueError, match="Buck and Boost only"):
         calculate_topology_operating_point(
             topology,
             point(mode="loss-balanced", conduction_regime="DCM"),
@@ -695,6 +695,298 @@ def _flat_dcm_device(
         [[2.0, 2.0], [0.0, max_current]]
     )
     return transistor
+
+
+def test_loss_balanced_buck_dcm_closes_independent_flat_drop_fixture() -> None:
+    """Check Buck currents and losses from independently derived flat drops."""
+    transistor = _flat_dcm_device()
+    values = point(
+        mode="loss-balanced", topology="buck", conduction_regime="DCM",
+        v_in=100, v_out=50, p_out=10, l_value=1e-3, f_sw=20_000,
+        c_out=1e-3, t_j=25, v_g=15,
+    )
+    switch_drop = 1.0
+    diode_drop = 2.0
+    on_voltage = values["v_in"] - values["v_out"] - switch_drop
+    off_voltage = values["v_out"] + diode_drop
+    period = 1 / values["f_sw"]
+    target_output_current = values["p_out"] / values["v_out"]
+    peak = np.sqrt(
+        2 * target_output_current * period
+        / (values["l_value"] * (1 / on_voltage + 1 / off_voltage))
+    )
+    on_time = values["l_value"] * peak / on_voltage
+    diode_time = values["l_value"] * peak / off_voltage
+    expected_duty = on_time / period
+    expected_diode_fraction = diode_time / period
+    expected_input_current = 0.5 * peak * expected_duty
+    expected_diode_current = 0.5 * peak * expected_diode_fraction
+    expected_switch_rms = peak * np.sqrt(expected_duty / 3)
+    expected_diode_rms = peak * np.sqrt(expected_diode_fraction / 3)
+    expected_switch_loss = switch_drop * expected_input_current
+    expected_diode_loss = diode_drop * expected_diode_current
+    independent_power_residual = (
+        values["v_in"] * expected_input_current
+        - values["p_out"]
+        - expected_switch_loss
+        - expected_diode_loss
+    )
+    independent_volt_second_residual = (
+        expected_duty * on_voltage - expected_diode_fraction * off_voltage
+    )
+
+    result = calculate_topology_operating_point(
+        "buck", values, transistor, transistor
+    )
+
+    calculated = result["calculated"]
+    assert calculated["duty_cycle"] == pytest.approx(expected_duty, rel=1e-8)
+    assert calculated["switch_conduction_fraction"] == pytest.approx(
+        expected_duty, rel=1e-8
+    )
+    assert calculated["diode_conduction_fraction"] == pytest.approx(
+        expected_diode_fraction, rel=1e-8
+    )
+    assert calculated["idle_fraction"] == pytest.approx(
+        1 - expected_duty - expected_diode_fraction, rel=1e-8
+    )
+    assert calculated["i_l_peak_a"] == pytest.approx(peak, rel=1e-8)
+    assert calculated["i_l_avg_a"] == pytest.approx(target_output_current, rel=1e-8)
+    assert calculated["i_in_avg_a"] == pytest.approx(expected_input_current, rel=1e-8)
+    assert calculated["i_out_avg_a"] == pytest.approx(target_output_current, rel=1e-8)
+    assert calculated["i_diode_avg_a"] == pytest.approx(expected_diode_current, rel=1e-8)
+    assert calculated["i_switch_rms_a"] == pytest.approx(expected_switch_rms, rel=5e-6)
+    assert calculated["i_diode_rms_a"] == pytest.approx(expected_diode_rms, rel=5e-6)
+    assert result["losses"]["conduction_switch_w"] == pytest.approx(
+        expected_switch_loss, rel=1e-8
+    )
+    assert result["losses"]["conduction_diode_w"] == pytest.approx(
+        expected_diode_loss, rel=1e-8
+    )
+    assert calculated["power_balance_residual_w"] == pytest.approx(
+        independent_power_residual, abs=1e-8
+    )
+    assert calculated["inductor_volt_second_residual_v"] == pytest.approx(
+        independent_volt_second_residual, abs=1e-8
+    )
+    assert independent_power_residual == pytest.approx(0, abs=1e-10)
+    assert independent_volt_second_residual == pytest.approx(0, abs=1e-10)
+    assert result["losses"]["loss_scope"] == "channel_conduction_only"
+
+
+def test_loss_balanced_buck_dcm_matches_independent_nonlinear_ramp_integrals() -> None:
+    """Check Buck DCM currents, losses, balances, and ripple on rising curves."""
+    transistor = _flat_dcm_device()
+    curve_currents = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 10.0])
+    switch_drops = np.array([1.0, 1.05, 1.2, 1.5, 2.0, 2.5, 3.0])
+    diode_drops = np.array([2.0, 2.2, 2.5, 3.0, 3.5, 4.0, 4.5])
+    transistor.switch.channel_data[0].graph_v_i = np.array(
+        [switch_drops, curve_currents]
+    )
+    transistor.diode.channel_data[0].graph_v_i = np.array(
+        [diode_drops, curve_currents]
+    )
+    values = point(
+        mode="loss-balanced", topology="buck", conduction_regime="DCM",
+        v_in=100, v_out=50, p_out=10, l_value=1e-3, f_sw=20_000,
+        c_out=1e-3, t_j=25, v_g=15,
+    )
+    period = 1 / values["f_sw"]
+    target_output_current = values["p_out"] / values["v_out"]
+    target_output_charge = target_output_current * period
+    inductance = values["l_value"]
+
+    def independent_ramp(peak: float) -> dict[str, Any]:
+        current = np.linspace(0.0, peak, 20_001)
+        switch_drop = np.interp(current, curve_currents, switch_drops)
+        diode_drop = np.interp(current, curve_currents, diode_drops)
+        inverse_on_voltage = 1 / (
+            values["v_in"] - values["v_out"] - switch_drop
+        )
+        inverse_off_voltage = 1 / (values["v_out"] + diode_drop)
+
+        def integral(integrand: np.ndarray) -> float:
+            return float(
+                np.sum(
+                    0.5 * (integrand[:-1] + integrand[1:]) * np.diff(current)
+                )
+            )
+
+        on_time = inductance * integral(inverse_on_voltage)
+        diode_time = inductance * integral(inverse_off_voltage)
+        charge_on = inductance * integral(current * inverse_on_voltage)
+        charge_diode = inductance * integral(current * inverse_off_voltage)
+        switch_energy = inductance * integral(
+            current * switch_drop * inverse_on_voltage
+        )
+        diode_energy = inductance * integral(
+            current * diode_drop * inverse_off_voltage
+        )
+        switch_voltage_time = inductance * integral(
+            switch_drop * inverse_on_voltage
+        )
+        diode_voltage_time = inductance * integral(
+            diode_drop * inverse_off_voltage
+        )
+        charge_current_out = (charge_on + charge_diode) / period
+        duty = on_time / period
+        diode_fraction = diode_time / period
+        input_current = charge_on / period
+        diode_current = charge_diode / period
+        switch_loss = switch_energy / period
+        diode_loss = diode_energy / period
+        switch_mean = switch_voltage_time / on_time
+        diode_mean = diode_voltage_time / diode_time
+        volt_second_residual = (
+            duty * (values["v_in"] - values["v_out"] - switch_mean)
+            + diode_fraction * (-values["v_out"] - diode_mean)
+        )
+        return {
+            "current": current,
+            "on_time": on_time,
+            "diode_time": diode_time,
+            "charge_on": charge_on,
+            "charge_diode": charge_diode,
+            "output_current": charge_current_out,
+            "input_current": input_current,
+            "diode_current": diode_current,
+            "switch_loss": switch_loss,
+            "diode_loss": diode_loss,
+            "duty": duty,
+            "diode_fraction": diode_fraction,
+            "idle_fraction": 1 - duty - diode_fraction,
+            "peak": peak,
+            "power_residual": (
+                values["v_in"] * input_current
+                - values["p_out"]
+                - switch_loss
+                - diode_loss
+            ),
+            "volt_second_residual": volt_second_residual,
+            "on_time_by_current": inductance * np.concatenate(
+                ([0.0], np.cumsum(
+                    0.5
+                    * (inverse_on_voltage[:-1] + inverse_on_voltage[1:])
+                    * np.diff(current)
+                ))
+            ),
+            "diode_time_by_current": inductance * np.concatenate(
+                ([0.0], np.cumsum(
+                    0.5
+                    * (inverse_off_voltage[:-1] + inverse_off_voltage[1:])
+                    * np.diff(current)
+                ))
+            ),
+        }
+
+    low, high = 0.0, 3.0
+    for _ in range(60):
+        midpoint = (low + high) / 2
+        ramp = independent_ramp(midpoint)
+        if ramp["charge_on"] + ramp["charge_diode"] < target_output_charge:
+            low = midpoint
+        else:
+            high = midpoint
+    expected = independent_ramp((low + high) / 2)
+    independent_current = expected["current"]
+    on_time_by_current = expected["on_time_by_current"]
+    diode_time_by_current = expected["diode_time_by_current"]
+    descending_current = independent_current[::-1]
+    descending_diode_time = (
+        expected["diode_time"] - diode_time_by_current[::-1]
+    )
+    phase_time = np.concatenate(
+        (
+            on_time_by_current,
+            expected["on_time"] + descending_diode_time[1:],
+            np.array([period]),
+        )
+    )
+    ramp_current = np.concatenate(
+        (independent_current, descending_current[1:], np.array([0.0]))
+    )
+    capacitor_current = np.concatenate(
+        (ramp_current[:-1] - target_output_current, np.array([-target_output_current]))
+    )
+    charge_steps = (
+        0.5 * (capacitor_current[:-1] + capacitor_current[1:]) * np.diff(phase_time)
+    )
+    charge = np.concatenate(([0.0], np.cumsum(charge_steps)))
+    independent_ripple = float(np.ptp(charge) / values["c_out"])
+
+    result = calculate_topology_operating_point(
+        "buck", values, transistor, transistor
+    )
+
+    calculated = result["calculated"]
+    assert calculated["i_l_peak_a"] == pytest.approx(expected["peak"], rel=3e-5)
+    assert calculated["duty_cycle"] == pytest.approx(expected["duty"], rel=3e-5)
+    assert calculated["diode_conduction_fraction"] == pytest.approx(
+        expected["diode_fraction"], rel=3e-5
+    )
+    assert calculated["idle_fraction"] == pytest.approx(
+        expected["idle_fraction"], abs=3e-5
+    )
+    assert calculated["i_in_avg_a"] == pytest.approx(
+        expected["input_current"], rel=3e-5
+    )
+    assert calculated["i_out_avg_a"] == pytest.approx(
+        expected["output_current"], rel=3e-5
+    )
+    assert calculated["i_l_avg_a"] == pytest.approx(
+        expected["output_current"], rel=3e-5
+    )
+    assert calculated["i_diode_avg_a"] == pytest.approx(
+        expected["diode_current"], rel=3e-5
+    )
+    assert result["losses"]["conduction_switch_w"] == pytest.approx(
+        expected["switch_loss"], rel=3e-5
+    )
+    assert result["losses"]["conduction_diode_w"] == pytest.approx(
+        expected["diode_loss"], rel=3e-5
+    )
+    assert calculated["power_balance_residual_w"] == pytest.approx(
+        expected["power_residual"], abs=1e-7
+    )
+    assert calculated["inductor_volt_second_residual_v"] == pytest.approx(
+        expected["volt_second_residual"], abs=1e-7
+    )
+    assert calculated["v_out_ripple_pp_v"] == pytest.approx(
+        independent_ripple, rel=3e-4
+    )
+
+
+def test_loss_balanced_buck_dcm_rejects_exact_boundary_but_accepts_below() -> None:
+    """Use flat-drop voltages to derive Buck's exact CCM boundary current."""
+    transistor = _flat_dcm_device()
+    values = point(
+        mode="loss-balanced", topology="buck", conduction_regime="DCM",
+        v_in=100, v_out=50, p_out=10, l_value=1e-3, f_sw=20_000,
+        c_out=1e-3, t_j=25, v_g=15,
+    )
+    l_f = values["l_value"] * values["f_sw"]
+    on_voltage = values["v_in"] - values["v_out"] - 1.0
+    off_voltage = values["v_out"] + 2.0
+    boundary_peak = 1 / (l_f * (1 / on_voltage + 1 / off_voltage))
+    boundary_power = values["v_out"] * boundary_peak / 2
+    boundary_values = {**values, "p_out": boundary_power}
+
+    with pytest.raises(ValueError, match="at or above the CCM boundary"):
+        calculate_topology_operating_point(
+            "buck", boundary_values, transistor, transistor
+        )
+
+    below_boundary = {**values, "p_out": boundary_power * 0.95}
+    result = calculate_topology_operating_point(
+        "buck", below_boundary, transistor, transistor
+    )
+    assert result["calculated"]["idle_fraction"] > 0
+    assert result["calculated"]["power_balance_residual_w"] == pytest.approx(
+        0, abs=1e-7
+    )
+    assert result["calculated"]["inductor_volt_second_residual_v"] == pytest.approx(
+        0, abs=1e-7
+    )
 
 
 def test_loss_balanced_boost_dcm_closes_independent_power_and_volt_second_fixture() -> None:
@@ -1659,11 +1951,14 @@ def test_loss_balanced_sweep_reports_out_of_range_coordinate() -> None:
         )
 
 
-def test_loss_balanced_sweep_rejects_dcm_with_actionable_error() -> None:
+@pytest.mark.parametrize("topology", ["buck", "boost"])
+def test_loss_balanced_sweep_rejects_dcm_with_actionable_error(
+    topology: str,
+) -> None:
     """Reject DCM before beginning a loss-balanced sweep."""
     with pytest.raises(ValueError, match="support CCM only.*conduction_regime='CCM'"):
         calculate_topology_sweep(
-            "boost", point(mode="loss-balanced", conduction_regime="DCM"),
+            topology, point(mode="loss-balanced", conduction_regime="DCM"),
             {"x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000,
              "x_points": 3, "metric": "i_l_ripple_pp_a"},
         )

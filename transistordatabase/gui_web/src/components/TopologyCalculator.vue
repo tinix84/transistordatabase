@@ -90,7 +90,7 @@
               </select>
             </label>
           </div>
-          <p class="hint">Estimate mode does not use device curves. Conduction-only mode requires exact-condition switch and diode channel curves. Detailed mode also requires exact-condition turn-on and turn-off curves. Loss-balanced mode requires exact-condition switch and diode channel curves. Boost supports CCM and DCM feedback; DCM feedback for other topologies and all curve extrapolation are rejected.</p>
+          <p class="hint">Estimate mode does not use device curves. Conduction-only mode requires exact-condition switch and diode channel curves. Detailed mode also requires exact-condition turn-on and turn-off curves. Loss-balanced mode requires exact-condition switch and diode channel curves. Buck and Boost support scalar DCM feedback; DCM feedback for other topologies and all curve extrapolation are rejected.</p>
         </div>
 
         <div v-if="form.mode !== 'estimate'" class="param-section">
@@ -124,7 +124,7 @@
           <h4>Python generated sweep</h4>
           <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox"> Include line or contour sweep</label>
           <p v-if="form.mode === 'loss-balanced'" class="hint">Loss-balanced sweeps solve each CCM point from exact-condition channel curves. Every point must be supported; no curve extrapolation is used.</p>
-          <p v-if="form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM'" class="hint">Loss-balanced sweeps support CCM only. Boost DCM is available for a scalar operating point.</p>
+          <p v-if="form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM'" class="hint">Loss-balanced sweeps support CCM only. Buck and Boost DCM feedback are available for scalar operating points.</p>
           <div v-if="form.sweep_enabled" class="param-grid">
             <label class="param-item">Sweep type
               <select v-model="form.sweep_kind"><option value="line">Line</option><option value="contour">Contour</option></select>
@@ -167,7 +167,7 @@
         <button class="btn btn-secondary" type="button" :disabled="loading || (form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM')" @click="compare">Compare topologies</button>
         </div>
         <div v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</div>
-        <p v-if="form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM'" class="hint">Topology comparison is unavailable for loss-balanced DCM. Only scalar Boost DCM feedback is supported.</p>
+        <p v-if="form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM'" class="hint">Topology comparison is unavailable for loss-balanced DCM. Only scalar Buck or Boost DCM feedback is supported.</p>
       </section>
 
       <section v-if="hasResults" class="results-panel">
@@ -341,7 +341,9 @@ const modelLabel = computed(() => {
   const mode = results.value?.model?.mode
   if (mode === 'loss-balanced') {
     const regime = results.value?.model?.conduction_regime || 'CCM'
-    const topology = results.value?.topology === 'boost' && regime === 'DCM' ? 'Boost DCM' : regime
+    const topology = ['buck', 'boost'].includes(results.value?.topology) && regime === 'DCM'
+      ? `${results.value.topology === 'buck' ? 'Buck' : 'Boost'} DCM`
+      : regime
     return `${topology} TDB channel loss-balanced averaged model`
   }
   if (mode === 'detailed') return 'TDB curve based partial device model'
