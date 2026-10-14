@@ -45,3 +45,17 @@ The mode closes its included channel-loss input/output power balance by solving 
 ## Completion rule
 
 This sprint is complete only when all accepted checks pass and the migration matrix still identifies nonlinear volt-second mismatch, switching and other missing losses, unavailable thermal closure, DCM feedback, screenshot parity, and broader desktop capabilities as open work.
+
+## Post-merge follow-up: PR #11 review findings
+
+Review status: corrective implementation and focused validation are complete; Sol's follow-up review is pending.
+
+- **P2 — loss-balanced topology comparison omitted balance and thermal details.** The Vue comparison now shows each successful CCM loss-balanced topology's power-balance residual, averaged inductor volt-second residual, thermal status and per-device availability reasons. It renders the response's channel-only, one-pass fixed-curve-temperature, and nonlinear volt-second caveats. Missing residuals display as unavailable, and per-topology errors and unsupported results remain safe to render. Estimate comparisons continue to state that efficiency is not calculated and do not show loss-balanced details.
+- **P2 — Buck, Buck-Boost, and Flyback flat-channel fixtures did not independently check currents and separate losses.** The fixtures now assert hand-derived input, inductor, output, and diode-average currents plus switch and diode losses. They check power balance and each topology's signed averaged volt-second equation independently. Buck-Boost retains its negative output polarity, and Flyback derives its secondary current and off-interval voltage using the explicit `Np/Ns = 2` ratio. The existing independent Boost fixture was left unchanged.
+
+Focused validation on the corrective branch:
+
+- `conda run --no-capture-output -n ntbees2 python -m pytest tests/test_topology_operating_point.py tests/test_topology_api.py -q` — 93 passed.
+- `npm run test:run -- src/tests/unit/TopologyWorkflow.test.js src/tests/unit/TopologyCalculator.test.js` — 59 passed across 2 files.
+- `conda run --no-capture-output -n ntbees2 ruff check tests/test_topology_operating_point.py` — passed.
+- `npm run build` — passed. Vite reported the existing >500 kB chunk advisory.
