@@ -11,7 +11,7 @@
       <label>Select Transistor:</label>
       <select
         v-model="selectedTransistorId"
-        :disabled="rawImportSaving"
+        :disabled="rawImportSaving || dptEnergySaving"
         @change="loadDPTData"
       >
         <option value="">-- Choose a transistor --</option>
@@ -571,6 +571,215 @@
               </div>
             </template>
           </section>
+
+          <section class="dpt-energy-section" data-testid="dpt-energy-derivation">
+            <h4>Derive switching energy from stored event windows</h4>
+            <p class="waveform-description">
+              This is a raw-window measurement. Signed instantaneous power
+              <code>p(t) = Vds(t) · Id(t)</code> is integrated by the trapezoid rule
+              from the first through last exact stored sample. No boundary detection,
+              resampling, interpolation, threshold extension, or automatic sign change
+              is applied. Choose an explicit current-axis value and both polarity signs
+              for every event; current is not inferred from the transient.
+            </p>
+
+            <div class="dpt-energy-form">
+              <label for="dpt-energy-loss-type">Energy curve</label>
+              <select
+                id="dpt-energy-loss-type"
+                data-testid="dpt-energy-loss-type"
+                v-model="dptEnergyForm.loss_type"
+                :disabled="dptEnergyBusy || dptEnergySaving"
+              >
+                <option value="e_on">Turn-on E_on</option>
+                <option value="e_off">Turn-off E_off</option>
+              </select>
+            </div>
+
+            <div
+              v-for="(point, pointIndex) in dptEnergyForm.points"
+              :key="point.id"
+              class="dpt-energy-point"
+              :data-testid="`dpt-energy-point-${pointIndex}`"
+            >
+              <h5>Event {{ pointIndex + 1 }}</h5>
+              <label :for="`dpt-energy-record-${pointIndex}`">Stored measurement</label>
+              <select
+                :id="`dpt-energy-record-${pointIndex}`"
+                :data-testid="`dpt-energy-record-${pointIndex}`"
+                v-model.number="point.measurement_index"
+                :disabled="dptEnergyBusy || dptEnergySaving"
+                @change="point.acquisition_index = null"
+              >
+                <option :value="null">Choose a stored measurement</option>
+                <option
+                  v-for="record in dptEnergyMeasurementOptions"
+                  :key="record.index"
+                  :value="record.index"
+                >
+                  {{ record.label }}
+                </option>
+              </select>
+
+              <label :for="`dpt-energy-acquisition-${pointIndex}`">Stored event acquisition</label>
+              <select
+                :id="`dpt-energy-acquisition-${pointIndex}`"
+                :data-testid="`dpt-energy-acquisition-${pointIndex}`"
+                v-model.number="point.acquisition_index"
+                :disabled="dptEnergyBusy || dptEnergySaving || !dptEnergyAcquisitionCount(point.measurement_index)"
+              >
+                <option :value="null">Choose an acquisition</option>
+                <option
+                  v-for="index in dptEnergyAcquisitionCount(point.measurement_index)"
+                  :key="index - 1"
+                  :value="index - 1"
+                >
+                  Acquisition {{ index }}
+                </option>
+              </select>
+
+              <label :for="`dpt-energy-current-${pointIndex}`">Explicit graph current i_x [A]</label>
+              <input
+                :id="`dpt-energy-current-${pointIndex}`"
+                :data-testid="`dpt-energy-current-${pointIndex}`"
+                v-model.number="point.i_x"
+                type="number"
+                min="0"
+                step="any"
+                :disabled="dptEnergyBusy || dptEnergySaving"
+              />
+
+              <label :for="`dpt-energy-vds-sign-${pointIndex}`">Vds polarity multiplier</label>
+              <select
+                :id="`dpt-energy-vds-sign-${pointIndex}`"
+                :data-testid="`dpt-energy-vds-sign-${pointIndex}`"
+                v-model.number="point.vds_sign"
+                :disabled="dptEnergyBusy || dptEnergySaving"
+              >
+                <option :value="null">Choose Vds sign</option>
+                <option :value="1">+1 · use stored Vds sign</option>
+                <option :value="-1">−1 · reverse stored Vds sign</option>
+              </select>
+
+              <label :for="`dpt-energy-id-sign-${pointIndex}`">Id polarity multiplier</label>
+              <select
+                :id="`dpt-energy-id-sign-${pointIndex}`"
+                :data-testid="`dpt-energy-id-sign-${pointIndex}`"
+                v-model.number="point.id_sign"
+                :disabled="dptEnergyBusy || dptEnergySaving"
+              >
+                <option :value="null">Choose Id sign</option>
+                <option :value="1">+1 · use stored Id sign</option>
+                <option :value="-1">−1 · reverse stored Id sign</option>
+              </select>
+
+              <button
+                v-if="dptEnergyForm.points.length > 2"
+                type="button"
+                class="btn-remove-energy-point"
+                :data-testid="`dpt-energy-remove-${pointIndex}`"
+                :disabled="dptEnergyBusy || dptEnergySaving"
+                @click="removeDptEnergyPoint(pointIndex)"
+              >
+                Remove event
+              </button>
+            </div>
+
+            <p v-if="!dptEnergyMeasurementOptions.length" class="no-data" role="status">
+              No stored paired {{ dptEnergyForm.loss_type === 'e_on' ? 'turn-on' : 'turn-off' }}
+              Vds and Id acquisitions are available.
+            </p>
+            <p v-if="dptEnergyFormError" class="raw-import-error" role="alert">
+              {{ dptEnergyFormError }}
+            </p>
+
+            <div class="dpt-energy-actions">
+              <button
+                type="button"
+                data-testid="dpt-energy-add-point"
+                :disabled="dptEnergyForm.points.length >= 50 || dptEnergyBusy || dptEnergySaving"
+                @click="addDptEnergyPoint"
+              >
+                Add event
+              </button>
+              <button
+                type="button"
+                data-testid="dpt-energy-preview"
+                :disabled="!dptEnergyCanPreview || dptEnergyBusy || dptEnergySaving"
+                @click="previewDptEnergy"
+              >
+                {{ dptEnergyBusy ? 'Calculating…' : 'Preview raw-window energy' }}
+              </button>
+            </div>
+
+            <p v-if="dptEnergyError" class="raw-import-error" role="alert">
+              {{ dptEnergyError }}
+            </p>
+            <p v-if="dptEnergyStatus" class="raw-import-status" role="status">
+              {{ dptEnergyStatus }}
+            </p>
+
+            <div
+              v-if="dptEnergyPreview && dptEnergyReviewIsCurrent"
+              class="dpt-energy-preview"
+              data-testid="dpt-energy-preview-result"
+            >
+              <h5>Review raw-window result</h5>
+              <p>
+                {{ dptEnergyPreview.save_action === 'extend'
+                  ? `Extend existing curve #${dptEnergyPreview.existing_curve_index + 1}`
+                  : 'Create a new curve' }}
+                · {{ dptEnergyPreview.loss_type === 'e_on' ? 'E_on' : 'E_off' }}
+                · {{ dptEnergyPreview.integration.quantity }}
+              </p>
+              <p>
+                {{ dptEnergyPreview.integration.formula }};
+                {{ dptEnergyPreview.integration.power_formula }}.
+                Integration interval: {{ dptEnergyPreview.integration.interval }}.
+              </p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Source</th><th>i_x [A]</th><th>Energy [J]</th>
+                    <th>Exact interval [s]</th><th>Samples</th><th>Signs (Vds, Id)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="point in dptEnergyPreview.points" :key="`${point.measurement_index}-${point.acquisition_index}`">
+                    <td>Measurement {{ point.measurement_index + 1 }}, acquisition {{ point.acquisition_index + 1 }}</td>
+                    <td>{{ point.i_x }}</td>
+                    <td>{{ point.energy_j }}</td>
+                    <td>[{{ point.start_s }}, {{ point.end_s }}]</td>
+                    <td>{{ point.sample_count }}</td>
+                    <td>{{ point.vds_sign > 0 ? '+' : '−' }}1, {{ point.id_sign > 0 ? '+' : '−' }}1</td>
+                  </tr>
+                </tbody>
+              </table>
+              <dl class="dpt-energy-conditions">
+                <div v-for="(value, key) in dptEnergyPreview.conditions" :key="key">
+                  <dt>{{ key }}</dt><dd>{{ value === null ? 'not recorded' : value }}</dd>
+                </div>
+              </dl>
+              <label class="dpt-energy-confirm">
+                <input
+                  v-model="dptEnergyConfirmed"
+                  data-testid="dpt-energy-confirm"
+                  type="checkbox"
+                  :disabled="dptEnergySaving"
+                />
+                I reviewed these raw-window measurements and confirm saving this curve.
+              </label>
+              <button
+                type="button"
+                class="btn-save-energy"
+                data-testid="dpt-energy-save"
+                :disabled="!dptEnergyConfirmed || !dptEnergyReviewIsCurrent || dptEnergySaving"
+                @click="saveDptEnergy"
+              >
+                {{ dptEnergySaving ? 'Saving…' : 'Save reviewed energy curve' }}
+              </button>
+            </div>
+          </section>
         </div>
 
         <div v-else class="no-data">
@@ -778,6 +987,215 @@ export default {
     const rawImportError = ref('')
     const rawImportForm = ref(emptyRawImportForm())
     const rawImportMetadata = ref(emptyRawImportMetadata())
+    const dptEnergyForm = ref({ loss_type: 'e_on', points: [emptyDptEnergyPoint(), emptyDptEnergyPoint()] })
+    const dptEnergyPreview = ref(null)
+    const dptEnergyPreviewSignature = ref('')
+    const dptEnergyBusy = ref(false)
+    const dptEnergySaving = ref(false)
+    const dptEnergyConfirmed = ref(false)
+    const dptEnergyError = ref('')
+    const dptEnergyStatus = ref('')
+    const dptEnergyRequestVersion = ref(0)
+
+    function emptyDptEnergyPoint() {
+      return {
+        id: `${Date.now()}-${Math.random()}`,
+        measurement_index: null,
+        acquisition_index: null,
+        i_x: '',
+        vds_sign: null,
+        id_sign: null
+      }
+    }
+
+    function invalidateDptEnergyReview({ clearStatus = true } = {}) {
+      dptEnergyRequestVersion.value += 1
+      dptEnergyPreview.value = null
+      dptEnergyPreviewSignature.value = ''
+      dptEnergyConfirmed.value = false
+      dptEnergyError.value = ''
+      if (clearStatus) dptEnergyStatus.value = ''
+      dptEnergyBusy.value = false
+    }
+
+    const dptEnergyInputSignature = computed(() => JSON.stringify({
+      transistor_id: selectedTransistorId.value,
+      loss_type: dptEnergyForm.value.loss_type,
+      points: dptEnergyForm.value.points.map(({ measurement_index, acquisition_index, i_x, vds_sign, id_sign }) => ({
+        measurement_index,
+        acquisition_index,
+        i_x,
+        vds_sign,
+        id_sign
+      }))
+    }))
+
+    const dptEnergyReviewIsCurrent = computed(() => (
+      Boolean(dptEnergyPreview.value)
+      && dptEnergyPreviewSignature.value === dptEnergyInputSignature.value
+    ))
+
+    watch(dptEnergyInputSignature, () => {
+      invalidateDptEnergyReview()
+    }, { flush: 'sync' })
+
+    const dptEnergyMeasurementOptions = computed(() => {
+      const suffix = dptEnergyForm.value.loss_type === 'e_on' ? 'on' : 'off'
+      return rawMeasurementRecords.value.flatMap((measurement, index) => {
+        const count = dptEnergyAcquisitionCount(index)
+        if (!count) return []
+        return [{
+          index,
+          label: `${measurementLabel(measurement, index)} · ${count} paired ${suffix} acquisition${count === 1 ? '' : 's'}`
+        }]
+      })
+    })
+
+    function dptEnergyAcquisitionCount(measurementIndex) {
+      if (!Number.isInteger(measurementIndex)) return 0
+      const measurement = rawMeasurementRecords.value[measurementIndex]
+      if (!measurement) return 0
+      const suffix = dptEnergyForm.value.loss_type === 'e_on' ? 'on' : 'off'
+      const vds = measurement[`dpt_${suffix}_vds`]
+      const current = measurement[`dpt_${suffix}_id`]
+      return Array.isArray(vds) && Array.isArray(current)
+        ? Math.min(vds.length, current.length)
+        : 0
+    }
+
+    const dptEnergyRequest = computed(() => {
+      const points = dptEnergyForm.value.points
+      if (points.length < 2 || points.length > 50) return null
+      const identities = new Set()
+      const currents = new Set()
+      const requestPoints = []
+      for (const point of points) {
+        if (
+          !Number.isInteger(point.measurement_index)
+          || !Number.isInteger(point.acquisition_index)
+          || point.acquisition_index < 0
+          || point.acquisition_index >= dptEnergyAcquisitionCount(point.measurement_index)
+          || !Number.isFinite(point.i_x)
+          || point.i_x <= 0
+          || ![1, -1].includes(point.vds_sign)
+          || ![1, -1].includes(point.id_sign)
+        ) return null
+        const identity = `${point.measurement_index}:${point.acquisition_index}`
+        if (identities.has(identity) || currents.has(point.i_x)) return null
+        identities.add(identity)
+        currents.add(point.i_x)
+        requestPoints.push({
+          measurement_index: point.measurement_index,
+          acquisition_index: point.acquisition_index,
+          i_x: point.i_x,
+          vds_sign: point.vds_sign,
+          id_sign: point.id_sign
+        })
+      }
+      return { loss_type: dptEnergyForm.value.loss_type, points: requestPoints }
+    })
+
+    const dptEnergyFormError = computed(() => {
+      if (dptEnergyForm.value.points.length < 2) return 'Select at least two event windows.'
+      if (dptEnergyForm.value.points.some(point => (
+        Number.isFinite(point.i_x) && point.i_x <= 0
+      ))) return 'Every graph current i_x must be greater than zero.'
+      const points = dptEnergyForm.value.points
+      const identities = points.map(point => `${point.measurement_index}:${point.acquisition_index}`)
+      if (identities.some((identity, index) => identities.indexOf(identity) !== index)
+        && points.every(point => Number.isInteger(point.measurement_index) && Number.isInteger(point.acquisition_index))) {
+        return 'Choose each stored event acquisition only once.'
+      }
+      const currents = points.map(point => point.i_x)
+      if (currents.every(Number.isFinite) && currents.some((value, index) => currents.indexOf(value) !== index)) {
+        return 'Every event needs a distinct i_x value.'
+      }
+      if (dptEnergyForm.value.points.some(point => (
+        !Number.isInteger(point.measurement_index)
+        || !Number.isInteger(point.acquisition_index)
+        || !Number.isFinite(point.i_x)
+        || point.i_x <= 0
+        || ![1, -1].includes(point.vds_sign)
+        || ![1, -1].includes(point.id_sign)
+      ))) {
+        return 'Choose a stored event, enter a positive i_x value, and choose both polarity signs for every event.'
+      }
+      return ''
+    })
+
+    const dptEnergyCanPreview = computed(() => (
+      Boolean(selectedTransistorId.value) && Boolean(dptEnergyRequest.value)
+    ))
+
+    function addDptEnergyPoint() {
+      if (dptEnergyForm.value.points.length >= 50) return
+      dptEnergyForm.value.points.push(emptyDptEnergyPoint())
+    }
+
+    function removeDptEnergyPoint(index) {
+      if (dptEnergyForm.value.points.length <= 2) return
+      dptEnergyForm.value.points.splice(index, 1)
+    }
+
+    async function previewDptEnergy() {
+      const request = dptEnergyRequest.value
+      if (!request || !selectedTransistorId.value) return
+      invalidateDptEnergyReview()
+      const requestVersion = dptEnergyRequestVersion.value
+      const transistorId = selectedTransistorId.value
+      const signature = dptEnergyInputSignature.value
+      dptEnergyBusy.value = true
+      dptEnergyError.value = ''
+      dptEnergyStatus.value = ''
+      try {
+        const preview = await transistorApi.previewDPTEnergy(transistorId, request)
+        if (
+          requestVersion !== dptEnergyRequestVersion.value
+          || signature !== dptEnergyInputSignature.value
+        ) return
+        dptEnergyPreview.value = preview
+        dptEnergyPreviewSignature.value = signature
+        dptEnergyStatus.value = 'Review every event interval, current-axis value, sign, energy, and condition before confirming save.'
+      } catch (err) {
+        if (requestVersion === dptEnergyRequestVersion.value) {
+          dptEnergyError.value = err?.response?.data?.detail || 'Failed to preview raw-window energy.'
+        }
+      } finally {
+        if (requestVersion === dptEnergyRequestVersion.value) dptEnergyBusy.value = false
+      }
+    }
+
+    async function saveDptEnergy() {
+      if (!dptEnergyReviewIsCurrent.value || !dptEnergyConfirmed.value) return
+      const review = dptEnergyPreview.value
+      const request = dptEnergyRequest.value
+      if (!request || !selectedTransistorId.value) return
+      const transistorId = selectedTransistorId.value
+      dptEnergySaving.value = true
+      dptEnergyError.value = ''
+      dptEnergyStatus.value = ''
+      try {
+        const saved = await transistorApi.saveDPTEnergy(transistorId, {
+          ...request,
+          source_token: review.source_token,
+          request_token: review.request_token,
+          save_action: review.save_action,
+          existing_curve_index: review.existing_curve_index,
+          target_curve_count: review.target_curve_count,
+          target_edit_token: review.target_edit_token
+        })
+        const savedStatus = `${saved.action === 'extended' ? 'Extended' : 'Added'} ${saved.loss_type === 'e_on' ? 'E_on' : 'E_off'} curve #${saved.curve_index + 1} with ${saved.point_count} measured points.`
+        invalidateDptEnergyReview()
+        await loadDPTData()
+        dptEnergyStatus.value = savedStatus
+      } catch (err) {
+        const detail = err?.response?.data?.detail
+        if (err?.response?.status === 409) invalidateDptEnergyReview()
+        dptEnergyError.value = detail || 'Failed to save the reviewed energy curve.'
+      } finally {
+        dptEnergySaving.value = false
+      }
+    }
 
     function emptyRawImportForm() {
       return {
@@ -1306,6 +1724,7 @@ export default {
       () => {
         dptDataRequestVersion.value += 1
         dptData.value = null
+        invalidateDptEnergyReview()
         resetRawImportWorkflow()
       },
       { flush: 'sync' }
@@ -1407,6 +1826,7 @@ export default {
           || requestedTransistorId !== selectedTransistorId.value
         ) return
         dptData.value = response
+        invalidateDptEnergyReview()
         selectedMeasurementIndex.value = 0
         selectedAcquisitionIndex.value = 0
         measurementSearch.value = ''
@@ -1511,6 +1931,22 @@ export default {
       rawImportError,
       rawImportForm,
       rawImportMetadata,
+      dptEnergyForm,
+      dptEnergyPreview,
+      dptEnergyBusy,
+      dptEnergySaving,
+      dptEnergyConfirmed,
+      dptEnergyError,
+      dptEnergyStatus,
+      dptEnergyMeasurementOptions,
+      dptEnergyAcquisitionCount,
+      dptEnergyFormError,
+      dptEnergyCanPreview,
+      dptEnergyReviewIsCurrent,
+      addDptEnergyPoint,
+      removeDptEnergyPoint,
+      previewDptEnergy,
+      saveDptEnergy,
       rawImportValueTraces,
       rawImportTraceMappingReady,
       rawImportSelectionValid,
@@ -2289,5 +2725,149 @@ h2 {
   text-align: center;
   padding: 40px;
   color: #999;
+}
+
+.dpt-energy-section {
+  margin-top: 28px;
+  padding: 20px;
+  border: 1px solid #d7dee8;
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.dpt-energy-section h4 {
+  margin: 0 0 12px;
+}
+
+.dpt-energy-section code {
+  color: #24344d;
+  font-weight: 600;
+}
+
+.dpt-energy-form,
+.dpt-energy-point {
+  display: grid;
+  grid-template-columns: minmax(170px, 240px) minmax(220px, 1fr);
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.dpt-energy-form {
+  margin: 18px 0;
+  max-width: 560px;
+}
+
+.dpt-energy-point {
+  position: relative;
+  margin: 14px 0;
+  padding: 16px;
+  border: 1px solid #e1e6ee;
+  border-radius: 6px;
+  background: white;
+}
+
+.dpt-energy-point h5 {
+  grid-column: 1 / -1;
+  margin: 0 0 4px;
+}
+
+.dpt-energy-point input,
+.dpt-energy-point select,
+.dpt-energy-form select {
+  min-width: 0;
+  padding: 7px 8px;
+  border: 1px solid #bcc6d4;
+  border-radius: 4px;
+}
+
+.btn-remove-energy-point {
+  grid-column: 2;
+  justify-self: start;
+}
+
+.dpt-energy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.dpt-energy-preview {
+  overflow-x: auto;
+  margin-top: 18px;
+  padding: 16px;
+  border-left: 4px solid #2563eb;
+  background: white;
+}
+
+.dpt-energy-preview h5 {
+  margin: 0 0 10px;
+}
+
+.dpt-energy-preview table {
+  width: 100%;
+  margin: 12px 0;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.dpt-energy-preview th,
+.dpt-energy-preview td {
+  padding: 8px;
+  border-bottom: 1px solid #e1e6ee;
+  white-space: nowrap;
+}
+
+.dpt-energy-conditions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px 16px;
+}
+
+.dpt-energy-conditions div {
+  display: grid;
+  grid-template-columns: minmax(90px, 0.7fr) minmax(100px, 1fr);
+  gap: 8px;
+}
+
+.dpt-energy-conditions dt {
+  font-weight: 600;
+}
+
+.dpt-energy-conditions dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.dpt-energy-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.btn-save-energy {
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 4px;
+  background: #155e34;
+  color: white;
+}
+
+.btn-save-energy:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 680px) {
+  .dpt-energy-form,
+  .dpt-energy-point {
+    grid-template-columns: 1fr;
+  }
+
+  .dpt-energy-point h5,
+  .btn-remove-energy-point {
+    grid-column: 1;
+  }
 }
 </style>

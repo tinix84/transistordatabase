@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, StrictInt, field_validator, model_validator
 
 
 class ChannelCurveCreate(BaseModel):
@@ -412,6 +412,50 @@ class DptRawImportRequest(DptRawTraceSelectionRequest):
     turn_on: DptRawEventWindow
     turn_off: DptRawEventWindow
     metadata: DptRawImportMetadata = Field(default_factory=DptRawImportMetadata)
+
+
+class DptEnergyPointRequest(BaseModel):
+    """One explicit current-axis point tied to a stored event acquisition."""
+
+    measurement_index: StrictInt = Field(..., ge=0)
+    acquisition_index: StrictInt = Field(..., ge=0)
+    i_x: float = Field(..., gt=0, allow_inf_nan=False, description="Current axis in A")
+    vds_sign: Literal[-1, 1] = Field(..., description="Explicit Vds polarity multiplier")
+    id_sign: Literal[-1, 1] = Field(..., description="Explicit Id polarity multiplier")
+
+
+class DptEnergyDerivationRequest(BaseModel):
+    """Inputs for one E_on or E_off graph derived from exact stored samples."""
+
+    loss_type: Literal["e_on", "e_off"]
+    points: List[DptEnergyPointRequest] = Field(..., min_length=2, max_length=50)
+
+
+class DptEnergySaveRequest(DptEnergyDerivationRequest):
+    """Reviewed inputs plus server-issued source and request preconditions."""
+
+    source_token: str = Field(..., min_length=64, max_length=64, pattern="^[a-f0-9]{64}$")
+    request_token: str = Field(..., min_length=64, max_length=64, pattern="^[a-f0-9]{64}$")
+    save_action: Literal["add", "extend"]
+    existing_curve_index: Optional[StrictInt] = Field(None, ge=0)
+    target_curve_count: StrictInt = Field(..., ge=0)
+    target_edit_token: Optional[str] = Field(
+        None, min_length=64, max_length=64, pattern="^[a-f0-9]{64}$"
+    )
+
+    @model_validator(mode="after")
+    def validate_target_snapshot(self) -> "DptEnergySaveRequest":
+        """Require a complete, internally consistent target state snapshot."""
+        if self.save_action == "add":
+            if self.existing_curve_index is not None or self.target_edit_token is not None:
+                raise ValueError("An add target cannot include a curve index or edit token")
+        elif (
+            self.existing_curve_index is None
+            or self.existing_curve_index >= self.target_curve_count
+            or self.target_edit_token is None
+        ):
+            raise ValueError("An extend target needs its curve index and edit token")
+        return self
 
 
 class PLECSImportResponse(BaseModel):
