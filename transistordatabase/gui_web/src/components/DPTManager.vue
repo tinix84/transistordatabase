@@ -107,8 +107,9 @@
           <section class="raw-import-section" data-testid="dpt-raw-import">
             <h4>Import an LTspice RAW measurement</h4>
             <p class="waveform-description">
-              Supports one native LTspice transient result without parameter steps.
-              Choose the Vds and Id traces, then enter each event window in seconds.
+              Select one transient plot, the source steps to import, and explicit
+              turn-on and turn-off windows in seconds. Step parameters and conditions
+              are never read from the RAW file or a companion log.
               The uploaded file is discarded after each request.
             </p>
             <div class="raw-import-file-row">
@@ -133,13 +134,60 @@
             </div>
 
             <div v-if="rawImportPreview" class="raw-import-preview" data-testid="dpt-raw-file-preview">
+              <div v-if="rawImportPreview.plots.length > 1" class="raw-import-plot-select">
+                <label for="dpt-raw-plot">Transient plot</label>
+                <select
+                  id="dpt-raw-plot"
+                  data-testid="dpt-raw-plot"
+                  v-model="rawImportForm.plot_index"
+                  :disabled="rawImportSaving"
+                  @change="selectRawImportPlot"
+                >
+                  <option value="">Choose a transient plot</option>
+                  <option
+                    v-for="plot in rawImportPreview.plots"
+                    :key="plot.plot_index"
+                    :value="String(plot.plot_index)"
+                    :disabled="!plot.is_transient"
+                  >
+                    Plot {{ plot.plot_index + 1 }} · {{ plot.plot_name }} ·
+                    {{ plot.sample_count.toLocaleString() }} samples
+                  </option>
+                </select>
+              </div>
               <p>
-                {{ rawImportPreview.filename }} · {{ rawImportPreview.plot_name }} ·
-                {{ rawImportPreview.sample_count.toLocaleString() }} samples
+                {{ rawImportPreview.filename }} ·
+                {{ rawImportSelectedPlot?.plot_name || 'Choose a transient plot' }}
+                <template v-if="rawImportSelectedPlot">
+                  · {{ rawImportSelectedPlot.sample_count.toLocaleString() }} samples
+                </template>
               </p>
-              <p class="raw-import-axis-note">
-                Time axis identified by the parser: <strong>{{ rawImportPreview.time_trace_name }}</strong>
+              <p v-if="rawImportSelectedPlot" class="raw-import-axis-note">
+                Time axis identified by the parser:
+                <strong>{{ rawImportSelectedPlot.trace_names[0] }}</strong>
               </p>
+              <fieldset
+                v-if="rawImportSelectedPlot?.is_stepped"
+                class="raw-import-step-select"
+                data-testid="dpt-raw-step-select"
+              >
+                <legend>Select source steps</legend>
+                <label
+                  v-for="step in rawImportSelectedPlot.steps"
+                  :key="step.step_index"
+                  class="raw-import-step-option"
+                >
+                  <input
+                    v-model="rawImportForm.step_indices"
+                    type="checkbox"
+                    :value="String(step.step_index)"
+                    :disabled="rawImportSaving"
+                    @change="selectRawImportSteps"
+                  />
+                  Step {{ step.step_index }} · {{ step.sample_count }} samples ·
+                  {{ step.time_range_s[0] }} to {{ step.time_range_s[1] }} s
+                </label>
+              </fieldset>
               <div class="raw-import-trace-grid">
                 <div>
                   <label for="dpt-raw-vds-trace">Vds trace (volts)</label>
@@ -184,7 +232,9 @@
                 :disabled="!rawImportTraceMappingReady || rawImportBusy || rawImportSaving"
                 @click="previewRawImportTraces"
               >
-                Preview selected traces
+                {{ rawImportWindowInputsValid
+                  ? 'Review import windows and conditions'
+                  : 'Preview selected traces' }}
               </button>
             </div>
 
@@ -197,8 +247,13 @@
                 Preview shows up to {{ rawImportTracePreview.preview_sample_count.toLocaleString() }}
                 display samples from {{ rawImportTracePreview.sample_count.toLocaleString() }}
                 source samples. Stored data will use every sample inside each selected window.
-                Time range: {{ rawImportTracePreview.time_range_s[0] }} to
-                {{ rawImportTracePreview.time_range_s[1] }} s.
+                <template v-if="rawImportTracePreview.time_range_s">
+                  Time range: {{ rawImportTracePreview.time_range_s[0] }} to
+                  {{ rawImportTracePreview.time_range_s[1] }} s.
+                </template>
+                <template v-else>
+                  {{ rawImportTracePreview.steps.length }} selected source steps.
+                </template>
               </p>
               <p
                 v-if="rawImportHasNonFiniteSamples"
@@ -215,7 +270,7 @@
                   x-label="Time [µs]"
                   :x-value-decimals="6"
                   y-label="Vds [V]"
-                  :show-legend="false"
+                  :show-legend="Boolean(rawImportSelectedPlot?.is_stepped)"
                 />
                 <CurvePlotter
                   title="Selected Id trace preview"
@@ -223,10 +278,73 @@
                   x-label="Time [µs]"
                   :x-value-decimals="6"
                   y-label="Id [A]"
-                  :show-legend="false"
+                  :show-legend="Boolean(rawImportSelectedPlot?.is_stepped)"
                 />
               </div>
-              <div class="raw-import-window-grid">
+              <div
+                v-if="rawImportRequiresExplicitContext"
+                class="raw-import-step-windows"
+                data-testid="dpt-raw-step-windows"
+              >
+                <fieldset
+                  v-for="step in rawImportSelectedSteps"
+                  :key="step.step_index"
+                  class="raw-import-step-window"
+                >
+                  <legend>Step {{ step.step_index }} acquisition</legend>
+                  <label>
+                    Acquisition current [A]
+                    <input
+                      v-model="rawImportStepForms[step.step_index].i_x"
+                      :data-testid="'dpt-raw-step-' + step.step_index + '-current'"
+                      type="number"
+                      step="any"
+                      :disabled="rawImportSaving"
+                    />
+                  </label>
+                  <label>
+                    Turn-on start [s]
+                    <input
+                      v-model="rawImportStepForms[step.step_index].turn_on_start_s"
+                      :data-testid="'dpt-raw-step-' + step.step_index + '-on-start'"
+                      type="number"
+                      step="any"
+                      :disabled="rawImportSaving"
+                    />
+                  </label>
+                  <label>
+                    Turn-on end [s]
+                    <input
+                      v-model="rawImportStepForms[step.step_index].turn_on_end_s"
+                      :data-testid="'dpt-raw-step-' + step.step_index + '-on-end'"
+                      type="number"
+                      step="any"
+                      :disabled="rawImportSaving"
+                    />
+                  </label>
+                  <label>
+                    Turn-off start [s]
+                    <input
+                      v-model="rawImportStepForms[step.step_index].turn_off_start_s"
+                      :data-testid="'dpt-raw-step-' + step.step_index + '-off-start'"
+                      type="number"
+                      step="any"
+                      :disabled="rawImportSaving"
+                    />
+                  </label>
+                  <label>
+                    Turn-off end [s]
+                    <input
+                      v-model="rawImportStepForms[step.step_index].turn_off_end_s"
+                      :data-testid="'dpt-raw-step-' + step.step_index + '-off-end'"
+                      type="number"
+                      step="any"
+                      :disabled="rawImportSaving"
+                    />
+                  </label>
+                </fieldset>
+              </div>
+              <div v-else class="raw-import-window-grid">
                 <fieldset>
                   <legend>Turn-on event window</legend>
                   <label for="dpt-raw-on-start">Start [s]</label>
@@ -271,8 +389,21 @@
                 </fieldset>
               </div>
 
-              <details class="raw-import-metadata">
-                <summary>Optional measurement conditions and provenance</summary>
+              <details class="raw-import-metadata" :open="rawImportRequiresExplicitContext">
+                <summary>
+                  {{ rawImportRequiresExplicitContext
+                    ? 'Required conditions for this source selection'
+                    : 'Optional measurement conditions and provenance' }}
+                </summary>
+                <p v-if="rawImportRequiresExplicitContext" class="raw-import-context-note">
+                  Enter values known from the test setup. RAW and .log step values are
+                  not read. Group selected steps only when every condition below is the
+                  same; use separate records if another condition changed.
+                  <template v-if="!rawImportSelectedPlot?.is_stepped">
+                    The selected plot is unstepped, so its sole source acquisition is
+                    step 0; enter its current explicitly.
+                  </template>
+                </p>
                 <div class="raw-import-metadata-grid" :class="{ 'is-saving': rawImportSaving }">
                   <label>Junction temperature [°C]<input v-model="rawImportMetadata.t_j" data-testid="dpt-raw-metadata-tj" :disabled="rawImportSaving" type="number" step="any" /></label>
                   <label>Supply voltage [V]<input v-model="rawImportMetadata.v_supply" :disabled="rawImportSaving" type="number" step="any" /></label>
@@ -288,6 +419,20 @@
                   <label class="raw-import-comment">Comment<textarea v-model="rawImportMetadata.comment" :disabled="rawImportSaving" maxlength="2000" rows="2" /></label>
                 </div>
               </details>
+              <label
+                v-if="rawImportRequiresExplicitContext"
+                class="raw-import-context-confirmation"
+              >
+                <input
+                  v-model="rawImportForm.same_context_confirmed"
+                  data-testid="dpt-raw-same-context"
+                  type="checkbox"
+                  :disabled="rawImportSaving"
+                  @change="selectRawImportContext"
+                />
+                I confirm selected steps share these entered conditions; only their
+                acquisition current differs.
+              </label>
               <button
                 type="button"
                 class="btn-import-raw-dpt"
@@ -295,13 +440,17 @@
                 :disabled="!rawImportSelectionValid || rawImportBusy || rawImportSaving"
                 @click="importRawDptMeasurement"
               >
-                {{ rawImportSaving ? 'Importing…' : 'Append DPT measurement' }}
+                {{ rawImportSaving
+                  ? 'Importing…'
+                  : rawImportRequiresExplicitContext
+                    ? 'Confirm and append reviewed DPT measurement'
+                    : 'Append DPT measurement' }}
               </button>
             </div>
             <p v-if="rawImportStatus" class="raw-import-status" role="status">
               {{ rawImportStatus }}
             </p>
-            <p v-if="rawImportError" class="raw-import-error" role="alert">
+            <p v-if="rawImportError" class="raw-import-error" data-testid="dpt-raw-error" role="alert">
               {{ rawImportError }}
             </p>
           </section>
@@ -987,6 +1136,7 @@ export default {
     const rawImportError = ref('')
     const rawImportForm = ref(emptyRawImportForm())
     const rawImportMetadata = ref(emptyRawImportMetadata())
+    const rawImportStepForms = ref({})
     const dptEnergyForm = ref({ loss_type: 'e_on', points: [emptyDptEnergyPoint(), emptyDptEnergyPoint()] })
     const dptEnergyPreview = ref(null)
     const dptEnergyPreviewSignature = ref('')
@@ -1199,6 +1349,9 @@ export default {
 
     function emptyRawImportForm() {
       return {
+        plot_index: '',
+        step_indices: [],
+        same_context_confirmed: false,
         vds_trace: '',
         id_trace: '',
         turn_on_start_s: '',
@@ -1225,10 +1378,13 @@ export default {
       }
     }
 
-    function invalidateRawImportReview({ resetWindows = true } = {}) {
+    function invalidateRawImportReview({
+      resetWindows = true,
+      clearTracePreview = true
+    } = {}) {
       rawImportRequestVersion.value += 1
       rawImportBusy.value = false
-      rawImportTracePreview.value = null
+      if (clearTracePreview) rawImportTracePreview.value = null
       rawImportReviewedState.value = null
       if (resetWindows) {
         rawImportForm.value = {
@@ -1236,8 +1392,25 @@ export default {
           turn_on_start_s: '',
           turn_on_end_s: '',
           turn_off_start_s: '',
-          turn_off_end_s: ''
+          turn_off_end_s: '',
+          same_context_confirmed: false
         }
+        rawImportStepForms.value = Object.fromEntries(
+          Object.keys(rawImportStepForms.value).map(index => [
+            index,
+            emptyRawImportStepForm()
+          ])
+        )
+      }
+    }
+
+    function emptyRawImportStepForm() {
+      return {
+        i_x: '',
+        turn_on_start_s: '',
+        turn_on_end_s: '',
+        turn_off_start_s: '',
+        turn_off_end_s: ''
       }
     }
 
@@ -1250,6 +1423,7 @@ export default {
       rawImportReviewedState.value = null
       rawImportForm.value = emptyRawImportForm()
       rawImportMetadata.value = emptyRawImportMetadata()
+      rawImportStepForms.value = {}
       rawImportBusy.value = false
       rawImportStatus.value = ''
       rawImportError.value = ''
@@ -1261,19 +1435,39 @@ export default {
         version: rawImportRequestVersion.value,
         file: rawImportFile.value,
         transistorId: selectedTransistorId.value,
-        timeTrace: rawImportPreview.value?.time_trace_name || null,
+        plotIndex: rawImportForm.value.plot_index,
+        stepIndices: [...(rawImportForm.value.step_indices || [])].join(','),
+        timeTrace: rawImportSelectedPlot.value?.trace_names?.[0] || null,
         vdsTrace: rawImportForm.value.vds_trace,
-        idTrace: rawImportForm.value.id_trace
+        idTrace: rawImportForm.value.id_trace,
+        inputSignature: rawImportInputSignature()
       }
+    }
+
+    function rawImportInputSignature() {
+      return JSON.stringify({
+        eventWindows: [
+          rawImportForm.value.turn_on_start_s,
+          rawImportForm.value.turn_on_end_s,
+          rawImportForm.value.turn_off_start_s,
+          rawImportForm.value.turn_off_end_s
+        ],
+        stepForms: rawImportStepForms.value,
+        metadata: rawImportMetadata.value,
+        sameContextConfirmed: rawImportForm.value.same_context_confirmed
+      })
     }
 
     function rawImportSnapshotIsCurrent(snapshot) {
       return snapshot.version === rawImportRequestVersion.value
         && snapshot.file === rawImportFile.value
         && snapshot.transistorId === selectedTransistorId.value
-        && snapshot.timeTrace === (rawImportPreview.value?.time_trace_name || null)
+        && snapshot.plotIndex === rawImportForm.value.plot_index
+        && snapshot.stepIndices === [...(rawImportForm.value.step_indices || [])].join(',')
+        && snapshot.timeTrace === (rawImportSelectedPlot.value?.trace_names?.[0] || null)
         && snapshot.vdsTrace === rawImportForm.value.vds_trace
         && snapshot.idTrace === rawImportForm.value.id_trace
+        && snapshot.inputSignature === rawImportInputSignature()
     }
 
     function rawImportHeaderIsCurrent() {
@@ -1287,9 +1481,12 @@ export default {
       return Boolean(review && rawImportTracePreview.value && rawImportHeaderIsCurrent())
         && review.file === rawImportFile.value
         && review.transistorId === selectedTransistorId.value
-        && review.timeTrace === rawImportPreview.value.time_trace_name
+        && review.plotIndex === rawImportForm.value.plot_index
+        && review.stepIndices === [...(rawImportForm.value.step_indices || [])].join(',')
+        && review.timeTrace === rawImportSelectedPlot.value?.trace_names?.[0]
         && review.vdsTrace === rawImportForm.value.vds_trace
         && review.idTrace === rawImportForm.value.id_trace
+        && review.inputSignature === rawImportInputSignature()
     }
 
     // DPT Configuration
@@ -1307,21 +1504,72 @@ export default {
 
     const generatedNetlist = ref(null)
     const validationResults = ref(null)
+    const rawImportSelectedPlot = computed(() => {
+      if (!rawImportHeaderIsCurrent() || rawImportForm.value.plot_index === '') return null
+      return rawImportPreview.value?.plots?.find(
+        plot => plot.plot_index === Number(rawImportForm.value.plot_index)
+      ) || null
+    })
+    const rawImportRequiresExplicitContext = computed(() => (
+      Boolean(rawImportSelectedPlot.value)
+      && (rawImportSelectedPlot.value.is_stepped
+        || (rawImportPreview.value?.plots?.length || 0) > 1)
+    ))
+    const rawImportSelectedSteps = computed(() => {
+      const selected = new Set(
+        (rawImportForm.value.step_indices || []).map(Number)
+      )
+      return (rawImportSelectedPlot.value?.steps || [])
+        .filter(step => selected.has(step.step_index))
+    })
     const rawImportValueTraces = computed(() => (
-      rawImportHeaderIsCurrent() && rawImportPreview.value?.trace_names?.filter(
-        trace => trace !== rawImportPreview.value.time_trace_name
+      rawImportSelectedPlot.value?.trace_names?.filter(
+        trace => trace !== rawImportSelectedPlot.value.trace_names[0]
       ) || []
     ))
     const rawImportTraceMappingReady = computed(() => (
       Boolean(rawImportFile.value)
-      && rawImportHeaderIsCurrent()
-      && Boolean(rawImportPreview.value?.time_trace_name)
+      && Boolean(rawImportSelectedPlot.value?.is_transient)
+      && Boolean(rawImportSelectedPlot.value?.trace_names?.[0])
       && Boolean(rawImportForm.value.vds_trace)
       && Boolean(rawImportForm.value.id_trace)
       && rawImportForm.value.vds_trace !== rawImportForm.value.id_trace
+      && (!rawImportRequiresExplicitContext.value
+        || rawImportSelectedSteps.value.length > 0)
     ))
-    const rawImportSelectionValid = computed(() => {
-      if (!rawImportReviewIsCurrent() || !rawImportTraceMappingReady.value) return false
+    const rawImportWindowInputsValid = computed(() => {
+      if (!rawImportTraceMappingReady.value) return false
+      if (rawImportRequiresExplicitContext.value) {
+        const numericWindowIsValid = (start, end) => (
+          start !== '' && end !== ''
+          && Number.isFinite(Number(start))
+          && Number.isFinite(Number(end))
+          && Number(end) >= Number(start)
+        )
+        const numericConditionFields = [
+          't_j', 'v_supply', 'v_g', 'v_g_off', 'r_g', 'r_g_off',
+          'load_inductance', 'commutation_inductance'
+        ]
+        const completeConditions = numericConditionFields.every(key => (
+          rawImportMetadata.value[key] !== ''
+          && rawImportMetadata.value[key] !== null
+          && rawImportMetadata.value[key] !== undefined
+          && Number.isFinite(Number(rawImportMetadata.value[key]))
+        )) && ['measurement_testbench', 'commutation_device'].every(key => (
+          String(rawImportMetadata.value[key] || '').trim() !== ''
+        ))
+        return rawImportForm.value.same_context_confirmed
+          && completeConditions
+          && rawImportSelectedSteps.value.length <= 50
+          && rawImportSelectedSteps.value.every(step => {
+            const form = rawImportStepForms.value[step.step_index]
+            if (!form || !Number.isFinite(Number(form.i_x)) || Number(form.i_x) <= 0) {
+              return false
+            }
+            return numericWindowIsValid(form.turn_on_start_s, form.turn_on_end_s)
+              && numericWindowIsValid(form.turn_off_start_s, form.turn_off_end_s)
+          })
+      }
       const windows = [
         [rawImportForm.value.turn_on_start_s, rawImportForm.value.turn_on_end_s],
         [rawImportForm.value.turn_off_start_s, rawImportForm.value.turn_off_end_s]
@@ -1333,8 +1581,16 @@ export default {
         && Number(end) >= Number(start)
       ))
     })
+    const rawImportSelectionValid = computed(() => (
+      rawImportReviewIsCurrent()
+      && rawImportWindowInputsValid.value
+      && (!rawImportRequiresExplicitContext.value
+        || Boolean(rawImportReviewedState.value?.reviewToken))
+    ))
     const rawImportHasNonFiniteSamples = computed(() => (
-      Object.values(rawImportTracePreview.value?.non_finite_preview_sample_counts || {})
+      Object.values(rawImportTracePreview.value?.steps || {})
+        .flatMap(step => Object.values(step.non_finite_preview_sample_counts || {}))
+        .concat(Object.values(rawImportTracePreview.value?.non_finite_preview_sample_counts || {}))
         .some(count => count > 0)
     ))
     function rawImportRequest(includeWindows = true) {
@@ -1353,20 +1609,44 @@ export default {
         }
       }
       const request = {
-        time_trace: rawImportPreview.value.time_trace_name,
+        plot_index: Number(rawImportForm.value.plot_index),
+        step_indices: (rawImportForm.value.step_indices || []).map(Number),
+        time_trace: rawImportSelectedPlot.value.trace_names[0],
         vds_trace: rawImportForm.value.vds_trace,
         id_trace: rawImportForm.value.id_trace
       }
       if (includeWindows) {
-        request.turn_on = {
-          start_s: Number(rawImportForm.value.turn_on_start_s),
-          end_s: Number(rawImportForm.value.turn_on_end_s)
-        }
-        request.turn_off = {
-          start_s: Number(rawImportForm.value.turn_off_start_s),
-          end_s: Number(rawImportForm.value.turn_off_end_s)
+        if (rawImportRequiresExplicitContext.value) {
+          request.step_selections = rawImportSelectedSteps.value.map(step => {
+            const form = rawImportStepForms.value[step.step_index]
+            return {
+              step_index: step.step_index,
+              i_x: Number(form.i_x),
+              turn_on: {
+                start_s: Number(form.turn_on_start_s),
+                end_s: Number(form.turn_on_end_s)
+              },
+              turn_off: {
+                start_s: Number(form.turn_off_start_s),
+                end_s: Number(form.turn_off_end_s)
+              }
+            }
+          })
+          request.same_context_confirmed = rawImportForm.value.same_context_confirmed
+        } else {
+          request.turn_on = {
+            start_s: Number(rawImportForm.value.turn_on_start_s),
+            end_s: Number(rawImportForm.value.turn_on_end_s)
+          }
+          request.turn_off = {
+            start_s: Number(rawImportForm.value.turn_off_start_s),
+            end_s: Number(rawImportForm.value.turn_off_end_s)
+          }
         }
         request.metadata = metadata
+      }
+      if (rawImportReviewedState.value?.reviewToken) {
+        request.review_token = rawImportReviewedState.value.reviewToken
       }
       return request
     }
@@ -1381,7 +1661,59 @@ export default {
       rawImportStatus.value = ''
       rawImportError.value = ''
       rawImportForm.value = emptyRawImportForm()
+      rawImportStepForms.value = {}
     }
+
+    function selectRawImportPlot() {
+      const plotIndex = rawImportForm.value.plot_index
+      const plot = rawImportPreview.value?.plots?.find(
+        item => item.plot_index === Number(plotIndex)
+      )
+      const chooseSingleSourceStep = Boolean(
+        plot && !plot.is_stepped && rawImportPreview.value.plots.length > 1
+      )
+      invalidateRawImportReview()
+      rawImportForm.value = {
+        ...emptyRawImportForm(),
+        plot_index: plotIndex,
+        step_indices: chooseSingleSourceStep ? ['0'] : []
+      }
+      rawImportStepForms.value = chooseSingleSourceStep
+        ? { 0: emptyRawImportStepForm() }
+        : {}
+      rawImportStatus.value = ''
+      rawImportError.value = ''
+    }
+
+    function selectRawImportSteps() {
+      const plot = rawImportSelectedPlot.value
+      const selectedIndexes = new Set(
+        (rawImportForm.value.step_indices || []).map(Number)
+      )
+      const selectedSteps = (plot?.steps || []).filter(step => (
+        selectedIndexes.has(step.step_index)
+      ))
+      rawImportForm.value = {
+        ...rawImportForm.value,
+        step_indices: selectedSteps.map(step => String(step.step_index)),
+        same_context_confirmed: false
+      }
+      const forms = {}
+      for (const step of selectedSteps) {
+        forms[step.step_index] = rawImportStepForms.value[step.step_index]
+          || emptyRawImportStepForm()
+      }
+      rawImportStepForms.value = forms
+      invalidateRawImportReview({ resetWindows: false })
+      rawImportStatus.value = ''
+      rawImportError.value = ''
+    }
+
+    function selectRawImportContext() {
+      invalidateRawImportReview({ resetWindows: false, clearTracePreview: false })
+      rawImportStatus.value = ''
+    }
+
     async function previewRawImportFile() {
       if (!rawImportFile.value || !selectedTransistorId.value) return
       invalidateRawImportReview()
@@ -1397,12 +1729,30 @@ export default {
           snapshot.file
         )
         if (!rawImportSnapshotIsCurrent(snapshot)) return
-        rawImportPreview.value = preview
+        const plots = Array.isArray(preview.plots)
+          ? preview.plots
+          : [{
+              plot_index: 0,
+              plot_name: preview.plot_name,
+              sample_count: preview.sample_count,
+              trace_names: preview.trace_names || [],
+              is_transient: true,
+              is_stepped: false,
+              steps: []
+            }]
+        rawImportPreview.value = { ...preview, plots }
+        rawImportForm.value = {
+          ...emptyRawImportForm(),
+          plot_index: plots.length === 1 ? String(plots[0].plot_index) : ''
+        }
+        rawImportStepForms.value = {}
         rawImportHeaderState.value = {
           file: snapshot.file,
           transistorId: snapshot.transistorId
         }
-        rawImportStatus.value = 'File header read. Choose the Vds and Id traces.'
+        rawImportStatus.value = plots.length > 1
+          ? 'File header read. Choose a transient plot, then its Vds and Id traces.'
+          : 'File header read. Choose the Vds and Id traces.'
       } catch (err) {
         if (!rawImportSnapshotIsCurrent(snapshot)) return
         rawImportPreview.value = null
@@ -1415,9 +1765,9 @@ export default {
     }
     async function previewRawImportTraces() {
       if (!rawImportTraceMappingReady.value || !selectedTransistorId.value) return
-      invalidateRawImportReview()
+      invalidateRawImportReview({ resetWindows: false })
       const snapshot = rawImportRequestSnapshot()
-      const request = rawImportRequest(false)
+      const request = rawImportRequest(rawImportWindowInputsValid.value)
       rawImportBusy.value = true
       rawImportError.value = ''
       rawImportStatus.value = ''
@@ -1434,9 +1784,15 @@ export default {
           transistorId: snapshot.transistorId,
           timeTrace: snapshot.timeTrace,
           vdsTrace: snapshot.vdsTrace,
-          idTrace: snapshot.idTrace
+          idTrace: snapshot.idTrace,
+          plotIndex: snapshot.plotIndex,
+          stepIndices: snapshot.stepIndices,
+          inputSignature: snapshot.inputSignature,
+          reviewToken: preview.review_token || null
         }
-        rawImportStatus.value = 'Trace preview loaded. Review the plots and enter both event windows.'
+        rawImportStatus.value = preview.review_token
+          ? 'The exact file, traces, source steps, event windows, currents, and conditions are reviewed. Confirm the append below.'
+          : 'Trace preview loaded. Review the plots and enter each event window.'
       } catch (err) {
         if (!rawImportSnapshotIsCurrent(snapshot)) return
         rawImportTracePreview.value = null
@@ -1448,6 +1804,22 @@ export default {
       }
     }
     function rawImportPreviewDataset(trace, title, color) {
+      const stepPreviews = rawImportTracePreview.value?.steps || []
+      const stepColors = [
+        '#2563eb', '#dc2626', '#059669', '#7c3aed', '#ea580c',
+        '#0891b2', '#be123c', '#4d7c0f', '#9333ea', '#0f766e'
+      ]
+      if (stepPreviews.length > 1 || rawImportSelectedPlot.value?.is_stepped) {
+        return stepPreviews.map(step => ({
+          label: `Step ${step.step_index} · ${title}`,
+          data: (step.traces?.[trace] || []).map(([time, value]) => ({
+            x: time * 1e6,
+            y: value
+          })),
+          borderColor: stepColors[step.step_index % stepColors.length] || color,
+          pointRadius: 0
+        }))
+      }
       const samples = rawImportTracePreview.value?.traces?.[trace] || []
       return [{
         label: title,
@@ -1478,8 +1850,10 @@ export default {
         )
         if (!rawImportSnapshotIsCurrent(snapshot) || !rawImportReviewIsCurrent()) return
         rawImportStatus.value = (
-          `Added one DPT record with ${result.on_sample_count} turn-on and `
-          + `${result.off_sample_count} turn-off samples.`
+          result.acquisition_count > 1
+            ? `Added one DPT record with ${result.acquisition_count} selected step acquisitions.`
+            : `Added one DPT record with ${result.on_sample_count} turn-on and `
+              + `${result.off_sample_count} turn-off samples.`
         )
         rawImportFile.value = null
         rawImportHeaderState.value = null
@@ -1490,7 +1864,12 @@ export default {
         await loadDPTData()
       } catch (err) {
         if (rawImportSnapshotIsCurrent(snapshot)) {
-          rawImportError.value = rawImportErrorMessage(err)
+          const detail = rawImportErrorMessage(err)
+          if (err?.response?.status === 409) {
+            invalidateRawImportReview({ resetWindows: false, clearTracePreview: false })
+            rawImportStatus.value = ''
+          }
+          rawImportError.value = detail
         }
       } finally {
         rawImportSaving.value = false
@@ -1741,6 +2120,42 @@ export default {
       { flush: 'sync' }
     )
 
+    watch(
+      () => [
+        rawImportForm.value.turn_on_start_s,
+        rawImportForm.value.turn_on_end_s,
+        rawImportForm.value.turn_off_start_s,
+        rawImportForm.value.turn_off_end_s,
+        rawImportForm.value.same_context_confirmed
+      ],
+      () => {
+        if (!rawImportTracePreview.value && !rawImportReviewedState.value) return
+        invalidateRawImportReview({ resetWindows: false, clearTracePreview: false })
+        rawImportStatus.value = 'Import inputs changed. Preview selected traces again to review them.'
+      },
+      { flush: 'sync' }
+    )
+
+    watch(
+      rawImportStepForms,
+      () => {
+        if (!rawImportTracePreview.value && !rawImportReviewedState.value) return
+        invalidateRawImportReview({ resetWindows: false, clearTracePreview: false })
+        rawImportStatus.value = 'Step current or windows changed. Preview selected traces again to review them.'
+      },
+      { deep: true, flush: 'sync' }
+    )
+
+    watch(
+      rawImportMetadata,
+      () => {
+        if (!rawImportTracePreview.value && !rawImportReviewedState.value) return
+        invalidateRawImportReview({ resetWindows: false, clearTracePreview: false })
+        rawImportStatus.value = 'Measurement conditions changed. Preview selected traces again to review them.'
+      },
+      { deep: true, flush: 'sync' }
+    )
+
     function measurementLabel(measurement, index) {
       const metadata = measurement?.metadata || {}
       const label = [metadata.dataset_type, metadata.comment]
@@ -1931,6 +2346,10 @@ export default {
       rawImportError,
       rawImportForm,
       rawImportMetadata,
+      rawImportStepForms,
+      rawImportSelectedPlot,
+      rawImportSelectedSteps,
+      rawImportRequiresExplicitContext,
       dptEnergyForm,
       dptEnergyPreview,
       dptEnergyBusy,
@@ -1949,11 +2368,15 @@ export default {
       saveDptEnergy,
       rawImportValueTraces,
       rawImportTraceMappingReady,
+      rawImportWindowInputsValid,
       rawImportSelectionValid,
       rawImportHasNonFiniteSamples,
       rawImportVdsPreviewDatasets,
       rawImportIdPreviewDatasets,
       selectRawImportFile,
+      selectRawImportPlot,
+      selectRawImportSteps,
+      selectRawImportContext,
       previewRawImportFile,
       previewRawImportTraces,
       importRawDptMeasurement,

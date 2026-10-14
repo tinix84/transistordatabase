@@ -117,6 +117,7 @@ const CurvePlotterStub = {
       :data-x-label="xLabel"
       :data-x-decimals="xValueDecimals"
       :data-y-label="yLabel"
+      :data-show-legend="showLegend"
     >
       <span>{{ title }}</span>
       <output>{{ JSON.stringify(datasets) }}</output>
@@ -433,6 +434,8 @@ describe('DPTManager raw waveform viewing', () => {
     await flushPromises()
 
     expect(previewDPTRawTraces).toHaveBeenCalledWith('Waveform Device', file, {
+      plot_index: 0,
+      step_indices: [],
       time_trace: 'time', vds_trace: 'V(ds)', id_trace: 'I(M1)'
     })
     expect(wrapper.find('.curve-plotter-stub[data-title="Selected Vds trace preview"]')
@@ -447,11 +450,16 @@ describe('DPTManager raw waveform viewing', () => {
     await wrapper.get('[data-testid="dpt-raw-on-end"]').setValue('0.000003')
     await wrapper.get('[data-testid="dpt-raw-off-start"]').setValue('0.000004')
     await wrapper.get('[data-testid="dpt-raw-off-end"]').setValue('0.000007')
+    expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled).toBe(true)
+    await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
+    await flushPromises()
     expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled).toBe(false)
     await wrapper.get('[data-testid="dpt-raw-import-submit"]').trigger('click')
     await flushPromises()
 
     expect(importDPTRawMeasurement).toHaveBeenCalledWith('Waveform Device', file, {
+      plot_index: 0,
+      step_indices: [],
       time_trace: 'time',
       vds_trace: 'V(ds)',
       id_trace: 'I(M1)',
@@ -503,6 +511,8 @@ describe('DPTManager raw waveform viewing', () => {
 
     await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
     expect(previewDPTRawTraces).toHaveBeenCalledWith('Waveform Device', file, {
+      plot_index: 0,
+      step_indices: [],
       time_trace: 'time', vds_trace: 'V(ds)', id_trace: 'I(M1)'
     })
 
@@ -519,6 +529,438 @@ describe('DPTManager raw waveform viewing', () => {
     expect(wrapper.find('[data-testid="dpt-raw-import-submit"]').exists()).toBe(false)
     await wrapper.vm.importRawDptMeasurement()
     expect(importDPTRawMeasurement).not.toHaveBeenCalled()
+  })
+
+  it('reviews a selected multi-plot step set with distinct plotted series', async () => {
+    const file = new File(['multi plot stepped raw'], 'stepped.raw')
+    previewDPTRawImport.mockResolvedValueOnce({
+      filename: file.name,
+      plots: [
+        {
+          plot_index: 0, plot_name: 'AC Analysis', sample_count: 4,
+          trace_names: ['frequency', 'V(out)'], is_transient: false,
+          is_stepped: false, steps: []
+        },
+        {
+          plot_index: 1, plot_name: 'Transient Analysis', sample_count: 8,
+          trace_names: ['time', 'V(ds)', 'I(M1)'], is_transient: true,
+          is_stepped: true,
+          steps: [
+            { step_index: 0, sample_count: 3, time_range_s: [0, 2e-6] },
+            { step_index: 1, sample_count: 5, time_range_s: [0, 4e-6] }
+          ]
+        }
+      ]
+    })
+    const steppedPreview = {
+      plot_index: 1,
+      sample_count: 8,
+      preview_sample_count: 8,
+      time_range_s: null,
+      traces: {},
+      steps: [
+        {
+          step_index: 0,
+          traces: {
+            'V(ds)': [[0, 400], [1e-6, 200], [2e-6, 100]],
+            'I(M1)': [[0, 0], [1e-6, 10], [2e-6, 20]]
+          },
+          non_finite_preview_sample_counts: { 'V(ds)': 0, 'I(M1)': 0 }
+        },
+        {
+          step_index: 1,
+          traces: {
+            'V(ds)': [[0, 500], [2e-6, 250], [4e-6, 100]],
+            'I(M1)': [[0, 0], [2e-6, 20], [4e-6, 40]]
+          },
+          non_finite_preview_sample_counts: { 'V(ds)': 0, 'I(M1)': 0 }
+        }
+      ]
+    }
+    previewDPTRawTraces
+      .mockResolvedValueOnce(steppedPreview)
+      .mockResolvedValueOnce({
+        ...steppedPreview,
+        review_required: true,
+        review_token: 'server-review-token'
+      })
+    importDPTRawMeasurement.mockResolvedValueOnce({
+      acquisition_count: 2,
+      on_sample_count: 4,
+      off_sample_count: 4
+    })
+
+    await chooseRawFile(wrapper, file)
+    await wrapper.get('[data-testid="dpt-raw-preview-file"]').trigger('click')
+    await flushPromises()
+    expect(wrapper.get('[data-testid="dpt-raw-plot"]').element.value).toBe('')
+    await wrapper.get('[data-testid="dpt-raw-plot"]').setValue('1')
+    await wrapper.get('[data-testid="dpt-raw-step-select"] input[value="0"]')
+      .setValue(true)
+    await wrapper.get('[data-testid="dpt-raw-step-select"] input[value="1"]')
+      .setValue(true)
+    await wrapper.get('[data-testid="dpt-raw-vds-trace"]').setValue('V(ds)')
+    await wrapper.get('[data-testid="dpt-raw-id-trace"]').setValue('I(M1)')
+    await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
+    await flushPromises()
+
+    expect(previewDPTRawTraces).toHaveBeenCalledWith('Waveform Device', file, {
+      plot_index: 1,
+      step_indices: [0, 1],
+      time_trace: 'time',
+      vds_trace: 'V(ds)',
+      id_trace: 'I(M1)'
+    })
+    const vdsChart = wrapper.find('.curve-plotter-stub[data-title="Selected Vds trace preview"]')
+    expect(vdsChart.attributes('data-show-legend')).toBe('true')
+    const vdsDatasets = JSON.parse(vdsChart.get('output').text())
+    expect(vdsDatasets.map(dataset => dataset.label)).toEqual([
+      'Step 0 · Vds', 'Step 1 · Vds'
+    ])
+    expect(vdsDatasets[0].borderColor).not.toBe(vdsDatasets[1].borderColor)
+
+    for (const step of [0, 1]) {
+      await wrapper.get(`[data-testid="dpt-raw-step-${step}-current"]`)
+        .setValue(String((step + 1) * 10))
+      await wrapper.get(`[data-testid="dpt-raw-step-${step}-on-start"]`).setValue('0')
+      await wrapper.get(`[data-testid="dpt-raw-step-${step}-on-end"]`).setValue('0.000002')
+      await wrapper.get(`[data-testid="dpt-raw-step-${step}-off-start"]`).setValue('0')
+      await wrapper.get(`[data-testid="dpt-raw-step-${step}-off-end"]`).setValue('0.000002')
+    }
+    wrapper.vm.rawImportMetadata.t_j = '125'
+    wrapper.vm.rawImportMetadata.v_supply = '400'
+    wrapper.vm.rawImportMetadata.v_g = '15'
+    wrapper.vm.rawImportMetadata.v_g_off = '-5'
+    wrapper.vm.rawImportMetadata.r_g = '10'
+    wrapper.vm.rawImportMetadata.r_g_off = '12'
+    wrapper.vm.rawImportMetadata.load_inductance = '0.75'
+    wrapper.vm.rawImportMetadata.commutation_inductance = '0.125'
+    wrapper.vm.rawImportMetadata.measurement_testbench = 'Fixture bench'
+    wrapper.vm.rawImportMetadata.commutation_device = 'Fixture diode'
+    await wrapper.get('[data-testid="dpt-raw-same-context"]').setValue(true)
+    await flushPromises()
+
+    expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled).toBe(true)
+    expect(wrapper.find('[data-testid="dpt-raw-waveform-preview"]').exists()).toBe(true)
+    await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
+    await flushPromises()
+    expect(previewDPTRawTraces).toHaveBeenNthCalledWith(2, 'Waveform Device', file, {
+      plot_index: 1,
+      step_indices: [0, 1],
+      time_trace: 'time',
+      vds_trace: 'V(ds)',
+      id_trace: 'I(M1)',
+      step_selections: [
+        {
+          step_index: 0,
+          i_x: 10,
+          turn_on: { start_s: 0, end_s: 2e-6 },
+          turn_off: { start_s: 0, end_s: 2e-6 }
+        },
+        {
+          step_index: 1,
+          i_x: 20,
+          turn_on: { start_s: 0, end_s: 2e-6 },
+          turn_off: { start_s: 0, end_s: 2e-6 }
+        }
+      ],
+      same_context_confirmed: true,
+      metadata: {
+        t_j: 125,
+        v_supply: 400,
+        v_g: 15,
+        v_g_off: -5,
+        r_g: 10,
+        r_g_off: 12,
+        load_inductance: 0.75,
+        commutation_inductance: 0.125,
+        measurement_testbench: 'Fixture bench',
+        commutation_device: 'Fixture diode'
+      }
+    })
+    expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled).toBe(false)
+    await wrapper.get('[data-testid="dpt-raw-import-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(importDPTRawMeasurement).toHaveBeenCalledWith('Waveform Device', file, {
+      plot_index: 1,
+      step_indices: [0, 1],
+      time_trace: 'time',
+      vds_trace: 'V(ds)',
+      id_trace: 'I(M1)',
+      step_selections: [
+        {
+          step_index: 0,
+          i_x: 10,
+          turn_on: { start_s: 0, end_s: 2e-6 },
+          turn_off: { start_s: 0, end_s: 2e-6 }
+        },
+        {
+          step_index: 1,
+          i_x: 20,
+          turn_on: { start_s: 0, end_s: 2e-6 },
+          turn_off: { start_s: 0, end_s: 2e-6 }
+        }
+      ],
+      same_context_confirmed: true,
+      review_token: 'server-review-token',
+      metadata: {
+        t_j: 125,
+        v_supply: 400,
+        v_g: 15,
+        v_g_off: -5,
+        r_g: 10,
+        r_g_off: 12,
+        load_inductance: 0.75,
+        commutation_inductance: 0.125,
+        measurement_testbench: 'Fixture bench',
+        commutation_device: 'Fixture diode'
+      }
+    })
+    expect(wrapper.text()).toContain('Added one DPT record with 2 selected step acquisitions')
+  })
+
+  it('requires reviewed step-zero current and conditions for a multi-plot unstepped selection', async () => {
+    const file = new File(['multi plot unstepped raw'], 'multi.raw')
+    previewDPTRawImport.mockResolvedValueOnce({
+      filename: file.name,
+      plots: [
+        {
+          plot_index: 0, plot_name: 'AC Analysis', sample_count: 4,
+          trace_names: ['frequency', 'V(out)'], is_transient: false,
+          is_stepped: false, steps: []
+        },
+        {
+          plot_index: 1, plot_name: 'Transient Analysis', sample_count: 3,
+          trace_names: ['time', 'V(ds)', 'I(M1)'], is_transient: true,
+          is_stepped: false,
+          steps: [{ step_index: 0, sample_count: 3, time_range_s: [0, 2e-6] }]
+        }
+      ]
+    })
+    const firstPreview = {
+      plot_index: 1,
+      sample_count: 3,
+      preview_sample_count: 3,
+      time_range_s: [0, 2e-6],
+      traces: {
+        'V(ds)': [[0, 400], [1e-6, 200], [2e-6, 100]],
+        'I(M1)': [[0, 0], [1e-6, 10], [2e-6, 20]]
+      }
+    }
+    previewDPTRawTraces
+      .mockResolvedValueOnce(firstPreview)
+      .mockResolvedValueOnce({
+        ...firstPreview,
+        review_required: true,
+        review_token: 'step-zero-review-token'
+      })
+    importDPTRawMeasurement.mockResolvedValueOnce({
+      acquisition_count: 1,
+      on_sample_count: 2,
+      off_sample_count: 1
+    })
+
+    await chooseRawFile(wrapper, file)
+    await wrapper.get('[data-testid="dpt-raw-preview-file"]').trigger('click')
+    await flushPromises()
+    await wrapper.get('[data-testid="dpt-raw-plot"]').setValue('1')
+    await wrapper.get('[data-testid="dpt-raw-vds-trace"]').setValue('V(ds)')
+    await wrapper.get('[data-testid="dpt-raw-id-trace"]').setValue('I(M1)')
+    await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="dpt-raw-step-select"]').exists()).toBe(false)
+    expect(wrapper.get('[data-testid="dpt-raw-step-0-current"]').exists()).toBe(true)
+    await wrapper.get('[data-testid="dpt-raw-step-0-current"]').setValue('10')
+    await wrapper.get('[data-testid="dpt-raw-step-0-on-start"]').setValue('0')
+    await wrapper.get('[data-testid="dpt-raw-step-0-on-end"]').setValue('0.000001')
+    await wrapper.get('[data-testid="dpt-raw-step-0-off-start"]').setValue('0.000002')
+    await wrapper.get('[data-testid="dpt-raw-step-0-off-end"]').setValue('0.000002')
+    wrapper.vm.rawImportMetadata.t_j = '25'
+    wrapper.vm.rawImportMetadata.v_supply = '400'
+    wrapper.vm.rawImportMetadata.v_g = '15'
+    wrapper.vm.rawImportMetadata.v_g_off = '-5'
+    wrapper.vm.rawImportMetadata.r_g = '10'
+    wrapper.vm.rawImportMetadata.r_g_off = '12'
+    wrapper.vm.rawImportMetadata.load_inductance = '0.75'
+    wrapper.vm.rawImportMetadata.commutation_inductance = '0.125'
+    wrapper.vm.rawImportMetadata.measurement_testbench = 'Fixture bench'
+    wrapper.vm.rawImportMetadata.commutation_device = 'Fixture diode'
+    await wrapper.get('[data-testid="dpt-raw-same-context"]').setValue(true)
+    await flushPromises()
+    expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled).toBe(true)
+
+    await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
+    await flushPromises()
+    expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled).toBe(false)
+    await wrapper.get('[data-testid="dpt-raw-import-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(previewDPTRawTraces).toHaveBeenLastCalledWith('Waveform Device', file, {
+      plot_index: 1,
+      step_indices: [0],
+      time_trace: 'time',
+      vds_trace: 'V(ds)',
+      id_trace: 'I(M1)',
+      step_selections: [{
+        step_index: 0,
+        i_x: 10,
+        turn_on: { start_s: 0, end_s: 1e-6 },
+        turn_off: { start_s: 2e-6, end_s: 2e-6 }
+      }],
+      same_context_confirmed: true,
+      metadata: {
+        t_j: 25,
+        v_supply: 400,
+        v_g: 15,
+        v_g_off: -5,
+        r_g: 10,
+        r_g_off: 12,
+        load_inductance: 0.75,
+        commutation_inductance: 0.125,
+        measurement_testbench: 'Fixture bench',
+        commutation_device: 'Fixture diode'
+      }
+    })
+    expect(importDPTRawMeasurement).toHaveBeenCalledWith('Waveform Device', file, {
+      plot_index: 1,
+      step_indices: [0],
+      time_trace: 'time',
+      vds_trace: 'V(ds)',
+      id_trace: 'I(M1)',
+      step_selections: [{
+        step_index: 0,
+        i_x: 10,
+        turn_on: { start_s: 0, end_s: 1e-6 },
+        turn_off: { start_s: 2e-6, end_s: 2e-6 }
+      }],
+      same_context_confirmed: true,
+      review_token: 'step-zero-review-token',
+      metadata: {
+        t_j: 25,
+        v_supply: 400,
+        v_g: 15,
+        v_g_off: -5,
+        r_g: 10,
+        r_g_off: 12,
+        load_inductance: 0.75,
+        commutation_inductance: 0.125,
+        measurement_testbench: 'Fixture bench',
+        commutation_device: 'Fixture diode'
+      }
+    })
+  })
+
+  it('invalidates a reviewed import token after a stale-save 409', async () => {
+    const file = new File(['stepped raw'], 'stepped.raw')
+    previewDPTRawImport.mockResolvedValueOnce({
+      filename: file.name,
+      plots: [{
+        plot_index: 0, plot_name: 'Transient Analysis', sample_count: 3,
+        trace_names: ['time', 'V(ds)', 'I(M1)'], is_transient: true,
+        is_stepped: true,
+        steps: [{ step_index: 0, sample_count: 3, time_range_s: [0, 2e-6] }]
+      }]
+    })
+    const tracePreview = {
+      plot_index: 0,
+      sample_count: 3,
+      preview_sample_count: 3,
+      time_range_s: null,
+      traces: {},
+      steps: [{
+        step_index: 0,
+        sample_count: 3,
+        traces: {
+          'V(ds)': [[0, 400], [1e-6, 200], [2e-6, 100]],
+          'I(M1)': [[0, 0], [1e-6, 10], [2e-6, 20]]
+        },
+        non_finite_preview_sample_counts: { 'V(ds)': 0, 'I(M1)': 0 }
+      }]
+    }
+    previewDPTRawTraces
+      .mockResolvedValueOnce(tracePreview)
+      .mockResolvedValueOnce({
+        ...tracePreview,
+        review_required: true,
+        review_token: 'stale-review-token'
+      })
+    importDPTRawMeasurement.mockRejectedValueOnce({
+      response: {
+        status: 409,
+        data: { detail: 'The RAW import review no longer matches the source.' }
+      }
+    })
+
+    await chooseRawFile(wrapper, file)
+    await wrapper.get('[data-testid="dpt-raw-preview-file"]').trigger('click')
+    await flushPromises()
+    await wrapper.get('[data-testid="dpt-raw-step-select"] input[value="0"]')
+      .setValue(true)
+    await wrapper.get('[data-testid="dpt-raw-vds-trace"]').setValue('V(ds)')
+    await wrapper.get('[data-testid="dpt-raw-id-trace"]').setValue('I(M1)')
+    await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
+    await flushPromises()
+    await wrapper.get('[data-testid="dpt-raw-step-0-current"]').setValue('10')
+    await wrapper.get('[data-testid="dpt-raw-step-0-on-start"]').setValue('0')
+    await wrapper.get('[data-testid="dpt-raw-step-0-on-end"]').setValue('0.000001')
+    await wrapper.get('[data-testid="dpt-raw-step-0-off-start"]').setValue('0.000002')
+    await wrapper.get('[data-testid="dpt-raw-step-0-off-end"]').setValue('0.000002')
+    wrapper.vm.rawImportMetadata.t_j = '25'
+    wrapper.vm.rawImportMetadata.v_supply = '400'
+    wrapper.vm.rawImportMetadata.v_g = '15'
+    wrapper.vm.rawImportMetadata.v_g_off = '-5'
+    wrapper.vm.rawImportMetadata.r_g = '10'
+    wrapper.vm.rawImportMetadata.r_g_off = '12'
+    wrapper.vm.rawImportMetadata.load_inductance = '0.75'
+    wrapper.vm.rawImportMetadata.commutation_inductance = '0.125'
+    wrapper.vm.rawImportMetadata.measurement_testbench = 'Fixture bench'
+    wrapper.vm.rawImportMetadata.commutation_device = 'Fixture diode'
+    await wrapper.get('[data-testid="dpt-raw-same-context"]').setValue(true)
+    await flushPromises()
+    await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
+    await flushPromises()
+    expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled).toBe(false)
+
+    await wrapper.get('[data-testid="dpt-raw-import-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="dpt-raw-waveform-preview"]').exists()).toBe(true)
+    expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled).toBe(true)
+    expect(wrapper.get('[data-testid="dpt-raw-error"]').text())
+      .toContain('no longer matches the source')
+  })
+
+  it('invalidates a selected step preview when its source selection changes', async () => {
+    const file = new File(['multi plot stepped raw'], 'stepped.raw')
+    previewDPTRawImport.mockResolvedValueOnce({
+      filename: file.name,
+      plots: [{
+        plot_index: 0, plot_name: 'Transient Analysis', sample_count: 8,
+        trace_names: ['time', 'V(ds)', 'I(M1)'], is_transient: true,
+        is_stepped: true,
+        steps: [
+          { step_index: 0, sample_count: 3, time_range_s: [0, 2e-6] },
+          { step_index: 1, sample_count: 5, time_range_s: [0, 4e-6] }
+        ]
+      }]
+    })
+    await chooseRawFile(wrapper, file)
+    await wrapper.get('[data-testid="dpt-raw-preview-file"]').trigger('click')
+    await flushPromises()
+    await wrapper.get('[data-testid="dpt-raw-step-select"] input[value="0"]')
+      .setValue(true)
+    await wrapper.get('[data-testid="dpt-raw-vds-trace"]').setValue('V(ds)')
+    await wrapper.get('[data-testid="dpt-raw-id-trace"]').setValue('I(M1)')
+    await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
+    await flushPromises()
+    expect(wrapper.find('[data-testid="dpt-raw-waveform-preview"]').exists()).toBe(true)
+
+    await wrapper.get('[data-testid="dpt-raw-step-select"] input[value="1"]')
+      .setValue(true)
+    expect(wrapper.find('[data-testid="dpt-raw-waveform-preview"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="dpt-raw-import-submit"]').exists()).toBe(false)
   })
 
   it('ignores a pending file preview after the selected device changes', async () => {
@@ -561,6 +1003,11 @@ describe('DPTManager raw waveform viewing', () => {
     await wrapper.get('[data-testid="dpt-raw-metadata-tj"]').setValue('125')
 
     expect(wrapper.find('[data-testid="dpt-raw-waveform-preview"]').exists()).toBe(true)
+    expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled)
+      .toBe(true)
+
+    await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
+    await flushPromises()
     expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled)
       .toBe(false)
 
