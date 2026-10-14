@@ -13,6 +13,7 @@ import ctypes
 import errno
 import hashlib
 import io
+import importlib.metadata
 import json
 import logging
 import math
@@ -22,12 +23,13 @@ import tempfile
 import threading
 import zipfile
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from functools import wraps
 from pathlib import Path, PureWindowsPath
 from typing import Any, AsyncIterator, Callable, Dict, List, Optional
 
 import numpy as np
-from fastapi import FastAPI, HTTPException, UploadFile, File, Query, BackgroundTasks
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 
@@ -74,7 +76,19 @@ from transistordatabase.gui_web.backend.schemas import (
     BielaModelRequest,
     GateChargeModelRequest,
     DPTConfigRequest,
+    DptRawImportRequest,
+    DptRawTraceSelectionRequest,
     PLECSImportResponse,
+)
+from transistordatabase.gui_web.backend.dpt_raw_import import (
+    DptRawImportError,
+    MAX_RAW_REQUEST_BODY_BYTES,
+    MAX_RAW_UPLOAD_BYTES,
+    MAX_TOTAL_EVENT_SAMPLES,
+    event_window_bounds,
+    make_trace_preview,
+    parse_ltspice_raw,
+    select_event_samples,
 )
 from transistordatabase.gui_web.backend.topology_service import TopologyCalculatorService
 
@@ -99,6 +113,111 @@ app = FastAPI(
     description="REST API for managing transistor data",
     version="1.0.0",
 )
+
+# Bound the legacy JSON parse required for raw DPT persistence and waveform reads.
+MAX_DPT_LEGACY_RECORD_FILE_BYTES = 64 * 1024 * 1024
+MAX_DPT_RAW_MEASUREMENT_BYTES = 32 * 1024 * 1024
+
+
+class _DptRawRequestBodyTooLarge(Exception):
+    """Signal that a streamed DPT RAW multipart body exceeded its cap."""
+
+
+class DptRawRequestBodyLimitMiddleware:
+    """Bound import request bodies before Starlette parses multipart uploads."""
+
+    def __init__(self, application: Callable[..., Any]) -> None:
+        self.application = application
+
+    @staticmethod
+    def _is_dpt_raw_import(scope: dict[str, Any]) -> bool:
+        path = scope.get("path", "")
+        return (
+            scope.get("type") == "http"
+            and scope.get("method") == "POST"
+            and path.startswith("/api/transistors/")
+            and path.endswith((
+                "/dpt_raw_import",
+                "/dpt_raw_import/preview",
+                "/dpt_raw_import/trace_preview",
+            ))
+        )
+
+    @staticmethod
+    async def _send_too_large(send: Callable[..., Any]) -> None:
+        limit_mib = MAX_RAW_REQUEST_BODY_BYTES / (1024 * 1024)
+        body = json.dumps({
+            "detail": (
+                f"The DPT RAW request body exceeds the {limit_mib:g} MiB limit, "
+                "including multipart overhead. Reduce the .raw file or export a "
+                "smaller transient window."
+            )
+        }).encode("utf-8")
+        await send({
+            "type": "http.response.start",
+            "status": 413,
+            "headers": [
+                (b"content-type", b"application/json"),
+                (b"content-length", str(len(body)).encode("ascii")),
+            ],
+        })
+        await send({"type": "http.response.body", "body": body})
+
+    async def __call__(
+        self,
+        scope: dict[str, Any],
+        receive: Callable[..., Any],
+        send: Callable[..., Any],
+    ) -> None:
+        """Enforce the import body cap before forwarding request chunks."""
+        if not self._is_dpt_raw_import(scope):
+            await self.application(scope, receive, send)
+            return
+
+        content_lengths = [
+            value
+            for key, value in scope.get("headers", [])
+            if key.lower() == b"content-length"
+        ]
+        for raw_length in content_lengths:
+            try:
+                if int(raw_length) > MAX_RAW_REQUEST_BODY_BYTES:
+                    await self._send_too_large(send)
+                    return
+            except ValueError:
+                # The streaming count below remains authoritative for malformed
+                # or absent Content-Length headers.
+                continue
+
+        received_bytes = 0
+        response_started = False
+
+        async def bounded_receive() -> dict[str, Any]:
+            nonlocal received_bytes
+            message = await receive()
+            if message.get("type") == "http.request":
+                received_bytes += len(message.get("body", b""))
+                if received_bytes > MAX_RAW_REQUEST_BODY_BYTES:
+                    raise _DptRawRequestBodyTooLarge
+            return message
+
+        async def tracked_send(message: dict[str, Any]) -> None:
+            nonlocal response_started
+            if message.get("type") == "http.response.start":
+                response_started = True
+            await send(message)
+
+        try:
+            await self.application(scope, bounded_receive, tracked_send)
+        except _DptRawRequestBodyTooLarge:
+            # Multipart parsing consumes the body before a route can start its
+            # response. If another layer already replied, do not emit a second.
+            if not response_started:
+                await self._send_too_large(send)
+
+
+# Register the cap inside CORS so early 413 responses retain normal CORS headers.
+app.add_middleware(DptRawRequestBodyLimitMiddleware)
 
 # Enable CORS for frontend communication
 app.add_middleware(
@@ -720,14 +839,35 @@ def _curve_edit_token(curve: dict[str, Any]) -> str:
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
-def _read_legacy_record_unlocked(name: str) -> dict[str, Any]:
+def _read_legacy_record_unlocked(
+    name: str,
+    *,
+    max_file_bytes: int | None = None,
+) -> dict[str, Any]:
     """Read a named raw record while the caller holds the mutation lock."""
     record_path = _legacy_record_path(name)
     try:
+        with record_path.open("rb") as record_file:
+            raw_record_bytes = record_file.read(
+                max_file_bytes + 1 if max_file_bytes is not None else -1
+            )
+        if max_file_bytes is not None and len(raw_record_bytes) > max_file_bytes:
+            raise HTTPException(
+                status_code=413,
+                detail=(
+                    f"The stored device JSON exceeds the "
+                    f"{_format_byte_limit(max_file_bytes)} DPT "
+                    "access limit. DPT reads and imports stop before parsing an "
+                    "oversized file; no stored data was changed."
+                ),
+            )
         # The legacy loader accepts Python's non-finite JSON constants (used by
         # some checked-in DPT samples), so preserve them in raw records. Keep
         # duplicate-key rejection while matching its numeric parsing behavior.
-        record = json.loads(record_path.read_bytes(), object_pairs_hook=_unique_json_object)
+        record = json.loads(
+            raw_record_bytes,
+            object_pairs_hook=_unique_json_object,
+        )
     except FileNotFoundError as error:
         raise HTTPException(status_code=404, detail=f"Transistor '{name}' not found") from error
     if not isinstance(record, dict) or record.get("name") != name:
@@ -829,12 +969,51 @@ def _legacy_json_default(value: Any) -> Any:
     raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
 
 
-def _write_legacy_record_unlocked(record_path: Path, record: Dict[str, Any]) -> None:
+def _encoded_json_size_up_to(
+    value: Any,
+    byte_limit: int,
+    *,
+    indent: int | None = None,
+) -> int:
+    """Count compact JSON UTF-8 bytes without building a duplicate JSON string."""
+    encoder = json.JSONEncoder(
+        allow_nan=True,
+        default=_legacy_json_default,
+        indent=indent,
+        separators=(",", ":") if indent is None else None,
+    )
+    byte_count = 0
+    for chunk in encoder.iterencode(value):
+        byte_count += len(chunk.encode("utf-8"))
+        if byte_count > byte_limit:
+            return byte_count
+    return byte_count
+
+
+def _format_byte_limit(byte_limit: int) -> str:
+    """Format a byte bound with MiB where that is an exact unit."""
+    mib = 1024 * 1024
+    if byte_limit % mib == 0:
+        return f"{byte_limit // mib} MiB ({byte_limit:,} bytes)"
+    return f"{byte_limit:,} bytes"
+
+
+def _write_legacy_record_unlocked(
+    record_path: Path,
+    record: Dict[str, Any],
+    *,
+    newline: str | None = None,
+) -> None:
     """Atomically replace a validated legacy record."""
     descriptor, temporary_name = tempfile.mkstemp(
         prefix=f".{record_path.name}.", suffix=".tmp", dir=record_path.parent
     )
-    with os.fdopen(descriptor, "w", encoding="utf-8") as record_file:
+    with os.fdopen(
+        descriptor,
+        "w",
+        encoding="utf-8",
+        newline=newline,
+    ) as record_file:
         json.dump(
             record,
             record_file,
@@ -2667,6 +2846,289 @@ _DPT_RAW_WAVEFORM_FIELDS = (
     "dpt_off_vds",
     "dpt_off_id",
 )
+MAX_DPT_WAVEFORM_PREVIEW_POINTS = 1000
+MAX_DPT_WAVEFORM_PREVIEW_TOTAL_POINTS = 40000
+
+
+async def _read_dpt_raw_upload(file: UploadFile) -> bytearray:
+    """Read a bounded upload in chunks without retaining a source file."""
+    filename = PureWindowsPath(file.filename or "").name
+    if not filename.casefold().endswith(".raw"):
+        raise HTTPException(
+            status_code=415,
+            detail="Unsupported file type. Choose an LTspice .raw file.",
+        )
+    content = bytearray()
+    while chunk := await file.read(64 * 1024):
+        content.extend(chunk)
+        if len(content) > MAX_RAW_UPLOAD_BYTES:
+            limit_mib = MAX_RAW_UPLOAD_BYTES // (1024 * 1024)
+            raise HTTPException(
+                status_code=413,
+                detail=(
+                    f"The .raw upload exceeds the {limit_mib} MiB limit. Reduce the "
+                    "LTspice output or export a smaller transient window."
+                ),
+            )
+    return content
+
+
+def _dpt_raw_upload_error(error: DptRawImportError) -> HTTPException:
+    """Map a parser or waveform selection error to an actionable API response."""
+    return HTTPException(status_code=error.status_code, detail=str(error))
+
+
+def _dpt_raw_trace_selection(
+    request: DptRawTraceSelectionRequest,
+) -> tuple[str, str, str]:
+    """Return the three explicit trace choices in parser order."""
+    return request.time_trace, request.vds_trace, request.id_trace
+
+
+@app.post("/api/transistors/{transistor_id}/dpt_raw_import/preview")
+async def preview_dpt_raw_import(
+    transistor_id: str,
+    file: UploadFile = File(...),
+) -> Dict[str, Any]:
+    """Inspect a bounded LTspice RAW header and list explicit trace choices."""
+    _validate_web_record_name(transistor_id)
+    content = await _read_dpt_raw_upload(file)
+    try:
+        parsed = parse_ltspice_raw(content, file.filename)
+    except DptRawImportError as error:
+        raise _dpt_raw_upload_error(error) from error
+    return {
+        "filename": parsed.filename,
+        "plot_name": parsed.plot_name,
+        "sample_count": parsed.sample_count,
+        "time_trace_name": parsed.trace_names[0] if parsed.trace_names else None,
+        "trace_names": parsed.trace_names,
+    }
+
+
+@app.post("/api/transistors/{transistor_id}/dpt_raw_import/trace_preview")
+async def preview_dpt_raw_traces(
+    transistor_id: str,
+    file: UploadFile = File(...),
+    selection_json: str = Form(...),
+) -> Dict[str, Any]:
+    """Return a display-only sample of the selected time, Vds, and Id traces."""
+    _validate_web_record_name(transistor_id)
+    try:
+        selection = DptRawTraceSelectionRequest.model_validate_json(selection_json)
+    except Exception as error:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid DPT trace selection: {error!s}",
+        ) from error
+    content = await _read_dpt_raw_upload(file)
+    try:
+        parsed = parse_ltspice_raw(
+            content,
+            file.filename,
+            _dpt_raw_trace_selection(selection),
+        )
+        preview = make_trace_preview(
+            parsed,
+            _dpt_raw_trace_selection(selection),
+        )
+    except DptRawImportError as error:
+        raise _dpt_raw_upload_error(error) from error
+    return {
+        "filename": parsed.filename,
+        "time_trace": selection.time_trace,
+        "vds_trace": selection.vds_trace,
+        "id_trace": selection.id_trace,
+        **preview,
+    }
+
+
+@app.post("/api/transistors/{transistor_id}/dpt_raw_import")
+async def import_dpt_raw_measurement(
+    transistor_id: str,
+    file: UploadFile = File(...),
+    selection_json: str = Form(...),
+) -> Dict[str, Any]:
+    """Append an explicitly reviewed LTspice acquisition to the legacy record."""
+    _validate_web_record_name(transistor_id)
+    try:
+        selection = DptRawImportRequest.model_validate_json(selection_json)
+    except Exception as error:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid DPT import selection: {error!s}",
+        ) from error
+    content = await _read_dpt_raw_upload(file)
+    trace_selection = _dpt_raw_trace_selection(selection)
+    try:
+        parsed = parse_ltspice_raw(content, file.filename, trace_selection)
+        assert parsed.time_values is not None
+        assert parsed.trace_values is not None
+        time_values = parsed.time_values
+        vds_values = parsed.trace_values[selection.vds_trace]
+        id_values = parsed.trace_values[selection.id_trace]
+        on_bounds = event_window_bounds(
+            time_values,
+            selection.turn_on.start_s,
+            selection.turn_on.end_s,
+        )
+        off_bounds = event_window_bounds(
+            time_values,
+            selection.turn_off.start_s,
+            selection.turn_off.end_s,
+        )
+        total_event_samples = (
+            on_bounds[1] - on_bounds[0] + off_bounds[1] - off_bounds[0]
+        )
+        if total_event_samples > MAX_TOTAL_EVENT_SAMPLES:
+            raise DptRawImportError(
+                f"The two event windows contain {total_event_samples:,} samples "
+                f"combined; the limit is {MAX_TOTAL_EVENT_SAMPLES:,}. Narrow the "
+                "turn-on or turn-off window.",
+                status_code=413,
+            )
+        on_vds, on_id = select_event_samples(
+            time_values,
+            vds_values,
+            id_values,
+            selection.turn_on.start_s,
+            selection.turn_on.end_s,
+            bounds=on_bounds,
+        )
+        off_vds, off_id = select_event_samples(
+            time_values,
+            vds_values,
+            id_values,
+            selection.turn_off.start_s,
+            selection.turn_off.end_s,
+            bounds=off_bounds,
+        )
+    except DptRawImportError as error:
+        raise _dpt_raw_upload_error(error) from error
+
+    try:
+        parser_version = importlib.metadata.version("PyLTSpice")
+    except importlib.metadata.PackageNotFoundError:
+        parser_version = "unknown"
+    imported_at = datetime.now(timezone.utc).isoformat()
+    provenance = {
+        "source_filename": parsed.filename,
+        "source_sha256": hashlib.sha256(content).hexdigest(),
+        "parser": "PyLTSpice.RawRead",
+        "parser_version": parser_version,
+        "imported_at": imported_at,
+        "trace_mapping": {
+            "time": selection.time_trace,
+            "vds": selection.vds_trace,
+            "id": selection.id_trace,
+        },
+        "event_windows_s": {
+            "turn_on": [selection.turn_on.start_s, selection.turn_on.end_s],
+            "turn_off": [selection.turn_off.start_s, selection.turn_off.end_s],
+        },
+    }
+    new_measurement = {
+        "dataset_type": "dpt_u_i",
+        **selection.metadata.model_dump(mode="json", exclude_none=True),
+        "dpt_on_vds": [on_vds],
+        "dpt_on_id": [on_id],
+        "dpt_off_vds": [off_vds],
+        "dpt_off_id": [off_id],
+        "import_provenance": provenance,
+    }
+
+    async with _record_mutation():
+        record_path = _legacy_record_path(transistor_id)
+        record = _read_legacy_record_unlocked(
+            transistor_id,
+            max_file_bytes=MAX_DPT_LEGACY_RECORD_FILE_BYTES,
+        )
+        existing = record.get("raw_measurement_data", [])
+        if existing is None:
+            existing_records: list[dict[str, Any]] = []
+        elif isinstance(existing, dict):
+            existing_records = [existing]
+        elif isinstance(existing, list) and all(
+            isinstance(measurement, dict) for measurement in existing
+        ):
+            existing_records = existing
+        else:
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    "Stored raw_measurement_data is not a list of measurement "
+                    "records; it was left unchanged."
+                ),
+            )
+
+        candidate_raw_records = [*existing_records, new_measurement]
+        raw_payload_size = _encoded_json_size_up_to(
+            candidate_raw_records,
+            MAX_DPT_RAW_MEASUREMENT_BYTES,
+        )
+        if raw_payload_size > MAX_DPT_RAW_MEASUREMENT_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail=(
+                    "Appending this measurement would exceed the cumulative "
+                    f"raw DPT payload limit of "
+                    f"{_format_byte_limit(MAX_DPT_RAW_MEASUREMENT_BYTES)}. "
+                    "Shorten the event windows or reduce existing raw DPT data; "
+                    "the existing record was left unchanged."
+                ),
+            )
+
+        candidate = {**record, "raw_measurement_data": candidate_raw_records}
+        candidate_file_size = _encoded_json_size_up_to(
+            candidate,
+            MAX_DPT_LEGACY_RECORD_FILE_BYTES,
+            indent=2,
+        )
+        if candidate_file_size > MAX_DPT_LEGACY_RECORD_FILE_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail=(
+                    "Appending this measurement would make the stored device JSON "
+                    f"exceed the DPT file limit of "
+                    f"{_format_byte_limit(MAX_DPT_LEGACY_RECORD_FILE_BYTES)}. "
+                    "The existing record was left unchanged."
+                ),
+            )
+        # Validate a deep copy of the model payload only. The legacy converter
+        # mutates arrays in several nested branches, while copying raw waveform
+        # records here would duplicate the largest part of the request memory.
+        model_candidate = copy.deepcopy({
+            key: value
+            for key, value in candidate.items()
+            if key != "raw_measurement_data"
+        })
+        try:
+            # Validate the legacy transistor while the raw measurement payload
+            # stays on its established top-level JSON persistence path.
+            _json_dict_to_legacy_transistor(model_candidate)
+            _write_legacy_record_unlocked(
+                record_path,
+                candidate,
+                newline="\n",
+            )
+        except HTTPException:
+            raise
+        except Exception as error:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Could not append this DPT measurement: {error!s}",
+            ) from error
+
+    return {
+        "success": True,
+        "transistor_id": transistor_id,
+        "raw_measurement_count": len(candidate["raw_measurement_data"]),
+        "on_sample_count": len(on_vds),
+        "off_sample_count": len(off_vds),
+        "provenance": provenance,
+    }
+
+
 def _json_safe_dpt_value(value: Any) -> Any:
     """Convert raw DPT values into strict JSON values without mutating them."""
     if isinstance(value, np.ndarray):
@@ -2696,30 +3158,132 @@ def _is_dpt_sample_pair(value: Any) -> bool:
     )
 
 
-def _serialize_dpt_waveform_acquisitions(value: Any) -> list[Any]:
-    """Serialize stored waveform acquisitions, preserving each sample order."""
+def _dpt_waveform_acquisitions(value: Any) -> list[Any]:
+    """Return the stored acquisition sequences without copying their samples."""
     if value is None:
         return []
     if isinstance(value, np.ndarray):
         if value.ndim == 2:
-            acquisitions = [value]
-        elif value.ndim == 3:
-            acquisitions = list(value)
-        else:
-            return []
-    elif isinstance(value, (list, tuple)):
+            return [value]
+        if value.ndim == 3:
+            return list(value)
+        return []
+    if isinstance(value, (list, tuple)):
         if not value:
             return []
         if all(_is_dpt_sample_pair(sample) for sample in value):
-            acquisitions = [value]
+            return [value]
+        return list(value)
+    return []
+
+
+def _allocate_dpt_waveform_preview_limits(
+    records: list[dict[str, Any]], requested_limit: int
+) -> list[dict[str, list[int]]]:
+    """Allocate a fair per-acquisition cap under one response point budget."""
+    descriptors: list[tuple[int, str, int, int]] = []
+    for record_index, record in enumerate(records):
+        for field in _DPT_RAW_WAVEFORM_FIELDS:
+            for acquisition_index, acquisition in enumerate(
+                _dpt_waveform_acquisitions(record.get(field))
+            ):
+                try:
+                    sample_count = len(acquisition)
+                except TypeError:
+                    sample_count = 0
+                descriptors.append((record_index, field, acquisition_index, sample_count))
+
+    minimum_points = sum(min(sample_count, 2) for *_, sample_count in descriptors)
+    if minimum_points > MAX_DPT_WAVEFORM_PREVIEW_TOTAL_POINTS:
+        raise HTTPException(
+            status_code=413,
+            detail=(
+                "This record contains too many non-empty waveform acquisitions "
+                "to retain their endpoints within the 40,000-point preview budget. "
+                "Open a smaller set of measurements or reduce stored acquisitions."
+            ),
+        )
+
+    counts = [sample_count for *_, sample_count in descriptors]
+    low, high = 2, requested_limit
+    while low <= high:
+        candidate = (low + high) // 2
+        if sum(min(sample_count, candidate) for sample_count in counts) <= (
+            MAX_DPT_WAVEFORM_PREVIEW_TOTAL_POINTS
+        ):
+            low = candidate + 1
         else:
-            acquisitions = list(value)
-    else:
-        return []
-    return [_json_safe_dpt_value(acquisition) for acquisition in acquisitions]
+            high = candidate - 1
+
+    limits = [min(sample_count, max(2, high)) for sample_count in counts]
+    remaining = MAX_DPT_WAVEFORM_PREVIEW_TOTAL_POINTS - sum(limits)
+    for index, sample_count in enumerate(counts):
+        if remaining <= 0:
+            break
+        if limits[index] < min(sample_count, requested_limit):
+            limits[index] += 1
+            remaining -= 1
+
+    allocated: list[dict[str, list[int]]] = [
+        {field: [] for field in _DPT_RAW_WAVEFORM_FIELDS} for _ in records
+    ]
+    for (record_index, field, _acquisition_index, _sample_count), limit in zip(
+        descriptors, limits, strict=True
+    ):
+        allocated[record_index][field].append(limit)
+    return allocated
 
 
-def _serialize_dpt_raw_measurement(record: Any) -> dict[str, Any]:
+def _serialize_dpt_waveform_acquisitions(
+    value: Any,
+    point_limit: int | None = None,
+    acquisition_limits: list[int] | None = None,
+    projection_stats: dict[str, int] | None = None,
+) -> list[Any]:
+    """Serialize acquisitions, optionally keeping bounded endpoint samples."""
+    acquisitions = _dpt_waveform_acquisitions(value)
+    serialized: list[Any] = []
+    for index, acquisition in enumerate(acquisitions):
+        try:
+            sample_count = len(acquisition)
+        except TypeError:
+            sample_count = 0
+        limit = (
+            acquisition_limits[index]
+            if acquisition_limits is not None and index < len(acquisition_limits)
+            else point_limit
+        )
+        if limit is not None and sample_count > limit:
+            indices = np.linspace(
+                0, sample_count - 1, num=limit, dtype=np.int64
+            )
+            if isinstance(acquisition, np.ndarray):
+                selected = acquisition[indices]
+            else:
+                selected = [acquisition[int(index)] for index in indices]
+            if projection_stats is not None:
+                projection_stats["downsampled_acquisition_count"] = (
+                    projection_stats.get("downsampled_acquisition_count", 0) + 1
+                )
+                projection_stats["returned_points"] = (
+                    projection_stats.get("returned_points", 0) + len(indices)
+                )
+            serialized.append(_json_safe_dpt_value(selected))
+        else:
+            if projection_stats is not None:
+                projection_stats["returned_points"] = (
+                    projection_stats.get("returned_points", 0) + sample_count
+                )
+            serialized.append(_json_safe_dpt_value(acquisition))
+    return serialized
+
+
+def _serialize_dpt_raw_measurement(
+    record: Any,
+    point_limit: int | None = None,
+    acquisition_limits: dict[str, list[int]] | None = None,
+    projection_stats: dict[str, int] | None = None,
+) -> dict[str, Any]:
     """Project one raw DPT record into a JSON-safe read-only response."""
     if isinstance(record, dict):
         source = record
@@ -2733,29 +3297,66 @@ def _serialize_dpt_raw_measurement(record: Any) -> dict[str, Any]:
     return {
         "metadata": metadata,
         **{
-            field: _serialize_dpt_waveform_acquisitions(source.get(field))
+            field: _serialize_dpt_waveform_acquisitions(
+                source.get(field),
+                point_limit,
+                acquisition_limits.get(field) if acquisition_limits else None,
+                projection_stats,
+            )
             for field in _DPT_RAW_WAVEFORM_FIELDS
         },
     }
 
 
 @app.get("/api/transistors/{transistor_id}/dpt_data")
-async def get_dpt_data(transistor_id: str) -> Dict[str, Any]:
+async def get_dpt_data(
+    transistor_id: str,
+    waveform_preview_points: Optional[int] = Query(
+        default=None, ge=2, le=MAX_DPT_WAVEFORM_PREVIEW_POINTS
+    ),
+) -> Dict[str, Any]:
     """Get DPT measurement data for a transistor.
 
     :param transistor_id: Transistor ID
+    :param waveform_preview_points: Optional per-acquisition point cap for web previews
     :return: DPT data if available
     """
+    preview_requested = waveform_preview_points is not None
     async with _record_mutation():
-        raw_record = _read_legacy_record_unlocked(transistor_id)
+        raw_record = _read_legacy_record_unlocked(
+            transistor_id,
+            max_file_bytes=(
+                MAX_DPT_LEGACY_RECORD_FILE_BYTES if preview_requested else None
+            ),
+        )
         raw_measurements = raw_record.get("raw_measurement_data")
-        if isinstance(raw_measurements, dict):
+        if preview_requested:
+            raw_payload_size = _encoded_json_size_up_to(
+                raw_measurements,
+                MAX_DPT_RAW_MEASUREMENT_BYTES,
+            )
+            if raw_payload_size > MAX_DPT_RAW_MEASUREMENT_BYTES:
+                raise HTTPException(
+                    status_code=413,
+                    detail=(
+                        "The stored raw DPT payload exceeds the cumulative preview "
+                        f"limit of "
+                        f"{_format_byte_limit(MAX_DPT_RAW_MEASUREMENT_BYTES)}. "
+                        "The opt-in bounded waveform preview stops before model "
+                        "conversion or serialization; the stored record was left "
+                        "unchanged."
+                    ),
+                )
+        if isinstance(raw_measurements, dict) or preview_requested:
             # The legacy loader expects an iterable of measurement objects,
-            # while older records can store one object directly. That field
-            # is not used by the core DPT summary, so omit it only from the
-            # in-memory projection passed through the existing adapter.
-            model_record = copy.deepcopy(raw_record)
-            model_record["raw_measurement_data"] = []
+            # while older records can store one object directly. Raw waveform
+            # arrays do not contribute to the DPT summary, so keep them out of
+            # this model-only validation copy and avoid loading them twice.
+            model_record = copy.deepcopy({
+                key: value
+                for key, value in raw_record.items()
+                if key != "raw_measurement_data"
+            })
             transistor = legacy_to_core(
                 _json_dict_to_legacy_transistor(model_record)
             )
@@ -2783,11 +3384,39 @@ async def get_dpt_data(transistor_id: str) -> Dict[str, Any]:
     raw_measurements = raw_record.get("raw_measurement_data")
     if isinstance(raw_measurements, dict):
         raw_measurements = [raw_measurements]
-    dpt_data["raw_measurement_data"] = [
-        _serialize_dpt_raw_measurement(record)
-        for record in raw_measurements
-        if isinstance(record, dict)
+    raw_records = [
+        record for record in raw_measurements if isinstance(record, dict)
     ] if isinstance(raw_measurements, list) else []
+    projection_stats = {
+        "downsampled_acquisition_count": 0,
+        "returned_points": 0,
+    }
+    allocated_limits = (
+        _allocate_dpt_waveform_preview_limits(
+            raw_records, waveform_preview_points
+        )
+        if waveform_preview_points is not None
+        else None
+    )
+    dpt_data["raw_measurement_data"] = [
+        _serialize_dpt_raw_measurement(
+            record,
+            waveform_preview_points,
+            allocated_limits[index] if allocated_limits is not None else None,
+            projection_stats,
+        )
+        for index, record in enumerate(raw_records)
+    ]
+    if waveform_preview_points is not None:
+        downsampled_count = projection_stats["downsampled_acquisition_count"]
+        dpt_data["waveform_preview"] = {
+            "max_points_per_acquisition": waveform_preview_points,
+            "max_total_points": MAX_DPT_WAVEFORM_PREVIEW_TOTAL_POINTS,
+            "returned_points": projection_stats["returned_points"],
+            "sampling": "uniform_with_endpoints",
+            "downsampled": downsampled_count > 0,
+            "downsampled_acquisition_count": downsampled_count,
+        }
 
     return dpt_data
 

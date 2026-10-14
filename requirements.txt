@@ -17,5 +17,6 @@ xmltodict
 fastapi
 uvicorn[standard]
 python-multipart
+PyLTSpice>=6.0.1,<7.0
 playwright
 pytest-playwright

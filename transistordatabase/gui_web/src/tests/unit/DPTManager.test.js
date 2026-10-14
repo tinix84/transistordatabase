@@ -1,15 +1,34 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 
-const { getAll, getDPTData, generateDPTNetlist, validateDPTData } = vi.hoisted(() => ({
+const {
+  getAll,
+  getDPTData,
+  generateDPTNetlist,
+  validateDPTData,
+  previewDPTRawImport,
+  previewDPTRawTraces,
+  importDPTRawMeasurement
+} = vi.hoisted(() => ({
   getAll: vi.fn(),
   getDPTData: vi.fn(),
   generateDPTNetlist: vi.fn(),
-  validateDPTData: vi.fn()
+  validateDPTData: vi.fn(),
+  previewDPTRawImport: vi.fn(),
+  previewDPTRawTraces: vi.fn(),
+  importDPTRawMeasurement: vi.fn()
 }))
 
 vi.mock('../../services/api.js', () => ({
-  transistorApi: { getAll, getDPTData, generateDPTNetlist, validateDPTData }
+  transistorApi: {
+    getAll,
+    getDPTData,
+    generateDPTNetlist,
+    validateDPTData,
+    previewDPTRawImport,
+    previewDPTRawTraces,
+    importDPTRawMeasurement
+  }
 }))
 
 import DPTManager from '../../components/DPTManager.vue'
@@ -18,6 +37,14 @@ const dptResponse = {
   has_e_on: true,
   has_e_off: true,
   has_e_rr: false,
+  waveform_preview: {
+    max_points_per_acquisition: 800,
+    max_total_points: 40000,
+    returned_points: 3200,
+    sampling: 'uniform_with_endpoints',
+    downsampled: true,
+    downsampled_acquisition_count: 4
+  },
   metadata: { t_j: 25, v_supply: 400, v_g: 15, r_g: 10, comment: 'Energy summary' },
   raw_measurement_data: [
     {
@@ -29,6 +56,8 @@ const dptResponse = {
         v_g: 15,
         v_g_off: -5,
         r_g: 10,
+        load_inductance: 0.75,
+        commutation_inductance: 0.125,
         measurement_testbench: 'Local test bench'
       },
       dpt_on_vds: [
@@ -89,17 +118,66 @@ const CurvePlotterStub = {
   `
 }
 
+function deferred() {
+  let resolve
+  let reject
+  const promise = new Promise((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise
+    reject = rejectPromise
+  })
+  return { promise, resolve, reject }
+}
+
+async function chooseRawFile(wrapper, file) {
+  const input = wrapper.get('[data-testid="dpt-raw-file"]')
+  Object.defineProperty(input.element, 'files', {
+    value: [file],
+    configurable: true
+  })
+  await input.trigger('change')
+}
+
+async function loadRawHeader(wrapper, file) {
+  await chooseRawFile(wrapper, file)
+  await wrapper.get('[data-testid="dpt-raw-preview-file"]').trigger('click')
+  await flushPromises()
+  await wrapper.get('[data-testid="dpt-raw-vds-trace"]').setValue('V(ds)')
+  await wrapper.get('[data-testid="dpt-raw-id-trace"]').setValue('I(M1)')
+}
+
 describe('DPTManager raw waveform viewing', () => {
   let wrapper
 
   beforeEach(async () => {
-    getAll.mockReset().mockResolvedValue([{ metadata: { name: 'Waveform Device' } }])
+    getAll.mockReset().mockResolvedValue([
+      { metadata: { name: 'Waveform Device' } },
+      { metadata: { name: 'Second Device' } }
+    ])
     getDPTData.mockReset().mockResolvedValue(structuredClone(dptResponse))
     generateDPTNetlist.mockReset().mockResolvedValue({
       netlist: 'test netlist', transistor_name: 'Waveform Device'
     })
     validateDPTData.mockReset().mockResolvedValue({
       valid: true, errors: [], warnings: []
+    })
+    previewDPTRawImport.mockReset().mockResolvedValue({
+      filename: 'switch.raw',
+      plot_name: 'Transient Analysis',
+      sample_count: 100,
+      time_trace_name: 'time',
+      trace_names: ['time', 'V(ds)', 'I(M1)', 'V(other)']
+    })
+    previewDPTRawTraces.mockReset().mockResolvedValue({
+      sample_count: 100,
+      preview_sample_count: 3,
+      time_range_s: [0, 99e-6],
+      traces: {
+        'V(ds)': [[0, 400], [50e-6, 200], [99e-6, 20]],
+        'I(M1)': [[0, 0], [50e-6, 20], [99e-6, 35]]
+      }
+    })
+    importDPTRawMeasurement.mockReset().mockResolvedValue({
+      on_sample_count: 3, off_sample_count: 4
     })
     wrapper = mount(DPTManager, {
       global: { stubs: { CurvePlotter: CurvePlotterStub } }
@@ -114,10 +192,14 @@ describe('DPTManager raw waveform viewing', () => {
   })
 
   it('shows conditions and separate turn-on/off voltage and current traces', () => {
-    expect(getDPTData).toHaveBeenCalledWith('Waveform Device')
+    expect(getDPTData).toHaveBeenCalledWith('Waveform Device', {
+      waveformPreviewPoints: 800
+    })
     expect(wrapper.text()).toContain('Supply voltage400 V')
     expect(wrapper.text()).toContain('Junction temperature25 °C')
     expect(wrapper.text()).toContain('Test benchLocal test bench')
+    expect(wrapper.text()).toContain('Load inductance0.75 µH')
+    expect(wrapper.text()).toContain('Commutation inductance0.125 µH')
     expect(wrapper.findAll('.curve-plotter-stub').map(chart => chart.attributes('data-title')))
       .toEqual(['Turn-on Vds', 'Turn-on Id', 'Turn-off Id'])
     expect(wrapper.findAll('.curve-plotter-stub').every(
@@ -135,8 +217,223 @@ describe('DPTManager raw waveform viewing', () => {
     expect(wrapper.find('[data-testid="dpt-waveform-off-vds"] [role="status"]').text())
       .toContain('Turn-off Vds')
     expect(wrapper.text()).toContain('Non-finite raw samples are preserved and shown as gaps.')
+    expect(wrapper.get('[data-testid="dpt-waveform-preview-notice"]').text())
+      .toContain('at most 800 points each')
+    expect(wrapper.get('[data-testid="dpt-waveform-preview-notice"]').text())
+      .toContain('capped at 40000 sample points')
     expect(wrapper.find('.curve-plotter-stub[data-title="Turn-off Id"]').text())
       .toContain('{"x":0,"y":null}')
+    const waveformDataset = JSON.parse(
+      wrapper.find('.curve-plotter-stub[data-title="Turn-on Vds"] output').text()
+    )[0]
+    expect(waveformDataset.pointRadius).toBe(0)
+  })
+
+  it('ignores a DPT response that completes after switching devices', async () => {
+    const pendingResponse = deferred()
+    const currentDeviceResponse = {
+      has_e_on: false,
+      has_e_off: false,
+      has_e_rr: false,
+      metadata: null,
+      raw_measurement_data: [{
+        metadata: {
+          dataset_type: 'dpt_u_i',
+          comment: 'Second device current response'
+        },
+        dpt_on_vds: [],
+        dpt_on_id: [],
+        dpt_off_vds: [],
+        dpt_off_id: []
+      }]
+    }
+    const staleDeviceResponse = structuredClone(currentDeviceResponse)
+    staleDeviceResponse.raw_measurement_data[0].metadata.comment = 'Stale first device response'
+    getDPTData.mockReset()
+      .mockReturnValueOnce(pendingResponse.promise)
+      .mockResolvedValueOnce(currentDeviceResponse)
+
+    const oldRequest = wrapper.vm.loadDPTData()
+    await wrapper.get('.transistor-selector select').setValue('Second Device')
+    await flushPromises()
+
+    expect(getDPTData).toHaveBeenNthCalledWith(2, 'Second Device', {
+      waveformPreviewPoints: 800
+    })
+    expect(wrapper.text()).toContain('Second device current response')
+
+    pendingResponse.resolve(staleDeviceResponse)
+    await oldRequest
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Second device current response')
+    expect(wrapper.text()).not.toContain('Stale first device response')
+  })
+
+  it('previews explicit traces and appends manually selected event windows', async () => {
+    const input = wrapper.get('[data-testid="dpt-raw-file"]')
+    const file = new File(['native raw bytes'], 'switch.raw', {
+      type: 'application/octet-stream'
+    })
+    Object.defineProperty(input.element, 'files', { value: [file], configurable: true })
+    await input.trigger('change')
+    await wrapper.get('[data-testid="dpt-raw-preview-file"]').trigger('click')
+    await flushPromises()
+
+    expect(previewDPTRawImport).toHaveBeenCalledWith('Waveform Device', file)
+    expect(wrapper.get('[data-testid="dpt-raw-file-preview"]').text())
+      .toContain('100 samples')
+    expect(wrapper.get('[data-testid="dpt-raw-vds-trace"]').findAll('option'))
+      .toHaveLength(4)
+
+    await wrapper.get('[data-testid="dpt-raw-vds-trace"]').setValue('V(ds)')
+    await wrapper.get('[data-testid="dpt-raw-id-trace"]').setValue('I(M1)')
+    await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
+    await flushPromises()
+
+    expect(previewDPTRawTraces).toHaveBeenCalledWith('Waveform Device', file, {
+      time_trace: 'time', vds_trace: 'V(ds)', id_trace: 'I(M1)'
+    })
+    expect(wrapper.find('.curve-plotter-stub[data-title="Selected Vds trace preview"]')
+      .exists()).toBe(true)
+    expect(wrapper.get('[data-testid="dpt-raw-import"]').text())
+      .toContain('Load inductance [µH]')
+    expect(wrapper.get('[data-testid="dpt-raw-import"]').text())
+      .toContain('Commutation inductance [µH]')
+    expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled).toBe(true)
+
+    await wrapper.get('[data-testid="dpt-raw-on-start"]').setValue('0.000001')
+    await wrapper.get('[data-testid="dpt-raw-on-end"]').setValue('0.000003')
+    await wrapper.get('[data-testid="dpt-raw-off-start"]').setValue('0.000004')
+    await wrapper.get('[data-testid="dpt-raw-off-end"]').setValue('0.000007')
+    expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled).toBe(false)
+    await wrapper.get('[data-testid="dpt-raw-import-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(importDPTRawMeasurement).toHaveBeenCalledWith('Waveform Device', file, {
+      time_trace: 'time',
+      vds_trace: 'V(ds)',
+      id_trace: 'I(M1)',
+      turn_on: { start_s: 1e-6, end_s: 3e-6 },
+      turn_off: { start_s: 4e-6, end_s: 7e-6 },
+      metadata: {}
+    })
+    expect(wrapper.text()).toContain('Added one DPT record with 3 turn-on and 4 turn-off samples')
+    expect(getDPTData).toHaveBeenCalledTimes(2)
+  })
+
+  it('ignores a pending file preview after the selected file changes', async () => {
+    const pendingPreview = deferred()
+    previewDPTRawImport.mockReturnValueOnce(pendingPreview.promise)
+    const firstFile = new File(['first raw'], 'first.raw')
+    const secondFile = new File(['second raw'], 'second.raw')
+
+    await chooseRawFile(wrapper, firstFile)
+    await wrapper.get('[data-testid="dpt-raw-preview-file"]').trigger('click')
+    expect(previewDPTRawImport).toHaveBeenCalledWith('Waveform Device', firstFile)
+
+    await chooseRawFile(wrapper, secondFile)
+    pendingPreview.resolve({
+      filename: 'first.raw',
+      plot_name: 'Transient Analysis',
+      sample_count: 100,
+      time_trace_name: 'time',
+      trace_names: ['time', 'V(ds)', 'I(M1)']
+    })
+    await flushPromises()
+
+    expect(wrapper.vm.rawImportFile.name).toBe(secondFile.name)
+    expect(wrapper.find('[data-testid="dpt-raw-file-preview"]').exists()).toBe(false)
+    expect(wrapper.vm.rawImportPreview).toBe(null)
+    expect(wrapper.find('[data-testid="dpt-raw-import-submit"]').exists()).toBe(false)
+    expect(wrapper.get('[data-testid="dpt-raw-preview-file"]').element.disabled).toBe(false)
+    await wrapper.get('[data-testid="dpt-raw-preview-file"]').trigger('click')
+    await flushPromises()
+    expect(previewDPTRawImport).toHaveBeenLastCalledWith('Waveform Device', secondFile)
+    expect(wrapper.get('[data-testid="dpt-raw-file-preview"]').text())
+      .toContain('switch.raw')
+  })
+
+  it('ignores a pending trace preview after the trace mapping changes', async () => {
+    const file = new File(['native raw bytes'], 'switch.raw')
+    await loadRawHeader(wrapper, file)
+    const pendingPreview = deferred()
+    previewDPTRawTraces.mockReturnValueOnce(pendingPreview.promise)
+
+    await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
+    expect(previewDPTRawTraces).toHaveBeenCalledWith('Waveform Device', file, {
+      time_trace: 'time', vds_trace: 'V(ds)', id_trace: 'I(M1)'
+    })
+
+    await wrapper.get('[data-testid="dpt-raw-vds-trace"]').setValue('V(other)')
+    pendingPreview.resolve({
+      sample_count: 100,
+      preview_sample_count: 3,
+      time_range_s: [0, 99e-6],
+      traces: { 'V(ds)': [[0, 400]], 'I(M1)': [[0, 0]] }
+    })
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="dpt-raw-waveform-preview"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="dpt-raw-import-submit"]').exists()).toBe(false)
+    await wrapper.vm.importRawDptMeasurement()
+    expect(importDPTRawMeasurement).not.toHaveBeenCalled()
+  })
+
+  it('ignores a pending file preview after the selected device changes', async () => {
+    const pendingPreview = deferred()
+    previewDPTRawImport.mockReturnValueOnce(pendingPreview.promise)
+    const file = new File(['native raw bytes'], 'switch.raw')
+    await chooseRawFile(wrapper, file)
+    wrapper.vm.rawImportMetadata.t_j = '125'
+    await wrapper.get('[data-testid="dpt-raw-preview-file"]').trigger('click')
+
+    await wrapper.get('.transistor-selector select').setValue('Second Device')
+    await flushPromises()
+    pendingPreview.resolve({
+      filename: 'switch.raw',
+      plot_name: 'Transient Analysis',
+      sample_count: 100,
+      time_trace_name: 'time',
+      trace_names: ['time', 'V(ds)', 'I(M1)']
+    })
+    await flushPromises()
+
+    expect(wrapper.vm.rawImportFile).toBe(null)
+    expect(wrapper.vm.rawImportPreview).toBe(null)
+    expect(wrapper.vm.rawImportTracePreview).toBe(null)
+    expect(wrapper.vm.rawImportForm.turn_on_start_s).toBe('')
+    expect(wrapper.vm.rawImportForm.turn_off_end_s).toBe('')
+    expect(wrapper.vm.rawImportMetadata.t_j).toBe('')
+    expect(wrapper.find('[data-testid="dpt-raw-file-preview"]').exists()).toBe(false)
+  })
+
+  it('clears reviewed file, trace, windows, and metadata on device change', async () => {
+    const file = new File(['native raw bytes'], 'switch.raw')
+    await loadRawHeader(wrapper, file)
+    await wrapper.get('[data-testid="dpt-raw-preview-traces"]').trigger('click')
+    await flushPromises()
+    await wrapper.get('[data-testid="dpt-raw-on-start"]').setValue('0.000001')
+    await wrapper.get('[data-testid="dpt-raw-on-end"]').setValue('0.000003')
+    await wrapper.get('[data-testid="dpt-raw-off-start"]').setValue('0.000004')
+    await wrapper.get('[data-testid="dpt-raw-off-end"]').setValue('0.000007')
+    await wrapper.get('[data-testid="dpt-raw-metadata-tj"]').setValue('125')
+
+    expect(wrapper.find('[data-testid="dpt-raw-waveform-preview"]').exists()).toBe(true)
+    expect(wrapper.get('[data-testid="dpt-raw-import-submit"]').element.disabled)
+      .toBe(false)
+
+    await wrapper.get('.transistor-selector select').setValue('Second Device')
+    await flushPromises()
+
+    expect(wrapper.vm.rawImportFile).toBe(null)
+    expect(wrapper.vm.rawImportPreview).toBe(null)
+    expect(wrapper.vm.rawImportTracePreview).toBe(null)
+    expect(wrapper.vm.rawImportForm.turn_on_start_s).toBe('')
+    expect(wrapper.vm.rawImportForm.turn_off_end_s).toBe('')
+    expect(wrapper.vm.rawImportMetadata.t_j).toBe('')
+    expect(wrapper.find('[data-testid="dpt-raw-file-preview"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="dpt-raw-waveform-preview"]').exists()).toBe(false)
   })
 
   it('selects another acquisition and measurement record', async () => {
