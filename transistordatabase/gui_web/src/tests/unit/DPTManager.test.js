@@ -97,8 +97,10 @@ describe('DPTManager raw waveform viewing', () => {
     expect(wrapper.findAll('.curve-plotter-stub').map(chart => chart.attributes('data-title')))
       .toEqual(['Turn-on Vds', 'Turn-on Id', 'Turn-off Id'])
     expect(wrapper.findAll('.curve-plotter-stub').every(
-      chart => chart.attributes('data-x-label') === 'Time [s]'
+      chart => chart.attributes('data-x-label') === 'Time [µs]'
     )).toBe(true)
+    expect(wrapper.find('.curve-plotter-stub[data-title="Turn-on Vds"]').text())
+      .toContain('{"x":1,"y":210}')
     expect(wrapper.find('[data-testid="dpt-waveform-off-vds"] [role="status"]').text())
       .toContain('Turn-off Vds')
     expect(wrapper.text()).toContain('Non-finite raw samples are preserved and shown as gaps.')
@@ -110,6 +112,8 @@ describe('DPTManager raw waveform viewing', () => {
     await wrapper.get('[data-testid="dpt-acquisition-select"]').setValue('1')
     expect(wrapper.find('.curve-plotter-stub[data-title="Turn-on Vds"]').text())
       .toContain('{"x":0,"y":390}')
+    expect(wrapper.find('.curve-plotter-stub[data-title="Turn-on Vds"]').text())
+      .toContain('{"x":1,"y":200}')
 
     await wrapper.get('[data-testid="dpt-measurement-select"]').setValue('1')
 

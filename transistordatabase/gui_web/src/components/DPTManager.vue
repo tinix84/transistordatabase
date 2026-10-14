@@ -171,7 +171,7 @@
                       v-if="plot.hasNumericPoints"
                       :title="plot.title"
                       :datasets="[{ label: plot.title, data: plot.data, borderColor: plot.color }]"
-                      x-label="Time [s]"
+                      x-label="Time [µs]"
                       :y-label="plot.yLabel"
                       :show-legend="false"
                     />
@@ -454,7 +454,7 @@ export default {
             if (typeof time !== 'number' || !Number.isFinite(time)) continue
             const finiteValue = typeof value === 'number' && Number.isFinite(value)
             if (!finiteValue) hasNonFiniteSamples = true
-            data.push({ x: time, y: finiteValue ? value : null })
+            data.push({ x: time * 1e6, y: finiteValue ? value : null })
           }
         }
         return {
