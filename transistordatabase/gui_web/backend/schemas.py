@@ -280,6 +280,88 @@ class TopologyCalculationRequest(BaseModel):
     sweep: TopologySweepRequest | None = None
 
 
+class BoostParetoBoundaryRequest(BaseModel):
+    """One shared SI-unit Boost CCM boundary for a semiconductor screen."""
+
+    v_in: float = Field(..., gt=0, allow_inf_nan=False)
+    v_out: float = Field(..., gt=0, allow_inf_nan=False)
+    p_out: float = Field(..., gt=0, allow_inf_nan=False)
+    f_sw: float = Field(..., gt=0, allow_inf_nan=False)
+    l_value: float = Field(..., gt=0, allow_inf_nan=False)
+    c_out: float = Field(..., gt=0, allow_inf_nan=False)
+    t_j: float = Field(..., allow_inf_nan=False)
+    t_case: float | None = Field(None, allow_inf_nan=False)
+
+    @model_validator(mode="after")
+    def validate_boost_boundary(self) -> BoostParetoBoundaryRequest:
+        """Require the voltage range supported by a Boost operating point.
+
+        :returns: This boundary after successful validation.
+        :rtype: BoostParetoBoundaryRequest
+        :param self: Boundary request instance to validate.
+        :type self: BoostParetoBoundaryRequest
+        :raises ValueError: If output voltage does not exceed input voltage.
+        """
+        if self.v_out <= self.v_in:
+            raise ValueError("Boost Pareto screening requires v_out > v_in.")
+        return self
+
+
+class ParetoCandidateRequest(BaseModel):
+    """One physical switch/rectifier configuration for Pareto evaluation."""
+
+    candidate_id: str = Field(..., min_length=1, max_length=64)
+    label: str = Field(..., min_length=1, max_length=120)
+    switch_transistor_id: str | None = None
+    diode_transistor_id: str | None = None
+    parallel_switches: int = Field(1, ge=1, le=100)
+    parallel_diodes: int = Field(1, ge=1, le=100)
+    v_g: float | None = Field(None, allow_inf_nan=False)
+    diode_v_g: float | None = Field(None, allow_inf_nan=False)
+
+    @field_validator("candidate_id", "label")
+    @classmethod
+    def strip_candidate_text(cls, value: str) -> str:
+        """Reject blank candidate text and normalize surrounding whitespace.
+
+        :param value: Candidate ID or display label supplied by the caller.
+        :type value: str
+        :returns: Trimmed nonblank value.
+        :rtype: str
+        :raises ValueError: If the value contains only whitespace.
+        """
+        value = value.strip()
+        if not value:
+            raise ValueError("Candidate identifiers and labels cannot be blank.")
+        return value
+
+
+class BoostSemiconductorParetoRequest(BaseModel):
+    """Fixed-boundary Boost CCM semiconductor Pareto request."""
+
+    boundary: BoostParetoBoundaryRequest
+    candidates: list[ParetoCandidateRequest] = Field(..., min_length=2, max_length=20)
+    catalog: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Raw sourced package and price metadata keyed by TDB identity",
+    )
+
+    @model_validator(mode="after")
+    def validate_candidate_ids(self) -> BoostSemiconductorParetoRequest:
+        """Keep candidate identifiers unique after whitespace normalization.
+
+        :returns: This request after successful validation.
+        :rtype: BoostSemiconductorParetoRequest
+        :param self: Pareto request instance to validate.
+        :type self: BoostSemiconductorParetoRequest
+        :raises ValueError: If any normalized candidate IDs are duplicated.
+        """
+        ids = [candidate.candidate_id for candidate in self.candidates]
+        if len(ids) != len(set(ids)):
+            raise ValueError("candidate_id values must be unique.")
+        return self
+
+
 class AdvancedSearchRequest(BaseModel):
     """Request schema for advanced transistor search."""
 

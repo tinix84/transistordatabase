@@ -1,6 +1,7 @@
 """FastAPI contract checks for the new topology workflow."""
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import pytest
@@ -192,6 +193,330 @@ def test_loss_balanced_boost_api_returns_power_closed_channel_result(
     assert result["performance"]["p_in_w"] == pytest.approx(
         1000 + result["losses"]["total_w"], rel=1e-7
     )
+
+
+def test_boost_pareto_api_keeps_candidate_errors_local(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Return candidate-specific curve and lookup failures beside valid rows.
+
+    :param gate_conditioned_client: API client with exact-condition TDB curves.
+    :type gate_conditioned_client: TestClient
+    :returns: None.
+    :rtype: None
+    """
+    request = {
+        "boundary": {
+            "v_in": 100,
+            "v_out": 200,
+            "p_out": 1000,
+            "f_sw": 20_000,
+            "l_value": 0.001,
+            "c_out": 0.001,
+            "t_j": 25,
+            "t_case": 60,
+        },
+        "candidates": [
+            {
+                "candidate_id": "valid",
+                "label": "Valid device pair",
+                "switch_transistor_id": "gated-device",
+                "diode_transistor_id": "gated-device",
+                "parallel_switches": 1,
+                "parallel_diodes": 1,
+                "v_g": 15,
+                "diode_v_g": 0,
+            },
+            {
+                "candidate_id": "wrong-gate",
+                "label": "Wrong exact switch gate",
+                "switch_transistor_id": "gated-device",
+                "diode_transistor_id": "gated-device",
+                "v_g": 14,
+                "diode_v_g": 0,
+            },
+            {
+                "candidate_id": "missing-device",
+                "label": "Missing TDB record",
+                "switch_transistor_id": "not-in-database",
+                "diode_transistor_id": "gated-device",
+                "v_g": 15,
+                "diode_v_g": 0,
+            },
+        ],
+        "catalog": {
+            "gated-device": {
+                "orderable_part": "GATED-DEVICE-1",
+                "unit_cost_usd": 5.0,
+                "length_mm": 10,
+                "width_mm": 5,
+                "height_mm": 2,
+                "price_source_url": "https://example.com/price",
+                "cost_accessed_on": "2026-10-14",
+                "dimensions_source_url": "https://example.com/datasheet",
+            }
+        },
+    }
+
+    response = gate_conditioned_client.post("/api/topology/pareto", json=request)
+
+    assert response.status_code == 200
+    result = response.json()
+    assert result["eligible_candidate_count"] == 1
+    assert result["pareto_candidate_ids"] == ["valid"]
+    candidates = {item["candidate_id"]: item for item in result["candidates"]}
+    assert candidates["valid"]["eligible"] is True
+    assert candidates["valid"]["catalog"]["switch"]["cost_accessed_on"] == "2026-10-14"
+    assert candidates["wrong-gate"]["eligible"] is False
+    assert any(
+        "Missing required switch channel curve" in reason
+        for reason in candidates["wrong-gate"]["ineligible_reasons"]
+    )
+    assert candidates["missing-device"]["eligible"] is False
+    assert any(
+        "not-in-database" in reason
+        for reason in candidates["missing-device"]["ineligible_reasons"]
+    )
+    assert "Exact objective ties remain non-dominated." in result["dominance_rule"]
+
+
+def test_boost_pareto_api_keeps_malformed_catalog_rows_local(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Keep malformed market data from rejecting a mixed candidate request.
+
+    :param gate_conditioned_client: API client with exact-condition TDB curves.
+    :type gate_conditioned_client: TestClient
+    :returns: None.
+    :rtype: None
+    """
+    request = {
+        "boundary": {
+            "v_in": 100,
+            "v_out": 200,
+            "p_out": 1000,
+            "f_sw": 20_000,
+            "l_value": 0.001,
+            "c_out": 0.001,
+            "t_j": 25,
+            "t_case": 60,
+        },
+        "candidates": [
+            {
+                "candidate_id": "valid",
+                "label": "Valid sourced catalog",
+                "switch_transistor_id": "gated-device",
+                "diode_transistor_id": "gated-device",
+                "v_g": 15,
+                "diode_v_g": 0,
+            },
+            {
+                "candidate_id": "malformed-catalog",
+                "label": "Malformed sourced catalog",
+                "switch_transistor_id": "missing-catalog-device",
+                "diode_transistor_id": "missing-catalog-device",
+                "v_g": 15,
+                "diode_v_g": 0,
+            },
+        ],
+        "catalog": {
+            "gated-device": {
+                "orderable_part": "GATED-DEVICE-1",
+                "unit_cost_usd": 5,
+                "length_mm": 10,
+                "width_mm": 5,
+                "height_mm": 2,
+                "price_source_url": "https://example.com/price",
+                "cost_accessed_on": "2026-10-14",
+                "dimensions_source_url": "https://example.com/datasheet",
+            },
+            "missing-catalog-device": {
+                "orderable_part": "BAD-DEVICE-1",
+                "unit_cost_usd": 0,
+                "length_mm": -1,
+                "width_mm": 5,
+                "height_mm": 2,
+                "price_source_url": "not-a-url",
+                "cost_accessed_on": "not-a-date",
+                "dimensions_source_url": "ftp://example.com/datasheet",
+            },
+        },
+    }
+
+    response = gate_conditioned_client.post("/api/topology/pareto", json=request)
+
+    assert response.status_code == 200
+    result = response.json()
+    assert result["eligible_candidate_count"] == 1
+    assert result["pareto_candidate_ids"] == ["valid"]
+    candidates = {item["candidate_id"]: item for item in result["candidates"]}
+    assert candidates["valid"]["eligible"] is True
+    malformed = candidates["malformed-catalog"]
+    assert malformed["eligible"] is False
+    reasons = " ".join(malformed["ineligible_reasons"])
+    assert "unit_cost_usd" in reasons
+    assert "length_mm" in reasons
+    assert "price_source_url" in reasons
+    assert "cost_accessed_on" in reasons
+    assert "dimensions_source_url" in reasons
+
+
+def test_boost_pareto_api_keeps_untyped_catalog_values_local(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Screen valid alternatives when one catalog row has untyped values.
+
+    :param gate_conditioned_client: API client with exact-condition TDB curves.
+    :type gate_conditioned_client: TestClient
+    :returns: None.
+    :rtype: None
+    """
+    backend._repo.devices["malformed-types-device"] = backend._repo.devices[
+        "gated-device"
+    ]
+    backend._repo.devices["non-object-catalog-device"] = backend._repo.devices[
+        "gated-device"
+    ]
+    request = {
+        "boundary": {
+            "v_in": 100,
+            "v_out": 200,
+            "p_out": 1000,
+            "f_sw": 20_000,
+            "l_value": 0.001,
+            "c_out": 0.001,
+            "t_j": 25,
+            "t_case": 60,
+        },
+        "candidates": [
+            {
+                "candidate_id": "valid",
+                "label": "Valid catalog",
+                "switch_transistor_id": "gated-device",
+                "diode_transistor_id": "gated-device",
+                "v_g": 15,
+                "diode_v_g": 0,
+            },
+            {
+                "candidate_id": "malformed-types",
+                "label": "Malformed catalog values",
+                "switch_transistor_id": "malformed-types-device",
+                "diode_transistor_id": "malformed-types-device",
+                "v_g": 15,
+                "diode_v_g": 0,
+            },
+            {
+                "candidate_id": "non-object-catalog",
+                "label": "Non-object catalog row",
+                "switch_transistor_id": "non-object-catalog-device",
+                "diode_transistor_id": "non-object-catalog-device",
+                "v_g": 15,
+                "diode_v_g": 0,
+            },
+        ],
+        "catalog": {
+            "gated-device": {
+                "orderable_part": "GATED-DEVICE-1",
+                "unit_cost_usd": 5,
+                "length_mm": 10,
+                "width_mm": 5,
+                "height_mm": 2,
+                "price_source_url": "https://example.com/price",
+                "cost_accessed_on": "2026-10-14",
+                "dimensions_source_url": "https://example.com/datasheet",
+            },
+            "malformed-types-device": {
+                "orderable_part": "BAD-DEVICE-1",
+                "unit_cost_usd": "unknown",
+                "length_mm": 1e309,
+                "width_mm": 5,
+                "height_mm": 2,
+                "price_source_url": 123,
+                "cost_accessed_on": "2026-10-14",
+                "dimensions_source_url": "",
+            },
+            "non-object-catalog-device": 123,
+        },
+    }
+    # Preserve a JSON numeric overflow token so the request exercises Pydantic's
+    # handling of untyped 1e309 as a non-finite float.
+    request_json = json.dumps(request).replace(
+        '"length_mm": Infinity', '"length_mm": 1e309'
+    )
+
+    response = gate_conditioned_client.post(
+        "/api/topology/pareto",
+        content=request_json,
+        headers={"Content-Type": "application/json"},
+    )
+
+    assert response.status_code == 200
+    result = response.json()
+    assert result["eligible_candidate_count"] == 1
+    assert result["pareto_candidate_ids"] == ["valid"]
+    candidates = {item["candidate_id"]: item for item in result["candidates"]}
+    assert candidates["valid"]["eligible"] is True
+    malformed = candidates["malformed-types"]
+    assert malformed["eligible"] is False
+    reasons = " ".join(malformed["ineligible_reasons"])
+    assert "unit_cost_usd" in reasons
+    assert "length_mm" in reasons
+    assert "price_source_url" in reasons
+    assert "package-dimensions source URL" in reasons
+    non_object = candidates["non-object-catalog"]
+    assert non_object["eligible"] is False
+    assert any(
+        "No sourced package and cost data" in reason
+        for reason in non_object["ineligible_reasons"]
+    )
+
+
+def test_boost_pareto_api_rejects_invalid_boundary_and_duplicate_ids(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Validate shared operating bounds and stable candidate identifiers.
+
+    :param gate_conditioned_client: API client with exact-condition TDB curves.
+    :type gate_conditioned_client: TestClient
+    :returns: None.
+    :rtype: None
+    """
+    candidate = {
+        "candidate_id": "same-id",
+        "label": "Candidate",
+        "switch_transistor_id": "gated-device",
+        "diode_transistor_id": "gated-device",
+        "v_g": 15,
+        "diode_v_g": 0,
+    }
+    request = {
+        "boundary": {
+            "v_in": 100,
+            "v_out": 90,
+            "p_out": 1000,
+            "f_sw": 20_000,
+            "l_value": 0.001,
+            "c_out": 0.001,
+            "t_j": 25,
+        },
+        "candidates": [candidate, {**candidate, "candidate_id": "other"}],
+        "catalog": {},
+    }
+    invalid_boundary = gate_conditioned_client.post(
+        "/api/topology/pareto", json=request
+    )
+    assert invalid_boundary.status_code == 422
+    assert "v_out > v_in" in invalid_boundary.text
+
+    request["boundary"]["v_out"] = 200
+    request["candidates"][1] = {
+        **candidate,
+        "candidate_id": " same-id ",
+        "label": "Duplicate id",
+    }
+    duplicate_ids = gate_conditioned_client.post("/api/topology/pareto", json=request)
+    assert duplicate_ids.status_code == 422
+    assert "candidate_id values must be unique" in duplicate_ids.text
 
 
 def test_loss_balanced_flyback_dcm_api_exposes_primary_and_secondary_currents(

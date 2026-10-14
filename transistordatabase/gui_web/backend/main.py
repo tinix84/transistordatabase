@@ -84,6 +84,7 @@ from transistordatabase.gui_web.backend.schemas import (
     DptEnergyDerivationRequest,
     DptEnergySaveRequest,
     PLECSImportResponse,
+    BoostSemiconductorParetoRequest,
 )
 from transistordatabase.gui_web.backend.dpt_raw_import import (
     DptRawImportError,
@@ -105,6 +106,9 @@ from transistordatabase.gui_web.backend.dpt_energy import (
     source_token as dpt_energy_source_token,
 )
 from transistordatabase.gui_web.backend.topology_service import TopologyCalculatorService
+from transistordatabase.topologies.semiconductor_pareto import (
+    calculate_boost_semiconductor_pareto,
+)
 
 logger = logging.getLogger(__name__)
 _DATABASE_BACKUP_FORMAT = "transistordatabase.database-backup"
@@ -2480,6 +2484,50 @@ def compare_topologies(request: Dict[str, Any]) -> Dict[str, Any]:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Comparison failed: {e!s}")
+
+
+@app.post("/api/topology/pareto")
+def calculate_boost_semiconductor_pareto_endpoint(
+    request: BoostSemiconductorParetoRequest,
+) -> dict[str, Any]:
+    """Evaluate sourced semiconductor candidates at one Boost CCM boundary.
+
+    :param request: Shared boundary, candidate definitions, and raw catalog data.
+    :type request: BoostSemiconductorParetoRequest
+    :returns: Pareto objective rules and candidate-level screening results.
+    :rtype: dict[str, Any]
+    """
+    candidates: list[dict[str, Any]] = []
+    for candidate_request in request.candidates:
+        candidate = candidate_request.model_dump(mode="python")
+        load_errors: list[str] = []
+        switch_id = candidate.get("switch_transistor_id")
+        diode_id = candidate.get("diode_transistor_id")
+        if not switch_id:
+            load_errors.append("Select a switch TDB device.")
+        else:
+            try:
+                candidate["switch_transistor"] = _get_transistor(switch_id)
+            except HTTPException as exc:
+                load_errors.append(str(exc.detail))
+        if not diode_id:
+            load_errors.append("Select a rectifier TDB device.")
+        else:
+            try:
+                candidate["diode_transistor"] = _get_transistor(diode_id)
+            except HTTPException as exc:
+                load_errors.append(str(exc.detail))
+        if load_errors:
+            candidate["device_load_error"] = " ".join(load_errors)
+        candidates.append(candidate)
+
+    catalog = request.catalog
+    try:
+        return calculate_boost_semiconductor_pareto(
+            request.boundary.model_dump(mode="python"), candidates, catalog
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.get("/api/topology/recommendations")

@@ -278,12 +278,14 @@
         </div>
       </section>
     </div>
+    <TopologyParetoPanel :transistors="transistors" />
   </div>
 </template>
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import Chart from 'chart.js/auto'
+import TopologyParetoPanel from './TopologyParetoPanel.vue'
 import { transistorApi } from '../services/api.js'
 
 const props = defineProps({ transistors: { type: Array, default: () => [] } })
