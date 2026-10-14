@@ -241,9 +241,37 @@
           Ranking uses {{ comparison.comparison.loss_scope }} losses only.
         </p>
         <div v-for="name in ['buck', 'boost', 'buck-boost', 'flyback']" :key="name" class="comparison-row">
-          <strong>{{ name }}</strong>
-          <span v-if="comparison[name]?.error" class="error-text">{{ comparison[name].error }}</span>
-          <span v-else>{{ comparison[name]?.performance?.efficiency_percent == null ? 'Operating point calculated; no loss-mode efficiency ranking' : `${format(comparison[name].performance.efficiency_percent, 3)}%` }}</span>
+          <div class="comparison-summary">
+            <strong>{{ name }}</strong>
+            <span v-if="comparison[name]?.error" class="error-text">{{ comparison[name].error }}</span>
+            <span v-else-if="comparison[name]?.supported === false" class="hint">{{ comparison[name]?.reason || 'Unsupported operating point.' }}</span>
+            <span v-else-if="!comparison[name]" class="hint">No operating point was returned.</span>
+            <span v-else-if="comparison[name]?.performance?.efficiency_percent == null" class="hint">
+              {{ comparison[name]?.model?.mode === 'estimate' ? 'Estimate mode; efficiency is not calculated.' : 'Efficiency is not reported for this mode.' }}
+            </span>
+            <span v-else>{{ format(comparison[name].performance.efficiency_percent, 3) }}%</span>
+          </div>
+          <div v-if="isLossBalancedCcmComparison(comparison[name])" class="comparison-details">
+            <p><strong>Power-balance residual:</strong> {{ format(comparison[name].performance?.power_balance_residual_w, 8) }} W</p>
+            <p><strong>Averaged inductor volt-second residual:</strong> {{ format(comparison[name].calculated?.inductor_volt_second_residual_v, 8) }} V</p>
+            <div v-if="comparison[name].temperatures" class="comparison-thermal">
+              <p><strong>Thermal status:</strong> {{ comparison[name].model?.thermal_closure || comparison[name].temperatures.thermal_closure || 'not reported' }}</p>
+              <p v-if="comparison[name].temperatures.t_case_c != null">Fixed case/sink reference: {{ format(comparison[name].temperatures.t_case_c, 1) }} °C.</p>
+              <p v-if="comparison[name].temperatures.switch_c != null">Switch junction estimate: {{ format(comparison[name].temperatures.switch_c, 1) }} °C.</p>
+              <p v-else>Switch temperature unavailable: {{ comparison[name].temperatures.switch_unavailable_reason || comparison[name].temperatures.unavailable_reason || 'Reason not reported.' }}</p>
+              <p v-if="comparison[name].temperatures.diode_c != null">Diode junction estimate: {{ format(comparison[name].temperatures.diode_c, 1) }} °C.</p>
+              <p v-else>Diode temperature unavailable: {{ comparison[name].temperatures.diode_unavailable_reason || comparison[name].temperatures.unavailable_reason || 'Reason not reported.' }}</p>
+              <p v-if="comparison[name].temperatures.thermal_closure_reason">Thermal status reason: {{ comparison[name].temperatures.thermal_closure_reason }}</p>
+            </div>
+            <p v-else>Thermal data not reported.</p>
+            <div class="comparison-limitations">
+              <strong>Model assumptions and limitations</strong>
+              <ul v-if="lossBalancedAssumptions(comparison[name]).length">
+                <li v-for="assumption in lossBalancedAssumptions(comparison[name])" :key="assumption">{{ assumption }}</li>
+              </ul>
+              <p v-else>No model assumptions or limitations were reported in this response.</p>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -347,6 +375,19 @@ function selectTopology(id) {
 }
 function format(value, digits = 2) {
   return Number.isFinite(value) ? Number(value).toFixed(digits) : '—'
+}
+function isLossBalancedCcmComparison(result) {
+  return result?.model?.mode === 'loss-balanced'
+    && result.model.conduction_regime === 'CCM'
+    && !result.error
+    && result.supported !== false
+}
+function lossBalancedAssumptions(result) {
+  const assumptions = result?.model?.assumptions
+  if (!Array.isArray(assumptions)) return []
+  return assumptions.filter(assumption => (
+    typeof assumption === 'string' && assumption.trim().length > 0
+  ))
 }
 function axisUnit(axis) {
   return ({ v_in: 'V', v_out: 'V', p_out: 'W', f_sw: 'kHz', l_value: 'µH', c_out: 'µF' })[axis]
@@ -591,6 +632,43 @@ onBeforeUnmount(destroyCharts)
   color: #2c3e50;
   border-bottom: 2px solid #3498db;
   padding-bottom: 0.5rem;
+}
+
+.comparison-row {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.comparison-row:last-child {
+  border-bottom: 0;
+}
+
+.comparison-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.comparison-details {
+  margin: 0.75rem 0 0 1rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid #dbeafe;
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.comparison-details p {
+  margin: 0.35rem 0;
+}
+
+.comparison-limitations {
+  margin-top: 0.75rem;
+}
+
+.comparison-limitations ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.25rem;
 }
 
 .topology-grid {

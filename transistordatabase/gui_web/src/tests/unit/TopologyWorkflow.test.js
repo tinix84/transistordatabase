@@ -244,6 +244,146 @@ describe('TopologyCalculator API workflow', () => {
     expect(request.switch_transistor_id).toBeUndefined()
   })
 
+  it('renders CCM loss-balanced comparison residuals, thermal availability, and model limits safely', async () => {
+    const assumptions = [
+      'CCM duty is adjusted to balance the requested output power and included channel-conduction losses.',
+      'Triangular inductor current in continuous conduction mode.',
+      'Output ripple is a calculated peak-to-peak estimate; capacitor ESR and switching ripple are ignored.',
+      'v_out and i_out are positive output magnitudes.',
+      'Loss-balanced mode solves CCM duty/current so input power balances output power plus included channel losses.',
+      'Inductor ripple is triangular and refined using measured switch-channel voltage at the selected exact curve conditions.',
+      'CCM power and averaged volt-second residuals can differ because the CCM solver uses a triangular-ripple approximation with nonlinear channel curves.',
+      'Only switch and diode channel conduction losses are included; switching, reverse recovery, gate drive, passive, and magnetic losses remain excluded.',
+      'Thermal output is a one-pass estimate at the selected curve temperature, not an electrothermal iteration.',
+      'Parallel devices are identical and share current evenly; each branch uses the original per-device TDB curves without modifying curve data.'
+    ]
+    const buckResult = {
+      ...estimateResponse,
+      topology: 'buck',
+      model: {
+        ...estimateResponse.model,
+        mode: 'loss-balanced',
+        conduction_regime: 'CCM',
+        thermal_closure: 'unavailable',
+        assumptions: [...assumptions, null, { ignored: 'non-string entry' }]
+      },
+      calculated: { ...estimateResponse.calculated, inductor_volt_second_residual_v: 0.125 },
+      losses: { scope: 'included switch and diode channel conduction only' },
+      performance: {
+        p_out_w: 500,
+        p_in_w: 510,
+        efficiency_percent: 98.04,
+        power_balance_residual_w: 0.001
+      },
+      temperatures: {
+        t_case_c: 60,
+        switch_c: null,
+        diode_c: null,
+        switch_unavailable_reason: 'switch junction-to-case data are missing',
+        diode_unavailable_reason: 'diode case-to-sink data are missing',
+        thermal_closure: 'unavailable',
+        thermal_closure_reason: 'switch junction-to-case data are missing'
+      }
+    }
+    const boostResult = {
+      ...buckResult,
+      topology: 'boost',
+      model: {
+        ...buckResult.model,
+        thermal_closure: 'closed_at_selected_curve_temperature',
+        assumptions: 'malformed assumption list'
+      },
+      calculated: { ...buckResult.calculated, inductor_volt_second_residual_v: null },
+      performance: { ...buckResult.performance, power_balance_residual_w: null },
+      temperatures: {
+        t_case_c: 60,
+        switch_c: 75,
+        diode_c: 80,
+        thermal_closure: 'closed_at_selected_curve_temperature'
+      }
+    }
+    compareTopologies.mockResolvedValueOnce({
+      comparison: { ranking_available: true, loss_scope: 'channel_conduction_only' },
+      buck: buckResult,
+      boost: boostResult,
+      'buck-boost': { error: 'Buck-Boost channel curve is unavailable' },
+      flyback: { supported: false, reason: 'Flyback operating point is unsupported' }
+    })
+
+    await setSelect('Calculation mode', 'loss-balanced')
+    await wrapper.findAll('button').find(button => button.text().includes('Compare topologies')).trigger('click')
+    await flushPromises()
+
+    const text = wrapper.text()
+    expect(text).toContain('Power-balance residual: 0.00100000 W')
+    expect(text).toContain('Averaged inductor volt-second residual: 0.12500000 V')
+    expect(text).toContain('Power-balance residual: — W')
+    expect(text).toContain('Averaged inductor volt-second residual: — V')
+    expect(text).toContain('Thermal status: unavailable')
+    expect(text).toContain('Switch temperature unavailable: switch junction-to-case data are missing')
+    expect(text).toContain('Diode temperature unavailable: diode case-to-sink data are missing')
+    expect(text).toContain('Thermal status: closed_at_selected_curve_temperature')
+    expect(text).toContain('Switch junction estimate: 75.0 °C')
+    expect(text).toContain('Model assumptions and limitations')
+    for (const assumption of assumptions) expect(text).toContain(assumption)
+    expect(text).toContain('No model assumptions or limitations were reported in this response.')
+    expect(text).not.toContain('[object Object]')
+    expect(text).toContain('Buck-Boost channel curve is unavailable')
+    expect(text).toContain('Flyback operating point is unsupported')
+    expect(text).not.toMatch(/undefined|NaN/)
+    expect(wrapper.findAll('.comparison-row')).toHaveLength(4)
+  })
+
+  it('keeps estimate comparison results clear and omits loss-balanced details', async () => {
+    compareTopologies.mockResolvedValueOnce({
+      comparison: {
+        ranking_available: false,
+        reason: 'Estimate mode does not calculate efficiency.'
+      },
+      buck: estimateResponse,
+      boost: { ...estimateResponse, topology: 'boost' },
+      'buck-boost': { ...estimateResponse, topology: 'buck-boost' },
+      flyback: { ...estimateResponse, topology: 'flyback' }
+    })
+
+    await wrapper.findAll('button').find(button => button.text().includes('Compare topologies')).trigger('click')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Estimate mode does not calculate efficiency.')
+    expect(wrapper.text()).toContain('Estimate mode; efficiency is not calculated.')
+    expect(wrapper.text()).not.toContain('Power-balance residual')
+    expect(wrapper.text()).not.toContain('Thermal status:')
+    expect(wrapper.text()).not.toContain('Model assumptions and limitations')
+  })
+
+  it('handles missing and malformed assumption lists in comparison results', async () => {
+    compareTopologies.mockResolvedValueOnce({
+      comparison: { ranking_available: false },
+      buck: {
+        ...estimateResponse,
+        model: { mode: 'loss-balanced', conduction_regime: 'CCM' }
+      },
+      boost: {
+        ...estimateResponse,
+        topology: 'boost',
+        model: {
+          ...estimateResponse.model,
+          mode: 'loss-balanced',
+          assumptions: 'not an array'
+        }
+      },
+      'buck-boost': { error: 'Buck-Boost result unavailable' },
+      flyback: { supported: false, reason: 'Unsupported operating point.' }
+    })
+
+    await setSelect('Calculation mode', 'loss-balanced')
+    await wrapper.findAll('button').find(button => button.text().includes('Compare topologies')).trigger('click')
+    await flushPromises()
+
+    expect(wrapper.text().match(/No model assumptions or limitations were reported in this response\./g)).toHaveLength(2)
+    expect(wrapper.text()).not.toMatch(/undefined|NaN|\[object Object\]/)
+  })
+
   it('downloads compare-only results with the exact comparison request and response', async () => {
     const comparisonResponse = {
       comparison: { ranking_available: false },
