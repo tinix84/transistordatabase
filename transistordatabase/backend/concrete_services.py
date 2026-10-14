@@ -837,22 +837,81 @@ class ComparisonService(IComparisonService):
         """Generate thermal impedance comparison plot data."""
         curves = []
 
+        # Foster curves share a fixed logarithmic display grid. Measured
+        # curves retain their recorded time and impedance samples unchanged.
         time_points = np.logspace(-6, 1, 100)  # 1µs to 10s
 
         for t in transistors:
-            foster = t.switch.thermal_foster
-            if not foster:
-                continue
+            for component_name, component in (
+                ('switch', t.switch),
+                ('diode', t.diode),
+            ):
+                foster = component.thermal_foster
+                if foster is None:
+                    continue
 
-            try:
-                z_th = [foster.get_thermal_impedance(tp) for tp in time_points]
+                measured = foster.graph_t_rthjc
+                if measured is not None:
+                    measured_points = np.asarray(measured)
+                    if (
+                        measured_points.ndim == 2
+                        and measured_points.shape[0] == 2
+                        and measured_points.shape[1] > 0
+                    ):
+                        curves.append({
+                            'name': (
+                                f'{t.metadata.name} / {component_name} '
+                                '- measured'
+                            ),
+                            'time_data': measured_points[0].tolist(),
+                            'z_th_data': measured_points[1].tolist(),
+                        })
+
+                r_th_vector = foster.r_th_vector
+                tau_vector = foster.tau_vector
+                if r_th_vector is None or tau_vector is None:
+                    continue
+
+                try:
+                    r_th = np.asarray(r_th_vector)
+                    tau = np.asarray(tau_vector)
+                except (TypeError, ValueError):
+                    continue
+
+                if (
+                    r_th.ndim != 1
+                    or tau.ndim != 1
+                    or r_th.size == 0
+                    or r_th.size != tau.size
+                    or not np.issubdtype(r_th.dtype, np.number)
+                    or not np.issubdtype(tau.dtype, np.number)
+                    or np.issubdtype(r_th.dtype, np.complexfloating)
+                    or np.issubdtype(tau.dtype, np.complexfloating)
+                ):
+                    continue
+
+                r_th = r_th.astype(np.float64, copy=False)
+                tau = tau.astype(np.float64, copy=False)
+                if (
+                    not np.isfinite(r_th).all()
+                    or not np.isfinite(tau).all()
+                    or (r_th <= 0).any()
+                    or (tau <= 0).any()
+                ):
+                    continue
+
+                z_th = [
+                    foster.get_thermal_impedance(float(time_point))
+                    for time_point in time_points
+                ]
                 curves.append({
-                    'name': t.metadata.name,
+                    'name': (
+                        f'{t.metadata.name} / {component_name} '
+                        '- Foster model'
+                    ),
                     'time_data': time_points.tolist(),
                     'z_th_data': z_th,
                 })
-            except (ValueError, AttributeError):
-                continue
 
         return {
             'title': 'Thermal Impedance Comparison',
