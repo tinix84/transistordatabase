@@ -5,7 +5,6 @@ import TransistorForm from './components/TransistorForm.vue'
 import TransistorComparison from './components/TransistorComparison.vue'
 import TransistorComparisonEnhanced from './components/TransistorComparisonEnhanced.vue'
 import TransistorPlotter from './components/TransistorPlotter.vue'
-import DatabaseManager from './components/DatabaseManager.vue'
 import SearchDatabase from './components/SearchDatabase.vue'
 import ExportingTools from './components/ExportingTools.vue'
 import BatchExportPanel from './components/BatchExportPanel.vue'
@@ -13,6 +12,7 @@ import TopologyCalculator from './components/TopologyCalculator.vue'
 import PLECSImporter from './components/PLECSImporter.vue'
 import AnalyticalCalculator from './components/AnalyticalCalculator.vue'
 import DPTManager from './components/DPTManager.vue'
+import DatabaseBackupManager from './components/DatabaseBackupManager.vue'
 import { transistorApi } from './services/api.js'
 
 const currentView = ref('search')
@@ -117,6 +117,10 @@ function showAnalytical() {
 
 function showDPT() {
   currentView.value = 'dpt'
+}
+
+function showDatabaseBackup() {
+  currentView.value = 'database-backup'
 }
 
 function showEditForm(transistor) {
@@ -285,6 +289,13 @@ function handleOpenDatabaseSearch() {
       >
         Topology
       </button>
+      <button
+        @click="showDatabaseBackup"
+        :class="{ active: currentView === 'database-backup' }"
+        class="nav-btn"
+      >
+        Database Backup
+      </button>
       <div class="nav-dropdown">
         <button
           @click="showMoreMenu = !showMoreMenu"
@@ -370,6 +381,11 @@ function handleOpenDatabaseSearch() {
         :transistors="transistors"
         @transistor-selected="handleTransistorSelected"
         @view-transistor-details="showEditForm"
+      />
+
+      <DatabaseBackupManager
+        v-if="currentView === 'database-backup'"
+        @restored="loadTransistors"
       />
 
       <!-- PLECS Import -->

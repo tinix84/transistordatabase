@@ -14,6 +14,7 @@ import errno
 import io
 import json
 import logging
+import math
 import os
 import sys
 import tempfile
@@ -21,7 +22,7 @@ import threading
 import zipfile
 from contextlib import asynccontextmanager
 from functools import wraps
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import Any, AsyncIterator, Callable, Dict, List, Optional
 
 import numpy as np
@@ -76,6 +77,17 @@ from transistordatabase.gui_web.backend.schemas import (
 from transistordatabase.gui_web.backend.topology_service import TopologyCalculatorService
 
 logger = logging.getLogger(__name__)
+_DATABASE_BACKUP_FORMAT = "transistordatabase.database-backup"
+_DATABASE_BACKUP_VERSION = 1
+_WINDOWS_RESERVED_DEVICE_NAMES = {
+    "aux",
+    "clock$",
+    "con",
+    "conin$",
+    "conout$",
+    "nul",
+    "prn",
+}
 
 # In-memory settings storage (use database in production)
 _user_settings: Dict[str, UserSettings] = {}
@@ -267,12 +279,58 @@ def _get_transistor(name: str) -> Transistor:
 
 
 def _validate_web_record_name(name: str) -> None:
-    """Reject names that the JSON repository cannot address as one file."""
-    if not name or "/" in name or "\\" in name:
+    """Reject identities unsafe as a filename on either supported platform."""
+    if not isinstance(name, str):
+        raise HTTPException(status_code=400, detail="Device names must be strings.")
+    windows_name = PureWindowsPath(name)
+    windows_stem = name.split(".", 1)[0].rstrip(" .").casefold()
+    reserved_windows_device = windows_stem in _WINDOWS_RESERVED_DEVICE_NAMES or (
+        len(windows_stem) == 4
+        and windows_stem[:3] in {"com", "lpt"}
+        and windows_stem[3] in "123456789¹²³"
+    )
+    if (
+        not name
+        or not name.strip()
+        or name in {".", ".."}
+        or name.endswith((".", " "))
+        or "/" in name
+        or "\\" in name
+        or any(character in name for character in '<>"|?*')
+        # A drive-relative Windows path (for example ``C:escape``) can
+        # override the base directory when joined with a Windows Path.
+        or bool(windows_name.drive)
+        or bool(windows_name.root)
+        # Colons also address NTFS alternate data streams, even on Linux/WSL.
+        or ":" in name
+        or reserved_windows_device
+        or "\0" in name
+        or any(ord(character) < 32 for character in name)
+    ):
         raise HTTPException(
             status_code=400,
-            detail="Device names must be non-empty and cannot contain path separators.",
+            detail=(
+                "Device names must be valid portable filenames: path separators, reserved Windows device names, "
+                "invalid filename characters, and trailing dots or spaces are not allowed."
+            ),
         )
+
+
+def _ensure_record_path_is_contained(record_path: Path, data_directory: Path) -> None:
+    """Reject paths that escape the configured repository on Windows or locally."""
+    try:
+        windows_root = PureWindowsPath(str(data_directory))
+        windows_record = PureWindowsPath(str(record_path))
+        windows_record.relative_to(windows_root)
+
+        resolved_root = data_directory.resolve()
+        resolved_record = record_path.resolve()
+        resolved_record.relative_to(resolved_root)
+    except (OSError, RuntimeError, ValueError) as error:
+        raise HTTPException(
+            status_code=400,
+            detail="The device record path must remain inside the configured database directory.",
+        ) from error
 
 
 def _legacy_record_path(name: str) -> Path:
@@ -284,7 +342,29 @@ def _legacy_record_path(name: str) -> Path:
             status_code=500,
             detail="The configured repository does not expose its JSON record directory.",
         )
-    return Path(data_directory) / f"{name}.json"
+    directory = Path(data_directory)
+    record_path = directory / f"{name}.json"
+    _ensure_record_path_is_contained(record_path, directory)
+    return record_path
+
+
+def _record_identity_key(name: str) -> str:
+    """Normalize an identity according to the destination filesystem semantics."""
+    return os.path.normcase(name)
+
+
+def _existing_record_name_keys_unlocked() -> set[str]:
+    """List existing JSON identities using the current filesystem semantics."""
+    data_directory = Path(_repo.data_directory)
+    try:
+        children = data_directory.iterdir()
+    except FileNotFoundError:
+        return set()
+    return {
+        _record_identity_key(child.stem)
+        for child in children
+        if child.suffix.casefold() == ".json"
+    }
 
 
 def _rename_noreplace(source: Path, destination: Path) -> None:
@@ -319,6 +399,153 @@ def _rename_noreplace(source: Path, destination: Path) -> None:
         errno.ENOTSUP,
         "Atomic no-overwrite record publication is supported only on Windows and Linux",
     )
+
+
+def _unique_json_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """Reject duplicate JSON keys instead of silently retaining the last value."""
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON object key: {key}")
+        result[key] = value
+    return result
+
+
+def _reject_json_constant(value: str) -> None:
+    """Reject JavaScript-style non-finite numbers that are outside JSON."""
+    raise ValueError(f"Invalid JSON numeric constant: {value}")
+
+
+def _parse_finite_json_float(value: str) -> float:
+    """Reject JSON number literals that cannot be represented as finite floats."""
+    parsed = float(value)
+    if not math.isfinite(parsed):
+        raise ValueError(f"JSON number is outside the finite float range: {value}")
+    significand = value.lower().split("e", 1)[0]
+    if parsed == 0.0 and any(character in "123456789" for character in significand):
+        raise ValueError(f"JSON number underflows the finite float range: {value}")
+    return parsed
+
+
+def _strict_json_loads(content: str | bytes) -> Any:
+    """Parse strict JSON without collapsing duplicate object keys."""
+    return json.loads(
+        content,
+        object_pairs_hook=_unique_json_object,
+        parse_constant=_reject_json_constant,
+        parse_float=_parse_finite_json_float,
+    )
+
+
+def _validate_raw_legacy_record(record: Any) -> Transistor:
+    """Validate one raw JSON record without changing the object to be stored."""
+    if not isinstance(record, dict):
+        raise ValueError("Each database record must be a JSON object.")
+    name = record.get("name")
+    if not isinstance(name, str):
+        raise ValueError("Record identity must be a string in the 'name' field.")
+    try:
+        _validate_web_record_name(name)
+    except HTTPException as error:
+        raise ValueError(str(error.detail)) from error
+
+    try:
+        json.dumps(record, ensure_ascii=False, allow_nan=False).encode("utf-8")
+    except (TypeError, ValueError, UnicodeEncodeError) as error:
+        raise ValueError(f"Record cannot be safely serialized as UTF-8 JSON: {error!s}") from error
+
+    try:
+        transistor = legacy_to_core(_json_dict_to_legacy_transistor(copy.deepcopy(record)))
+    except Exception as error:
+        raise ValueError(f"Legacy transistor validation failed: {error!s}") from error
+    if transistor.metadata.name != name:
+        raise ValueError("Legacy validation changed the exact record identity.")
+    return transistor
+
+
+def _parse_backup_document(content: bytes) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Parse and fully validate a versioned raw-record backup document."""
+    try:
+        document = _strict_json_loads(content)
+    except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as error:
+        return [], [{"file": "backup", "error": f"Invalid JSON: {error!s}"}]
+
+    if not isinstance(document, dict):
+        return [], [{"file": "backup", "error": "Backup root must be a JSON object."}]
+    if document.get("format") != _DATABASE_BACKUP_FORMAT:
+        return [], [{"file": "backup", "error": "Unsupported database backup format."}]
+    if type(document.get("version")) is not int or document["version"] != _DATABASE_BACKUP_VERSION:
+        return [], [{"file": "backup", "error": "Unsupported database backup version."}]
+    raw_records = document.get("records")
+    if not isinstance(raw_records, list):
+        return [], [{"file": "backup", "error": "Backup 'records' must be a JSON array."}]
+
+    records: list[dict[str, Any]] = []
+    errors: list[dict[str, Any]] = []
+    seen_names: set[str] = set()
+    for index, raw_record in enumerate(raw_records):
+        name = raw_record.get("name") if isinstance(raw_record, dict) else None
+        label = name if isinstance(name, str) else f"record {index + 1}"
+        if isinstance(name, str):
+            identity_key = _record_identity_key(name)
+            if identity_key in seen_names:
+                errors.append({
+                    "index": index,
+                    "name": name,
+                    "error": "Duplicate record identity under current filesystem path semantics.",
+                })
+                continue
+            seen_names.add(identity_key)
+        try:
+            _validate_raw_legacy_record(raw_record)
+        except Exception as error:
+            errors.append({"index": index, "name": label, "error": str(error)})
+            continue
+        records.append(raw_record)
+    return records, errors
+
+
+def _read_database_raw_records_unlocked() -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    """Read every JSON record and report any corrupt or mismatched member."""
+    data_directory = Path(_repo.data_directory)
+    records: list[dict[str, Any]] = []
+    errors: list[dict[str, str]] = []
+    seen_identity_keys: set[str] = set()
+    for record_path in sorted(data_directory.glob("*.json"), key=lambda path: path.name.casefold()):
+        try:
+            _validate_web_record_name(record_path.stem)
+            expected_record_path = _legacy_record_path(record_path.stem)
+            if record_path != expected_record_path:
+                raise ValueError("Record path does not match a safe repository filename identity.")
+            _ensure_record_path_is_contained(record_path, data_directory)
+            identity_key = _record_identity_key(record_path.stem)
+            if identity_key in seen_identity_keys:
+                raise ValueError("Duplicate record identity under current filesystem path semantics.")
+            seen_identity_keys.add(identity_key)
+            record = _strict_json_loads(record_path.read_bytes())
+            if not isinstance(record, dict):
+                raise ValueError("Record must be a JSON object.")
+            if record.get("name") != record_path.stem:
+                raise ValueError("Record name does not exactly match its filename identity.")
+            _validate_raw_legacy_record(record)
+            records.append(record)
+        except Exception as error:
+            errors.append({"file": record_path.name, "error": str(error)})
+    return records, errors
+
+
+def _write_raw_record_create_unlocked(record: dict[str, Any]) -> None:
+    """Atomically publish a raw record without replacing an existing identity."""
+    record_path = _legacy_record_path(record["name"])
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{record_path.name}.", suffix=".tmp", dir=record_path.parent
+    )
+    temporary_path = Path(temporary_name)
+    with os.fdopen(descriptor, "w", encoding="utf-8") as record_file:
+        json.dump(record, record_file, indent=2, ensure_ascii=False, allow_nan=False)
+        record_file.flush()
+        os.fsync(record_file.fileno())
+    _rename_noreplace(temporary_path, record_path)
 
 
 def _patch_legacy_record_unlocked(name: str, transistor_data: Dict[str, Any]) -> None:
@@ -1143,18 +1370,137 @@ async def batch_export(request: BatchExportRequest, background_tasks: Background
 # Upload / Import
 # ---------------------------------------------------------------------------
 
+@app.get("/api/database/backup")
+async def export_database_backup() -> StreamingResponse:
+    """Download all validated raw JSON records in a versioned backup file."""
+    async with _record_mutation():
+        records, errors = _read_database_raw_records_unlocked()
+    if errors:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "message": "Database backup was not created because records are invalid.",
+                "records": errors,
+            },
+        )
+
+    document = {
+        "format": _DATABASE_BACKUP_FORMAT,
+        "version": _DATABASE_BACKUP_VERSION,
+        "records": records,
+    }
+    content = json.dumps(document, indent=2, ensure_ascii=False, allow_nan=False).encode("utf-8")
+    return StreamingResponse(
+        io.BytesIO(content),
+        media_type="application/json",
+        headers={"Content-Disposition": 'attachment; filename="transistordatabase-backup.json"'},
+    )
+
+
+@app.post("/api/database/backup/validate")
+async def validate_database_backup(file: UploadFile = File(...)) -> Dict[str, Any]:
+    """Validate a complete backup and preview existing-name conflicts."""
+    if not file.filename or Path(file.filename).suffix.casefold() != ".json":
+        raise HTTPException(status_code=400, detail="Select a .json database backup file.")
+    records, errors = _parse_backup_document(await file.read())
+    if errors:
+        raise HTTPException(
+            status_code=400,
+            detail={"message": "Backup validation failed; no records can be restored.", "errors": errors},
+        )
+
+    async with _record_mutation():
+        record_paths = [_legacy_record_path(record["name"]) for record in records]
+        existing_name_keys = _existing_record_name_keys_unlocked()
+        conflicts = []
+        for record, record_path in zip(records, record_paths):
+            if _record_identity_key(record["name"]) in existing_name_keys or record_path.exists():
+                conflicts.append(record["name"])
+    conflict_keys = {_record_identity_key(name) for name in conflicts}
+    restore_names = [
+        record["name"]
+        for record in records
+        if _record_identity_key(record["name"]) not in conflict_keys
+    ]
+    return {
+        "valid": True,
+        "format": _DATABASE_BACKUP_FORMAT,
+        "version": _DATABASE_BACKUP_VERSION,
+        "record_count": len(records),
+        "restore_count": len(restore_names),
+        "restore_names": restore_names,
+        "conflicts": conflicts,
+    }
+
+
+@app.post("/api/database/backup/restore")
+async def restore_database_backup(file: UploadFile = File(...)) -> Dict[str, Any]:
+    """Add validated records while leaving existing database files untouched."""
+    if not file.filename or Path(file.filename).suffix.casefold() != ".json":
+        raise HTTPException(status_code=400, detail="Select a .json database backup file.")
+    records, errors = _parse_backup_document(await file.read())
+    if errors:
+        raise HTTPException(
+            status_code=400,
+            detail={"message": "Backup validation failed; no records were restored.", "errors": errors},
+        )
+
+    restored: list[str] = []
+    conflicts: list[str] = []
+    errors: list[dict[str, str]] = []
+    async with _record_mutation():
+        record_paths = [_legacy_record_path(record["name"]) for record in records]
+        existing_name_keys = _existing_record_name_keys_unlocked()
+        for record, record_path in zip(records, record_paths):
+            name = record["name"]
+            name_key = _record_identity_key(name)
+            if name_key in existing_name_keys or record_path.exists():
+                conflicts.append(name)
+                continue
+            try:
+                _write_raw_record_create_unlocked(record)
+                restored.append(name)
+                existing_name_keys.add(name_key)
+            except FileExistsError:
+                conflicts.append(name)
+                existing_name_keys.add(name_key)
+            except OSError as error:
+                errors.append({"name": name, "error": str(error)})
+
+    return {
+        "valid": True,
+        "restored": restored,
+        "conflicts": conflicts,
+        "errors": errors,
+    }
+
+
 @app.post("/api/transistors/upload")
 async def upload_transistor(file: UploadFile = File(...)) -> Dict[str, Any]:
-    """Upload and import a transistor from a JSON file."""
-    if not file.filename.endswith('.json'):
+    """Create one transistor from raw JSON without overwriting an existing name."""
+    if not file.filename or Path(file.filename).suffix.casefold() != ".json":
         raise HTTPException(status_code=400, detail="Only JSON files are supported")
 
     try:
-        content = await file.read()
-        record = json.loads(content)
-        transistor = legacy_to_core(_json_dict_to_legacy_transistor(record))
+        record = _strict_json_loads(await file.read())
+        transistor = _validate_raw_legacy_record(record)
         async with _record_mutation():
-            _repo.save(transistor)
+            record_path = _legacy_record_path(transistor.metadata.name)
+            if (
+                _record_identity_key(transistor.metadata.name) in _existing_record_name_keys_unlocked()
+                or record_path.exists()
+            ):
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"Transistor '{transistor.metadata.name}' already exists.",
+                )
+            try:
+                _write_raw_record_create_unlocked(record)
+            except FileExistsError:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"Transistor '{transistor.metadata.name}' already exists.",
+                )
         return {
             "id": transistor.metadata.name,
             "message": "Transistor uploaded successfully",
@@ -1162,8 +1508,12 @@ async def upload_transistor(file: UploadFile = File(...)) -> Dict[str, Any]:
             "manufacturer": transistor.metadata.manufacturer,
             "type": transistor.metadata.type,
         }
-    except json.JSONDecodeError as e:
+    except HTTPException:
+        raise
+    except (json.JSONDecodeError, UnicodeDecodeError, ValueError) as e:
         raise HTTPException(status_code=400, detail=f"Invalid JSON: {e!s}")
+    except OSError as e:
+        raise HTTPException(status_code=500, detail=f"Cannot safely create record: {e!s}")
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Upload failed: {e!s}")
 

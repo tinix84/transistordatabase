@@ -147,6 +147,30 @@ export const transistorApi = {
     return response.data
   },
 
+  // Full raw-record database backup and additive restore
+  async downloadDatabaseBackup() {
+    const response = await api.get('/api/database/backup', { responseType: 'blob' })
+    return response.data
+  },
+
+  async validateDatabaseBackup(file) {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await api.post('/api/database/backup/validate', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    return response.data
+  },
+
+  async restoreDatabaseBackup(file) {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await api.post('/api/database/backup/restore', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    return response.data
+  },
+
   // Get all curves for a transistor
   async getCurves(id) {
     const response = await api.get(`/api/transistors/${pathSegment(id)}/curves`)

@@ -59,7 +59,7 @@ Validation: scalar/vector/mesh consistency; axis units and array shapes; reprodu
 
 Use the same checklist and vertical-workflow approach for database search, creation/editing, curve management, comparison, import/export, settings and all other documented desktop capabilities. The order after topology remains open. Do not treat completion of the current Vue feature set as proof of full desktop coverage.
 
-The search-driven general database lifecycle slice is tracked in the [database lifecycle sprint](sprint-web-database-lifecycle.md); it does not close this broader replacement.
+The search-driven general database lifecycle slice is tracked in the [database lifecycle sprint](sprint-web-database-lifecycle.md); it does not close this broader replacement. Full-database raw JSON backup/restore and create-only single-record upload are tracked in the [database backup sprint](sprint-web-database-backup.md); other import/export capabilities remain open.
 
 Curve loading, plotting, and the existing add/delete browser routes are tracked in the [web curve workflow sprint](sprint-web-curve-workflow.md). That slice leaves the wider migration open; saved-curve editing, transient thermal curves, DPT measurement handling, and other desktop capabilities still need separate parity evidence.
 
