@@ -114,6 +114,66 @@ test.describe('topology migration browser workflow', () => {
     await expect(page.locator('.results-panel')).toHaveCount(0)
   })
 
+  test('submits and exports Boost DCM channel feedback with both residuals', async ({ page }) => {
+    await page.route('**/api/transistors', route => route.fulfill({ json: [
+      { metadata: { name: 'Boost DCM Switch' } },
+      { metadata: { name: 'Boost DCM Diode' } }
+    ] }))
+    const response = topologyResult(null, 'loss-balanced')
+    response.topology = 'boost'
+    response.model.conduction_regime = 'DCM'
+    response.calculated = {
+      ...response.calculated,
+      duty_cycle: 0.45,
+      i_l_peak_a: 2.25,
+      switch_conduction_fraction: 0.45,
+      diode_conduction_fraction: 0.44,
+      idle_fraction: 0.11,
+      inductor_volt_second_residual_v: 1e-10,
+      power_balance_residual_w: 2e-10
+    }
+    response.losses = {
+      conduction_switch_w: 1,
+      conduction_diode_w: 2,
+      total_w: 3,
+      scope: 'switch and diode channel conduction only',
+      loss_scope: 'channel_conduction_only'
+    }
+    response.performance = {
+      p_out_w: 100,
+      p_in_w: 103,
+      efficiency_percent: 97.09,
+      power_balance_residual_w: 2e-10
+    }
+    const capturedRequest = await mockTopologyCalculation(page, response)
+
+    await openTopology(page)
+    await page.locator('label.param-item').filter({ hasText: 'Calculation mode' }).locator('select').selectOption('loss-balanced')
+    await page.locator('label.param-item').filter({ hasText: 'Conduction regime' }).locator('select').selectOption('DCM')
+    await page.locator('label.param-item').filter({ hasText: 'Switch transistor' }).locator('select').selectOption('Boost DCM Switch')
+    await page.locator('label.param-item').filter({ hasText: 'Diode transistor' }).locator('select').selectOption('Boost DCM Diode')
+    await setParameter(page, 'Output power', 100)
+    await setParameter(page, 'Junction temperature', 25)
+    await setParameter(page, 'Switch gate voltage', 15)
+    await page.getByRole('button', { name: 'Calculate', exact: true }).click()
+
+    await expect(page.locator('.model-label')).toHaveText('Boost DCM TDB channel loss-balanced averaged model')
+    await expect(page.locator('.results-panel')).toContainText('Power-balance residual: 0.00000000 W')
+    await expect(page.locator('.results-panel')).toContainText('Averaged inductor volt-second residual: 0.00000000 V')
+    expect(capturedRequest()).toMatchObject({
+      topology: 'boost', mode: 'loss-balanced', conduction_regime: 'DCM',
+      switch_transistor_id: 'Boost DCM Switch', diode_transistor_id: 'Boost DCM Diode'
+    })
+
+    const downloadPromise = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Download JSON' }).click()
+    const exported = JSON.parse(await readFile(await (await downloadPromise).path(), 'utf8'))
+    expect(exported.request).toMatchObject({ topology: 'boost', mode: 'loss-balanced', conduction_regime: 'DCM' })
+    expect(exported.result.losses.loss_scope).toBe('channel_conduction_only')
+    expect(exported.result.calculated.inductor_volt_second_residual_v).toBe(1e-10)
+    expect(exported.result.calculated.power_balance_residual_w).toBe(2e-10)
+  })
+
   test('sends separate switch and diode selections in a curve-backed browser request', async ({ page }) => {
     await page.route('**/api/transistors', route => route.fulfill({ json: [
       { metadata: { name: 'Browser Switch MOSFET' } },
