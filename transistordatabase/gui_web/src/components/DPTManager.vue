@@ -484,6 +484,7 @@ export default {
     const comparisonMode = ref(false)
     const selectedComparisonIndices = ref([])
     const comparisonAcquisitionIndices = ref({})
+    const comparisonColors = ['#2563eb', '#dc2626', '#7c3aed', '#ea580c', '#059669', '#9333ea']
     const generating = ref(false)
     const validating = ref(false)
     const error = ref(null)
@@ -549,6 +550,25 @@ export default {
     const measurementConditions = computed(() => (
       conditionsForMeasurement(selectedMeasurement.value)
     ))
+    function projectRawSamples(samples) {
+      const data = []
+      let hasNonFiniteSamples = false
+      if (Array.isArray(samples)) {
+        for (const sample of samples) {
+          if (!Array.isArray(sample) || sample.length < 2) continue
+          const [time, value] = sample
+          if (typeof time !== 'number' || !Number.isFinite(time)) continue
+          const finiteValue = typeof value === 'number' && Number.isFinite(value)
+          if (!finiteValue) hasNonFiniteSamples = true
+          data.push({ x: time * 1e6, y: finiteValue ? value : null })
+        }
+      }
+      return {
+        data,
+        hasNumericPoints: data.some(point => point.y !== null),
+        hasNonFiniteSamples,
+      }
+    }
     const comparisonRecords = computed(() => (
       selectedComparisonIndices.value
         .filter(index => rawMeasurementRecords.value[index])
@@ -583,27 +603,16 @@ export default {
         const samples = Array.isArray(acquisitions)
           ? acquisitions[selectedAcquisitionIndex.value]
           : null
-        const data = []
-        let hasNonFiniteSamples = false
-        if (Array.isArray(samples)) {
-          for (const sample of samples) {
-            if (!Array.isArray(sample) || sample.length < 2) continue
-            const [time, value] = sample
-            if (typeof time !== 'number' || !Number.isFinite(time)) continue
-            const finiteValue = typeof value === 'number' && Number.isFinite(value)
-            if (!finiteValue) hasNonFiniteSamples = true
-            data.push({ x: time * 1e6, y: finiteValue ? value : null })
-          }
-        }
+        const projection = projectRawSamples(samples)
         return {
           ...plot,
           datasets: [{
             label: plot.title,
-            data,
+            data: projection.data,
             borderColor: plot.color,
           }],
-          hasNumericPoints: data.some(point => point.y !== null),
-          hasNonFiniteSamples,
+          hasNumericPoints: projection.hasNumericPoints,
+          hasNonFiniteSamples: projection.hasNonFiniteSamples,
           missingLabels: [],
         }
       })
@@ -616,7 +625,6 @@ export default {
         { key: 'off-vds', field: 'dpt_off_vds', title: 'Turn-off Vds', yLabel: 'Vds [V]' },
         { key: 'off-id', field: 'dpt_off_id', title: 'Turn-off Id', yLabel: 'Id [A]' },
       ]
-      const colors = ['#2563eb', '#dc2626', '#7c3aed', '#ea580c', '#059669', '#9333ea']
       return plots.map(plot => {
         const datasets = []
         const missingLabels = []
@@ -631,23 +639,16 @@ export default {
             missingLabels.push(traceLabel)
             continue
           }
-          const data = []
-          for (const sample of samples) {
-            if (!Array.isArray(sample) || sample.length < 2) continue
-            const [time, value] = sample
-            if (typeof time !== 'number' || !Number.isFinite(time)) continue
-            const finiteValue = typeof value === 'number' && Number.isFinite(value)
-            if (!finiteValue) hasNonFiniteSamples = true
-            data.push({ x: time * 1e6, y: finiteValue ? value : null })
-          }
-          if (data.length === 0) {
+          const projection = projectRawSamples(samples)
+          if (projection.data.length === 0) {
             missingLabels.push(`${traceLabel} (no finite timestamps)`)
             continue
           }
+          hasNonFiniteSamples ||= projection.hasNonFiniteSamples
           datasets.push({
             label: traceLabel,
-            data,
-            borderColor: colors[record.index % colors.length],
+            data: projection.data,
+            borderColor: comparisonColor(record.index),
           })
         }
         return {
@@ -712,9 +713,7 @@ export default {
     }
 
     function comparisonColor(index) {
-      return ['#2563eb', '#dc2626', '#7c3aed', '#ea580c', '#059669', '#9333ea'][
-        index % 6
-      ]
+      return comparisonColors[index % comparisonColors.length]
     }
 
     onMounted(async () => {
