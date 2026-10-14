@@ -111,20 +111,60 @@
             </div>
 
             <template v-else>
-              <div class="waveform-selectors" v-if="!comparisonMode">
-                <label for="dpt-measurement-select">Measurement record:</label>
+              <div class="measurement-filter">
+                <label for="dpt-measurement-search">Filter stored measurements</label>
+                <div class="measurement-filter-controls">
+                  <input
+                    id="dpt-measurement-search"
+                    v-model="measurementSearch"
+                    data-testid="dpt-measurement-search"
+                    type="search"
+                    placeholder="Search conditions, test bench, comment…"
+                  />
+                  <button
+                    v-if="measurementSearch"
+                    class="btn-clear-measurement-search"
+                    data-testid="dpt-measurement-search-clear"
+                    type="button"
+                    @click="measurementSearch = ''"
+                  >
+                    Clear
+                  </button>
+                </div>
+                <p class="measurement-filter-count" aria-live="polite">
+                  Showing {{ filteredMeasurementRecords.length }} of
+                  {{ rawMeasurementRecords.length }} stored measurements.
+                </p>
+                <p
+                  v-if="filteredMeasurementRecords.length === 0"
+                  class="no-data"
+                  data-testid="dpt-measurement-search-empty"
+                  role="status"
+                >
+                  No stored DPT measurements match this search. Clear the search to view all records.
+                </p>
+              </div>
+
+              <div v-if="!comparisonMode" class="waveform-selectors">
+                <label
+                  v-if="filteredMeasurementRecords.length"
+                  for="dpt-measurement-select"
+                >
+                  Measurement record:
+                </label>
                 <select
+                  v-if="filteredMeasurementRecords.length"
                   id="dpt-measurement-select"
                   data-testid="dpt-measurement-select"
                   v-model.number="selectedMeasurementIndex"
                   @change="selectedAcquisitionIndex = 0"
                 >
                   <option
-                    v-for="(measurement, index) in rawMeasurementRecords"
-                    :key="index"
-                    :value="index"
+                    v-for="record in filteredMeasurementRecords"
+                    :key="record.index"
+                    :value="record.index"
                   >
-                    {{ measurementLabel(measurement, index) }}
+                    {{ measurementLabel(record.measurement, record.index) }}
                   </option>
                 </select>
                 <button
@@ -134,7 +174,7 @@
                   type="button"
                   @click="toggleComparisonMode"
                 >
-                  Compare measurements
+                  Compare measurements ({{ filteredMeasurementRecords.length }} available)
                 </button>
               </div>
 
@@ -152,18 +192,29 @@
                     </button>
                   </div>
                   <label
-                    v-for="(measurement, index) in rawMeasurementRecords"
-                    :key="index"
+                    v-for="record in filteredMeasurementRecords"
+                    :key="record.index"
                     class="comparison-record-option"
                   >
                     <input
                       type="checkbox"
-                      :data-testid="`dpt-compare-record-${index}`"
-                      :checked="selectedComparisonIndices.includes(index)"
-                      @change="toggleComparisonRecord(index)"
+                      :data-testid="`dpt-compare-record-${record.index}`"
+                      :checked="selectedComparisonIndices.includes(record.index)"
+                      @change="toggleComparisonRecord(record.index)"
                     />
-                    <span>{{ measurementLabel(measurement, index) }}</span>
+                    <span>{{ measurementLabel(record.measurement, record.index) }}</span>
                   </label>
+                  <p
+                    v-if="hiddenSelectedComparisonRecords.length"
+                    class="comparison-filter-note"
+                    data-testid="dpt-hidden-comparison-note"
+                    role="status"
+                  >
+                    {{ hiddenSelectedComparisonRecords.length }} selected measurement<span
+                      v-if="hiddenSelectedComparisonRecords.length !== 1"
+                    >s</span>
+                    hidden by this search stay in the comparison. Clear the search to change their selection.
+                  </p>
                 </div>
 
                 <div
@@ -225,7 +276,7 @@
               </div>
 
               <div
-                v-if="!comparisonMode && selectedMeasurement"
+                v-if="!comparisonMode && selectedMeasurementVisible"
                 class="raw-measurement-details"
               >
                 <div v-if="measurementConditions.length" class="measurement-conditions">
@@ -261,7 +312,9 @@
               </div>
 
               <div
-                v-if="comparisonMode ? comparisonRecords.length >= 2 : acquisitionCount > 0"
+                v-if="comparisonMode
+                  ? comparisonRecords.length >= 2
+                  : selectedMeasurementVisible && acquisitionCount > 0"
                 class="waveform-grid"
               >
                   <section
@@ -467,7 +520,7 @@
 </template>
 
 <script>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { transistorApi } from '../services/api'
 import CurvePlotter from './CurvePlotter.vue'
 
@@ -481,6 +534,7 @@ export default {
     const dptData = ref(null)
     const selectedMeasurementIndex = ref(0)
     const selectedAcquisitionIndex = ref(0)
+    const measurementSearch = ref('')
     const comparisonMode = ref(false)
     const selectedComparisonIndices = ref([])
     const comparisonAcquisitionIndices = ref({})
@@ -509,8 +563,27 @@ export default {
         ? dptData.value.raw_measurement_data
         : []
     ))
+    const filteredMeasurementRecords = computed(() => {
+      const terms = measurementSearch.value
+        .trim()
+        .toLocaleLowerCase()
+        .split(/\s+/)
+        .filter(Boolean)
+      return rawMeasurementRecords.value
+        .map((measurement, index) => ({ measurement, index }))
+        .filter(({ measurement }) => {
+          if (terms.length === 0) return true
+          const searchableText = measurementSearchText(measurement)
+          return terms.every(term => searchableText.includes(term))
+        })
+    })
     const selectedMeasurement = computed(() => (
       rawMeasurementRecords.value[selectedMeasurementIndex.value] || null
+    ))
+    const selectedMeasurementVisible = computed(() => (
+      filteredMeasurementRecords.value.some(
+        record => record.index === selectedMeasurementIndex.value
+      )
     ))
     function getAcquisitionCount(measurement) {
       if (!measurement) return 0
@@ -550,6 +623,21 @@ export default {
     const measurementConditions = computed(() => (
       conditionsForMeasurement(selectedMeasurement.value)
     ))
+    function measurementSearchText(measurement) {
+      const metadata = measurement?.metadata || {}
+      const metadataValues = Object.values(metadata).flatMap(value => (
+        Array.isArray(value) ? value : [value]
+      ))
+      const conditionValues = conditionsForMeasurement(measurement)
+        .flatMap(condition => [condition.label, condition.value])
+      return [...metadataValues, ...conditionValues]
+        .filter(value => value !== null && value !== undefined && value !== '')
+        .map(value => (
+          typeof value === 'object' ? JSON.stringify(value) : String(value)
+        ))
+        .join(' ')
+        .toLocaleLowerCase()
+    }
     function projectRawSamples(samples) {
       const data = []
       let hasNonFiniteSamples = false
@@ -588,6 +676,13 @@ export default {
             acquisitionIndex,
           }
         })
+    ))
+    const hiddenSelectedComparisonRecords = computed(() => (
+      comparisonRecords.value.filter(record => (
+        !filteredMeasurementRecords.value.some(
+          visibleRecord => visibleRecord.index === record.index
+        )
+      ))
     ))
     const waveformPlots = computed(() => {
       const measurement = selectedMeasurement.value
@@ -666,6 +761,24 @@ export default {
       comparisonMode.value ? comparisonWaveformPlots.value : waveformPlots.value
     ))
 
+    function selectFirstVisibleMeasurementIfNeeded() {
+      const visibleIndexes = filteredMeasurementRecords.value.map(
+        record => record.index
+      )
+      if (
+        visibleIndexes.length &&
+        !visibleIndexes.includes(selectedMeasurementIndex.value)
+      ) {
+        selectedMeasurementIndex.value = visibleIndexes[0]
+        selectedAcquisitionIndex.value = 0
+      }
+    }
+
+    watch(measurementSearch, () => {
+      if (comparisonMode.value) return
+      selectFirstVisibleMeasurementIfNeeded()
+    })
+
     function measurementLabel(measurement, index) {
       const metadata = measurement?.metadata || {}
       const label = [metadata.dataset_type, metadata.comment]
@@ -679,16 +792,23 @@ export default {
     function toggleComparisonMode() {
       comparisonMode.value = !comparisonMode.value
       if (comparisonMode.value) {
-        const firstIndex = selectedMeasurementIndex.value
-        const secondIndex = rawMeasurementRecords.value.findIndex(
-          (_measurement, index) => index !== firstIndex
+        const visibleIndexes = filteredMeasurementRecords.value.map(
+          record => record.index
         )
-        selectedComparisonIndices.value = secondIndex >= 0
-          ? [firstIndex, secondIndex]
-          : [firstIndex]
+        const firstIndex = visibleIndexes.includes(selectedMeasurementIndex.value)
+          ? selectedMeasurementIndex.value
+          : visibleIndexes[0]
+        const secondIndex = visibleIndexes.find(index => index !== firstIndex)
+        selectedComparisonIndices.value = firstIndex === undefined
+          ? []
+          : secondIndex !== undefined
+            ? [firstIndex, secondIndex]
+            : [firstIndex]
         comparisonAcquisitionIndices.value = Object.fromEntries(
           selectedComparisonIndices.value.map(index => [index, 0])
         )
+      } else {
+        selectFirstVisibleMeasurementIfNeeded()
       }
     }
 
@@ -736,6 +856,7 @@ export default {
         dptData.value = await transistorApi.getDPTData(selectedTransistorId.value)
         selectedMeasurementIndex.value = 0
         selectedAcquisitionIndex.value = 0
+        measurementSearch.value = ''
         comparisonMode.value = false
         selectedComparisonIndices.value = []
         comparisonAcquisitionIndices.value = {}
@@ -804,6 +925,10 @@ export default {
       activeTab,
       dptData,
       rawMeasurementRecords,
+      filteredMeasurementRecords,
+      measurementSearch,
+      selectedMeasurementVisible,
+      hiddenSelectedComparisonRecords,
       selectedMeasurement,
       selectedMeasurementIndex,
       selectedAcquisitionIndex,
@@ -998,6 +1123,51 @@ h2 {
 .waveform-gap-note {
   color: #5b6573;
   font-size: 14px;
+}
+
+.measurement-filter {
+  max-width: 620px;
+  margin: 18px 0;
+}
+
+.measurement-filter > label {
+  display: block;
+  margin-bottom: 7px;
+  font-weight: 600;
+}
+
+.measurement-filter-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.measurement-filter-controls input {
+  min-width: 0;
+  flex: 1;
+  padding: 9px 10px;
+  border: 1px solid #b8c2cc;
+  border-radius: 4px;
+  background: white;
+}
+
+.btn-clear-measurement-search {
+  padding: 8px 12px;
+  border: 1px solid #b8c2cc;
+  border-radius: 4px;
+  color: #344054;
+  background: white;
+  cursor: pointer;
+}
+
+.btn-clear-measurement-search:hover {
+  background: #f3f4f6;
+}
+
+.measurement-filter-count,
+.comparison-filter-note {
+  margin: 7px 0 0;
+  color: #5b6573;
+  font-size: 13px;
 }
 
 .waveform-selectors,

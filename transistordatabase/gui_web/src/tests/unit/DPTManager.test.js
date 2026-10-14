@@ -155,6 +155,70 @@ describe('DPTManager raw waveform viewing', () => {
     expect(wrapper.find('.curve-plotter-stub[data-title="Turn-on Id"]').exists()).toBe(true)
   })
 
+  it('filters the single-record choices by condition and metadata text', async () => {
+    await wrapper.get('[data-testid="dpt-measurement-search"]').setValue('600 v')
+
+    const measurementSelect = wrapper.get('[data-testid="dpt-measurement-select"]')
+    expect(measurementSelect.findAll('option')).toHaveLength(1)
+    expect(measurementSelect.element.value).toBe('1')
+    expect(wrapper.text()).toContain('Showing 1 of 2 stored measurements.')
+    expect(wrapper.text()).toContain('Junction temperature125 °C')
+    expect(wrapper.find('.curve-plotter-stub[data-title="Turn-on Vds"]').text())
+      .toContain('{"x":2,"y":300}')
+
+    await wrapper.get('[data-testid="dpt-measurement-search"]').setValue('local test bench')
+
+    expect(wrapper.get('[data-testid="dpt-measurement-select"]').findAll('option'))
+      .toHaveLength(1)
+    expect(wrapper.get('[data-testid="dpt-measurement-select"]').element.value).toBe('0')
+    expect(wrapper.text()).toContain('Test benchLocal test bench')
+  })
+
+  it('allows comparison entry when only one of multiple stored records matches', async () => {
+    await wrapper.get('[data-testid="dpt-measurement-search"]').setValue('600 v')
+
+    const compareButton = wrapper.get('[data-testid="dpt-compare-toggle"]')
+    expect(compareButton.text()).toContain('1 available')
+    await compareButton.trigger('click')
+
+    expect(wrapper.find('[data-testid="dpt-compare-record-0"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="dpt-compare-record-1"]').exists()).toBe(true)
+    expect(wrapper.findAll('.comparison-record-option')).toHaveLength(1)
+    expect(wrapper.get('[data-testid="dpt-compare-toggle"]').text())
+      .toContain('Return to one measurement')
+    expect(wrapper.get('[data-testid="dpt-comparison-selection-status"]')
+      .text()).toContain('Select at least two stored measurements')
+  })
+
+  it('allows comparison entry when none of multiple stored records match', async () => {
+    await wrapper.get('[data-testid="dpt-measurement-search"]').setValue('no matching condition')
+
+    const compareButton = wrapper.get('[data-testid="dpt-compare-toggle"]')
+    expect(compareButton.text()).toContain('0 available')
+    await compareButton.trigger('click')
+
+    expect(wrapper.get('[data-testid="dpt-compare-toggle"]').text())
+      .toContain('Return to one measurement')
+    expect(wrapper.findAll('.comparison-record-option')).toHaveLength(0)
+    expect(wrapper.get('[data-testid="dpt-comparison-selection-status"]')
+      .text()).toContain('Select at least two stored measurements')
+  })
+
+  it('shows a no-match state and restores records when the filter is cleared', async () => {
+    await wrapper.get('[data-testid="dpt-measurement-search"]').setValue('no matching condition')
+
+    expect(wrapper.get('[data-testid="dpt-measurement-search-empty"]').text())
+      .toContain('No stored DPT measurements match this search')
+    expect(wrapper.find('[data-testid="dpt-measurement-select"]').exists()).toBe(false)
+    expect(wrapper.find('.waveform-grid').exists()).toBe(false)
+
+    await wrapper.get('[data-testid="dpt-measurement-search-clear"]').trigger('click')
+
+    expect(wrapper.get('[data-testid="dpt-measurement-select"]').findAll('option'))
+      .toHaveLength(2)
+    expect(wrapper.find('.curve-plotter-stub[data-title="Turn-on Vds"]').exists()).toBe(true)
+  })
+
   it('shows a clear empty state when no raw records are returned', async () => {
     getDPTData.mockResolvedValueOnce({
       has_e_on: true,
@@ -219,6 +283,39 @@ describe('DPTManager raw waveform viewing', () => {
     expect(wrapper.findAll('.curve-plotter-stub').every(
       chart => chart.attributes('data-x-decimals') === '6'
     )).toBe(true)
+  })
+
+  it('filters comparison candidates while retaining hidden selected overlays and acquisitions', async () => {
+    await wrapper.get('[data-testid="dpt-compare-toggle"]').trigger('click')
+    await wrapper.get('[data-testid="dpt-comparison-acquisition-0"]').setValue('1')
+    await wrapper.get('[data-testid="dpt-comparison-acquisition-1"]').setValue('2')
+    const apiPayload = await getDPTData.mock.results[0].value
+    const originalRawRecords = structuredClone(apiPayload.raw_measurement_data)
+
+    await wrapper.get('[data-testid="dpt-measurement-search"]').setValue('local test bench')
+
+    expect(wrapper.find('[data-testid="dpt-compare-record-0"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="dpt-compare-record-1"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="dpt-compare-record-0"]').element.checked).toBe(true)
+    expect(wrapper.get('[data-testid="dpt-hidden-comparison-note"]').text())
+      .toContain('1 selected measurement hidden by this search stay in the comparison')
+    expect(wrapper.get('[data-testid="dpt-comparison-acquisition-0"]').element.value)
+      .toBe('1')
+    expect(wrapper.get('[data-testid="dpt-comparison-acquisition-1"]').element.value)
+      .toBe('2')
+    expect(wrapper.get('[data-testid="dpt-comparison-record-1"]').exists()).toBe(true)
+    const onVds = JSON.parse(
+      wrapper.find('[data-testid="dpt-waveform-on-vds"] output').text()
+    )
+    expect(onVds[0].data[1]).toEqual({ x: 1, y: 200 })
+    expect(onVds[1].data[1]).toEqual({ x: 4, y: 270 })
+    expect(apiPayload.raw_measurement_data).toEqual(originalRawRecords)
+
+    await wrapper.get('[data-testid="dpt-measurement-search-clear"]').trigger('click')
+
+    expect(wrapper.find('[data-testid="dpt-compare-record-1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="dpt-compare-record-1"]').element.checked).toBe(true)
+    expect(wrapper.find('[data-testid="dpt-hidden-comparison-note"]').exists()).toBe(false)
   })
 
   it('requires two selected records and returns to the existing single-record viewer', async () => {
