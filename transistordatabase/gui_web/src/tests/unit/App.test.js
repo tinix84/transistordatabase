@@ -6,6 +6,7 @@ import { mount, flushPromises } from '@vue/test-utils'
 import App from '../../App.vue'
 import { transistorApi } from '../../services/api'
 import { mockTransistors } from '../fixtures/transistors'
+import DatabaseBackupManager from '../../components/DatabaseBackupManager.vue'
 
 // Mock the transistorApi
 vi.mock('../../services/api', () => ({
@@ -28,9 +29,6 @@ vi.mock('../../components/TransistorComparison.vue', () => ({
 vi.mock('../../components/TransistorPlotter.vue', () => ({
   default: { name: 'TransistorPlotter', template: '<div>TransistorPlotter</div>' }
 }))
-vi.mock('../../components/DatabaseManager.vue', () => ({
-  default: { name: 'DatabaseManager', template: '<div>DatabaseManager</div>' }
-}))
 vi.mock('../../components/SearchDatabase.vue', () => ({
   default: { name: 'SearchDatabase', template: '<div>SearchDatabase</div>' }
 }))
@@ -39,6 +37,9 @@ vi.mock('../../components/ExportingTools.vue', () => ({
 }))
 vi.mock('../../components/TopologyCalculator.vue', () => ({
   default: { name: 'TopologyCalculator', template: '<div>TopologyCalculator</div>' }
+}))
+vi.mock('../../components/DatabaseBackupManager.vue', () => ({
+  default: { name: 'DatabaseBackupManager', template: '<div>DatabaseBackupManager</div>' }
 }))
 
 describe('App.vue', () => {
@@ -165,6 +166,16 @@ describe('App.vue', () => {
       await topologyButton.trigger('click')
 
       expect(wrapper.vm.currentView).toBe('topology')
+    })
+
+    it('opens database backup from the active navigation', async () => {
+      const wrapper = mount(App)
+      await flushPromises()
+
+      await wrapper.findAll('button.nav-btn').find(button => button.text().includes('Database Backup')).trigger('click')
+
+      expect(wrapper.vm.currentView).toBe('database-backup')
+      expect(wrapper.findComponent(DatabaseBackupManager).exists()).toBe(true)
     })
 
     it('should mark active navigation button', async () => {

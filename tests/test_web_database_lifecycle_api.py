@@ -244,10 +244,10 @@ def test_curve_add_rejects_record_filename_name_mismatch_without_changing_either
     assert other_path.read_bytes() == before_other
 
 
-def test_json_upload_converts_from_memory_before_locked_repository_save(
+def test_json_upload_preserves_raw_record_and_publishes_create_only(
     isolated_database: tuple[TestClient, TemporaryJsonRepository, dict[str, dict[str, object]]],
 ) -> None:
-    """Load an uploaded raw record without temporary-file cleanup or deletion."""
+    """Preserve an uploaded raw record instead of saving an adapted core object."""
     client, repository, _originals = isolated_database
     record = _legacy_record("Uploaded Lifecycle Device")
 
@@ -258,7 +258,11 @@ def test_json_upload_converts_from_memory_before_locked_repository_save(
 
     assert response.status_code == 200
     assert response.json()["name"] == "Uploaded Lifecycle Device"
-    assert repository.saved_names == ["Uploaded Lifecycle Device"]
+    assert repository.saved_names == []
+    stored = json.loads(
+        (repository.data_directory / "Uploaded Lifecycle Device.json").read_text(encoding="utf-8")
+    )
+    assert stored == record
 
 
 def test_update_patches_only_general_fields_in_temporary_legacy_json(
