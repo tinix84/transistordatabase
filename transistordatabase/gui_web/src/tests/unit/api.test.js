@@ -98,6 +98,35 @@ describe('API Service', () => {
     })
   })
 
+  describe('getDPTData()', () => {
+    it('keeps the existing full waveform request when no preview is requested', async () => {
+      mock.onGet('/api/transistors/PreviewDevice/dpt_data').reply(200, {
+        raw_measurement_data: []
+      })
+
+      await transistorApi.getDPTData('PreviewDevice')
+
+      expect(mock.history.get[0].url)
+        .toBe('/api/transistors/PreviewDevice/dpt_data')
+      expect(mock.history.get[0].params).toBeUndefined()
+    })
+
+    it('requests the bounded waveform preview when a point cap is supplied', async () => {
+      mock.onGet('/api/transistors/PreviewDevice/dpt_data').reply(200, {
+        raw_measurement_data: [],
+        waveform_preview: { max_points_per_acquisition: 800 }
+      })
+
+      const result = await transistorApi.getDPTData('PreviewDevice', {
+        waveformPreviewPoints: 800
+      })
+
+      expect(mock.history.get[0].params)
+        .toEqual({ waveform_preview_points: 800 })
+      expect(result.waveform_preview.max_points_per_acquisition).toBe(800)
+    })
+  })
+
   describe('getById()', () => {
     it('should fetch specific transistor by ID', async () => {
       const name = 'CREE_C3M0060065J'

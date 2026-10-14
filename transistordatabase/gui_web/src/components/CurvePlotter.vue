@@ -115,7 +115,7 @@ export default {
           borderColor: ds.borderColor || this.getColor(index),
           backgroundColor: ds.backgroundColor || this.getColor(index, 0.1),
           borderWidth: ds.borderWidth || 2,
-          pointRadius: ds.pointRadius || 3,
+          pointRadius: ds.pointRadius ?? 3,
           pointHoverRadius: ds.pointHoverRadius || 5,
           tension: ds.tension || 0,
           fill: ds.fill || false
@@ -208,7 +208,7 @@ export default {
         borderColor: ds.borderColor || this.getColor(index),
         backgroundColor: ds.backgroundColor || this.getColor(index, 0.1),
         borderWidth: ds.borderWidth || 2,
-        pointRadius: ds.pointRadius || 3,
+        pointRadius: ds.pointRadius ?? 3,
         tension: ds.tension || 0,
         fill: ds.fill || false
       }))

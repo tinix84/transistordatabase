@@ -9,7 +9,11 @@
     <!-- Transistor Selector -->
     <div class="transistor-selector">
       <label>Select Transistor:</label>
-      <select v-model="selectedTransistorId" @change="loadDPTData">
+      <select
+        v-model="selectedTransistorId"
+        :disabled="rawImportSaving"
+        @change="loadDPTData"
+      >
         <option value="">-- Choose a transistor --</option>
         <option v-for="t in transistorList" :key="t.id" :value="t.id">
           {{ t.name }}
@@ -100,10 +104,228 @@
             </div>
           </div>
 
+          <section class="raw-import-section" data-testid="dpt-raw-import">
+            <h4>Import an LTspice RAW measurement</h4>
+            <p class="waveform-description">
+              Supports one native LTspice transient result without parameter steps.
+              Choose the Vds and Id traces, then enter each event window in seconds.
+              The uploaded file is discarded after each request.
+            </p>
+            <div class="raw-import-file-row">
+              <label for="dpt-raw-file">LTspice .raw file</label>
+              <input
+                id="dpt-raw-file"
+                ref="rawImportFileInput"
+                data-testid="dpt-raw-file"
+                type="file"
+                accept=".raw"
+                :disabled="rawImportSaving"
+                @change="selectRawImportFile"
+              />
+              <button
+                type="button"
+                data-testid="dpt-raw-preview-file"
+                :disabled="!rawImportFile || rawImportBusy || rawImportSaving"
+                @click="previewRawImportFile"
+              >
+                {{ rawImportBusy ? 'Reading…' : 'Read file and list traces' }}
+              </button>
+            </div>
+
+            <div v-if="rawImportPreview" class="raw-import-preview" data-testid="dpt-raw-file-preview">
+              <p>
+                {{ rawImportPreview.filename }} · {{ rawImportPreview.plot_name }} ·
+                {{ rawImportPreview.sample_count.toLocaleString() }} samples
+              </p>
+              <p class="raw-import-axis-note">
+                Time axis identified by the parser: <strong>{{ rawImportPreview.time_trace_name }}</strong>
+              </p>
+              <div class="raw-import-trace-grid">
+                <div>
+                  <label for="dpt-raw-vds-trace">Vds trace (volts)</label>
+                  <select
+                    id="dpt-raw-vds-trace"
+                    data-testid="dpt-raw-vds-trace"
+                    v-model="rawImportForm.vds_trace"
+                    :disabled="rawImportSaving"
+                  >
+                    <option value="">Choose a trace</option>
+                    <option
+                      v-for="trace in rawImportValueTraces"
+                      :key="trace"
+                      :value="trace"
+                    >
+                      {{ trace }}
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label for="dpt-raw-id-trace">Id trace (amperes)</label>
+                  <select
+                    id="dpt-raw-id-trace"
+                    data-testid="dpt-raw-id-trace"
+                    v-model="rawImportForm.id_trace"
+                    :disabled="rawImportSaving"
+                  >
+                    <option value="">Choose a trace</option>
+                    <option
+                      v-for="trace in rawImportValueTraces"
+                      :key="trace"
+                      :value="trace"
+                    >
+                      {{ trace }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <button
+                type="button"
+                data-testid="dpt-raw-preview-traces"
+                :disabled="!rawImportTraceMappingReady || rawImportBusy || rawImportSaving"
+                @click="previewRawImportTraces"
+              >
+                Preview selected traces
+              </button>
+            </div>
+
+            <div
+              v-if="rawImportTracePreview"
+              class="raw-import-waveform-preview"
+              data-testid="dpt-raw-waveform-preview"
+            >
+              <p>
+                Preview shows up to {{ rawImportTracePreview.preview_sample_count.toLocaleString() }}
+                display samples from {{ rawImportTracePreview.sample_count.toLocaleString() }}
+                source samples. Stored data will use every sample inside each selected window.
+                Time range: {{ rawImportTracePreview.time_range_s[0] }} to
+                {{ rawImportTracePreview.time_range_s[1] }} s.
+              </p>
+              <p
+                v-if="rawImportHasNonFiniteSamples"
+                class="raw-import-gap-note"
+                role="status"
+              >
+                Non-finite trace samples are shown as gaps. Event windows can be imported
+                when every selected Vds and Id sample is finite.
+              </p>
+              <div class="raw-import-plots">
+                <CurvePlotter
+                  title="Selected Vds trace preview"
+                  :datasets="rawImportVdsPreviewDatasets"
+                  x-label="Time [µs]"
+                  :x-value-decimals="6"
+                  y-label="Vds [V]"
+                  :show-legend="false"
+                />
+                <CurvePlotter
+                  title="Selected Id trace preview"
+                  :datasets="rawImportIdPreviewDatasets"
+                  x-label="Time [µs]"
+                  :x-value-decimals="6"
+                  y-label="Id [A]"
+                  :show-legend="false"
+                />
+              </div>
+              <div class="raw-import-window-grid">
+                <fieldset>
+                  <legend>Turn-on event window</legend>
+                  <label for="dpt-raw-on-start">Start [s]</label>
+                  <input
+                    id="dpt-raw-on-start"
+                    v-model="rawImportForm.turn_on_start_s"
+                    data-testid="dpt-raw-on-start"
+                    type="number"
+                    step="any"
+                    :disabled="rawImportSaving"
+                  />
+                  <label for="dpt-raw-on-end">End [s]</label>
+                  <input
+                    id="dpt-raw-on-end"
+                    v-model="rawImportForm.turn_on_end_s"
+                    data-testid="dpt-raw-on-end"
+                    type="number"
+                    step="any"
+                    :disabled="rawImportSaving"
+                  />
+                </fieldset>
+                <fieldset>
+                  <legend>Turn-off event window</legend>
+                  <label for="dpt-raw-off-start">Start [s]</label>
+                  <input
+                    id="dpt-raw-off-start"
+                    v-model="rawImportForm.turn_off_start_s"
+                    data-testid="dpt-raw-off-start"
+                    type="number"
+                    step="any"
+                    :disabled="rawImportSaving"
+                  />
+                  <label for="dpt-raw-off-end">End [s]</label>
+                  <input
+                    id="dpt-raw-off-end"
+                    v-model="rawImportForm.turn_off_end_s"
+                    data-testid="dpt-raw-off-end"
+                    type="number"
+                    step="any"
+                    :disabled="rawImportSaving"
+                  />
+                </fieldset>
+              </div>
+
+              <details class="raw-import-metadata">
+                <summary>Optional measurement conditions and provenance</summary>
+                <div class="raw-import-metadata-grid" :class="{ 'is-saving': rawImportSaving }">
+                  <label>Junction temperature [°C]<input v-model="rawImportMetadata.t_j" data-testid="dpt-raw-metadata-tj" :disabled="rawImportSaving" type="number" step="any" /></label>
+                  <label>Supply voltage [V]<input v-model="rawImportMetadata.v_supply" :disabled="rawImportSaving" type="number" step="any" /></label>
+                  <label>Turn-on gate voltage [V]<input v-model="rawImportMetadata.v_g" :disabled="rawImportSaving" type="number" step="any" /></label>
+                  <label>Turn-off gate voltage [V]<input v-model="rawImportMetadata.v_g_off" :disabled="rawImportSaving" type="number" step="any" /></label>
+                  <label>Turn-on gate resistance [Ω]<input v-model="rawImportMetadata.r_g" :disabled="rawImportSaving" type="number" step="any" /></label>
+                  <label>Turn-off gate resistance [Ω]<input v-model="rawImportMetadata.r_g_off" :disabled="rawImportSaving" type="number" step="any" /></label>
+                  <label>Load inductance [µH]<input v-model="rawImportMetadata.load_inductance" :disabled="rawImportSaving" type="number" step="any" /></label>
+                  <label>Commutation inductance [µH]<input v-model="rawImportMetadata.commutation_inductance" :disabled="rawImportSaving" type="number" step="any" /></label>
+                  <label>Measurement date<input v-model="rawImportMetadata.measurement_date" :disabled="rawImportSaving" type="date" /></label>
+                  <label>Test bench<input v-model="rawImportMetadata.measurement_testbench" :disabled="rawImportSaving" type="text" maxlength="256" /></label>
+                  <label>Commutation device<input v-model="rawImportMetadata.commutation_device" :disabled="rawImportSaving" type="text" maxlength="256" /></label>
+                  <label class="raw-import-comment">Comment<textarea v-model="rawImportMetadata.comment" :disabled="rawImportSaving" maxlength="2000" rows="2" /></label>
+                </div>
+              </details>
+              <button
+                type="button"
+                class="btn-import-raw-dpt"
+                data-testid="dpt-raw-import-submit"
+                :disabled="!rawImportSelectionValid || rawImportBusy || rawImportSaving"
+                @click="importRawDptMeasurement"
+              >
+                {{ rawImportSaving ? 'Importing…' : 'Append DPT measurement' }}
+              </button>
+            </div>
+            <p v-if="rawImportStatus" class="raw-import-status" role="status">
+              {{ rawImportStatus }}
+            </p>
+            <p v-if="rawImportError" class="raw-import-error" role="alert">
+              {{ rawImportError }}
+            </p>
+          </section>
+
           <section class="raw-waveforms-section" aria-labelledby="raw-waveforms-title">
             <h4 id="raw-waveforms-title">Stored Raw DPT Waveforms</h4>
             <p class="waveform-description">
               These plots show stored samples only. They do not calculate switching energy.
+            </p>
+            <p
+              v-if="dptData.waveform_preview"
+              class="waveform-preview-notice"
+              data-testid="dpt-waveform-preview-notice"
+              role="status"
+            >
+              <template v-if="dptData.waveform_preview.downsampled">
+                {{ dptData.waveform_preview.downsampled_acquisition_count }} stored acquisitions are uniformly downsampled to at most
+                {{ dptData.waveform_preview.max_points_per_acquisition }} points each, with first and last samples retained.
+              </template>
+              <template v-else>
+                Stored acquisitions are shown in full up to
+                {{ dptData.waveform_preview.max_points_per_acquisition }} points each.
+              </template>
+              The response is capped at {{ dptData.waveform_preview.max_total_points }} sample points; all source samples remain stored.
             </p>
 
             <div v-if="rawMeasurementRecords.length === 0" class="no-data" role="status">
@@ -532,6 +754,7 @@ export default {
     const selectedTransistorId = ref('')
     const activeTab = ref('data')
     const dptData = ref(null)
+    const dptDataRequestVersion = ref(0)
     const selectedMeasurementIndex = ref(0)
     const selectedAcquisitionIndex = ref(0)
     const measurementSearch = ref('')
@@ -542,6 +765,114 @@ export default {
     const generating = ref(false)
     const validating = ref(false)
     const error = ref(null)
+    const rawImportFileInput = ref(null)
+    const rawImportFile = ref(null)
+    const rawImportBusy = ref(false)
+    const rawImportSaving = ref(false)
+    const rawImportRequestVersion = ref(0)
+    const rawImportHeaderState = ref(null)
+    const rawImportReviewedState = ref(null)
+    const rawImportPreview = ref(null)
+    const rawImportTracePreview = ref(null)
+    const rawImportStatus = ref('')
+    const rawImportError = ref('')
+    const rawImportForm = ref(emptyRawImportForm())
+    const rawImportMetadata = ref(emptyRawImportMetadata())
+
+    function emptyRawImportForm() {
+      return {
+        vds_trace: '',
+        id_trace: '',
+        turn_on_start_s: '',
+        turn_on_end_s: '',
+        turn_off_start_s: '',
+        turn_off_end_s: ''
+      }
+    }
+
+    function emptyRawImportMetadata() {
+      return {
+        t_j: '',
+        v_supply: '',
+        v_g: '',
+        v_g_off: '',
+        r_g: '',
+        r_g_off: '',
+        load_inductance: '',
+        commutation_inductance: '',
+        measurement_date: '',
+        measurement_testbench: '',
+        commutation_device: '',
+        comment: ''
+      }
+    }
+
+    function invalidateRawImportReview({ resetWindows = true } = {}) {
+      rawImportRequestVersion.value += 1
+      rawImportBusy.value = false
+      rawImportTracePreview.value = null
+      rawImportReviewedState.value = null
+      if (resetWindows) {
+        rawImportForm.value = {
+          ...rawImportForm.value,
+          turn_on_start_s: '',
+          turn_on_end_s: '',
+          turn_off_start_s: '',
+          turn_off_end_s: ''
+        }
+      }
+    }
+
+    function resetRawImportWorkflow() {
+      rawImportRequestVersion.value += 1
+      rawImportFile.value = null
+      rawImportHeaderState.value = null
+      rawImportPreview.value = null
+      rawImportTracePreview.value = null
+      rawImportReviewedState.value = null
+      rawImportForm.value = emptyRawImportForm()
+      rawImportMetadata.value = emptyRawImportMetadata()
+      rawImportBusy.value = false
+      rawImportStatus.value = ''
+      rawImportError.value = ''
+      if (rawImportFileInput.value) rawImportFileInput.value.value = ''
+    }
+
+    function rawImportRequestSnapshot() {
+      return {
+        version: rawImportRequestVersion.value,
+        file: rawImportFile.value,
+        transistorId: selectedTransistorId.value,
+        timeTrace: rawImportPreview.value?.time_trace_name || null,
+        vdsTrace: rawImportForm.value.vds_trace,
+        idTrace: rawImportForm.value.id_trace
+      }
+    }
+
+    function rawImportSnapshotIsCurrent(snapshot) {
+      return snapshot.version === rawImportRequestVersion.value
+        && snapshot.file === rawImportFile.value
+        && snapshot.transistorId === selectedTransistorId.value
+        && snapshot.timeTrace === (rawImportPreview.value?.time_trace_name || null)
+        && snapshot.vdsTrace === rawImportForm.value.vds_trace
+        && snapshot.idTrace === rawImportForm.value.id_trace
+    }
+
+    function rawImportHeaderIsCurrent() {
+      return Boolean(rawImportPreview.value && rawImportHeaderState.value)
+        && rawImportHeaderState.value.file === rawImportFile.value
+        && rawImportHeaderState.value.transistorId === selectedTransistorId.value
+    }
+
+    function rawImportReviewIsCurrent() {
+      const review = rawImportReviewedState.value
+      return Boolean(review && rawImportTracePreview.value && rawImportHeaderIsCurrent())
+        && review.file === rawImportFile.value
+        && review.transistorId === selectedTransistorId.value
+        && review.timeTrace === rawImportPreview.value.time_trace_name
+        && review.vdsTrace === rawImportForm.value.vds_trace
+        && review.idTrace === rawImportForm.value.id_trace
+    }
 
     // DPT Configuration
     const dptConfig = ref({
@@ -558,6 +889,195 @@ export default {
 
     const generatedNetlist = ref(null)
     const validationResults = ref(null)
+    const rawImportValueTraces = computed(() => (
+      rawImportHeaderIsCurrent() && rawImportPreview.value?.trace_names?.filter(
+        trace => trace !== rawImportPreview.value.time_trace_name
+      ) || []
+    ))
+    const rawImportTraceMappingReady = computed(() => (
+      Boolean(rawImportFile.value)
+      && rawImportHeaderIsCurrent()
+      && Boolean(rawImportPreview.value?.time_trace_name)
+      && Boolean(rawImportForm.value.vds_trace)
+      && Boolean(rawImportForm.value.id_trace)
+      && rawImportForm.value.vds_trace !== rawImportForm.value.id_trace
+    ))
+    const rawImportSelectionValid = computed(() => {
+      if (!rawImportReviewIsCurrent() || !rawImportTraceMappingReady.value) return false
+      const windows = [
+        [rawImportForm.value.turn_on_start_s, rawImportForm.value.turn_on_end_s],
+        [rawImportForm.value.turn_off_start_s, rawImportForm.value.turn_off_end_s]
+      ]
+      return windows.every(([start, end]) => (
+        start !== '' && end !== ''
+        && Number.isFinite(Number(start))
+        && Number.isFinite(Number(end))
+        && Number(end) >= Number(start)
+      ))
+    })
+    const rawImportHasNonFiniteSamples = computed(() => (
+      Object.values(rawImportTracePreview.value?.non_finite_preview_sample_counts || {})
+        .some(count => count > 0)
+    ))
+    function rawImportRequest(includeWindows = true) {
+      const metadata = {}
+      const numberFields = new Set([
+        't_j', 'v_supply', 'v_g', 'v_g_off', 'r_g', 'r_g_off',
+        'load_inductance', 'commutation_inductance'
+      ])
+      for (const [key, value] of Object.entries(rawImportMetadata.value)) {
+        if (value === '' || value === null || value === undefined) continue
+        if (numberFields.has(key)) {
+          const numericValue = Number(value)
+          if (Number.isFinite(numericValue)) metadata[key] = numericValue
+        } else {
+          metadata[key] = value
+        }
+      }
+      const request = {
+        time_trace: rawImportPreview.value.time_trace_name,
+        vds_trace: rawImportForm.value.vds_trace,
+        id_trace: rawImportForm.value.id_trace
+      }
+      if (includeWindows) {
+        request.turn_on = {
+          start_s: Number(rawImportForm.value.turn_on_start_s),
+          end_s: Number(rawImportForm.value.turn_on_end_s)
+        }
+        request.turn_off = {
+          start_s: Number(rawImportForm.value.turn_off_start_s),
+          end_s: Number(rawImportForm.value.turn_off_end_s)
+        }
+        request.metadata = metadata
+      }
+      return request
+    }
+    function rawImportErrorMessage(err) {
+      return err?.response?.data?.detail || err?.message || 'DPT RAW import failed.'
+    }
+    function selectRawImportFile(event) {
+      invalidateRawImportReview()
+      rawImportFile.value = event.target.files?.[0] || null
+      rawImportHeaderState.value = null
+      rawImportPreview.value = null
+      rawImportStatus.value = ''
+      rawImportError.value = ''
+      rawImportForm.value = emptyRawImportForm()
+    }
+    async function previewRawImportFile() {
+      if (!rawImportFile.value || !selectedTransistorId.value) return
+      invalidateRawImportReview()
+      rawImportPreview.value = null
+      rawImportHeaderState.value = null
+      const snapshot = rawImportRequestSnapshot()
+      rawImportBusy.value = true
+      rawImportError.value = ''
+      rawImportStatus.value = ''
+      try {
+        const preview = await transistorApi.previewDPTRawImport(
+          snapshot.transistorId,
+          snapshot.file
+        )
+        if (!rawImportSnapshotIsCurrent(snapshot)) return
+        rawImportPreview.value = preview
+        rawImportHeaderState.value = {
+          file: snapshot.file,
+          transistorId: snapshot.transistorId
+        }
+        rawImportStatus.value = 'File header read. Choose the Vds and Id traces.'
+      } catch (err) {
+        if (!rawImportSnapshotIsCurrent(snapshot)) return
+        rawImportPreview.value = null
+        rawImportError.value = rawImportErrorMessage(err)
+      } finally {
+        if (snapshot.version === rawImportRequestVersion.value) {
+          rawImportBusy.value = false
+        }
+      }
+    }
+    async function previewRawImportTraces() {
+      if (!rawImportTraceMappingReady.value || !selectedTransistorId.value) return
+      invalidateRawImportReview()
+      const snapshot = rawImportRequestSnapshot()
+      const request = rawImportRequest(false)
+      rawImportBusy.value = true
+      rawImportError.value = ''
+      rawImportStatus.value = ''
+      try {
+        const preview = await transistorApi.previewDPTRawTraces(
+          snapshot.transistorId,
+          snapshot.file,
+          request
+        )
+        if (!rawImportSnapshotIsCurrent(snapshot)) return
+        rawImportTracePreview.value = preview
+        rawImportReviewedState.value = {
+          file: snapshot.file,
+          transistorId: snapshot.transistorId,
+          timeTrace: snapshot.timeTrace,
+          vdsTrace: snapshot.vdsTrace,
+          idTrace: snapshot.idTrace
+        }
+        rawImportStatus.value = 'Trace preview loaded. Review the plots and enter both event windows.'
+      } catch (err) {
+        if (!rawImportSnapshotIsCurrent(snapshot)) return
+        rawImportTracePreview.value = null
+        rawImportError.value = rawImportErrorMessage(err)
+      } finally {
+        if (snapshot.version === rawImportRequestVersion.value) {
+          rawImportBusy.value = false
+        }
+      }
+    }
+    function rawImportPreviewDataset(trace, title, color) {
+      const samples = rawImportTracePreview.value?.traces?.[trace] || []
+      return [{
+        label: title,
+        data: samples.map(([time, value]) => ({ x: time * 1e6, y: value })),
+        borderColor: color,
+        pointRadius: 0
+      }]
+    }
+    const rawImportVdsPreviewDatasets = computed(() => (
+      rawImportPreviewDataset(rawImportForm.value.vds_trace, 'Vds', '#2563eb')
+    ))
+    const rawImportIdPreviewDatasets = computed(() => (
+      rawImportPreviewDataset(rawImportForm.value.id_trace, 'Id', '#dc2626')
+    ))
+    async function importRawDptMeasurement() {
+      if (!rawImportSelectionValid.value || !selectedTransistorId.value) return
+      const snapshot = rawImportRequestSnapshot()
+      if (!rawImportSnapshotIsCurrent(snapshot) || !rawImportReviewIsCurrent()) return
+      const request = rawImportRequest(true)
+      rawImportSaving.value = true
+      rawImportError.value = ''
+      rawImportStatus.value = ''
+      try {
+        const result = await transistorApi.importDPTRawMeasurement(
+          snapshot.transistorId,
+          snapshot.file,
+          request
+        )
+        if (!rawImportSnapshotIsCurrent(snapshot) || !rawImportReviewIsCurrent()) return
+        rawImportStatus.value = (
+          `Added one DPT record with ${result.on_sample_count} turn-on and `
+          + `${result.off_sample_count} turn-off samples.`
+        )
+        rawImportFile.value = null
+        rawImportHeaderState.value = null
+        rawImportPreview.value = null
+        rawImportTracePreview.value = null
+        rawImportReviewedState.value = null
+        if (rawImportFileInput.value) rawImportFileInput.value.value = ''
+        await loadDPTData()
+      } catch (err) {
+        if (rawImportSnapshotIsCurrent(snapshot)) {
+          rawImportError.value = rawImportErrorMessage(err)
+        }
+      } finally {
+        rawImportSaving.value = false
+      }
+    }
     const rawMeasurementRecords = computed(() => (
       Array.isArray(dptData.value?.raw_measurement_data)
         ? dptData.value.raw_measurement_data
@@ -606,8 +1126,8 @@ export default {
         ['v_g_off', 'Turn-off gate voltage', 'V'],
         ['r_g', 'Gate resistance', 'Ω'],
         ['r_g_off', 'Turn-off gate resistance', 'Ω'],
-        ['load_inductance', 'Load inductance', 'H'],
-        ['commutation_inductance', 'Commutation inductance', 'H'],
+        ['load_inductance', 'Load inductance', 'µH'],
+        ['commutation_inductance', 'Commutation inductance', 'µH'],
         ['measurement_date', 'Measurement date', ''],
         ['measurement_testbench', 'Test bench', ''],
         ['commutation_device', 'Commutation device', ''],
@@ -705,6 +1225,7 @@ export default {
             label: plot.title,
             data: projection.data,
             borderColor: plot.color,
+            pointRadius: 0,
           }],
           hasNumericPoints: projection.hasNumericPoints,
           hasNonFiniteSamples: projection.hasNonFiniteSamples,
@@ -744,6 +1265,7 @@ export default {
             label: traceLabel,
             data: projection.data,
             borderColor: comparisonColor(record.index),
+            pointRadius: 0,
           })
         }
         return {
@@ -778,6 +1300,27 @@ export default {
       if (comparisonMode.value) return
       selectFirstVisibleMeasurementIfNeeded()
     })
+
+    watch(
+      selectedTransistorId,
+      () => {
+        dptDataRequestVersion.value += 1
+        dptData.value = null
+        resetRawImportWorkflow()
+      },
+      { flush: 'sync' }
+    )
+
+    watch(
+      [() => rawImportForm.value.vds_trace, () => rawImportForm.value.id_trace],
+      () => {
+        invalidateRawImportReview()
+        rawImportBusy.value = false
+        rawImportStatus.value = ''
+        rawImportError.value = ''
+      },
+      { flush: 'sync' }
+    )
 
     function measurementLabel(measurement, index) {
       const metadata = measurement?.metadata || {}
@@ -849,11 +1392,21 @@ export default {
     })
 
     async function loadDPTData() {
-      if (!selectedTransistorId.value) return
+      const requestedTransistorId = selectedTransistorId.value
+      if (!requestedTransistorId) return
+      const requestVersion = ++dptDataRequestVersion.value
 
       try {
         error.value = null
-        dptData.value = await transistorApi.getDPTData(selectedTransistorId.value)
+        const response = await transistorApi.getDPTData(
+          requestedTransistorId,
+          { waveformPreviewPoints: 800 }
+        )
+        if (
+          requestVersion !== dptDataRequestVersion.value
+          || requestedTransistorId !== selectedTransistorId.value
+        ) return
+        dptData.value = response
         selectedMeasurementIndex.value = 0
         selectedAcquisitionIndex.value = 0
         measurementSearch.value = ''
@@ -861,7 +1414,11 @@ export default {
         selectedComparisonIndices.value = []
         comparisonAcquisitionIndices.value = {}
       } catch (err) {
-        error.value = 'Failed to load DPT data'
+        if (
+          requestVersion !== dptDataRequestVersion.value
+          || requestedTransistorId !== selectedTransistorId.value
+        ) return
+        error.value = err?.response?.data?.detail || 'Failed to load DPT data'
         dptData.value = null
       }
     }
@@ -944,6 +1501,26 @@ export default {
       waveformPlots,
       activeWaveformPlots,
       measurementLabel,
+      rawImportFileInput,
+      rawImportFile,
+      rawImportBusy,
+      rawImportSaving,
+      rawImportPreview,
+      rawImportTracePreview,
+      rawImportStatus,
+      rawImportError,
+      rawImportForm,
+      rawImportMetadata,
+      rawImportValueTraces,
+      rawImportTraceMappingReady,
+      rawImportSelectionValid,
+      rawImportHasNonFiniteSamples,
+      rawImportVdsPreviewDatasets,
+      rawImportIdPreviewDatasets,
+      selectRawImportFile,
+      previewRawImportFile,
+      previewRawImportTraces,
+      importRawDptMeasurement,
       dptConfig,
       generating,
       validating,
@@ -1105,6 +1682,110 @@ h2 {
   margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid #e0e0e0;
+}
+
+.raw-import-section {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #cbd8e4;
+  border-radius: 8px;
+  background: #f7fafc;
+}
+
+.raw-import-section h4 {
+  margin: 0 0 8px;
+}
+
+.raw-import-file-row,
+.raw-import-trace-grid,
+.raw-import-window-grid,
+.raw-import-metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  align-items: end;
+  margin: 16px 0;
+}
+
+.raw-import-file-row {
+  grid-template-columns: minmax(220px, 1fr) auto;
+}
+
+.raw-import-section label {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.raw-import-section input,
+.raw-import-section select,
+.raw-import-section textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #aebbc8;
+  border-radius: 4px;
+  background: #fff;
+  font: inherit;
+  font-weight: 400;
+}
+
+.raw-import-axis-note {
+  color: #334155;
+}
+
+.raw-import-plots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.raw-import-window-grid fieldset {
+  display: grid;
+  grid-template-columns: minmax(72px, auto) minmax(120px, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+}
+
+.raw-import-window-grid legend {
+  padding: 0 5px;
+  font-weight: 600;
+}
+
+.raw-import-metadata {
+  margin: 18px 0;
+}
+
+.raw-import-metadata summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.raw-import-metadata-grid {
+  margin-top: 14px;
+}
+
+.raw-import-comment {
+  grid-column: 1 / -1;
+}
+
+.btn-import-raw-dpt {
+  margin-top: 8px;
+}
+
+.raw-import-status {
+  color: #166534;
+  margin-bottom: 0;
+}
+
+.raw-import-error {
+  color: #b91c1c;
+  margin-bottom: 0;
 }
 
 .raw-waveforms-section {

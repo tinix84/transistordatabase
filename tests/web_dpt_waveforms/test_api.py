@@ -102,6 +102,7 @@ def test_dpt_data_includes_multiple_raw_records_and_acquisitions(
 
     assert response.status_code == 200
     payload = response.json()
+    assert "waveform_preview" not in payload
     assert payload["has_e_on"] is True
     assert payload["has_e_off"] is True
     assert "has_e_rr" in payload
@@ -122,6 +123,85 @@ def test_dpt_data_includes_multiple_raw_records_and_acquisitions(
     assert raw_records[1]["dpt_on_id"] == []
     assert raw_records[1]["dpt_off_vds"] == [[[0.0, 600.0], [2e-6, 580.0]]]
     json.dumps(payload, allow_nan=False)
+    assert record_path.read_bytes() == before
+
+
+def test_default_dpt_get_keeps_full_response_without_preview_caps(
+    isolated_database: tuple[TestClient, Path, dict[str, Any]],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The opt-in preview budgets do not narrow legacy default GET behavior."""
+    client, record_path, _record = isolated_database
+    monkeypatch.setattr(main, "MAX_DPT_LEGACY_RECORD_FILE_BYTES", 16)
+    monkeypatch.setattr(main, "MAX_DPT_RAW_MEASUREMENT_BYTES", 16)
+
+    response = client.get(f"/api/transistors/{DEVICE_NAME}/dpt_data")
+
+    assert record_path.stat().st_size > 16
+    assert response.status_code == 200
+    payload = response.json()
+    assert "waveform_preview" not in payload
+    assert payload["raw_measurement_data"][0]["dpt_on_vds"] == [
+        [[0.0, 400.0], [1e-6, 210.0]],
+        [[0.0, 390.0], [1e-6, 200.0]],
+    ]
+
+
+def test_bounded_dpt_preview_obeys_total_budget_and_preserves_source_json(
+    isolated_database: tuple[TestClient, Path, dict[str, Any]],
+) -> None:
+    """Repeated stored imports share one bounded, endpoint-preserving preview."""
+    client, record_path, record = isolated_database
+    fields = (
+        "dpt_on_vds",
+        "dpt_on_id",
+        "dpt_off_vds",
+        "dpt_off_id",
+    )
+    sample_count = 400
+    raw_records = []
+    for measurement_index in range(100):
+        measurement = {
+            "dataset_type": "dpt_u_i",
+            "comment": f"measurement {measurement_index}",
+        }
+        for field in fields:
+            measurement[field] = [[
+                [sample_index * 1e-9, float(sample_index + measurement_index)]
+                for sample_index in range(sample_count)
+            ]]
+        raw_records.append(measurement)
+    record["raw_measurement_data"] = raw_records
+    record_path.write_text(
+        json.dumps(record, separators=(",", ":")), encoding="utf-8"
+    )
+    before = record_path.read_bytes()
+
+    response = client.get(
+        f"/api/transistors/{DEVICE_NAME}/dpt_data",
+        params={"waveform_preview_points": 800},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert len(payload["raw_measurement_data"]) == 100
+    returned_points = 0
+    for record_index, measurement in enumerate(payload["raw_measurement_data"]):
+        for field in fields:
+            acquisition = measurement[field][0]
+            assert len(acquisition) == 100
+            assert acquisition[0] == [0.0, float(record_index)]
+            assert acquisition[-1] == [399e-9, float(399 + record_index)]
+            returned_points += len(acquisition)
+    assert returned_points == 40000
+    assert payload["waveform_preview"] == {
+        "max_points_per_acquisition": 800,
+        "max_total_points": 40000,
+        "returned_points": 40000,
+        "sampling": "uniform_with_endpoints",
+        "downsampled": True,
+        "downsampled_acquisition_count": 400,
+    }
     assert record_path.read_bytes() == before
 
 

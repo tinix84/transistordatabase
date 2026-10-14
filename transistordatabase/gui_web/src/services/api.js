@@ -287,8 +287,47 @@ export const transistorApi = {
     return response.data
   },
 
-  async getDPTData(transistorId) {
-    const response = await api.get(`/api/transistors/${pathSegment(transistorId)}/dpt_data`)
+  async getDPTData(transistorId, options = {}) {
+    const path = `/api/transistors/${pathSegment(transistorId)}/dpt_data`
+    const previewPoints = options?.waveformPreviewPoints
+    const response = Number.isInteger(previewPoints)
+      ? await api.get(path, { params: { waveform_preview_points: previewPoints } })
+      : await api.get(path)
+    return response.data
+  },
+
+  async previewDPTRawImport(transistorId, file) {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await api.post(
+      `/api/transistors/${pathSegment(transistorId)}/dpt_raw_import/preview`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    )
+    return response.data
+  },
+
+  async previewDPTRawTraces(transistorId, file, selection) {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('selection_json', JSON.stringify(selection))
+    const response = await api.post(
+      `/api/transistors/${pathSegment(transistorId)}/dpt_raw_import/trace_preview`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    )
+    return response.data
+  },
+
+  async importDPTRawMeasurement(transistorId, file, selection) {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('selection_json', JSON.stringify(selection))
+    const response = await api.post(
+      `/api/transistors/${pathSegment(transistorId)}/dpt_raw_import`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    )
     return response.data
   },
 

@@ -359,6 +359,60 @@ class DPTConfigRequest(BaseModel):
     t_pulse2: float = Field(2e-6, description="Duration of second pulse in s", gt=0)
 
 
+class DptRawEventWindow(BaseModel):
+    """Explicit inclusive time window in seconds for one DPT switching event."""
+
+    start_s: float = Field(..., allow_inf_nan=False)
+    end_s: float = Field(..., allow_inf_nan=False)
+
+    @model_validator(mode="after")
+    def check_order(self) -> "DptRawEventWindow":
+        """Reject reversed event boundaries before reading or writing records."""
+        if self.end_s < self.start_s:
+            raise ValueError("event window end_s must be at or after start_s")
+        return self
+
+
+class DptRawImportMetadata(BaseModel):
+    """Optional test conditions stored in an existing raw DPT record."""
+
+    t_j: float | None = Field(None, allow_inf_nan=False)
+    v_supply: float | None = Field(None, allow_inf_nan=False)
+    v_g: float | None = Field(None, allow_inf_nan=False)
+    v_g_off: float | None = Field(None, allow_inf_nan=False)
+    r_g: float | None = Field(None, allow_inf_nan=False)
+    r_g_off: float | None = Field(None, allow_inf_nan=False)
+    load_inductance: float | None = Field(None, allow_inf_nan=False)
+    commutation_inductance: float | None = Field(None, allow_inf_nan=False)
+    measurement_date: datetime | None = None
+    measurement_testbench: str | None = Field(None, max_length=256)
+    commutation_device: str | None = Field(None, max_length=256)
+    comment: str | None = Field(None, max_length=2000)
+
+
+class DptRawTraceSelectionRequest(BaseModel):
+    """Explicit time, Vds, and Id trace choices from one RAW result."""
+
+    time_trace: str = Field(..., min_length=1, max_length=256)
+    vds_trace: str = Field(..., min_length=1, max_length=256)
+    id_trace: str = Field(..., min_length=1, max_length=256)
+
+    @model_validator(mode="after")
+    def check_trace_mapping(self) -> "DptRawTraceSelectionRequest":
+        """Require distinct, explicit time, Vds, and Id trace choices."""
+        if len({self.time_trace, self.vds_trace, self.id_trace}) != 3:
+            raise ValueError("time_trace, vds_trace, and id_trace must be distinct")
+        return self
+
+
+class DptRawImportRequest(DptRawTraceSelectionRequest):
+    """User-selected traces, event windows, and conditions for one raw import."""
+
+    turn_on: DptRawEventWindow
+    turn_off: DptRawEventWindow
+    metadata: DptRawImportMetadata = Field(default_factory=DptRawImportMetadata)
+
+
 class PLECSImportResponse(BaseModel):
     """Response schema for PLECS import operations."""
 
