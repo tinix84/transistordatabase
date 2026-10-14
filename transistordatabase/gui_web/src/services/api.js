@@ -279,6 +279,11 @@ export const transistorApi = {
     return response.data
   },
 
+    async calculateTopologyPareto(params) {
+      const response = await api.post('/api/topology/pareto', params)
+      return response.data
+    },
+
   // DPT (Double Pulse Test)
   async generateDPTNetlist(transistorId, config) {
     const response = await api.post('/api/dpt/generate_netlist', config, {
