@@ -174,9 +174,49 @@ test.describe('topology migration browser workflow', () => {
     })
   })
 
+  test('submits and exports a loss-balanced line sweep with its model limits', async ({ page }) => {
+    const sweep = {
+      kind: 'line', mode: 'loss-balanced', loss_scope: 'channel_conduction_only',
+      voltage_law_note: 'Each point reports its averaged inductor volt-second residual.',
+      voltage_law_residual_values_v: [0.01, 0.02],
+      x_axis: 'f_sw', x_unit: 'Hz', x_values: [50000, 100000],
+      metric: 'p_loss_total_w', metric_unit: 'W', values: [8, 10]
+    }
+    const capturedRequest = await mockTopologyCalculation(page, topologyResult(sweep, 'loss-balanced'))
+
+    await openTopology(page)
+    await page.locator('label.param-item').filter({ hasText: 'Calculation mode' }).locator('select').selectOption('loss-balanced')
+    await page.locator('label.sweep-toggle input').check()
+    await setParameter(page, 'X maximum', 100)
+    await setParameter(page, 'X points', 2)
+    await page.getByRole('button', { name: 'Calculate', exact: true }).click()
+
+    const sweepSection = page.locator('.charts-section').filter({ hasText: 'p_loss_total_w vs f_sw' })
+    await expect(sweepSection).toContainText('channel_conduction_only')
+    await expect(sweepSection).toContainText('averaged inductor volt-second residual')
+    await expect(sweepSection).toContainText('Hover a point to inspect its averaged volt-second residual')
+    await expect(sweepSection.getByRole('img', { name: 'p_loss_total_w vs f_sw' })).toBeVisible()
+    expect(capturedRequest()).toMatchObject({
+      mode: 'loss-balanced',
+      sweep: { x_axis: 'f_sw', x_min: 50000, x_max: 100000, x_points: 2 }
+    })
+
+    const downloadPromise = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Download JSON' }).click()
+    const download = await downloadPromise
+    const exported = JSON.parse(await readFile(await download.path(), 'utf8'))
+    expect(exported.request.mode).toBe('loss-balanced')
+    expect(exported.request.sweep).toBeDefined()
+    expect(exported.result.sweep.loss_scope).toBe('channel_conduction_only')
+    expect(exported.result.sweep.voltage_law_residual_values_v).toEqual([0.01, 0.02])
+    expect(exported.result.sweep.voltage_law_note).toContain('volt-second residual')
+  })
+
   test('shows contour sweep values and coordinate tooltips in the browser', async ({ page }) => {
     const sweep = {
-      kind: 'contour',
+      kind: 'contour', mode: 'loss-balanced', loss_scope: 'channel_conduction_only',
+      voltage_law_note: 'Each point reports its averaged inductor volt-second residual.',
+      voltage_law_residual_values_v: [[0.01, 0.02, 0.03], [0.04, 0.05, 0.06]],
       x_axis: 'f_sw',
       x_unit: 'Hz',
       x_values: [50000, 100000, 150000],
@@ -187,9 +227,10 @@ test.describe('topology migration browser workflow', () => {
       metric_unit: 'A',
       values: [[5, 7.5, 10], [10, 15, 20]]
     }
-    const capturedRequest = await mockTopologyCalculation(page, topologyResult(sweep))
+    const capturedRequest = await mockTopologyCalculation(page, topologyResult(sweep, 'loss-balanced'))
 
     await openTopology(page, 'Buck')
+    await page.locator('label.param-item').filter({ hasText: 'Calculation mode' }).locator('select').selectOption('loss-balanced')
     await page.locator('label.sweep-toggle input').check()
     await page.locator('label.param-item').filter({ hasText: 'Sweep type' }).locator('select').selectOption('contour')
     await setParameter(page, 'X maximum', 150)
@@ -204,9 +245,12 @@ test.describe('topology migration browser workflow', () => {
     await expect(cells).toHaveCount(6)
     const firstCell = cells.first()
     await firstCell.hover()
-    await expect(firstCell).toHaveAttribute('title', 'x=50000 Hz; y=100 V; i_l_ripple_pp_a=5 A')
+    await expect(firstCell).toHaveAttribute('title', 'x=50000 Hz; y=100 V; i_l_ripple_pp_a=5 A; inductor_volt_second_residual=0.01 V')
     await expect(page.locator('.results-panel')).toContainText('X: f_sw (Hz); Y: v_in (V); color shows i_l_ripple_pp_a (A).')
+    await expect(page.locator('.charts-section').filter({ hasText: 'i_l_ripple_pp_a contour' })).toContainText('channel_conduction_only')
+    await expect(page.locator('.charts-section').filter({ hasText: 'i_l_ripple_pp_a contour' })).toContainText('volt-second residual')
     expect(capturedRequest()).toMatchObject({
+      mode: 'loss-balanced',
       sweep: {
         x_axis: 'f_sw', x_min: 50000, x_max: 150000, x_points: 3,
         y_axis: 'v_in', y_min: 100, y_max: 200, y_points: 2,

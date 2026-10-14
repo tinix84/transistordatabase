@@ -1426,10 +1426,11 @@ def calculate_topology_sweep(
     diode_transistor: Transistor | None = None,
 ) -> dict[str, Any]:
     """Generate a Python-side line or contour sweep of one supported metric."""
-    if parameters.get("mode") == "loss-balanced":
+    loss_balanced = parameters.get("mode") == "loss-balanced"
+    if loss_balanced and parameters.get("conduction_regime", "CCM") != "CCM":
         raise ValueError(
-            "Topology sweeps are not supported in loss-balanced mode; "
-            "calculate a single CCM operating point"
+            "Loss-balanced topology sweeps support CCM only; "
+            "select conduction_regime='CCM'"
         )
     x_axis = sweep.get("x_axis")
     y_axis = sweep.get("y_axis")
@@ -1459,7 +1460,15 @@ def calculate_topology_sweep(
             raise ValueError("Contour sweeps are limited to 2500 operating points")
         y_values = np.linspace(y_min, y_max, y_points)
 
-    def evaluate(x_value: float, y_value: float | None) -> float:
+    def coordinate_label(x_value: float, y_value: float | None) -> str:
+        location = f"x={x_value:g} {_SWEEP_AXES[x_axis][1]}"
+        if y_value is not None and y_axis is not None:
+            location += f", y={y_value:g} {_SWEEP_AXES[y_axis][1]}"
+        return location
+
+    def evaluate(
+        x_value: float, y_value: float | None
+    ) -> tuple[float, float | None]:
         changed = dict(parameters)
         changed[_SWEEP_AXES[x_axis][0]] = float(x_value)
         if y_axis is not None and y_value is not None:
@@ -1481,16 +1490,39 @@ def calculate_topology_sweep(
         value = point[section]
         if value is None or value.get(key) is None:
             raise ValueError(
-                f"Sweep metric '{metric}' is unavailable in "
-                f"{parameters.get('mode')} mode"
+                f"Sweep point ({coordinate_label(x_value, y_value)}) has no "
+                f"'{metric}' value in "
+                f"{parameters.get('mode')} mode; choose a metric available "
+                "for every operating point"
             )
-        return float(value[key])
+        residual = None
+        if loss_balanced:
+            residual = point["calculated"].get("inductor_volt_second_residual_v")
+            if residual is None:
+                raise ValueError(
+                    f"Sweep point ({coordinate_label(x_value, y_value)}) has no "
+                    "inductor volt-second residual"
+                )
+        return float(value[key]), float(residual) if residual is not None else None
 
     if y_values is None:
-        values: Any = [evaluate(float(x), None) for x in x_values]
+        evaluated = [evaluate(float(x), None) for x in x_values]
+        values: Any = [metric_value for metric_value, _ in evaluated]
+        residual_values = (
+            [residual for _, residual in evaluated] if loss_balanced else None
+        )
     else:
-        values = [[evaluate(float(x), float(y)) for x in x_values] for y in y_values]
-    return {
+        evaluated = [
+            [evaluate(float(x), float(y)) for x in x_values] for y in y_values
+        ]
+        values = [
+            [metric_value for metric_value, _ in row] for row in evaluated
+        ]
+        residual_values = (
+            [[residual for _, residual in row] for row in evaluated]
+            if loss_balanced else None
+        )
+    result = {
         "kind": "line" if y_values is None else "contour",
         "x_axis": x_axis,
         "x_unit": _SWEEP_AXES[x_axis][1],
@@ -1502,3 +1534,18 @@ def calculate_topology_sweep(
         "metric_unit": _SWEEP_METRICS[metric][2],
         "values": values,
     }
+    if loss_balanced:
+        result.update(
+            {
+                "mode": "loss-balanced",
+                "loss_scope": "channel_conduction_only",
+                "voltage_law_residual_values_v": residual_values,
+                "voltage_law_note": (
+                    "Each point solves included channel-loss power balance and "
+                    "reports its averaged inductor volt-second residual in "
+                    "voltage_law_residual_values_v; "
+                    "nonlinear curve points may not close both balances exactly."
+                ),
+            }
+        )
+    return result

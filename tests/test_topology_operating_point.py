@@ -1124,14 +1124,160 @@ def test_contour_sweep_enforces_work_limit() -> None:
         )
 
 
-def test_loss_balanced_mode_rejects_sweeps_before_evaluating_points() -> None:
-    """The scalar loss-balanced mode is not silently applied across a sweep."""
-    with pytest.raises(ValueError, match="sweeps are not supported in loss-balanced mode"):
-        calculate_topology_sweep(
-            "boost",
-            point(mode="loss-balanced"),
+@pytest.mark.parametrize(
+    "sweep",
+    [
+        {
+            "x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000,
+            "x_points": 201, "metric": "i_l_ripple_pp_a",
+        },
+        {
+            "x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000,
+            "x_points": 2, "y_axis": "l_value", "y_min": 200e-6,
+            "y_max": 400e-6, "y_points": 201, "metric": "i_l_ripple_pp_a",
+        },
+    ],
+    ids=["x-axis", "y-axis"],
+)
+def test_sweep_limits_each_axis_to_200_points(sweep: dict[str, Any]) -> None:
+    """Reject line and contour axes above the documented 200-point cap."""
+    with pytest.raises(ValueError, match="2 to 200 points"):
+        calculate_topology_sweep("buck", point(), sweep)
+
+
+@pytest.mark.parametrize(
+    ("sweep", "expected_x_points", "expected_y_points"),
+    [
+        (
             {
                 "x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000,
-                "x_points": 3, "metric": "i_l_ripple_pp_a",
+                "x_points": 200, "metric": "i_l_ripple_pp_a",
             },
+            200,
+            None,
+        ),
+        (
+            {
+                "x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000,
+                "x_points": 2, "y_axis": "l_value", "y_min": 200e-6,
+                "y_max": 400e-6, "y_points": 200, "metric": "i_l_ripple_pp_a",
+            },
+            2,
+            200,
+        ),
+    ],
+    ids=["line-x-axis", "contour-y-axis"],
+)
+def test_sweep_accepts_200_points_on_each_axis(
+    sweep: dict[str, Any],
+    expected_x_points: int,
+    expected_y_points: int | None,
+) -> None:
+    """Allow the documented inclusive 200-point maximum on either axis."""
+    result = calculate_topology_sweep("buck", point(), sweep)
+    assert len(result["x_values"]) == expected_x_points
+    if expected_y_points is not None:
+        assert len(result["y_values"]) == expected_y_points
+        assert len(result["values"]) == expected_y_points
+        assert all(len(row) == expected_x_points for row in result["values"])
+
+
+def test_loss_balanced_line_sweep_matches_independent_scalar_points() -> None:
+    """Every sweep value is the scalar solver result at its exact coordinate."""
+    switch = device("loss-balanced switch")
+    diode = device("loss-balanced diode")
+    parameters = point(
+        mode="loss-balanced", v_in=100, v_out=200, p_out=1000,
+        f_sw=20_000, l_value=1e-3, c_out=1e-3, t_j=25, v_g=15,
+    )
+    sweep = {
+        "x_axis": "f_sw", "x_min": 20_000, "x_max": 30_000,
+        "x_points": 3, "metric": "p_loss_total_w",
+    }
+    result = calculate_topology_sweep("boost", parameters, sweep, switch, diode)
+
+    assert result["kind"] == "line"
+    assert result["x_unit"] == "Hz"
+    assert result["loss_scope"] == "channel_conduction_only"
+    assert "volt-second residual" in result["voltage_law_note"]
+    for frequency, value, residual in zip(
+        result["x_values"],
+        result["values"],
+        result["voltage_law_residual_values_v"],
+        strict=True,
+    ):
+        scalar_parameters = {**parameters, "f_sw": frequency}
+        scalar = calculate_topology_operating_point(
+            "boost", scalar_parameters, switch, diode
+        )
+        assert value == pytest.approx(scalar["losses"]["total_w"])
+        assert residual == pytest.approx(
+            scalar["calculated"]["inductor_volt_second_residual_v"]
+        )
+
+
+def test_loss_balanced_contour_sweep_matches_scalar_points() -> None:
+    """Contour rows and columns preserve the scalar values and axis shape."""
+    switch = device("loss-balanced switch")
+    diode = device("loss-balanced diode")
+    parameters = point(
+        mode="loss-balanced", v_in=100, v_out=200, p_out=1000,
+        f_sw=20_000, l_value=1e-3, c_out=1e-3, t_j=25, v_g=15,
+    )
+    result = calculate_topology_sweep(
+        "boost", parameters,
+        {
+            "x_axis": "f_sw", "x_min": 20_000, "x_max": 30_000,
+            "x_points": 3, "y_axis": "l_value", "y_min": 1e-3,
+            "y_max": 2e-3, "y_points": 2, "metric": "efficiency_percent",
+        },
+        switch, diode,
+    )
+
+    assert result["kind"] == "contour"
+    assert result["x_unit"] == "Hz"
+    assert result["y_unit"] == "H"
+    assert len(result["values"]) == 2
+    assert all(len(row) == 3 for row in result["values"])
+    residuals = result["voltage_law_residual_values_v"]
+    assert len(residuals) == 2
+    assert all(len(row) == 3 for row in residuals)
+    for y_index, inductance in enumerate(result["y_values"]):
+        for x_index, frequency in enumerate(result["x_values"]):
+            scalar = calculate_topology_operating_point(
+                "boost", {**parameters, "l_value": inductance, "f_sw": frequency},
+                switch, diode,
+            )
+            assert result["values"][y_index][x_index] == pytest.approx(
+                scalar["performance"]["efficiency_percent"]
+            )
+            assert residuals[y_index][x_index] == pytest.approx(
+                scalar["calculated"]["inductor_volt_second_residual_v"]
+            )
+
+
+def test_loss_balanced_sweep_reports_out_of_range_coordinate() -> None:
+    """A single unsupported curve point fails the sweep without extrapolation."""
+    switch = device("limited switch", max_current=12)
+    diode = device("limited diode", max_current=12)
+    parameters = point(
+        mode="loss-balanced", v_in=100, v_out=200, p_out=1000,
+        f_sw=20_000, l_value=1e-3, c_out=1e-3, t_j=25, v_g=15,
+    )
+    with pytest.raises(ValueError, match=r"Sweep point \(x=2000 W\).*curve supports"):
+        calculate_topology_sweep(
+            "boost", parameters,
+            {"x_axis": "p_out", "x_min": 1000, "x_max": 3000,
+             "x_points": 3, "metric": "efficiency_percent"},
+            switch, diode,
+        )
+
+
+def test_loss_balanced_sweep_rejects_dcm_with_actionable_error() -> None:
+    """Reject DCM before beginning a loss-balanced sweep."""
+    with pytest.raises(ValueError, match="support CCM only.*conduction_regime='CCM'"):
+        calculate_topology_sweep(
+            "boost", point(mode="loss-balanced", conduction_regime="DCM"),
+            {"x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000,
+             "x_points": 3, "metric": "i_l_ripple_pp_a"},
         )

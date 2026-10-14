@@ -239,20 +239,67 @@ def test_line_sweep_is_generated_and_serialized_by_backend(client: TestClient) -
     assert sweep["values"][-1] == pytest.approx(6.25)
 
 
-def test_loss_balanced_api_rejects_sweeps_before_calculating(client: TestClient) -> None:
-    """Return a clear client error for unsupported loss-balanced sweeps."""
-    response = client.post(
-        "/api/topology/calculate",
-        json=payload(
-            mode="loss-balanced",
-            sweep={
-                "x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000,
-                "x_points": 3, "metric": "i_l_ripple_pp_a",
-            },
-        ),
+def test_loss_balanced_api_returns_line_sweep_scope_and_points(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Expose loss-balanced line values and model limits in the API response."""
+    request = payload(
+        topology="boost", mode="loss-balanced", v_in=100, v_out=200,
+        p_out=1000, f_sw=20_000, l_value=1e-3, c_out=1e-3,
+        t_j=25, v_g=15, diode_v_g=0,
+        switch_transistor_id="gated-device", diode_transistor_id="gated-device",
+        sweep={"x_axis": "f_sw", "x_min": 20_000, "x_max": 30_000,
+               "x_points": 3, "metric": "p_loss_total_w"},
     )
+    response = gate_conditioned_client.post("/api/topology/calculate", json=request)
+    assert response.status_code == 200
+    result = response.json()
+    sweep = result["sweep"]
+    assert sweep["kind"] == "line"
+    assert sweep["x_unit"] == "Hz"
+    assert sweep["loss_scope"] == "channel_conduction_only"
+    assert "volt-second residual" in sweep["voltage_law_note"]
+    assert len(sweep["values"]) == 3
+    assert len(sweep["voltage_law_residual_values_v"]) == 3
+    assert all(value is not None for value in sweep["voltage_law_residual_values_v"])
+
+    contour_response = gate_conditioned_client.post(
+        "/api/topology/calculate",
+        json={
+            **request,
+            "sweep": {
+                "x_axis": "f_sw", "x_min": 20_000, "x_max": 30_000,
+                "x_points": 3, "y_axis": "l_value", "y_min": 0.001,
+                "y_max": 0.002, "y_points": 2, "metric": "efficiency_percent",
+            },
+        },
+    )
+    assert contour_response.status_code == 200
+    contour = contour_response.json()["sweep"]
+    assert contour["kind"] == "contour"
+    assert len(contour["values"]) == 2
+    assert all(len(row) == 3 for row in contour["values"])
+    assert len(contour["voltage_law_residual_values_v"]) == 2
+    assert all(len(row) == 3 for row in contour["voltage_law_residual_values_v"])
+    assert contour["loss_scope"] == "channel_conduction_only"
+
+
+def test_loss_balanced_api_reports_sweep_curve_failure_coordinate(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Return a client error naming the unsupported coordinate and curve range."""
+    request = payload(
+        topology="boost", mode="loss-balanced", v_in=100, v_out=200,
+        p_out=1000, f_sw=20_000, l_value=1e-3, c_out=1e-3,
+        t_j=25, v_g=15, diode_v_g=0,
+        switch_transistor_id="gated-device", diode_transistor_id="gated-device",
+        sweep={"x_axis": "p_out", "x_min": 1000, "x_max": 100_000,
+               "x_points": 2, "metric": "efficiency_percent"},
+    )
+    response = gate_conditioned_client.post("/api/topology/calculate", json=request)
     assert response.status_code == 400
-    assert "Topology sweeps are not supported in loss-balanced mode" in response.json()["detail"]
+    assert "Sweep point (x=100000 W)" in response.json()["detail"]
+    assert "curve supports" in response.json()["detail"]
 
 
 def test_loss_balanced_comparison_returns_scope_with_efficiency_ranking(

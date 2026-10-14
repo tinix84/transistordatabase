@@ -122,9 +122,10 @@
 
         <div class="param-section">
           <h4>Python generated sweep</h4>
-          <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox" :disabled="form.mode === 'loss-balanced'"> Include line or contour sweep</label>
-          <p v-if="form.mode === 'loss-balanced'" class="hint">Line and contour sweeps are unavailable in loss-balanced mode. Calculate one CCM operating point.</p>
-          <div v-if="form.sweep_enabled && form.mode !== 'loss-balanced'" class="param-grid">
+          <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox"> Include line or contour sweep</label>
+          <p v-if="form.mode === 'loss-balanced'" class="hint">Loss-balanced sweeps solve each CCM point from exact-condition channel curves. Every point must be supported; no curve extrapolation is used.</p>
+          <p v-if="form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM'" class="hint">Set conduction regime to CCM to calculate a loss-balanced sweep.</p>
+          <div v-if="form.sweep_enabled" class="param-grid">
             <label class="param-item">Sweep type
               <select v-model="form.sweep_kind"><option value="line">Line</option><option value="contour">Contour</option></select>
             </label>
@@ -218,10 +219,13 @@
         </div>
         <div v-if="results.sweep?.kind === 'line'" class="charts-section">
           <h4>{{ results.sweep.metric }} vs {{ results.sweep.x_axis }}</h4>
+          <p v-if="results.sweep.loss_scope" class="hint">Sweep scope: {{ results.sweep.loss_scope }}. {{ results.sweep.voltage_law_note }}</p>
+          <p v-if="results.sweep.voltage_law_residual_values_v" class="hint">Hover a point to inspect its averaged volt-second residual on the right-hand axis.</p>
           <div class="chart-container"><canvas ref="sweepCanvas" role="img" :aria-label="`${results.sweep.metric} vs ${results.sweep.x_axis}`"></canvas></div>
         </div>
         <div v-if="results.sweep?.kind === 'contour'" class="charts-section">
           <h4>{{ results.sweep.metric }} contour</h4>
+          <p v-if="results.sweep.loss_scope" class="hint">Sweep scope: {{ results.sweep.loss_scope }}. {{ results.sweep.voltage_law_note }}</p>
           <div class="contour-scroll"><div class="contour-grid" role="img" :aria-label="`${results.sweep.metric} contour plot`" :style="{ gridTemplateColumns: `repeat(${results.sweep.x_values.length}, minmax(18px, 1fr))` }">
             <span v-for="cell in contourCells" :key="cell.key" :title="cell.title" :style="{ backgroundColor: cell.color }"></span>
           </div></div>
@@ -325,7 +329,7 @@ const contourCells = computed(() => {
     return {
       key: `${yIndex}-${xIndex}`,
       color: `hsl(${hue}, 78%, 53%)`,
-      title: `x=${sweep.x_values[xIndex]} ${sweep.x_unit}; y=${sweep.y_values[yIndex]} ${sweep.y_unit}; ${sweep.metric}=${value} ${sweep.metric_unit}`
+      title: `x=${sweep.x_values[xIndex]} ${sweep.x_unit}; y=${sweep.y_values[yIndex]} ${sweep.y_unit}; ${sweep.metric}=${value} ${sweep.metric_unit}${sweep.voltage_law_residual_values_v ? `; inductor_volt_second_residual=${sweep.voltage_law_residual_values_v[yIndex][xIndex]} V` : ''}`
     }
   }))
 })
@@ -385,7 +389,7 @@ function buildPayload(includeSweep = true) {
     v_g_off: form.mode === 'detailed' ? optionalNumber(form.v_g_off) : undefined,
     r_g_on: form.mode === 'detailed' ? optionalNumber(form.r_g_on) : undefined,
     r_g_off: form.mode === 'detailed' ? optionalNumber(form.r_g_off) : undefined,
-    ...(includeSweep && form.mode !== 'loss-balanced' && buildSweep() ? { sweep: buildSweep() } : {})
+    ...(includeSweep && buildSweep() ? { sweep: buildSweep() } : {})
   }
 }
 async function calculate() {
@@ -454,16 +458,31 @@ async function renderCharts() {
   }
   if (results.value?.sweep?.kind === 'line' && sweepCanvas.value) {
     const sweep = results.value.sweep
+    const datasets = [{
+      label: `${sweep.metric} (${sweep.metric_unit})`, data: sweep.values,
+      borderColor: '#198754', pointRadius: 2, borderWidth: 2
+    }]
+    const scales = {
+      x: { title: { display: true, text: `${sweep.x_axis} (${sweep.x_unit})` } },
+      y: { title: { display: true, text: `${sweep.metric} (${sweep.metric_unit})` } }
+    }
+    if (sweep.voltage_law_residual_values_v) {
+      datasets.push({
+        label: 'Inductor volt-second residual (V)',
+        data: sweep.voltage_law_residual_values_v,
+        borderColor: '#dc3545', pointRadius: 2, borderWidth: 2,
+        yAxisID: 'residual'
+      })
+      scales.residual = {
+        type: 'linear', position: 'right',
+        title: { display: true, text: 'Volt-second residual (V)' },
+        grid: { drawOnChartArea: false }
+      }
+    }
     sweepChart = new Chart(sweepCanvas.value, {
       type: 'line',
-      data: { labels: sweep.x_values, datasets: [{
-        label: `${sweep.metric} (${sweep.metric_unit})`, data: sweep.values,
-        borderColor: '#198754', pointRadius: 2, borderWidth: 2
-      }] },
-      options: { responsive: true, plugins: { legend: { display: true } }, scales: {
-        x: { title: { display: true, text: `${sweep.x_axis} (${sweep.x_unit})` } },
-        y: { title: { display: true, text: `${sweep.metric} (${sweep.metric_unit})` } }
-      } }
+      data: { labels: sweep.x_values, datasets },
+      options: { responsive: true, plugins: { legend: { display: true } }, scales }
     })
   }
 }
@@ -516,9 +535,6 @@ function invalidateResults() {
   destroyCharts()
 }
 watch([form, selectedTopology], invalidateResults, { deep: true })
-watch(() => form.mode, mode => {
-  if (mode === 'loss-balanced') form.sweep_enabled = false
-})
 watch(() => form.x_axis, axis => {
   if (form.y_axis === axis) form.y_axis = axes.find(item => item.id !== axis)?.id || 'v_in'
 })
