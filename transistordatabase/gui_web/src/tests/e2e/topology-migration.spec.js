@@ -243,6 +243,90 @@ test.describe('topology migration browser workflow', () => {
     expect(exported.result.calculated.power_balance_residual_w).toBe(2e-10)
   })
 
+  test('submits and exports inverting Buck-Boost DCM channel feedback', async ({ page }) => {
+    await page.route('**/api/transistors', route => route.fulfill({ json: [
+      { metadata: { name: 'Buck-Boost DCM Switch' } },
+      { metadata: { name: 'Buck-Boost DCM Diode' } }
+    ] }))
+    const response = topologyResult(null, 'loss-balanced')
+    response.topology = 'buck-boost'
+    response.model.conduction_regime = 'DCM'
+    response.model.output_polarity = -1
+    response.calculated = {
+      ...response.calculated,
+      duty_cycle: 0.21,
+      i_in_avg_a: 0.1,
+      i_out_avg_a: 0.2,
+      i_l_avg_a: 0.3,
+      i_l_peak_a: 0.7,
+      i_diode_avg_a: 0.2,
+      switch_conduction_fraction: 0.21,
+      diode_conduction_fraction: 0.4,
+      idle_fraction: 0.39,
+      inductor_volt_second_residual_v: 1e-10,
+      power_balance_residual_w: 2e-10,
+      v_out_signed_v: -50
+    }
+    response.losses = {
+      conduction_switch_w: 0.1,
+      conduction_diode_w: 0.4,
+      total_w: 0.5,
+      scope: 'included switch and diode channel conduction only',
+      loss_scope: 'channel_conduction_only'
+    }
+    response.performance = {
+      p_out_w: 10,
+      p_in_w: 10.5,
+      efficiency_percent: 95.24,
+      power_balance_residual_w: 2e-10
+    }
+    const capturedRequest = await mockTopologyCalculation(page, response)
+
+    await openTopology(page, 'Inverting buck-boost')
+    await expect(page.getByText(
+      'Scalar DCM feedback is supported for Buck, Boost, and inverting Buck-Boost; Flyback DCM feedback is unsupported.'
+    )).toBeVisible()
+    await page.locator('label.param-item').filter({ hasText: 'Calculation mode' }).locator('select').selectOption('loss-balanced')
+    await page.locator('label.param-item').filter({ hasText: 'Conduction regime' }).locator('select').selectOption('DCM')
+    await expect(page.locator('.sweep-toggle input')).toBeDisabled()
+    await expect(page.getByRole('button', { name: 'Compare topologies' })).toBeDisabled()
+    await page.locator('label.param-item').filter({ hasText: 'Switch transistor' }).locator('select').selectOption('Buck-Boost DCM Switch')
+    await page.locator('label.param-item').filter({ hasText: 'Diode transistor' }).locator('select').selectOption('Buck-Boost DCM Diode')
+    await setParameter(page, 'Input voltage', 100)
+    await setParameter(page, 'Output voltage magnitude', 50)
+    await setParameter(page, 'Output power', 10)
+    await setParameter(page, 'Switching frequency', 20)
+    await setParameter(page, 'Inductance', 1000)
+    await setParameter(page, 'Junction temperature', 25)
+    await setParameter(page, 'Switch gate voltage', 15)
+    await page.getByRole('button', { name: 'Calculate', exact: true }).click()
+
+    await expect(page.locator('.model-label')).toHaveText('Buck-Boost DCM TDB channel loss-balanced averaged model')
+    await expect(page.locator('.results-panel')).toContainText('Inverting buck-boost output')
+    await expect(page.locator('.results-panel')).toContainText('signed output voltage is -50.00 V')
+    await expect(page.locator('.result-item').filter({ hasText: 'Average input current (loss-balanced)' })).toContainText('0.100 A')
+    await expect(page.locator('.result-item').filter({ hasText: 'Average output current' })).toContainText('0.200 A')
+    await expect(page.locator('.result-item').filter({ hasText: 'Average inductor current' })).toContainText('0.300 A')
+    await expect(page.locator('.loss-item').filter({ hasText: 'Switch conduction' })).toContainText('0.100 W')
+    await expect(page.locator('.loss-item').filter({ hasText: 'Diode conduction' })).toContainText('0.400 W')
+    await expect(page.locator('.results-panel')).toContainText('Power-balance residual: 0.00000000 W')
+    await expect(page.locator('.results-panel')).toContainText('Averaged inductor volt-second residual: 0.00000000 V')
+    expect(capturedRequest()).toMatchObject({
+      topology: 'buck-boost', mode: 'loss-balanced', conduction_regime: 'DCM',
+      switch_transistor_id: 'Buck-Boost DCM Switch',
+      diode_transistor_id: 'Buck-Boost DCM Diode'
+    })
+
+    const downloadPromise = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Download JSON' }).click()
+    const exported = JSON.parse(await readFile(await (await downloadPromise).path(), 'utf8'))
+    expect(exported.request).toMatchObject({
+      topology: 'buck-boost', mode: 'loss-balanced', conduction_regime: 'DCM'
+    })
+    expect(exported.result.model.output_polarity).toBe(-1)
+    expect(exported.result.losses.loss_scope).toBe('channel_conduction_only')
+  })
+
   test('sends separate switch and diode selections in a curve-backed browser request', async ({ page }) => {
     await page.route('**/api/transistors', route => route.fulfill({ json: [
       { metadata: { name: 'Browser Switch MOSFET' } },

@@ -90,7 +90,7 @@
               </select>
             </label>
           </div>
-          <p class="hint">Estimate mode does not use device curves. Conduction-only mode requires exact-condition switch and diode channel curves. Detailed mode also requires exact-condition turn-on and turn-off curves. Loss-balanced mode requires exact-condition switch and diode channel curves. Buck and Boost support scalar DCM feedback; DCM feedback for other topologies and all curve extrapolation are rejected.</p>
+          <p class="hint">Estimate mode does not use device curves. Conduction-only mode requires exact-condition switch and diode channel curves. Detailed mode also requires exact-condition turn-on and turn-off curves. Loss-balanced mode requires exact-condition switch and diode channel curves. Scalar DCM feedback is supported for Buck, Boost, and inverting Buck-Boost; Flyback DCM feedback is unsupported. All curve extrapolation is rejected.</p>
         </div>
 
         <div v-if="form.mode !== 'estimate'" class="param-section">
@@ -122,10 +122,10 @@
 
         <div class="param-section">
           <h4>Python generated sweep</h4>
-          <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox"> Include line or contour sweep</label>
+          <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox" :disabled="lossBalancedDcm"> Include line or contour sweep</label>
           <p v-if="form.mode === 'loss-balanced'" class="hint">Loss-balanced sweeps solve each CCM point from exact-condition channel curves. Every point must be supported; no curve extrapolation is used.</p>
-          <p v-if="form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM'" class="hint">Loss-balanced sweeps support CCM only. Buck and Boost DCM feedback are available for scalar operating points.</p>
-          <div v-if="form.sweep_enabled" class="param-grid">
+          <p v-if="lossBalancedDcm" class="hint">Loss-balanced sweeps support CCM only. Buck, Boost, and Buck-Boost DCM feedback are available for scalar operating points.</p>
+          <div v-if="form.sweep_enabled && !lossBalancedDcm" class="param-grid">
             <label class="param-item">Sweep type
               <select v-model="form.sweep_kind"><option value="line">Line</option><option value="contour">Contour</option></select>
             </label>
@@ -167,7 +167,7 @@
         <button class="btn btn-secondary" type="button" :disabled="loading || (form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM')" @click="compare">Compare topologies</button>
         </div>
         <div v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</div>
-        <p v-if="form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM'" class="hint">Topology comparison is unavailable for loss-balanced DCM. Only scalar Buck or Boost DCM feedback is supported.</p>
+        <p v-if="lossBalancedDcm" class="hint">Topology comparison is unavailable for loss-balanced DCM. Only scalar Buck, Boost, and Buck-Boost DCM feedback is supported.</p>
       </section>
 
       <section v-if="hasResults" class="results-panel">
@@ -337,12 +337,19 @@ let requestSequence = 0
 const transistors = computed(() => props.transistors || [])
 const hasResults = computed(() => results.value !== null)
 const hasExportableResults = computed(() => hasResults.value || comparison.value !== null)
+const lossBalancedDcm = computed(() => (
+  form.mode === 'loss-balanced' && form.conduction_regime === 'DCM'
+))
+watch(lossBalancedDcm, unsupported => {
+  if (unsupported) form.sweep_enabled = false
+})
 const modelLabel = computed(() => {
   const mode = results.value?.model?.mode
   if (mode === 'loss-balanced') {
     const regime = results.value?.model?.conduction_regime || 'CCM'
-    const topology = ['buck', 'boost'].includes(results.value?.topology) && regime === 'DCM'
-      ? `${results.value.topology === 'buck' ? 'Buck' : 'Boost'} DCM`
+    const dcmNames = { buck: 'Buck', boost: 'Boost', 'buck-boost': 'Buck-Boost' }
+    const topology = dcmNames[results.value?.topology] && regime === 'DCM'
+      ? `${dcmNames[results.value.topology]} DCM`
       : regime
     return `${topology} TDB channel loss-balanced averaged model`
   }
@@ -436,7 +443,9 @@ function buildPayload(includeSweep = true) {
     v_g_off: form.mode === 'detailed' ? optionalNumber(form.v_g_off) : undefined,
     r_g_on: form.mode === 'detailed' ? optionalNumber(form.r_g_on) : undefined,
     r_g_off: form.mode === 'detailed' ? optionalNumber(form.r_g_off) : undefined,
-    ...(includeSweep && buildSweep() ? { sweep: buildSweep() } : {})
+    ...(includeSweep && !lossBalancedDcm.value && buildSweep()
+      ? { sweep: buildSweep() }
+      : {})
   }
 }
 async function calculate() {
