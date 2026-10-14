@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Web DPT measurement comparison**: Overlays selected stored raw measurements in separate turn-on/off Vds/Id plots, with per-record acquisition selectors, measurement conditions, and non-finite sample gaps.
 - **Web DPT raw waveform viewing**: Displays stored turn-on and turn-off Vds/Id samples by measurement and acquisition with available test conditions. Non-finite samples remain visible as chart gaps; no switching energy is derived.
 - **Web transistor curves**: Users can edit saved channel, switching-energy, gate-charge, SOA, and capacitance curves in place. Updates target the selected raw curve and preserve unrelated legacy data; stale edits are rejected when the curve changes after it was loaded. Saved curves also open in an in-app plot with displayed units, including gate-charge conversion from C to nC.
 

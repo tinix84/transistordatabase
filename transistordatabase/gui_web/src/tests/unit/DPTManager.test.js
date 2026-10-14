@@ -46,11 +46,29 @@ const dptResponse = {
       ]
     },
     {
-      metadata: { dataset_type: 'dpt_u_i_r', comment: 'Second raw record', t_j: 125 },
-      dpt_on_vds: [],
-      dpt_on_id: [],
-      dpt_off_vds: [[[0, 600], [2e-6, 580]]],
-      dpt_off_id: [[[0, 40], [2e-6, 35]]]
+      metadata: {
+        dataset_type: 'dpt_u_i_r', comment: 'Second raw record', t_j: 125, v_supply: 600
+      },
+      dpt_on_vds: [
+        [[0, 610], [2e-6, 300]],
+        [[0, 620], [3e-6, 280]],
+        [[0, 630], [4e-6, 270]]
+      ],
+      dpt_on_id: [
+        [[0, 0], [2e-6, 30]],
+        [[0, 0], [3e-6, 32]],
+        [[0, 0], [4e-6, 34]]
+      ],
+      dpt_off_vds: [
+        [[0, 600], [2e-6, 580]],
+        [[0, 620], [3e-6, 590]],
+        [[0, 630], [4e-6, 600]]
+      ],
+      dpt_off_id: [
+        [[0, 40], [2e-6, 35]],
+        [[0, 42], [3e-6, 36]],
+        [[0, 44], [4e-6, 38]]
+      ]
     }
   ]
 }
@@ -66,7 +84,7 @@ const CurvePlotterStub = {
       :data-y-label="yLabel"
     >
       <span>{{ title }}</span>
-      <output>{{ JSON.stringify(datasets[0].data) }}</output>
+      <output>{{ JSON.stringify(datasets) }}</output>
     </div>
   `
 }
@@ -110,7 +128,7 @@ describe('DPTManager raw waveform viewing', () => {
     )).toBe(true)
     const plottedSamples = JSON.parse(
       wrapper.find('.curve-plotter-stub[data-title="Turn-on Vds"] output').text()
-    )
+    )[0].data
     expect(plottedSamples[0].x).toBeCloseTo(-0.079605, 12)
     expect(plottedSamples[1].x).toBeCloseTo(-0.079445, 12)
     expect(plottedSamples[3].x).toBe(1)
@@ -133,10 +151,8 @@ describe('DPTManager raw waveform viewing', () => {
     expect(wrapper.text()).toContain('Junction temperature125 °C')
     expect(wrapper.find('.curve-plotter-stub[data-title="Turn-off Vds"]').text())
       .toContain('{"x":0,"y":600}')
-    expect(wrapper.find('[data-testid="dpt-waveform-on-vds"] [role="status"]').text())
-      .toContain('Turn-on Vds')
-    expect(wrapper.find('[data-testid="dpt-waveform-on-id"] [role="status"]').text())
-      .toContain('Turn-on Id')
+    expect(wrapper.find('.curve-plotter-stub[data-title="Turn-on Vds"]').exists()).toBe(true)
+    expect(wrapper.find('.curve-plotter-stub[data-title="Turn-on Id"]').exists()).toBe(true)
   })
 
   it('shows a clear empty state when no raw records are returned', async () => {
@@ -152,6 +168,70 @@ describe('DPTManager raw waveform viewing', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('No raw DPT waveform measurements are stored')
+  })
+
+  it('overlays selected records with independent acquisitions, conditions and gaps', async () => {
+    await wrapper.get('[data-testid="dpt-compare-toggle"]').trigger('click')
+
+    expect(wrapper.find('[data-testid="dpt-compare-record-0"]').element.checked).toBe(true)
+    expect(wrapper.find('[data-testid="dpt-compare-record-1"]').element.checked).toBe(true)
+    expect(wrapper.find('[data-testid="dpt-comparison-record-0"]').text())
+      .toContain('Junction temperature25 °C')
+    expect(wrapper.find('[data-testid="dpt-comparison-record-1"]').text())
+      .toContain('Junction temperature125 °C')
+    expect(wrapper.find('[data-testid="dpt-comparison-record-1"]').text())
+      .toContain('Supply voltage600 V')
+    expect(wrapper.find('[data-testid="dpt-comparison-acquisition-0"]').findAll('option'))
+      .toHaveLength(2)
+    expect(wrapper.find('[data-testid="dpt-comparison-acquisition-1"]').findAll('option'))
+      .toHaveLength(3)
+
+    await wrapper.get('[data-testid="dpt-comparison-acquisition-0"]').setValue('1')
+    await wrapper.get('[data-testid="dpt-comparison-acquisition-1"]').setValue('2')
+
+    const onVds = JSON.parse(
+      wrapper.find('[data-testid="dpt-waveform-on-vds"] output').text()
+    )
+    expect(onVds).toHaveLength(2)
+    expect(onVds[0].label).toContain('First raw acquisition set · Acquisition 2')
+    expect(onVds[0].data[1]).toEqual({ x: 1, y: 200 })
+    expect(onVds[1].label).toContain('Second raw record · Acquisition 3')
+    expect(onVds[1].data[1]).toEqual({ x: 4, y: 270 })
+    const onId = JSON.parse(
+      wrapper.find('[data-testid="dpt-waveform-on-id"] output').text()
+    )
+    expect(onId).toHaveLength(2)
+    expect(onId[0].data[1]).toEqual({ x: 1, y: 22 })
+    const offVds = JSON.parse(
+      wrapper.find('[data-testid="dpt-waveform-off-vds"] output').text()
+    )
+    expect(offVds).toHaveLength(1)
+    expect(offVds[0].data[1]).toEqual({ x: 4, y: 600 })
+
+    await wrapper.get('[data-testid="dpt-comparison-acquisition-0"]').setValue('0')
+    const offId = JSON.parse(
+      wrapper.find('[data-testid="dpt-waveform-off-id"] output').text()
+    )
+    expect(offId[0].data[0]).toEqual({ x: 0, y: null })
+    expect(offId[1].data[0]).toEqual({ x: 0, y: 44 })
+    expect(wrapper.find('[data-testid="dpt-waveform-off-vds"]').text())
+      .toContain('No Turn-off Vds samples for: Measurement 1 · dpt_u_i · First raw acquisition set · Acquisition 1')
+    expect(wrapper.findAll('.curve-plotter-stub').every(
+      chart => chart.attributes('data-x-decimals') === '6'
+    )).toBe(true)
+  })
+
+  it('requires two selected records and returns to the existing single-record viewer', async () => {
+    await wrapper.get('[data-testid="dpt-compare-toggle"]').trigger('click')
+    await wrapper.get('[data-testid="dpt-compare-record-1"]').setValue(false)
+
+    expect(wrapper.get('[data-testid="dpt-comparison-selection-status"]').text())
+      .toContain('Select at least two stored measurements')
+    expect(wrapper.findAll('.waveform-panel')).toHaveLength(0)
+
+    await wrapper.get('[data-testid="dpt-compare-toggle"]').trigger('click')
+    expect(wrapper.find('[data-testid="dpt-measurement-select"]').exists()).toBe(true)
+    expect(wrapper.find('.curve-plotter-stub[data-title="Turn-on Vds"]').exists()).toBe(true)
   })
 
   it('keeps the existing netlist and validation tabs available', async () => {

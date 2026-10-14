@@ -111,7 +111,7 @@
             </div>
 
             <template v-else>
-              <div class="waveform-selectors">
+              <div class="waveform-selectors" v-if="!comparisonMode">
                 <label for="dpt-measurement-select">Measurement record:</label>
                 <select
                   id="dpt-measurement-select"
@@ -127,9 +127,107 @@
                     {{ measurementLabel(measurement, index) }}
                   </option>
                 </select>
+                <button
+                  v-if="rawMeasurementRecords.length > 1"
+                  class="btn-compare-waveforms"
+                  data-testid="dpt-compare-toggle"
+                  type="button"
+                  @click="toggleComparisonMode"
+                >
+                  Compare measurements
+                </button>
               </div>
 
-              <div v-if="selectedMeasurement" class="raw-measurement-details">
+              <div v-if="comparisonMode" class="dpt-comparison-controls">
+                <div class="comparison-record-selector">
+                  <div class="comparison-selector-heading">
+                    <h5>Choose measurements to compare</h5>
+                    <button
+                      class="btn-compare-waveforms"
+                      data-testid="dpt-compare-toggle"
+                      type="button"
+                      @click="toggleComparisonMode"
+                    >
+                      Return to one measurement
+                    </button>
+                  </div>
+                  <label
+                    v-for="(measurement, index) in rawMeasurementRecords"
+                    :key="index"
+                    class="comparison-record-option"
+                  >
+                    <input
+                      type="checkbox"
+                      :data-testid="`dpt-compare-record-${index}`"
+                      :checked="selectedComparisonIndices.includes(index)"
+                      @change="toggleComparisonRecord(index)"
+                    />
+                    <span>{{ measurementLabel(measurement, index) }}</span>
+                  </label>
+                </div>
+
+                <div
+                  v-if="comparisonRecords.length < 2"
+                  class="no-data"
+                  data-testid="dpt-comparison-selection-status"
+                  role="status"
+                >
+                  Select at least two stored measurements to compare.
+                </div>
+
+                <div v-else class="comparison-record-details">
+                  <section
+                    v-for="record in comparisonRecords"
+                    :key="record.index"
+                    class="comparison-record-card"
+                    :data-testid="`dpt-comparison-record-${record.index}`"
+                  >
+                    <div class="comparison-record-heading">
+                      <span
+                        class="comparison-record-swatch"
+                        :style="{ backgroundColor: comparisonColor(record.index) }"
+                        aria-hidden="true"
+                      ></span>
+                      <h5>{{ record.label }}</h5>
+                    </div>
+                    <div v-if="record.acquisitionCount > 1" class="acquisition-selector">
+                      <label :for="`dpt-comparison-acquisition-${record.index}`">
+                        Acquisition for {{ record.label }}:
+                      </label>
+                      <select
+                        :id="`dpt-comparison-acquisition-${record.index}`"
+                        :data-testid="`dpt-comparison-acquisition-${record.index}`"
+                        v-model.number="comparisonAcquisitionIndices[record.index]"
+                      >
+                        <option
+                          v-for="acquisitionIndex in record.acquisitionCount"
+                          :key="acquisitionIndex - 1"
+                          :value="acquisitionIndex - 1"
+                        >
+                          Acquisition {{ acquisitionIndex }}
+                        </option>
+                      </select>
+                    </div>
+                    <p v-else-if="record.acquisitionCount === 1" class="single-acquisition-note">
+                      Acquisition 1
+                    </p>
+                    <p v-else class="no-data" role="status">
+                      No acquisitions are available for this measurement.
+                    </p>
+                    <dl v-if="record.conditions.length" class="comparison-conditions">
+                      <div v-for="condition in record.conditions" :key="condition.label">
+                        <dt>{{ condition.label }}</dt>
+                        <dd>{{ condition.value }}</dd>
+                      </div>
+                    </dl>
+                  </section>
+                </div>
+              </div>
+
+              <div
+                v-if="!comparisonMode && selectedMeasurement"
+                class="raw-measurement-details"
+              >
                 <div v-if="measurementConditions.length" class="measurement-conditions">
                   <h5>Test conditions</h5>
                   <dl>
@@ -160,9 +258,14 @@
                   No acquisitions are available for this measurement.
                 </div>
 
-                <div v-if="acquisitionCount > 0" class="waveform-grid">
+              </div>
+
+              <div
+                v-if="comparisonMode ? comparisonRecords.length >= 2 : acquisitionCount > 0"
+                class="waveform-grid"
+              >
                   <section
-                    v-for="plot in waveformPlots"
+                    v-for="plot in activeWaveformPlots"
                     :key="plot.key"
                     class="waveform-panel"
                     :data-testid="`dpt-waveform-${plot.key}`"
@@ -170,20 +273,26 @@
                     <CurvePlotter
                       v-if="plot.hasNumericPoints"
                       :title="plot.title"
-                      :datasets="[{ label: plot.title, data: plot.data, borderColor: plot.color }]"
+                      :datasets="plot.datasets"
                       x-label="Time [µs]"
                       :x-value-decimals="6"
                       :y-label="plot.yLabel"
-                      :show-legend="false"
+                      :show-legend="comparisonMode"
                     />
                     <div v-else class="no-data" role="status">
-                      No finite samples are available for {{ plot.title }} in this acquisition.
+                      No finite samples are available for {{ plot.title }}.
+                    </div>
+                    <div
+                      v-if="plot.missingLabels.length"
+                      class="missing-comparison-traces"
+                      role="status"
+                    >
+                      No {{ plot.title }} samples for: {{ plot.missingLabels.join('; ') }}.
                     </div>
                     <p v-if="plot.hasNonFiniteSamples" class="waveform-gap-note">
                       Non-finite raw samples are preserved and shown as gaps.
                     </p>
                   </section>
-                </div>
               </div>
             </template>
           </section>
@@ -372,6 +481,9 @@ export default {
     const dptData = ref(null)
     const selectedMeasurementIndex = ref(0)
     const selectedAcquisitionIndex = ref(0)
+    const comparisonMode = ref(false)
+    const selectedComparisonIndices = ref([])
+    const comparisonAcquisitionIndices = ref({})
     const generating = ref(false)
     const validating = ref(false)
     const error = ref(null)
@@ -399,17 +511,19 @@ export default {
     const selectedMeasurement = computed(() => (
       rawMeasurementRecords.value[selectedMeasurementIndex.value] || null
     ))
-    const acquisitionCount = computed(() => {
-      const measurement = selectedMeasurement.value
+    function getAcquisitionCount(measurement) {
       if (!measurement) return 0
       return Math.max(
         0,
         ...['dpt_on_vds', 'dpt_on_id', 'dpt_off_vds', 'dpt_off_id']
           .map(field => Array.isArray(measurement[field]) ? measurement[field].length : 0)
       )
+    }
+    const acquisitionCount = computed(() => {
+      return getAcquisitionCount(selectedMeasurement.value)
     })
-    const measurementConditions = computed(() => {
-      const metadata = selectedMeasurement.value?.metadata || {}
+    function conditionsForMeasurement(measurement) {
+      const metadata = measurement?.metadata || {}
       const definitions = [
         ['dataset_type', 'Dataset type', ''],
         ['t_j', 'Junction temperature', '°C'],
@@ -431,7 +545,30 @@ export default {
         const formatted = Array.isArray(value) ? value.join(', ') : String(value)
         return [{ label, value: unit ? `${formatted} ${unit}` : formatted }]
       })
-    })
+    }
+    const measurementConditions = computed(() => (
+      conditionsForMeasurement(selectedMeasurement.value)
+    ))
+    const comparisonRecords = computed(() => (
+      selectedComparisonIndices.value
+        .filter(index => rawMeasurementRecords.value[index])
+        .map(index => {
+          const measurement = rawMeasurementRecords.value[index]
+          const count = getAcquisitionCount(measurement)
+          const requestedAcquisition = Number(comparisonAcquisitionIndices.value[index] || 0)
+          const acquisitionIndex = count > 0
+            ? Math.min(Math.max(0, requestedAcquisition), count - 1)
+            : 0
+          return {
+            index,
+            measurement,
+            label: measurementLabel(measurement, index),
+            conditions: conditionsForMeasurement(measurement),
+            acquisitionCount: count,
+            acquisitionIndex,
+          }
+        })
+    ))
     const waveformPlots = computed(() => {
       const measurement = selectedMeasurement.value
       if (!measurement) return []
@@ -460,19 +597,124 @@ export default {
         }
         return {
           ...plot,
-          data,
+          datasets: [{
+            label: plot.title,
+            data,
+            borderColor: plot.color,
+          }],
           hasNumericPoints: data.some(point => point.y !== null),
           hasNonFiniteSamples,
+          missingLabels: [],
         }
       })
     })
+
+    const comparisonWaveformPlots = computed(() => {
+      const plots = [
+        { key: 'on-vds', field: 'dpt_on_vds', title: 'Turn-on Vds', yLabel: 'Vds [V]' },
+        { key: 'on-id', field: 'dpt_on_id', title: 'Turn-on Id', yLabel: 'Id [A]' },
+        { key: 'off-vds', field: 'dpt_off_vds', title: 'Turn-off Vds', yLabel: 'Vds [V]' },
+        { key: 'off-id', field: 'dpt_off_id', title: 'Turn-off Id', yLabel: 'Id [A]' },
+      ]
+      const colors = ['#2563eb', '#dc2626', '#7c3aed', '#ea580c', '#059669', '#9333ea']
+      return plots.map(plot => {
+        const datasets = []
+        const missingLabels = []
+        let hasNonFiniteSamples = false
+        for (const record of comparisonRecords.value) {
+          const acquisitions = record.measurement[plot.field]
+          const samples = Array.isArray(acquisitions)
+            ? acquisitions[record.acquisitionIndex]
+            : null
+          const traceLabel = `${record.label} · Acquisition ${record.acquisitionIndex + 1}`
+          if (!Array.isArray(samples) || samples.length === 0) {
+            missingLabels.push(traceLabel)
+            continue
+          }
+          const data = []
+          for (const sample of samples) {
+            if (!Array.isArray(sample) || sample.length < 2) continue
+            const [time, value] = sample
+            if (typeof time !== 'number' || !Number.isFinite(time)) continue
+            const finiteValue = typeof value === 'number' && Number.isFinite(value)
+            if (!finiteValue) hasNonFiniteSamples = true
+            data.push({ x: time * 1e6, y: finiteValue ? value : null })
+          }
+          if (data.length === 0) {
+            missingLabels.push(`${traceLabel} (no finite timestamps)`)
+            continue
+          }
+          datasets.push({
+            label: traceLabel,
+            data,
+            borderColor: colors[record.index % colors.length],
+          })
+        }
+        return {
+          ...plot,
+          datasets,
+          hasNumericPoints: datasets.some(dataset => (
+            dataset.data.some(point => point.y !== null)
+          )),
+          hasNonFiniteSamples,
+          missingLabels,
+        }
+      })
+    })
+    const activeWaveformPlots = computed(() => (
+      comparisonMode.value ? comparisonWaveformPlots.value : waveformPlots.value
+    ))
 
     function measurementLabel(measurement, index) {
       const metadata = measurement?.metadata || {}
       const label = [metadata.dataset_type, metadata.comment]
         .filter(value => value !== null && value !== undefined && value !== '')
         .join(' · ')
-      return label || `Measurement ${index + 1}`
+      return label
+        ? `Measurement ${index + 1} · ${label}`
+        : `Measurement ${index + 1}`
+    }
+
+    function toggleComparisonMode() {
+      comparisonMode.value = !comparisonMode.value
+      if (comparisonMode.value) {
+        const firstIndex = selectedMeasurementIndex.value
+        const secondIndex = rawMeasurementRecords.value.findIndex(
+          (_measurement, index) => index !== firstIndex
+        )
+        selectedComparisonIndices.value = secondIndex >= 0
+          ? [firstIndex, secondIndex]
+          : [firstIndex]
+        comparisonAcquisitionIndices.value = Object.fromEntries(
+          selectedComparisonIndices.value.map(index => [index, 0])
+        )
+      }
+    }
+
+    function toggleComparisonRecord(index) {
+      if (selectedComparisonIndices.value.includes(index)) {
+        selectedComparisonIndices.value = selectedComparisonIndices.value.filter(
+          selectedIndex => selectedIndex !== index
+        )
+        const nextAcquisitions = { ...comparisonAcquisitionIndices.value }
+        delete nextAcquisitions[index]
+        comparisonAcquisitionIndices.value = nextAcquisitions
+      } else {
+        selectedComparisonIndices.value = [
+          ...selectedComparisonIndices.value,
+          index,
+        ].sort((left, right) => left - right)
+        comparisonAcquisitionIndices.value = {
+          ...comparisonAcquisitionIndices.value,
+          [index]: 0,
+        }
+      }
+    }
+
+    function comparisonColor(index) {
+      return ['#2563eb', '#dc2626', '#7c3aed', '#ea580c', '#059669', '#9333ea'][
+        index % 6
+      ]
     }
 
     onMounted(async () => {
@@ -495,6 +737,9 @@ export default {
         dptData.value = await transistorApi.getDPTData(selectedTransistorId.value)
         selectedMeasurementIndex.value = 0
         selectedAcquisitionIndex.value = 0
+        comparisonMode.value = false
+        selectedComparisonIndices.value = []
+        comparisonAcquisitionIndices.value = {}
       } catch (err) {
         error.value = 'Failed to load DPT data'
         dptData.value = null
@@ -563,9 +808,17 @@ export default {
       selectedMeasurement,
       selectedMeasurementIndex,
       selectedAcquisitionIndex,
+      comparisonMode,
+      selectedComparisonIndices,
+      comparisonRecords,
+      comparisonAcquisitionIndices,
+      toggleComparisonMode,
+      toggleComparisonRecord,
+      comparisonColor,
       acquisitionCount,
       measurementConditions,
       waveformPlots,
+      activeWaveformPlots,
       measurementLabel,
       dptConfig,
       generating,
@@ -769,6 +1022,117 @@ h2 {
   border: 1px solid #b8c2cc;
   border-radius: 4px;
   background: white;
+}
+
+.btn-compare-waveforms {
+  padding: 8px 12px;
+  border: 1px solid #2563eb;
+  border-radius: 4px;
+  color: #1d4ed8;
+  background: white;
+  cursor: pointer;
+}
+
+.btn-compare-waveforms:hover {
+  background: #eff6ff;
+}
+
+.dpt-comparison-controls {
+  margin-top: 18px;
+}
+
+.comparison-record-selector {
+  padding: 16px;
+  border: 1px solid #dbe3eb;
+  border-radius: 6px;
+  background: white;
+}
+
+.comparison-selector-heading,
+.comparison-record-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.comparison-selector-heading h5,
+.comparison-record-heading h5 {
+  margin: 0;
+}
+
+.comparison-record-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.comparison-record-option input {
+  width: 16px;
+  height: 16px;
+}
+
+.comparison-record-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.comparison-record-card {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid #dbe3eb;
+  border-radius: 6px;
+  background: white;
+}
+
+.comparison-record-heading {
+  justify-content: flex-start;
+  margin-bottom: 12px;
+}
+
+.comparison-record-swatch {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  border-radius: 50%;
+}
+
+.comparison-record-card .acquisition-selector {
+  margin: 10px 0;
+}
+
+.comparison-conditions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 6px 12px;
+  margin: 12px 0 0;
+}
+
+.comparison-conditions > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.comparison-conditions dt {
+  font-weight: 600;
+}
+
+.comparison-conditions dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.single-acquisition-note,
+.missing-comparison-traces {
+  margin: 10px 0;
+  color: #5b6573;
+  font-size: 14px;
 }
 
 .measurement-conditions {
