@@ -59,7 +59,8 @@ class TopologyCalculatorService:
         ):
             raise ValueError(
                 "Topology comparison does not support loss-balanced DCM; "
-                "only scalar Buck or Boost DCM operating points are supported"
+                "only scalar Buck, Boost, or Buck-Boost DCM operating points "
+                "are supported"
             )
         results: Dict[str, Any] = {}
         for topology in TopologyCalculatorService.SUPPORTED_TOPOLOGIES:

@@ -204,7 +204,7 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Averaged inductor volt-second residual: 0.00000000 V')
     const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
     expect(comparisonButton.element.disabled).toBe(true)
-    expect(wrapper.text()).toContain('Only scalar Buck or Boost DCM feedback is supported')
+    expect(wrapper.text()).toContain('Only scalar Buck, Boost, and Buck-Boost DCM feedback is supported')
   })
 
   it('runs scalar Buck DCM loss-balanced mode and displays its solved metrics', async () => {
@@ -255,7 +255,75 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Averaged inductor volt-second residual: 0.00000000 V')
     const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
     expect(comparisonButton.element.disabled).toBe(true)
-    expect(wrapper.text()).toContain('Only scalar Buck or Boost DCM feedback is supported')
+    expect(wrapper.text()).toContain('Only scalar Buck, Boost, and Buck-Boost DCM feedback is supported')
+  })
+
+  it('runs scalar inverting Buck-Boost DCM and disables sweep/comparison', async () => {
+    calculateTopology.mockResolvedValueOnce({
+      ...estimateResponse,
+      topology: 'buck-boost',
+      calculated: {
+        ...estimateResponse.calculated,
+        duty_cycle: 0.21,
+        i_in_avg_a: 0.1,
+        i_out_avg_a: 0.2,
+        i_l_avg_a: 0.3,
+        i_l_peak_a: 0.7,
+        i_diode_avg_a: 0.2,
+        switch_conduction_fraction: 0.21,
+        diode_conduction_fraction: 0.4,
+        idle_fraction: 0.39,
+        inductor_volt_second_residual_v: 1e-10,
+        power_balance_residual_w: 2e-10,
+        v_out_signed_v: -50
+      },
+      model: {
+        ...estimateResponse.model,
+        mode: 'loss-balanced',
+        conduction_regime: 'DCM',
+        output_polarity: -1
+      },
+      losses: {
+        conduction_switch_w: 0.1,
+        conduction_diode_w: 0.4,
+        total_w: 0.5,
+        scope: 'switch and diode channel conduction only',
+        loss_scope: 'channel_conduction_only'
+      },
+      performance: {
+        p_out_w: 10,
+        p_in_w: 10.5,
+        efficiency_percent: 95.24,
+        power_balance_residual_w: 2e-10
+      }
+    })
+    await wrapper.findAll('button.topology-card').find(button => button.text().includes('Inverting buck-boost')).trigger('click')
+    await setSelect('Calculation mode', 'loss-balanced')
+    await setSelect('Conduction regime', 'DCM')
+    expect(wrapper.text()).toContain(
+      'Scalar DCM feedback is supported for Buck, Boost, and inverting Buck-Boost; Flyback DCM feedback is unsupported.'
+    )
+
+    const sweepToggle = wrapper.find('.sweep-toggle input')
+    expect(sweepToggle.element.disabled).toBe(true)
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+
+    expect(calculateTopology.mock.calls[0][0]).toMatchObject({
+      topology: 'buck-boost', mode: 'loss-balanced', conduction_regime: 'DCM'
+    })
+    expect(wrapper.text()).toContain('Buck-Boost DCM TDB channel loss-balanced averaged model')
+    expect(wrapper.text()).toContain('Inverting buck-boost output')
+    expect(wrapper.text()).toContain('-50.00 V')
+    expect(wrapper.text()).toContain('0.100 A')
+    expect(wrapper.text()).toContain('0.200 A')
+    expect(wrapper.text()).toContain('0.300 A')
+    expect(wrapper.findAll('.loss-item').find(item => item.text().includes('Switch conduction')).text()).toContain('0.100 W')
+    expect(wrapper.findAll('.loss-item').find(item => item.text().includes('Diode conduction')).text()).toContain('0.400 W')
+    expect(wrapper.text()).toContain('Power-balance residual: 0.00000000 W')
+    expect(wrapper.text()).toContain('Averaged inductor volt-second residual: 0.00000000 V')
+    const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
+    expect(comparisonButton.element.disabled).toBe(true)
   })
 
   it('shows backend validation errors instead of stale results', async () => {

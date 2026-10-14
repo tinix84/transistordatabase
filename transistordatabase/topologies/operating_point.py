@@ -617,13 +617,13 @@ def _loss_balanced_channel_dcm_operating_point(
     parallel_switches: int,
     parallel_diodes: int,
 ) -> dict[str, Any]:
-    """Solve Buck or Boost DCM from exact channel curves.
+    """Solve Buck, Boost, or inverting Buck-Boost DCM from exact curves.
 
     Integrate each current ramp with its measured current-dependent inductor
     voltage. The peak current is solved against output charge per period; input
     charge and channel energy use the same trajectory, so both balances are
     independently reported. Buck delivers output current during both ramps;
-    Boost delivers output current during the diode ramp only.
+    Boost and inverting Buck-Boost deliver output current during the diode ramp.
     """
     v_in = _finite_positive(parameters, "v_in")
     v_out = _finite_positive(parameters, "v_out")
@@ -638,8 +638,12 @@ def _loss_balanced_channel_dcm_operating_point(
         if v_out <= v_in:
             raise ValueError("Boost DCM requires v_out > v_in > 0")
         on_voltage_base = v_in
+    elif topology == "buck-boost":
+        on_voltage_base = v_in
     else:
-        raise ValueError("Channel-feedback DCM supports Buck and Boost only")
+        raise ValueError(
+            "Channel-feedback DCM supports Buck, Boost, and Buck-Boost only"
+        )
 
     switch_i, switch_v = _curve_arrays(switch_curve, "switch channel")
     diode_i, diode_v = _curve_arrays(diode_curve, "diode channel")
@@ -711,7 +715,11 @@ def _loss_balanced_channel_dcm_operating_point(
         off_voltage = (
             v_out + diode_drop
             if topology == "buck"
-            else v_out - v_in + diode_drop
+            else (
+                v_out - v_in + diode_drop
+                if topology == "boost"
+                else v_out + diode_drop
+            )
         )
         if np.any(on_voltage <= 0):
             bad = float(current[np.flatnonzero(on_voltage <= 0)[0]])
@@ -743,7 +751,7 @@ def _loss_balanced_channel_dcm_operating_point(
         occupied = duty + diode_fraction
         input_current = (
             charge_on / period
-            if topology == "buck"
+            if topology in ("buck", "buck-boost")
             else (charge_on + charge_diode) / period
         )
         diode_current = charge_diode / period
@@ -751,6 +759,11 @@ def _loss_balanced_channel_dcm_operating_point(
             (charge_on + charge_diode) / period
             if topology == "buck"
             else diode_current
+        )
+        inductor_average = (
+            (charge_on + charge_diode) / period
+            if topology == "buck-boost"
+            else output_current if topology == "buck" else input_current
         )
         switch_loss = switch_energy / period
         diode_loss = diode_energy / period
@@ -761,10 +774,15 @@ def _loss_balanced_channel_dcm_operating_point(
                 duty * (v_in - v_out - switch_mean)
                 + diode_fraction * (-v_out - diode_mean)
             )
-        else:
+        elif topology == "boost":
             volt_second_residual = (
                 duty * (v_in - switch_mean)
                 + diode_fraction * (v_in - v_out - diode_mean)
+            )
+        else:
+            volt_second_residual = (
+                duty * (v_in - switch_mean)
+                + diode_fraction * (-v_out - diode_mean)
             )
         return {
             "peak": peak,
@@ -772,9 +790,7 @@ def _loss_balanced_channel_dcm_operating_point(
             "diode_fraction": diode_fraction,
             "idle_fraction": 1.0 - occupied,
             "occupied": occupied,
-            "average_current": (
-                output_current if topology == "buck" else input_current
-            ),
+            "average_current": inductor_average,
             "input_current": input_current,
             "output_current": output_current,
             "diode_current": diode_current,
@@ -1092,10 +1108,11 @@ def calculate_topology_operating_point(
     if (
         mode == "loss-balanced"
         and conduction_regime == "DCM"
-        and topology not in ("buck", "boost")
+        and topology not in ("buck", "boost", "buck-boost")
     ):
         raise ValueError(
-            "loss-balanced DCM currently supports scalar Buck and Boost only; "
+            "loss-balanced DCM currently supports scalar Buck, Boost, and "
+            "Buck-Boost only; "
             "use explicit "
             "estimate, conduction-only, or detailed mode for this topology"
         )
@@ -1226,7 +1243,7 @@ def calculate_topology_operating_point(
         occupied_fraction = duty + diode_fraction
         loss_balanced_channel_dcm = (
             mode == "loss-balanced"
-            and topology in ("buck", "boost")
+            and topology in ("buck", "boost", "buck-boost")
             and conduction_regime == "DCM"
         )
         if (
@@ -1263,7 +1280,8 @@ def calculate_topology_operating_point(
     if conduction_regime == "DCM":
         v_ripple = (
             0.0
-            if mode == "loss-balanced" and topology in ("buck", "boost")
+            if mode == "loss-balanced"
+            and topology in ("buck", "boost", "buck-boost")
             else _dcm_output_ripple(
                 topology,
                 duty,
