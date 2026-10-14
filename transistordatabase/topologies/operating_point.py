@@ -608,7 +608,8 @@ def _loss_balanced_ccm_operating_point(
     raise no_supported_solution(boundary_error) from boundary_error
 
 
-def _loss_balanced_boost_dcm_operating_point(
+def _loss_balanced_channel_dcm_operating_point(
+    topology: str,
     parameters: Mapping[str, Any],
     switch_curve: ChannelCharacteristics,
     diode_curve: ChannelCharacteristics,
@@ -616,20 +617,29 @@ def _loss_balanced_boost_dcm_operating_point(
     parallel_switches: int,
     parallel_diodes: int,
 ) -> dict[str, Any]:
-    """Solve Boost DCM from exact channel curves with volt-second closure.
+    """Solve Buck or Boost DCM from exact channel curves.
 
     Integrate each current ramp with its measured current-dependent inductor
     voltage. The peak current is solved against output charge per period; input
     charge and channel energy use the same trajectory, so both balances are
-    independently reported.
+    independently reported. Buck delivers output current during both ramps;
+    Boost delivers output current during the diode ramp only.
     """
     v_in = _finite_positive(parameters, "v_in")
     v_out = _finite_positive(parameters, "v_out")
     p_out = _finite_positive(parameters, "p_out")
     f_sw = _finite_positive(parameters, "f_sw")
     l_value = _finite_positive(parameters, "l_value")
-    if v_out <= v_in:
-        raise ValueError("Boost DCM requires v_out > v_in > 0")
+    if topology == "buck":
+        if v_out >= v_in:
+            raise ValueError("Buck DCM requires 0 < v_out < v_in")
+        on_voltage_base = v_in - v_out
+    elif topology == "boost":
+        if v_out <= v_in:
+            raise ValueError("Boost DCM requires v_out > v_in > 0")
+        on_voltage_base = v_in
+    else:
+        raise ValueError("Channel-feedback DCM supports Buck and Boost only")
 
     switch_i, switch_v = _curve_arrays(switch_curve, "switch channel")
     diode_i, diode_v = _curve_arrays(diode_curve, "diode channel")
@@ -641,19 +651,20 @@ def _loss_balanced_boost_dcm_operating_point(
                 label, float(currents[0]), float(currents[-1]), 0.0, "below"
             )
     switch_positive_limit = float(switch_i[-1])
-    invalid_switch = np.flatnonzero(switch_v >= v_in)
+    invalid_switch = np.flatnonzero(switch_v >= on_voltage_base)
     if invalid_switch.size:
         first_invalid = int(invalid_switch[0])
         if first_invalid == 0:
             raise ValueError(
-                "Boost DCM switch channel leaves no positive inductor-current "
+                f"{topology.title()} DCM switch channel leaves no positive "
+                "inductor-current "
                 "ramp at zero current"
             )
         feasible_current = float(switch_i[first_invalid - 1])
         invalid_current = float(switch_i[first_invalid])
         for _ in range(80):
             midpoint = (feasible_current + invalid_current) / 2.0
-            if np.interp(midpoint, switch_i, switch_v) < v_in:
+            if np.interp(midpoint, switch_i, switch_v) < on_voltage_base:
                 feasible_current = midpoint
             else:
                 invalid_current = midpoint
@@ -665,7 +676,9 @@ def _loss_balanced_boost_dcm_operating_point(
         switch_positive_limit * parallel_switches,
     )
     if current_limit <= 0:
-        raise ValueError("Boost DCM channel curves have no positive current range")
+        raise ValueError(
+            f"{topology.title()} DCM channel curves have no positive current range"
+        )
     period = 1.0 / f_sw
     target_i_out = p_out / v_out
 
@@ -694,12 +707,17 @@ def _loss_balanced_boost_dcm_operating_point(
         current = np.linspace(0.0, peak, 257)
         switch_drop = np.interp(current / parallel_switches, switch_i, switch_v)
         diode_drop = np.interp(current / parallel_diodes, diode_i, diode_v)
-        on_voltage = v_in - switch_drop
-        off_voltage = v_out - v_in + diode_drop
+        on_voltage = on_voltage_base - switch_drop
+        off_voltage = (
+            v_out + diode_drop
+            if topology == "buck"
+            else v_out - v_in + diode_drop
+        )
         if np.any(on_voltage <= 0):
             bad = float(current[np.flatnonzero(on_voltage <= 0)[0]])
             raise ValueError(
-                "Boost DCM switch channel leaves no positive inductor-current "
+                f"{topology.title()} DCM switch channel leaves no positive "
+                "inductor-current "
                 f"ramp at {bad:g} A"
             )
         inverse_on = 1.0 / on_voltage
@@ -723,25 +741,43 @@ def _loss_balanced_boost_dcm_operating_point(
         duty = on_time / period
         diode_fraction = diode_time / period
         occupied = duty + diode_fraction
-        input_current = (charge_on + charge_diode) / period
-        output_current = charge_diode / period
+        input_current = (
+            charge_on / period
+            if topology == "buck"
+            else (charge_on + charge_diode) / period
+        )
+        diode_current = charge_diode / period
+        output_current = (
+            (charge_on + charge_diode) / period
+            if topology == "buck"
+            else diode_current
+        )
         switch_loss = switch_energy / period
         diode_loss = diode_energy / period
         switch_mean = switch_voltage_time / on_time
         diode_mean = diode_voltage_time / diode_time
-        volt_second_residual = (
-            duty * (v_in - switch_mean)
-            + diode_fraction * (v_in - v_out - diode_mean)
-        )
+        if topology == "buck":
+            volt_second_residual = (
+                duty * (v_in - v_out - switch_mean)
+                + diode_fraction * (-v_out - diode_mean)
+            )
+        else:
+            volt_second_residual = (
+                duty * (v_in - switch_mean)
+                + diode_fraction * (v_in - v_out - diode_mean)
+            )
         return {
             "peak": peak,
             "duty": duty,
             "diode_fraction": diode_fraction,
             "idle_fraction": 1.0 - occupied,
             "occupied": occupied,
-            "average_current": input_current,
+            "average_current": (
+                output_current if topology == "buck" else input_current
+            ),
             "input_current": input_current,
             "output_current": output_current,
+            "diode_current": diode_current,
             "ripple": peak,
             "valley": 0.0,
             "switch_loss_per_device": switch_loss / parallel_switches,
@@ -780,13 +816,15 @@ def _loss_balanced_boost_dcm_operating_point(
         boundary_tolerance = 1e-10 * max(target_i_out, 1.0)
         if target_i_out >= high_state["output_current"] - boundary_tolerance:
             raise ValueError(
-                "Requested Boost DCM point is at or above the CCM boundary: "
+                f"Requested {topology.title()} DCM point is at or above the "
+                "CCM boundary: "
                 f"required output current {target_i_out:g} A reaches or exceeds "
                 f"supported DCM boundary near {high_state['output_current']:g} A"
             )
     elif high_state["output_current"] < target_i_out * (1.0 - 1e-10):
         raise ValueError(
-            "No supported Boost DCM solution inside the exact channel-curve "
+            f"No supported {topology.title()} DCM solution inside the "
+            "exact channel-curve "
             f"range; peak current is limited to {current_limit:g} A"
         )
 
@@ -805,21 +843,26 @@ def _loss_balanced_boost_dcm_operating_point(
         else:
             high = peak
     else:
-        raise ValueError("Boost DCM loss-balanced current solve did not converge")
+        raise ValueError(
+            f"{topology.title()} DCM loss-balanced current solve did not converge"
+        )
 
     if state["occupied"] >= 1.0:
         raise ValueError(
-            "Requested Boost DCM point is at or above the CCM boundary; "
+            f"Requested {topology.title()} DCM point is at or above the "
+            "CCM boundary; "
             "select CCM for this operating point"
         )
     if abs(state["power_balance_residual"]) > 1e-8 * max(p_out, 1.0):
         raise ValueError(
-            "Boost DCM quadrature did not close input/output plus channel-loss "
+            f"{topology.title()} DCM quadrature did not close "
+            "input/output plus channel-loss "
             f"power balance (residual {state['power_balance_residual']:g} W)"
         )
     if abs(state["volt_second_residual"]) > 1e-8 * max(v_in, v_out):
         raise ValueError(
-            "Boost DCM quadrature did not close the averaged inductor "
+            f"{topology.title()} DCM quadrature did not close the averaged "
+            "inductor "
             f"volt-second balance (residual {state['volt_second_residual']:g} V)"
         )
     state["iterations"] = _iteration
@@ -880,6 +923,7 @@ def _trajectory_output_ripple(
     phase: np.ndarray,
     current: np.ndarray,
     *,
+    topology: str,
     duty: float,
     diode_fraction: float,
     output_current: float,
@@ -895,8 +939,12 @@ def _trajectory_output_ripple(
         phase_start = float(phase[index])
         phase_end = float(phase[index + 1])
         midpoint = (phase_start + phase_end) / 2.0
-        in_diode = duty < midpoint < diode_end
-        if in_diode:
+        carries_output_current = (
+            midpoint < diode_end
+            if topology == "buck"
+            else duty < midpoint < diode_end
+        )
+        if carries_output_current:
             current_start = float(current[index]) - output_current
             current_end = float(current[index + 1]) - output_current
         else:
@@ -1041,9 +1089,14 @@ def calculate_topology_operating_point(
     conduction_regime = parameters.get("conduction_regime", "CCM")
     if conduction_regime not in ("CCM", "DCM"):
         raise ValueError("conduction_regime must be 'CCM' or 'DCM'")
-    if mode == "loss-balanced" and conduction_regime == "DCM" and topology != "boost":
+    if (
+        mode == "loss-balanced"
+        and conduction_regime == "DCM"
+        and topology not in ("buck", "boost")
+    ):
         raise ValueError(
-            "loss-balanced DCM currently supports Boost only; use explicit "
+            "loss-balanced DCM currently supports scalar Buck and Boost only; "
+            "use explicit "
             "estimate, conduction-only, or detailed mode for this topology"
         )
 
@@ -1171,13 +1224,13 @@ def calculate_topology_operating_point(
             i_l_average = 0.5 * i_l_peak * (duty + diode_fraction)
             v_l_on = v_in
         occupied_fraction = duty + diode_fraction
-        loss_balanced_boost_dcm = (
+        loss_balanced_channel_dcm = (
             mode == "loss-balanced"
-            and topology == "boost"
+            and topology in ("buck", "boost")
             and conduction_regime == "DCM"
         )
         if (
-            not loss_balanced_boost_dcm
+            not loss_balanced_channel_dcm
             and (
                 not 0 < duty < 1
                 or not 0 < diode_fraction < 1
@@ -1210,7 +1263,7 @@ def calculate_topology_operating_point(
     if conduction_regime == "DCM":
         v_ripple = (
             0.0
-            if mode == "loss-balanced" and topology == "boost"
+            if mode == "loss-balanced" and topology in ("buck", "boost")
             else _dcm_output_ripple(
                 topology,
                 duty,
@@ -1252,7 +1305,8 @@ def calculate_topology_operating_point(
             "parallel_diodes": parallel_diodes,
             "assumptions": [
                 (
-                    f"{conduction_regime} Boost duty and current are solved from "
+                    f"{topology.title()} DCM current ramps and duty are solved "
+                    "from "
                     "the exact channel curves and requested output current."
                     if mode == "loss-balanced"
                     and conduction_regime == "DCM"
@@ -1360,7 +1414,8 @@ def calculate_topology_operating_point(
         diode_peak = i_diode_peak / parallel_diodes
         if mode == "loss-balanced":
             if conduction_regime == "DCM":
-                solved = _loss_balanced_boost_dcm_operating_point(
+                solved = _loss_balanced_channel_dcm_operating_point(
+                    topology,
                     parameters,
                     switch_channel,
                     diode_channel,
@@ -1394,12 +1449,13 @@ def calculate_topology_operating_point(
                 i_in = float(solved["input_current"])
                 i_diode_valley = 0.0
                 i_diode_peak = i_l_peak
-                i_diode_average = i_out
+                i_diode_average = float(solved["diode_current"])
                 i_switch_rms = float(solved["switch_rms"])
                 i_diode_rms = float(solved["diode_rms"])
                 v_ripple = _trajectory_output_ripple(
                     solved["waveform_phase"],
                     solved["waveform_current"],
+                    topology=topology,
                     duty=duty,
                     diode_fraction=diode_fraction,
                     output_current=i_out,
@@ -1496,7 +1552,8 @@ def calculate_topology_operating_point(
             result["model"]["assumptions"].extend(
                 [
                     (
-                        "Boost DCM integrates the current-dependent switch and "
+                        f"{topology.title()} DCM integrates current-dependent "
+                        "switch and "
                         "diode channel curves over both ramps and solves output "
                         "charge with separate input/output power and volt-second "
                         "residuals."
@@ -1505,7 +1562,8 @@ def calculate_topology_operating_point(
                         "power balances output power plus included channel losses."
                     ),
                     (
-                        "Boost DCM reports the zero-current idle fraction after "
+                        f"{topology.title()} DCM reports the zero-current idle "
+                        "fraction after "
                         "switch and diode demagnetization intervals."
                         if conduction_regime == "DCM"
                         else "Inductor ripple is triangular and refined using "
