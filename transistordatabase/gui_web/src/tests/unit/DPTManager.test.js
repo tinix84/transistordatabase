@@ -174,6 +174,22 @@ describe('DPTManager raw waveform viewing', () => {
     expect(wrapper.text()).toContain('Test benchLocal test bench')
   })
 
+  it('allows comparison entry when only one of multiple stored records matches', async () => {
+    await wrapper.get('[data-testid="dpt-measurement-search"]').setValue('600 v')
+
+    const compareButton = wrapper.get('[data-testid="dpt-compare-toggle"]')
+    expect(compareButton.text()).toContain('1 available')
+    await compareButton.trigger('click')
+
+    expect(wrapper.find('[data-testid="dpt-compare-record-0"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="dpt-compare-record-1"]').exists()).toBe(true)
+    expect(wrapper.findAll('.comparison-record-option')).toHaveLength(1)
+    expect(wrapper.get('[data-testid="dpt-compare-toggle"]').text())
+      .toContain('Return to one measurement')
+    expect(wrapper.get('[data-testid="dpt-comparison-selection-status"]')
+      .text()).toContain('Select at least two stored measurements')
+  })
+
   it('shows a no-match state and restores records when the filter is cleared', async () => {
     await wrapper.get('[data-testid="dpt-measurement-search"]').setValue('no matching condition')
 

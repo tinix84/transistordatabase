@@ -165,7 +165,7 @@
                   </option>
                 </select>
                 <button
-                  v-if="filteredMeasurementRecords.length > 1"
+                  v-if="rawMeasurementRecords.length > 1"
                   class="btn-compare-waveforms"
                   data-testid="dpt-compare-toggle"
                   type="button"
@@ -758,8 +758,7 @@ export default {
       comparisonMode.value ? comparisonWaveformPlots.value : waveformPlots.value
     ))
 
-    watch(measurementSearch, () => {
-      if (comparisonMode.value) return
+    function selectFirstVisibleMeasurementIfNeeded() {
       const visibleIndexes = filteredMeasurementRecords.value.map(
         record => record.index
       )
@@ -770,6 +769,11 @@ export default {
         selectedMeasurementIndex.value = visibleIndexes[0]
         selectedAcquisitionIndex.value = 0
       }
+    }
+
+    watch(measurementSearch, () => {
+      if (comparisonMode.value) return
+      selectFirstVisibleMeasurementIfNeeded()
     })
 
     function measurementLabel(measurement, index) {
@@ -801,16 +805,7 @@ export default {
           selectedComparisonIndices.value.map(index => [index, 0])
         )
       } else {
-        const visibleIndexes = filteredMeasurementRecords.value.map(
-          record => record.index
-        )
-        if (
-          visibleIndexes.length &&
-          !visibleIndexes.includes(selectedMeasurementIndex.value)
-        ) {
-          selectedMeasurementIndex.value = visibleIndexes[0]
-          selectedAcquisitionIndex.value = 0
-        }
+        selectFirstVisibleMeasurementIfNeeded()
       }
     }
 
