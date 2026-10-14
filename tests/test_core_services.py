@@ -341,8 +341,8 @@ class TestComparisonService:
         assert isinstance(result, list)
 
     def test_thermal_comparison_includes_measured_and_paired_models(
-        self, transistor
-    ):
+        self, transistor: Transistor
+    ) -> None:
         """Switch and diode thermal measurements and models stay distinct."""
         transistor.metadata.name = "THERMAL_TEST"
         transistor.diode.thermal_foster = FosterThermalModel(
@@ -375,8 +375,8 @@ class TestComparisonService:
         assert result["log_scale_x"] is True
 
     def test_thermal_comparison_keeps_measured_data_without_valid_model(
-        self, transistor
-    ):
+        self, transistor: Transistor
+    ) -> None:
         """Measured points remain when Foster parameters are absent or invalid."""
         transistor.switch.thermal_foster.r_th_total = 12.0
         transistor.switch.thermal_foster.r_th_vector = None
@@ -401,9 +401,24 @@ class TestComparisonService:
         assert result["curves"][1]["time_data"] == [0.003, 0.03]
         assert result["curves"][1]["z_th_data"] == [0.02, 0.21]
 
+    def test_thermal_comparison_keeps_measured_data_with_nonnumeric_model(
+        self, transistor: Transistor
+    ) -> None:
+        """String-valued model parameters do not abort measured plotting."""
+        transistor.switch.thermal_foster.r_th_vector = ["0.1"]
+        transistor.switch.thermal_foster.tau_vector = ["0.0001"]
+
+        result = self.svc._plot_thermal_comparison([transistor])
+
+        assert [curve["name"] for curve in result["curves"]] == [
+            "TEST_SVC / switch - measured",
+        ]
+        assert result["curves"][0]["time_data"] == [0.001, 0.01, 0.1, 1.0]
+        assert result["curves"][0]["z_th_data"] == [0.05, 0.2, 0.4, 0.5]
+
     def test_thermal_comparison_includes_diode_model_without_switch_model(
-        self, transistor
-    ):
+        self, transistor: Transistor
+    ) -> None:
         """A diode Foster curve is shown even if the switch model is absent."""
         transistor.switch.thermal_foster.r_th_vector = None
         transistor.switch.thermal_foster.tau_vector = None
@@ -423,7 +438,9 @@ class TestComparisonService:
         ]
         assert len(result["curves"][-1]["time_data"]) == 100
 
-    def test_thermal_comparison_does_not_mutate_transistors(self, transistor):
+    def test_thermal_comparison_does_not_mutate_transistors(
+        self, transistor: Transistor
+    ) -> None:
         """Generating thermal comparison leaves the source curves unchanged."""
         switch_model = transistor.switch.thermal_foster
         diode_model = FosterThermalModel(

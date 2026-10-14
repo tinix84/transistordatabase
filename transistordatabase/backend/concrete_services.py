@@ -873,8 +873,8 @@ class ComparisonService(IComparisonService):
                     continue
 
                 try:
-                    r_th = np.asarray(r_th_vector, dtype=np.float64)
-                    tau = np.asarray(tau_vector, dtype=np.float64)
+                    r_th = np.asarray(r_th_vector)
+                    tau = np.asarray(tau_vector)
                 except (TypeError, ValueError):
                     continue
 
@@ -883,7 +883,17 @@ class ComparisonService(IComparisonService):
                     or tau.ndim != 1
                     or r_th.size == 0
                     or r_th.size != tau.size
-                    or not np.isfinite(r_th).all()
+                    or not np.issubdtype(r_th.dtype, np.number)
+                    or not np.issubdtype(tau.dtype, np.number)
+                    or np.issubdtype(r_th.dtype, np.complexfloating)
+                    or np.issubdtype(tau.dtype, np.complexfloating)
+                ):
+                    continue
+
+                r_th = r_th.astype(np.float64, copy=False)
+                tau = tau.astype(np.float64, copy=False)
+                if (
+                    not np.isfinite(r_th).all()
                     or not np.isfinite(tau).all()
                     or (r_th <= 0).any()
                     or (tau <= 0).any()
