@@ -776,28 +776,8 @@ export default {
     const rawImportTracePreview = ref(null)
     const rawImportStatus = ref('')
     const rawImportError = ref('')
-    const rawImportForm = ref({
-      vds_trace: '',
-      id_trace: '',
-      turn_on_start_s: '',
-      turn_on_end_s: '',
-      turn_off_start_s: '',
-      turn_off_end_s: ''
-    })
-    const rawImportMetadata = ref({
-      t_j: '',
-      v_supply: '',
-      v_g: '',
-      v_g_off: '',
-      r_g: '',
-      r_g_off: '',
-      load_inductance: '',
-      commutation_inductance: '',
-      measurement_date: '',
-      measurement_testbench: '',
-      commutation_device: '',
-      comment: ''
-    })
+    const rawImportForm = ref(emptyRawImportForm())
+    const rawImportMetadata = ref(emptyRawImportMetadata())
 
     function emptyRawImportForm() {
       return {

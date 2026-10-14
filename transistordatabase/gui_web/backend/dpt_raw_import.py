@@ -245,12 +245,16 @@ def parse_ltspice_raw(
         ) from error
 
 
+def _preview_indices(sample_count: int, limit: int) -> np.ndarray:
+    """Return ordered preview indices while preserving first and last points."""
+    if sample_count <= limit:
+        return np.arange(sample_count)
+    return np.linspace(0, sample_count - 1, num=limit, dtype=np.int64)
+
+
 def preview_samples(values: np.ndarray, limit: int = MAX_PREVIEW_POINTS) -> np.ndarray:
     """Return a display-only, ordered subset while preserving first and last points."""
-    if len(values) <= limit:
-        return values.copy()
-    indices = np.linspace(0, len(values) - 1, num=limit, dtype=np.int64)
-    return values[indices]
+    return values[_preview_indices(len(values), limit)]
 
 
 def event_window_bounds(
@@ -312,12 +316,7 @@ def make_trace_preview(parsed: ParsedRaw, selected_traces: Sequence[str]) -> dic
     if parsed.time_values is None or parsed.trace_values is None:
         raise DptRawImportError("Select traces before requesting a waveform preview.")
     times = parsed.time_values
-    preview_times = preview_samples(times)
-    indices = (
-        np.arange(len(times))
-        if len(times) <= MAX_PREVIEW_POINTS
-        else np.linspace(0, len(times) - 1, MAX_PREVIEW_POINTS, dtype=np.int64)
-    )
+    indices = _preview_indices(len(times), MAX_PREVIEW_POINTS)
     preview_traces: dict[str, list[list[float | None]]] = {}
     non_finite_counts: dict[str, int] = {}
     for name in selected_traces[1:]:
@@ -335,7 +334,7 @@ def make_trace_preview(parsed: ParsedRaw, selected_traces: Sequence[str]) -> dic
     return {
         "sample_count": parsed.sample_count,
         "time_range_s": [float(np.min(times)), float(np.max(times))],
-        "preview_sample_count": len(preview_times),
+        "preview_sample_count": len(indices),
         "traces": preview_traces,
         "non_finite_preview_sample_counts": non_finite_counts,
     }
