@@ -214,6 +214,7 @@ test.describe('topology migration browser workflow', () => {
     await openTopology(page, 'Buck')
     await page.locator('label.param-item').filter({ hasText: 'Calculation mode' }).locator('select').selectOption('loss-balanced')
     await page.locator('label.param-item').filter({ hasText: 'Conduction regime' }).locator('select').selectOption('DCM')
+    await expect(page.getByRole('button', { name: 'Compare topologies' })).toBeDisabled()
     await page.locator('label.param-item').filter({ hasText: 'Switch transistor' }).locator('select').selectOption('Buck DCM Switch')
     await page.locator('label.param-item').filter({ hasText: 'Diode transistor' }).locator('select').selectOption('Buck DCM Diode')
     await setParameter(page, 'Input voltage', 100)
