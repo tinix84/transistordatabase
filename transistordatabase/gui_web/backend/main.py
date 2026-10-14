@@ -18,9 +18,11 @@ import json
 import logging
 import math
 import os
+import secrets
 import sys
 import tempfile
 import threading
+import time
 import zipfile
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -32,6 +34,7 @@ import numpy as np
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
+from pydantic import ValidationError
 
 from transistordatabase.backend.concrete_services import (
     ConcreteServiceFactory,
@@ -90,6 +93,7 @@ from transistordatabase.gui_web.backend.dpt_raw_import import (
     event_window_bounds,
     make_trace_preview,
     parse_ltspice_raw,
+    selected_step_ranges,
     select_event_samples,
 )
 from transistordatabase.gui_web.backend.dpt_energy import (
@@ -127,6 +131,10 @@ app = FastAPI(
 # Bound the legacy JSON parse required for raw DPT persistence and waveform reads.
 MAX_DPT_LEGACY_RECORD_FILE_BYTES = 64 * 1024 * 1024
 MAX_DPT_RAW_MEASUREMENT_BYTES = 32 * 1024 * 1024
+DPT_RAW_REVIEW_TOKEN_TTL_SECONDS = 15 * 60
+MAX_DPT_RAW_REVIEW_TOKENS = 1024
+_dpt_raw_review_tokens: dict[str, tuple[float, str]] = {}
+_dpt_raw_review_tokens_lock = threading.Lock()
 
 
 class _DptRawRequestBodyTooLarge(Exception):
@@ -2895,25 +2903,169 @@ def _dpt_raw_trace_selection(
     return request.time_trace, request.vds_trace, request.id_trace
 
 
+def _accumulate_dpt_event_samples(
+    total_event_samples: int,
+    on_bounds: tuple[int, int],
+    off_bounds: tuple[int, int],
+) -> int:
+    """Add two inclusive window spans and enforce the shared persisted-sample cap."""
+    total = (
+        total_event_samples
+        + on_bounds[1]
+        - on_bounds[0]
+        + off_bounds[1]
+        - off_bounds[0]
+    )
+    if total > MAX_TOTAL_EVENT_SAMPLES:
+        raise DptRawImportError(
+            f"The selected event windows contain {total:,} samples combined; the "
+            f"limit is {MAX_TOTAL_EVENT_SAMPLES:,}. Narrow windows or select fewer "
+            "steps.",
+            status_code=413,
+        )
+    return total
+
+
+def _dpt_raw_review_required(plots: list[dict[str, Any]], plot_index: int) -> bool:
+    """Require reviewed server binding for stepped or selected multi-plot data."""
+    return len(plots) > 1 or bool(plots[plot_index]["is_stepped"])
+
+
+def _dpt_raw_review_signature(
+    transistor_id: str,
+    content: bytes | bytearray,
+    selection: DptRawImportRequest,
+) -> str:
+    """Bind the import token to the bytes and canonical complete user selection."""
+    selection_data = selection.model_dump(
+        mode="json", exclude={"review_token"}, exclude_none=True
+    )
+    request_body = json.dumps(
+        {
+            "transistor_id": transistor_id,
+            "source_sha256": hashlib.sha256(content).hexdigest(),
+            "selection": selection_data,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+    return hashlib.sha256(request_body).hexdigest()
+
+
+def _issue_dpt_raw_review_token(signature: str) -> str:
+    """Create a short-lived one-time token for one reviewed source selection."""
+    now = time.monotonic()
+    token = secrets.token_urlsafe(32)
+    with _dpt_raw_review_tokens_lock:
+        expired = [
+            value
+            for value, (expires_at, _signature) in _dpt_raw_review_tokens.items()
+            if expires_at <= now
+        ]
+        for value in expired:
+            _dpt_raw_review_tokens.pop(value, None)
+        if len(_dpt_raw_review_tokens) >= MAX_DPT_RAW_REVIEW_TOKENS:
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "The local RAW review session limit is full. Wait for an existing "
+                    "review to expire, then preview this import again."
+                ),
+            )
+        _dpt_raw_review_tokens[token] = (
+            now + DPT_RAW_REVIEW_TOKEN_TTL_SECONDS,
+            signature,
+        )
+    return token
+
+
+def _consume_dpt_raw_review_token(token: str | None, signature: str) -> None:
+    """Consume one reviewed token and reject missing, stale, or altered requests."""
+    if not token:
+        raise HTTPException(
+            status_code=409,
+            detail="Review this exact RAW file, plot, trace mapping, windows, and conditions before importing.",
+        )
+    now = time.monotonic()
+    with _dpt_raw_review_tokens_lock:
+        stored = _dpt_raw_review_tokens.pop(token, None)
+    if stored is None or stored[0] <= now or stored[1] != signature:
+        raise HTTPException(
+            status_code=409,
+            detail="The RAW import review is missing, expired, already used, or no longer matches the submitted file and selections. Review it again.",
+        )
+
+
+def _require_dpt_raw_common_context(selection: DptRawImportRequest) -> None:
+    """Require explicit common conditions for all grouped source-step imports."""
+    if selection.step_selections is None:
+        raise DptRawImportError(
+            "Select each source step and enter its current and event windows."
+        )
+    required_conditions = (
+        "t_j",
+        "v_supply",
+        "v_g",
+        "v_g_off",
+        "r_g",
+        "r_g_off",
+        "load_inductance",
+        "commutation_inductance",
+        "measurement_testbench",
+        "commutation_device",
+    )
+    missing_conditions = [
+        name
+        for name in required_conditions
+        if getattr(selection.metadata, name) in (None, "")
+    ]
+    if missing_conditions:
+        raise DptRawImportError(
+            "A grouped source-step record requires explicit common values for: "
+            + ", ".join(missing_conditions)
+            + ". These values are not read from RAW or .log data."
+        )
+    if not selection.same_context_confirmed:
+        raise DptRawImportError(
+            "Confirm that selected steps share the entered conditions; only current may vary."
+        )
+
+
 @app.post("/api/transistors/{transistor_id}/dpt_raw_import/preview")
 async def preview_dpt_raw_import(
     transistor_id: str,
     file: UploadFile = File(...),
 ) -> Dict[str, Any]:
-    """Inspect a bounded LTspice RAW header and list explicit trace choices."""
+    """List bounded plot metadata and step ranges without loading signal traces."""
     _validate_web_record_name(transistor_id)
     content = await _read_dpt_raw_upload(file)
     try:
-        parsed = parse_ltspice_raw(content, file.filename)
+        parsed = parse_ltspice_raw(content, file.filename, plot_index=None)
     except DptRawImportError as error:
         raise _dpt_raw_upload_error(error) from error
-    return {
+    plots = parsed.plots or []
+    first_transient = next((plot for plot in plots if plot["is_transient"]), None)
+    if first_transient is None:
+        raise HTTPException(
+            status_code=400,
+            detail="The .raw file contains no transient analysis plot.",
+        )
+    response = {
         "filename": parsed.filename,
-        "plot_name": parsed.plot_name,
-        "sample_count": parsed.sample_count,
-        "time_trace_name": parsed.trace_names[0] if parsed.trace_names else None,
-        "trace_names": parsed.trace_names,
+        "plots": plots,
+        "total_sample_count": sum(plot["sample_count"] for plot in plots),
     }
+    if first_transient is not None:
+        response.update(
+            {
+                "plot_name": first_transient["plot_name"],
+                "sample_count": first_transient["sample_count"],
+                "time_trace_name": first_transient["trace_names"][0],
+                "trace_names": first_transient["trace_names"],
+            }
+        )
+    return response
 
 
 @app.post("/api/transistors/{transistor_id}/dpt_raw_import/trace_preview")
@@ -2933,15 +3085,84 @@ async def preview_dpt_raw_traces(
         ) from error
     content = await _read_dpt_raw_upload(file)
     try:
+        header = parse_ltspice_raw(content, file.filename, plot_index=None)
+        plots = header.plots or []
+        if len(plots) > 1 and selection.plot_index is None:
+            raise DptRawImportError(
+                "Select a transient plot from the file preview before loading traces."
+            )
+        plot_index = selection.plot_index if selection.plot_index is not None else 0
+        if plot_index >= len(plots) or not plots[plot_index]["is_transient"]:
+            raise DptRawImportError(
+                "The selected plot is not a transient analysis. Select a transient plot."
+            )
+        if plots[plot_index]["is_stepped"] and not selection.step_indices:
+            raise DptRawImportError(
+                "Select at least one source step before previewing traces."
+            )
         parsed = parse_ltspice_raw(
             content,
             file.filename,
             _dpt_raw_trace_selection(selection),
+            plot_index=plot_index,
+            step_indices=selection.step_indices or None,
         )
         preview = make_trace_preview(
             parsed,
             _dpt_raw_trace_selection(selection),
+            selection.step_indices or None,
         )
+        review_required = _dpt_raw_review_required(plots, plot_index)
+        review_token = None
+        if review_required and selection.step_selections is not None:
+            try:
+                reviewed_selection = DptRawImportRequest.model_validate(
+                    selection.model_dump(mode="python", exclude={"review_token"})
+                )
+            except ValidationError as error:
+                messages = "; ".join(
+                    item["msg"].removeprefix("Value error, ")
+                    for item in error.errors()
+                )
+                raise DptRawImportError(
+                    "Invalid grouped DPT trace selection: " + messages,
+                    status_code=422,
+                ) from error
+            _require_dpt_raw_common_context(reviewed_selection)
+            range_by_index = {
+                item["step_index"]: item for item in (parsed.step_ranges or [])
+            }
+            total_event_samples = 0
+            for step_selection in reviewed_selection.step_selections or []:
+                selected_range = range_by_index.get(step_selection.step_index)
+                if selected_range is None:
+                    raise DptRawImportError(
+                        f"Source step {step_selection.step_index} is not present in "
+                        "the selected plot. Reload the file preview."
+                    )
+                step_times = parsed.time_values[
+                    selected_range["start_index"] : selected_range["end_index"]
+                ] if parsed.time_values is not None else np.asarray([])
+                on_bounds = event_window_bounds(
+                    step_times,
+                    step_selection.turn_on.start_s,
+                    step_selection.turn_on.end_s,
+                )
+                off_bounds = event_window_bounds(
+                    step_times,
+                    step_selection.turn_off.start_s,
+                    step_selection.turn_off.end_s,
+                )
+                total_event_samples = _accumulate_dpt_event_samples(
+                    total_event_samples,
+                    on_bounds,
+                    off_bounds,
+                )
+            review_token = _issue_dpt_raw_review_token(
+                _dpt_raw_review_signature(
+                    transistor_id, content, reviewed_selection
+                )
+            )
     except DptRawImportError as error:
         raise _dpt_raw_upload_error(error) from error
     return {
@@ -2949,6 +3170,10 @@ async def preview_dpt_raw_traces(
         "time_trace": selection.time_trace,
         "vds_trace": selection.vds_trace,
         "id_trace": selection.id_trace,
+        "plot_index": parsed.plot_index,
+        "step_indices": [item["step_index"] for item in preview["steps"]],
+        "review_required": review_required,
+        "review_token": review_token,
         **preview,
     }
 
@@ -2959,7 +3184,7 @@ async def import_dpt_raw_measurement(
     file: UploadFile = File(...),
     selection_json: str = Form(...),
 ) -> Dict[str, Any]:
-    """Append an explicitly reviewed LTspice acquisition to the legacy record."""
+    """Append explicitly reviewed LTspice acquisitions to the legacy record."""
     _validate_web_record_name(transistor_id)
     try:
         selection = DptRawImportRequest.model_validate_json(selection_json)
@@ -2971,48 +3196,156 @@ async def import_dpt_raw_measurement(
     content = await _read_dpt_raw_upload(file)
     trace_selection = _dpt_raw_trace_selection(selection)
     try:
-        parsed = parse_ltspice_raw(content, file.filename, trace_selection)
+        header = parse_ltspice_raw(content, file.filename, plot_index=None)
+        plots = header.plots or []
+        if len(plots) > 1 and selection.plot_index is None:
+            raise DptRawImportError(
+                "Select a transient plot before confirming the import."
+            )
+        plot_index = selection.plot_index if selection.plot_index is not None else 0
+        if plot_index >= len(plots) or not plots[plot_index]["is_transient"]:
+            raise DptRawImportError(
+                "The selected plot is not a transient analysis. Select a transient plot."
+            )
+        summary = plots[plot_index]
+        review_required = _dpt_raw_review_required(plots, plot_index)
+        if review_required:
+            _require_dpt_raw_common_context(selection)
+        elif selection.step_selections is not None:
+            raise DptRawImportError(
+                "Explicit source-step acquisition review is only required for a "
+                "stepped plot or a selected plot from a multi-plot file."
+            )
+
+        axis_only = parse_ltspice_raw(
+            content,
+            file.filename,
+            plot_index=plot_index,
+        )
+        assert axis_only.time_values is not None
+        time_values = axis_only.time_values
+        on_acquisitions: list[list[list[float]]] = []
+        on_id_acquisitions: list[list[list[float]]] = []
+        off_acquisitions: list[list[list[float]]] = []
+        off_id_acquisitions: list[list[list[float]]] = []
+        event_windows_by_step: dict[str, dict[str, list[float]]] = {}
+        current_by_step: dict[str, float] = {}
+        total_event_samples = 0
+        if selection.step_selections is None:
+            assert selection.turn_on is not None and selection.turn_off is not None
+            selected_ranges = selected_step_ranges(axis_only, [0])
+            windows = [(selected_ranges[0], selection.turn_on, selection.turn_off, None)]
+        else:
+            step_by_index = {
+                item["step_index"]: item
+                for item in (axis_only.step_ranges or [])
+            }
+            windows = []
+            for step_selection in selection.step_selections:
+                step = step_by_index.get(step_selection.step_index)
+                if step is None:
+                    raise DptRawImportError(
+                        f"Source step {step_selection.step_index} is not present in "
+                        "the selected plot. Reload the file preview."
+                    )
+                windows.append(
+                    (
+                        step,
+                        step_selection.turn_on,
+                        step_selection.turn_off,
+                        step_selection.i_x,
+                    )
+                )
+
+        preflight_windows = []
+        for step, turn_on, turn_off, i_x in windows:
+            start = step["start_index"]
+            end = step["end_index"]
+            step_time = time_values[start:end]
+            on_bounds = event_window_bounds(
+                step_time, turn_on.start_s, turn_on.end_s
+            )
+            off_bounds = event_window_bounds(
+                step_time, turn_off.start_s, turn_off.end_s
+            )
+            total_event_samples = _accumulate_dpt_event_samples(
+                total_event_samples,
+                on_bounds,
+                off_bounds,
+            )
+            preflight_windows.append(
+                (step, turn_on, turn_off, i_x, on_bounds, off_bounds)
+            )
+
+        # Load selected signals only after every source step, time window and the
+        # aggregate persisted-sample budget have passed preflight.
+        parsed = parse_ltspice_raw(
+            content,
+            file.filename,
+            trace_selection,
+            plot_index=plot_index,
+            step_indices=(
+                [item.step_index for item in selection.step_selections]
+                if selection.step_selections is not None
+                else [0]
+            ),
+        )
         assert parsed.time_values is not None
         assert parsed.trace_values is not None
-        time_values = parsed.time_values
+        expected_loaded_times = np.concatenate(
+            [
+                time_values[item["start_index"] : item["end_index"]]
+                for item in sorted(
+                    [window[0] for window in windows],
+                    key=lambda item: item["start_index"],
+                )
+            ]
+        )
+        if not np.array_equal(parsed.time_values, expected_loaded_times):
+            raise DptRawImportError(
+                "The RAW time axis changed between preflight and trace loading. "
+                "Upload the source again."
+            )
         vds_values = parsed.trace_values[selection.vds_trace]
         id_values = parsed.trace_values[selection.id_trace]
-        on_bounds = event_window_bounds(
-            time_values,
-            selection.turn_on.start_s,
-            selection.turn_on.end_s,
-        )
-        off_bounds = event_window_bounds(
-            time_values,
-            selection.turn_off.start_s,
-            selection.turn_off.end_s,
-        )
-        total_event_samples = (
-            on_bounds[1] - on_bounds[0] + off_bounds[1] - off_bounds[0]
-        )
-        if total_event_samples > MAX_TOTAL_EVENT_SAMPLES:
-            raise DptRawImportError(
-                f"The two event windows contain {total_event_samples:,} samples "
-                f"combined; the limit is {MAX_TOTAL_EVENT_SAMPLES:,}. Narrow the "
-                "turn-on or turn-off window.",
-                status_code=413,
+        loaded_step_by_index = {
+            item["step_index"]: item
+            for item in (parsed.step_ranges or [])
+        }
+        for step, turn_on, turn_off, i_x, on_bounds, off_bounds in preflight_windows:
+            loaded_step = loaded_step_by_index[step["step_index"]]
+            start = loaded_step["start_index"]
+            end = loaded_step["end_index"]
+            step_time = parsed.time_values[start:end]
+            step_vds = vds_values[start:end]
+            step_id = id_values[start:end]
+            on_vds, on_id = select_event_samples(
+                step_time,
+                step_vds,
+                step_id,
+                turn_on.start_s,
+                turn_on.end_s,
+                bounds=on_bounds,
             )
-        on_vds, on_id = select_event_samples(
-            time_values,
-            vds_values,
-            id_values,
-            selection.turn_on.start_s,
-            selection.turn_on.end_s,
-            bounds=on_bounds,
-        )
-        off_vds, off_id = select_event_samples(
-            time_values,
-            vds_values,
-            id_values,
-            selection.turn_off.start_s,
-            selection.turn_off.end_s,
-            bounds=off_bounds,
-        )
+            off_vds, off_id = select_event_samples(
+                step_time,
+                step_vds,
+                step_id,
+                turn_off.start_s,
+                turn_off.end_s,
+                bounds=off_bounds,
+            )
+            on_acquisitions.append(on_vds)
+            on_id_acquisitions.append(on_id)
+            off_acquisitions.append(off_vds)
+            off_id_acquisitions.append(off_id)
+            step_key = str(step["step_index"])
+            event_windows_by_step[step_key] = {
+                "turn_on": [turn_on.start_s, turn_on.end_s],
+                "turn_off": [turn_off.start_s, turn_off.end_s],
+            }
+            if i_x is not None:
+                current_by_step[step_key] = i_x
     except DptRawImportError as error:
         raise _dpt_raw_upload_error(error) from error
 
@@ -3027,27 +3360,60 @@ async def import_dpt_raw_measurement(
         "parser": "PyLTSpice.RawRead",
         "parser_version": parser_version,
         "imported_at": imported_at,
+        "source_plot_index": plot_index,
         "trace_mapping": {
             "time": selection.time_trace,
             "vds": selection.vds_trace,
             "id": selection.id_trace,
         },
-        "event_windows_s": {
-            "turn_on": [selection.turn_on.start_s, selection.turn_on.end_s],
-            "turn_off": [selection.turn_off.start_s, selection.turn_off.end_s],
-        },
+        "event_windows_s": (
+            {
+                "turn_on": [
+                    selection.turn_on.start_s,
+                    selection.turn_on.end_s,
+                ],
+                "turn_off": [
+                    selection.turn_off.start_s,
+                    selection.turn_off.end_s,
+                ],
+            }
+            if selection.step_selections is None
+            else None
+        ),
     }
+    if selection.step_selections is not None:
+        provenance.update(
+            {
+                "source_step_indices": [
+                    item["step_index"] for item in selected_step_ranges(
+                        parsed,
+                        [item.step_index for item in selection.step_selections],
+                    )
+                ],
+                "current_axis_i_x_by_source_step_a": current_by_step,
+                "same_context_confirmed_by_user": selection.same_context_confirmed,
+                "conditions_source": "explicit user-entered common metadata",
+                "step_parameters_imported": False,
+                "event_windows_are_step_local_seconds": True,
+                "event_windows_by_source_step_s": event_windows_by_step,
+            }
+        )
     new_measurement = {
         "dataset_type": "dpt_u_i",
         **selection.metadata.model_dump(mode="json", exclude_none=True),
-        "dpt_on_vds": [on_vds],
-        "dpt_on_id": [on_id],
-        "dpt_off_vds": [off_vds],
-        "dpt_off_id": [off_id],
+        "dpt_on_vds": on_acquisitions,
+        "dpt_on_id": on_id_acquisitions,
+        "dpt_off_vds": off_acquisitions,
+        "dpt_off_id": off_id_acquisitions,
         "import_provenance": provenance,
     }
 
     async with _record_mutation():
+        if review_required:
+            _consume_dpt_raw_review_token(
+                selection.review_token,
+                _dpt_raw_review_signature(transistor_id, content, selection),
+            )
         record_path = _legacy_record_path(transistor_id)
         record = _read_legacy_record_unlocked(
             transistor_id,
@@ -3133,8 +3499,9 @@ async def import_dpt_raw_measurement(
         "success": True,
         "transistor_id": transistor_id,
         "raw_measurement_count": len(candidate["raw_measurement_data"]),
-        "on_sample_count": len(on_vds),
-        "off_sample_count": len(off_vds),
+        "on_sample_count": sum(map(len, on_acquisitions)),
+        "off_sample_count": sum(map(len, off_acquisitions)),
+        "acquisition_count": len(on_acquisitions),
         "provenance": provenance,
     }
 

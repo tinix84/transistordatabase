@@ -397,21 +397,67 @@ class DptRawTraceSelectionRequest(BaseModel):
     time_trace: str = Field(..., min_length=1, max_length=256)
     vds_trace: str = Field(..., min_length=1, max_length=256)
     id_trace: str = Field(..., min_length=1, max_length=256)
+    plot_index: StrictInt | None = Field(None, ge=0)
+    step_indices: List[StrictInt] = Field(default_factory=list, max_length=50)
+    turn_on: DptRawEventWindow | None = None
+    turn_off: DptRawEventWindow | None = None
+    step_selections: List[DptRawStepSelection] | None = Field(None, max_length=50)
+    same_context_confirmed: bool = False
+    metadata: DptRawImportMetadata = Field(default_factory=DptRawImportMetadata)
+    review_token: str | None = Field(None, min_length=16, max_length=128)
 
     @model_validator(mode="after")
     def check_trace_mapping(self) -> "DptRawTraceSelectionRequest":
         """Require distinct, explicit time, Vds, and Id trace choices."""
         if len({self.time_trace, self.vds_trace, self.id_trace}) != 3:
             raise ValueError("time_trace, vds_trace, and id_trace must be distinct")
+        if len(set(self.step_indices)) != len(self.step_indices):
+            raise ValueError("step_indices must be unique")
+        if self.step_selections is not None:
+            step_indexes = [item.step_index for item in self.step_selections]
+            if len(set(step_indexes)) != len(step_indexes):
+                raise ValueError("step_selections must use each source step only once")
+            if self.step_indices != step_indexes:
+                raise ValueError(
+                    "step_indices must exactly match step_selections in the reviewed order"
+                )
         return self
 
 
-class DptRawImportRequest(DptRawTraceSelectionRequest):
-    """User-selected traces, event windows, and conditions for one raw import."""
+class DptRawStepSelection(BaseModel):
+    """Explicit current and two event windows for one selected RAW step."""
 
+    step_index: StrictInt = Field(..., ge=0)
+    i_x: float = Field(..., gt=0, allow_inf_nan=False, description="Acquisition current [A]")
     turn_on: DptRawEventWindow
     turn_off: DptRawEventWindow
-    metadata: DptRawImportMetadata = Field(default_factory=DptRawImportMetadata)
+
+
+class DptRawImportRequest(DptRawTraceSelectionRequest):
+    """User-selected plot, traces, events, and conditions for one raw import."""
+
+    @model_validator(mode="after")
+    def check_event_selection(self) -> "DptRawImportRequest":
+        """Require one legacy pair or an explicit unique step selection."""
+        if self.step_selections is not None:
+            if not self.step_selections:
+                raise ValueError("step_selections must contain at least one selected step")
+            if self.turn_on is not None or self.turn_off is not None:
+                raise ValueError("Use either step_selections or turn_on/turn_off")
+            step_indexes = [item.step_index for item in self.step_selections]
+            if len(set(step_indexes)) != len(step_indexes):
+                raise ValueError("step_selections must use each source step only once")
+            if self.step_indices != step_indexes:
+                raise ValueError(
+                    "step_indices must exactly match step_selections in the reviewed order"
+                )
+            if not self.same_context_confirmed:
+                raise ValueError(
+                    "Confirm that all selected steps share the entered test conditions."
+                )
+        elif self.turn_on is None or self.turn_off is None:
+            raise ValueError("Provide turn_on and turn_off event windows.")
+        return self
 
 
 class DptEnergyPointRequest(BaseModel):
