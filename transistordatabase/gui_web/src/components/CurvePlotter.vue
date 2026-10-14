@@ -57,6 +57,10 @@ export default {
       type: String,
       default: 'X'
     },
+    xValueDecimals: {
+      type: Number,
+      default: 3
+    },
     yLabel: {
       type: String,
       default: 'Y'
@@ -139,7 +143,7 @@ export default {
               callbacks: {
                 label: (context) => {
                   const label = context.dataset.label || ''
-                  return `${label}: (${context.parsed.x.toFixed(3)}, ${context.parsed.y.toFixed(3)})`
+                  return `${label}: (${context.parsed.x.toFixed(this.xValueDecimals)}, ${context.parsed.y.toFixed(3)})`
                 }
               }
             },

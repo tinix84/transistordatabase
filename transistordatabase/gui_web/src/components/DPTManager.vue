@@ -99,6 +99,94 @@
               <strong>Comment:</strong> {{ dptData.metadata.comment }}
             </div>
           </div>
+
+          <section class="raw-waveforms-section" aria-labelledby="raw-waveforms-title">
+            <h4 id="raw-waveforms-title">Stored Raw DPT Waveforms</h4>
+            <p class="waveform-description">
+              These plots show stored samples only. They do not calculate switching energy.
+            </p>
+
+            <div v-if="rawMeasurementRecords.length === 0" class="no-data" role="status">
+              No raw DPT waveform measurements are stored for this transistor.
+            </div>
+
+            <template v-else>
+              <div class="waveform-selectors">
+                <label for="dpt-measurement-select">Measurement record:</label>
+                <select
+                  id="dpt-measurement-select"
+                  data-testid="dpt-measurement-select"
+                  v-model.number="selectedMeasurementIndex"
+                  @change="selectedAcquisitionIndex = 0"
+                >
+                  <option
+                    v-for="(measurement, index) in rawMeasurementRecords"
+                    :key="index"
+                    :value="index"
+                  >
+                    {{ measurementLabel(measurement, index) }}
+                  </option>
+                </select>
+              </div>
+
+              <div v-if="selectedMeasurement" class="raw-measurement-details">
+                <div v-if="measurementConditions.length" class="measurement-conditions">
+                  <h5>Test conditions</h5>
+                  <dl>
+                    <div v-for="condition in measurementConditions" :key="condition.label">
+                      <dt>{{ condition.label }}</dt>
+                      <dd>{{ condition.value }}</dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <div v-if="acquisitionCount > 0" class="acquisition-selector">
+                  <label for="dpt-acquisition-select">Acquisition:</label>
+                  <select
+                    id="dpt-acquisition-select"
+                    data-testid="dpt-acquisition-select"
+                    v-model.number="selectedAcquisitionIndex"
+                  >
+                    <option
+                      v-for="index in acquisitionCount"
+                      :key="index - 1"
+                      :value="index - 1"
+                    >
+                      Acquisition {{ index }}
+                    </option>
+                  </select>
+                </div>
+                <div v-else class="no-data" role="status">
+                  No acquisitions are available for this measurement.
+                </div>
+
+                <div v-if="acquisitionCount > 0" class="waveform-grid">
+                  <section
+                    v-for="plot in waveformPlots"
+                    :key="plot.key"
+                    class="waveform-panel"
+                    :data-testid="`dpt-waveform-${plot.key}`"
+                  >
+                    <CurvePlotter
+                      v-if="plot.hasNumericPoints"
+                      :title="plot.title"
+                      :datasets="[{ label: plot.title, data: plot.data, borderColor: plot.color }]"
+                      x-label="Time [µs]"
+                      :x-value-decimals="6"
+                      :y-label="plot.yLabel"
+                      :show-legend="false"
+                    />
+                    <div v-else class="no-data" role="status">
+                      No finite samples are available for {{ plot.title }} in this acquisition.
+                    </div>
+                    <p v-if="plot.hasNonFiniteSamples" class="waveform-gap-note">
+                      Non-finite raw samples are preserved and shown as gaps.
+                    </p>
+                  </section>
+                </div>
+              </div>
+            </template>
+          </section>
         </div>
 
         <div v-else class="no-data">
@@ -270,16 +358,20 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { transistorApi } from '../services/api'
+import CurvePlotter from './CurvePlotter.vue'
 
 export default {
   name: 'DPTManager',
+  components: { CurvePlotter },
   setup() {
     const transistorList = ref([])
     const selectedTransistorId = ref('')
     const activeTab = ref('data')
     const dptData = ref(null)
+    const selectedMeasurementIndex = ref(0)
+    const selectedAcquisitionIndex = ref(0)
     const generating = ref(false)
     const validating = ref(false)
     const error = ref(null)
@@ -299,6 +391,89 @@ export default {
 
     const generatedNetlist = ref(null)
     const validationResults = ref(null)
+    const rawMeasurementRecords = computed(() => (
+      Array.isArray(dptData.value?.raw_measurement_data)
+        ? dptData.value.raw_measurement_data
+        : []
+    ))
+    const selectedMeasurement = computed(() => (
+      rawMeasurementRecords.value[selectedMeasurementIndex.value] || null
+    ))
+    const acquisitionCount = computed(() => {
+      const measurement = selectedMeasurement.value
+      if (!measurement) return 0
+      return Math.max(
+        0,
+        ...['dpt_on_vds', 'dpt_on_id', 'dpt_off_vds', 'dpt_off_id']
+          .map(field => Array.isArray(measurement[field]) ? measurement[field].length : 0)
+      )
+    })
+    const measurementConditions = computed(() => {
+      const metadata = selectedMeasurement.value?.metadata || {}
+      const definitions = [
+        ['dataset_type', 'Dataset type', ''],
+        ['t_j', 'Junction temperature', '°C'],
+        ['v_supply', 'Supply voltage', 'V'],
+        ['v_g', 'Gate voltage', 'V'],
+        ['v_g_off', 'Turn-off gate voltage', 'V'],
+        ['r_g', 'Gate resistance', 'Ω'],
+        ['r_g_off', 'Turn-off gate resistance', 'Ω'],
+        ['load_inductance', 'Load inductance', 'H'],
+        ['commutation_inductance', 'Commutation inductance', 'H'],
+        ['measurement_date', 'Measurement date', ''],
+        ['measurement_testbench', 'Test bench', ''],
+        ['commutation_device', 'Commutation device', ''],
+        ['comment', 'Comment', ''],
+      ]
+      return definitions.flatMap(([key, label, unit]) => {
+        const value = metadata[key]
+        if (value === null || value === undefined || value === '') return []
+        const formatted = Array.isArray(value) ? value.join(', ') : String(value)
+        return [{ label, value: unit ? `${formatted} ${unit}` : formatted }]
+      })
+    })
+    const waveformPlots = computed(() => {
+      const measurement = selectedMeasurement.value
+      if (!measurement) return []
+      const plots = [
+        { key: 'on-vds', field: 'dpt_on_vds', title: 'Turn-on Vds', yLabel: 'Vds [V]', color: '#2563eb' },
+        { key: 'on-id', field: 'dpt_on_id', title: 'Turn-on Id', yLabel: 'Id [A]', color: '#dc2626' },
+        { key: 'off-vds', field: 'dpt_off_vds', title: 'Turn-off Vds', yLabel: 'Vds [V]', color: '#7c3aed' },
+        { key: 'off-id', field: 'dpt_off_id', title: 'Turn-off Id', yLabel: 'Id [A]', color: '#ea580c' },
+      ]
+      return plots.map(plot => {
+        const acquisitions = measurement[plot.field]
+        const samples = Array.isArray(acquisitions)
+          ? acquisitions[selectedAcquisitionIndex.value]
+          : null
+        const data = []
+        let hasNonFiniteSamples = false
+        if (Array.isArray(samples)) {
+          for (const sample of samples) {
+            if (!Array.isArray(sample) || sample.length < 2) continue
+            const [time, value] = sample
+            if (typeof time !== 'number' || !Number.isFinite(time)) continue
+            const finiteValue = typeof value === 'number' && Number.isFinite(value)
+            if (!finiteValue) hasNonFiniteSamples = true
+            data.push({ x: time * 1e6, y: finiteValue ? value : null })
+          }
+        }
+        return {
+          ...plot,
+          data,
+          hasNumericPoints: data.some(point => point.y !== null),
+          hasNonFiniteSamples,
+        }
+      })
+    })
+
+    function measurementLabel(measurement, index) {
+      const metadata = measurement?.metadata || {}
+      const label = [metadata.dataset_type, metadata.comment]
+        .filter(value => value !== null && value !== undefined && value !== '')
+        .join(' · ')
+      return label || `Measurement ${index + 1}`
+    }
 
     onMounted(async () => {
       try {
@@ -318,6 +493,8 @@ export default {
       try {
         error.value = null
         dptData.value = await transistorApi.getDPTData(selectedTransistorId.value)
+        selectedMeasurementIndex.value = 0
+        selectedAcquisitionIndex.value = 0
       } catch (err) {
         error.value = 'Failed to load DPT data'
         dptData.value = null
@@ -382,6 +559,14 @@ export default {
       selectedTransistorId,
       activeTab,
       dptData,
+      rawMeasurementRecords,
+      selectedMeasurement,
+      selectedMeasurementIndex,
+      selectedAcquisitionIndex,
+      acquisitionCount,
+      measurementConditions,
+      waveformPlots,
+      measurementLabel,
       dptConfig,
       generating,
       validating,
@@ -543,6 +728,104 @@ h2 {
   margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid #e0e0e0;
+}
+
+.raw-waveforms-section {
+  margin-top: 30px;
+  padding: 20px;
+  border: 1px solid #dbe3eb;
+  border-radius: 8px;
+  background: #fbfdff;
+}
+
+.raw-waveforms-section h4 {
+  margin: 0 0 8px;
+}
+
+.waveform-description,
+.waveform-gap-note {
+  color: #5b6573;
+  font-size: 14px;
+}
+
+.waveform-selectors,
+.acquisition-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.waveform-selectors label,
+.acquisition-selector label {
+  font-weight: 600;
+}
+
+.waveform-selectors select,
+.acquisition-selector select {
+  min-width: 220px;
+  padding: 8px 10px;
+  border: 1px solid #b8c2cc;
+  border-radius: 4px;
+  background: white;
+}
+
+.measurement-conditions {
+  margin: 18px 0;
+  padding: 16px;
+  border-radius: 6px;
+  background: #f1f5f9;
+}
+
+.measurement-conditions h5 {
+  margin: 0 0 10px;
+}
+
+.measurement-conditions dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px 18px;
+  margin: 0;
+}
+
+.measurement-conditions dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.measurement-conditions dt {
+  font-weight: 600;
+}
+
+.measurement-conditions dd {
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.waveform-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-top: 18px;
+}
+
+.waveform-panel {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+}
+
+.waveform-panel :deep(.curve-plotter .chart-container) {
+  height: 280px;
+}
+
+.waveform-gap-note {
+  margin: 8px 0 0;
 }
 
 /* Config Form */
