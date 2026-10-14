@@ -161,6 +161,49 @@ def test_conduction_only_mode_requires_device_channels_at_api_boundary(client: T
     assert "Missing required switch channel curve" in response.json()["detail"]
 
 
+def test_loss_balanced_boost_api_returns_power_closed_channel_result(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Expose the direct Boost CCM solver and its channel-only scope via HTTP."""
+    request = payload(
+        topology="boost",
+        mode="loss-balanced",
+        v_in=100,
+        v_out=200,
+        p_out=1000,
+        f_sw=20_000,
+        l_value=0.001,
+        c_out=0.001,
+        t_j=25,
+        v_g=15,
+        diode_v_g=0,
+        switch_transistor_id="gated-device",
+        diode_transistor_id="gated-device",
+    )
+    response = gate_conditioned_client.post("/api/topology/calculate", json=request)
+    assert response.status_code == 200
+    result = response.json()
+    assert result["model"]["mode"] == "loss-balanced"
+    assert result["losses"]["loss_scope"] == "channel_conduction_only"
+    assert 0 < result["calculated"]["inductor_volt_second_residual_v"] < 0.01
+    assert result["performance"]["p_in_w"] == pytest.approx(
+        100 * result["calculated"]["i_in_avg_a"]
+    )
+    assert result["performance"]["p_in_w"] == pytest.approx(
+        1000 + result["losses"]["total_w"], rel=1e-7
+    )
+
+
+def test_loss_balanced_api_rejects_unsupported_regime(client: TestClient) -> None:
+    """Return a clear client error for unsupported loss-balanced DCM."""
+    response = client.post(
+        "/api/topology/calculate",
+        json=payload(topology="buck", mode="loss-balanced", conduction_regime="DCM"),
+    )
+    assert response.status_code == 400
+    assert "supports CCM only" in response.json()["detail"]
+
+
 def test_api_requires_and_passes_gate_condition_for_diode_channel_curves(gate_conditioned_client: TestClient) -> None:
     """Require explicit diode gate selection and return its curve provenance."""
     request = payload(
@@ -194,6 +237,44 @@ def test_line_sweep_is_generated_and_serialized_by_backend(client: TestClient) -
     assert sweep["x_unit"] == "Hz"
     assert sweep["values"][0] == pytest.approx(12.5)
     assert sweep["values"][-1] == pytest.approx(6.25)
+
+
+def test_loss_balanced_api_rejects_sweeps_before_calculating(client: TestClient) -> None:
+    """Return a clear client error for unsupported loss-balanced sweeps."""
+    response = client.post(
+        "/api/topology/calculate",
+        json=payload(
+            mode="loss-balanced",
+            sweep={
+                "x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000,
+                "x_points": 3, "metric": "i_l_ripple_pp_a",
+            },
+        ),
+    )
+    assert response.status_code == 400
+    assert "Topology sweeps are not supported in loss-balanced mode" in response.json()["detail"]
+
+
+def test_loss_balanced_comparison_returns_scope_with_efficiency_ranking(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Label the partial-loss scope when the comparison ranking is available."""
+    response = gate_conditioned_client.post(
+        "/api/topology/compare",
+        json={
+            "parameters": payload(
+                topology="boost", mode="loss-balanced", v_in=100, v_out=200,
+                p_out=1000, f_sw=20_000, l_value=1e-3, c_out=1e-3,
+                t_j=25, v_g=15, diode_v_g=0,
+            ),
+            "switch_transistor_id": "gated-device",
+            "diode_transistor_id": "gated-device",
+        },
+    )
+    assert response.status_code == 200
+    comparison = response.json()["comparison"]
+    assert comparison["ranking_available"] is True
+    assert comparison["loss_scope"] == "channel_conduction_only"
 
 
 def test_estimate_comparison_does_not_rank_unmodeled_efficiencies(client: TestClient) -> None:

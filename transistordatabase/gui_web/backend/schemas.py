@@ -240,11 +240,11 @@ class TopologyCalculationRequest(BaseModel):
     """SI-unit request for one headless topology operating point and optional sweep."""
 
     topology: str = Field(..., description="buck, boost, buck-boost, or flyback; other topologies are unsupported")
-    mode: Literal["estimate", "conduction-only", "detailed"] = Field(
+    mode: Literal["estimate", "conduction-only", "detailed", "loss-balanced"] = Field(
         ...,
         description=(
-            "Select an ideal estimate, channel conduction only, or channel conduction plus "
-            "switch turn-on/turn-off losses"
+            "Select an ideal estimate, channel conduction only, channel conduction plus "
+            "switch turn-on/turn-off losses, or a CCM channel-loss-balanced solve"
         ),
     )
     conduction_regime: Literal["CCM", "DCM"] = Field(
