@@ -1,6 +1,6 @@
 # Sprint: CCM loss-balanced topology sweeps
 
-Status: implementation in review; based on merged CCM channel-loss feedback PR #11 at `6a7541f`.
+Status: merged into main; based on merged CCM channel-loss feedback PR #11 at `6a7541f`.
 
 ## Goal
 
@@ -25,7 +25,7 @@ Extend the existing bounded Python line and contour sweep workflow to the `loss-
 - This remains a channel-conduction-only loss screen. Switching, reverse-recovery, gate-drive, passive, and magnetic losses are excluded.
 - Each point power-balances included channel losses and reports its own averaged inductor volt-second residual. Nonlinear curve cases may not close both equations exactly; no exact nonlinear closure or electrothermal iteration is claimed.
 - Exact-condition curves only; no extrapolation. One unsupported sweep point rejects the request rather than producing a partial grid.
-- No changes to Qt, the persisted TDB schema, core models, adapters, ABCs, device records, or the separate `ntbees2` interfaces/adapters/converters. Do not alter `trial.json`; do not stage, commit, or push as part of this sprint.
+- No changes to Qt, the persisted TDB schema, core models, adapters, ABCs, device records, or the separate `ntbees2` interfaces/adapters/converters. Do not alter `trial.json`.
 
 ## Acceptance
 

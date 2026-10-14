@@ -195,13 +195,57 @@ def test_loss_balanced_boost_api_returns_power_closed_channel_result(
 
 
 def test_loss_balanced_api_rejects_unsupported_regime(client: TestClient) -> None:
-    """Return a clear client error for unsupported loss-balanced DCM."""
+    """Return a clear client error for non-Boost loss-balanced DCM."""
     response = client.post(
         "/api/topology/calculate",
         json=payload(topology="buck", mode="loss-balanced", conduction_regime="DCM"),
     )
     assert response.status_code == 400
-    assert "supports CCM only" in response.json()["detail"]
+    assert "Boost only" in response.json()["detail"]
+
+
+def test_loss_balanced_boost_dcm_api_exposes_both_balance_residuals(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Expose channel-only Boost DCM feedback and both independent balances."""
+    request = payload(
+        topology="boost", mode="loss-balanced", conduction_regime="DCM",
+        v_in=100, v_out=200, p_out=100, f_sw=20_000,
+        l_value=0.001, c_out=0.001, t_j=25, v_g=15, diode_v_g=0,
+        switch_transistor_id="gated-device", diode_transistor_id="gated-device",
+    )
+    response = gate_conditioned_client.post("/api/topology/calculate", json=request)
+    assert response.status_code == 200
+    result = response.json()
+    calculated = result["calculated"]
+    assert result["model"]["conduction_regime"] == "DCM"
+    assert result["losses"]["loss_scope"] == "channel_conduction_only"
+    assert calculated["idle_fraction"] > 0
+    assert calculated["switch_conduction_fraction"] + calculated[
+        "diode_conduction_fraction"
+    ] + calculated["idle_fraction"] == pytest.approx(1)
+    assert abs(calculated["inductor_volt_second_residual_v"]) < 1e-8
+    assert abs(calculated["power_balance_residual_w"]) < 1e-6
+    assert result["performance"]["p_in_w"] == pytest.approx(
+        request["v_in"] * calculated["i_in_avg_a"]
+    )
+
+
+def test_loss_balanced_boost_dcm_api_rejects_target_at_ccm_boundary(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Return an actionable API error when the requested point is not DCM."""
+    response = gate_conditioned_client.post(
+        "/api/topology/calculate",
+        json=payload(
+            topology="boost", mode="loss-balanced", conduction_regime="DCM",
+            v_in=100, v_out=200, p_out=150, f_sw=20_000,
+            l_value=0.001, c_out=0.001, t_j=25, v_g=15, diode_v_g=0,
+            switch_transistor_id="gated-device", diode_transistor_id="gated-device",
+        ),
+    )
+    assert response.status_code == 400
+    assert "at or above the CCM boundary" in response.json()["detail"]
 
 
 def test_api_requires_and_passes_gate_condition_for_diode_channel_curves(gate_conditioned_client: TestClient) -> None:
@@ -322,6 +366,26 @@ def test_loss_balanced_comparison_returns_scope_with_efficiency_ranking(
     comparison = response.json()["comparison"]
     assert comparison["ranking_available"] is True
     assert comparison["loss_scope"] == "channel_conduction_only"
+
+
+def test_loss_balanced_dcm_topology_comparison_is_rejected(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Do not rank a scalar-only Boost DCM result against invalid topologies."""
+    response = gate_conditioned_client.post(
+        "/api/topology/compare",
+        json={
+            "parameters": payload(
+                topology="boost", mode="loss-balanced", conduction_regime="DCM",
+                v_in=100, v_out=200, p_out=100, f_sw=20_000,
+                l_value=1e-3, c_out=1e-3, t_j=25, v_g=15, diode_v_g=0,
+            ),
+            "switch_transistor_id": "gated-device",
+            "diode_transistor_id": "gated-device",
+        },
+    )
+    assert response.status_code == 400
+    assert "does not support loss-balanced DCM" in response.json()["detail"]
 
 
 def test_estimate_comparison_does_not_rank_unmodeled_efficiencies(client: TestClient) -> None:

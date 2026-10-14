@@ -53,6 +53,14 @@ class TopologyCalculatorService:
         diode_transistor: Transistor | None = None,
     ) -> Dict[str, Any]:
         """Compare supported topologies and retain per-topology domain errors."""
+        if (
+            parameters.get("mode") == "loss-balanced"
+            and parameters.get("conduction_regime", "CCM") == "DCM"
+        ):
+            raise ValueError(
+                "Topology comparison does not support loss-balanced DCM; "
+                "only a scalar Boost DCM operating point is supported"
+            )
         results: Dict[str, Any] = {}
         for topology in TopologyCalculatorService.SUPPORTED_TOPOLOGIES:
             try:

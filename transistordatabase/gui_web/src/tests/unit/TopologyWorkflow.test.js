@@ -162,12 +162,49 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Hover a point to inspect its averaged volt-second residual')
   })
 
-  it('disables topology comparison for unsupported loss-balanced DCM', async () => {
+  it('runs scalar Boost DCM loss-balanced mode and displays both residuals', async () => {
+    calculateTopology.mockResolvedValueOnce({
+      ...estimateResponse,
+      topology: 'boost',
+      calculated: {
+        ...estimateResponse.calculated,
+        duty_cycle: 0.45,
+        i_l_peak_a: 2.25,
+        switch_conduction_fraction: 0.45,
+        diode_conduction_fraction: 0.44,
+        idle_fraction: 0.11,
+        inductor_volt_second_residual_v: 1e-10,
+        power_balance_residual_w: 2e-10
+      },
+      model: { ...estimateResponse.model, mode: 'loss-balanced', conduction_regime: 'DCM' },
+      losses: {
+        conduction_switch_w: 1,
+        conduction_diode_w: 2,
+        total_w: 3,
+        scope: 'channel conduction only',
+        loss_scope: 'channel_conduction_only'
+      },
+      performance: {
+        p_out_w: 100,
+        p_in_w: 103,
+        efficiency_percent: 97.09,
+        power_balance_residual_w: 2e-10
+      }
+    })
+    await wrapper.findAll('button.topology-card').find(button => button.text().includes('Boost')).trigger('click')
     await setSelect('Calculation mode', 'loss-balanced')
     await setSelect('Conduction regime', 'DCM')
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+    expect(calculateTopology.mock.calls[0][0]).toMatchObject({
+      topology: 'boost', mode: 'loss-balanced', conduction_regime: 'DCM'
+    })
+    expect(wrapper.text()).toContain('Boost DCM TDB channel loss-balanced averaged model')
+    expect(wrapper.text()).toContain('Power-balance residual: 0.00000000 W')
+    expect(wrapper.text()).toContain('Averaged inductor volt-second residual: 0.00000000 V')
     const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
     expect(comparisonButton.element.disabled).toBe(true)
-    expect(wrapper.text()).toContain('the solver supports CCM only')
+    expect(wrapper.text()).toContain('Only scalar Boost DCM feedback is supported')
   })
 
   it('shows backend validation errors instead of stale results', async () => {

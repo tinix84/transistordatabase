@@ -36,7 +36,7 @@
               <option value="estimate">Ideal operating-point estimate</option>
               <option value="conduction-only">TDB channel conduction only</option>
               <option value="detailed">TDB curve based losses</option>
-              <option value="loss-balanced">CCM loss-balanced channel model</option>
+              <option value="loss-balanced">Loss-balanced channel model</option>
             </select>
           </label>
           <label class="param-item">Conduction regime
@@ -90,7 +90,7 @@
               </select>
             </label>
           </div>
-          <p class="hint">Estimate mode does not use device curves. Conduction-only mode requires exact-condition switch and diode channel curves. Detailed mode also requires exact-condition turn-on and turn-off curves. Loss-balanced mode supports CCM operation with exact-condition switch and diode channel curves; DCM and curve extrapolation are rejected.</p>
+          <p class="hint">Estimate mode does not use device curves. Conduction-only mode requires exact-condition switch and diode channel curves. Detailed mode also requires exact-condition turn-on and turn-off curves. Loss-balanced mode requires exact-condition switch and diode channel curves. Boost supports CCM and DCM feedback; DCM feedback for other topologies and all curve extrapolation are rejected.</p>
         </div>
 
         <div v-if="form.mode !== 'estimate'" class="param-section">
@@ -124,7 +124,7 @@
           <h4>Python generated sweep</h4>
           <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox"> Include line or contour sweep</label>
           <p v-if="form.mode === 'loss-balanced'" class="hint">Loss-balanced sweeps solve each CCM point from exact-condition channel curves. Every point must be supported; no curve extrapolation is used.</p>
-          <p v-if="form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM'" class="hint">Set conduction regime to CCM to calculate a loss-balanced sweep.</p>
+          <p v-if="form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM'" class="hint">Loss-balanced sweeps support CCM only. Boost DCM is available for a scalar operating point.</p>
           <div v-if="form.sweep_enabled" class="param-grid">
             <label class="param-item">Sweep type
               <select v-model="form.sweep_kind"><option value="line">Line</option><option value="contour">Contour</option></select>
@@ -167,7 +167,7 @@
         <button class="btn btn-secondary" type="button" :disabled="loading || (form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM')" @click="compare">Compare topologies</button>
         </div>
         <div v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</div>
-        <p v-if="form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM'" class="hint">Topology comparison is unavailable for loss-balanced DCM; the solver supports CCM only.</p>
+        <p v-if="form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM'" class="hint">Topology comparison is unavailable for loss-balanced DCM. Only scalar Boost DCM feedback is supported.</p>
       </section>
 
       <section v-if="hasResults" class="results-panel">
@@ -311,7 +311,11 @@ const hasResults = computed(() => results.value !== null)
 const hasExportableResults = computed(() => hasResults.value || comparison.value !== null)
 const modelLabel = computed(() => {
   const mode = results.value?.model?.mode
-  if (mode === 'loss-balanced') return 'CCM TDB channel loss-balanced averaged model'
+  if (mode === 'loss-balanced') {
+    const regime = results.value?.model?.conduction_regime || 'CCM'
+    const topology = results.value?.topology === 'boost' && regime === 'DCM' ? 'Boost DCM' : regime
+    return `${topology} TDB channel loss-balanced averaged model`
+  }
   if (mode === 'detailed') return 'TDB curve based partial device model'
   if (mode === 'conduction-only') return 'TDB channel conduction-only partial model'
   return `Ideal ${results.value?.model?.conduction_regime || 'CCM'} operating-point estimate`

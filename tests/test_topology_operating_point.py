@@ -18,6 +18,7 @@ from transistordatabase.core.models import (
 )
 from transistordatabase.core.repository import JsonTransistorLoader
 from transistordatabase.topologies.operating_point import (
+    _dcm_output_ripple,
     calculate_topology_operating_point,
     calculate_topology_sweep,
 )
@@ -671,19 +672,273 @@ def test_loss_balanced_boost_rejects_no_positive_on_interval_voltage() -> None:
         )
 
 
-@pytest.mark.parametrize(
-    "topology",
-    ["buck", "boost", "buck-boost", "flyback"],
-)
-def test_loss_balanced_mode_rejects_dcm_for_all_topologies(topology: str) -> None:
-    """Keep the current measured-curve solve within the explicit CCM domain."""
-    with pytest.raises(ValueError, match="supports CCM only"):
+@pytest.mark.parametrize("topology", ["buck", "buck-boost", "flyback"])
+def test_loss_balanced_mode_rejects_unsupported_dcm_topologies(topology: str) -> None:
+    """Keep DCM channel feedback explicitly Boost-only."""
+    with pytest.raises(ValueError, match="Boost only"):
         calculate_topology_operating_point(
             topology,
             point(mode="loss-balanced", conduction_regime="DCM"),
             device(),
             device(),
         )
+
+
+def _flat_dcm_device(
+    name: str = "flat DCM device", *, max_current: float = 100.0
+) -> Transistor:
+    transistor = device(name, max_current=max_current)
+    transistor.switch.channel_data[0].graph_v_i = np.array(
+        [[1.0, 1.0], [0.0, max_current]]
+    )
+    transistor.diode.channel_data[0].graph_v_i = np.array(
+        [[2.0, 2.0], [0.0, max_current]]
+    )
+    return transistor
+
+
+def test_loss_balanced_boost_dcm_closes_independent_power_and_volt_second_fixture() -> None:
+    """Check both balances from independent flat-drop Boost DCM equations."""
+    transistor = _flat_dcm_device()
+    values = point(
+        mode="loss-balanced", topology="boost", conduction_regime="DCM",
+        v_in=100, v_out=200, p_out=100, l_value=1e-3, f_sw=20_000,
+        c_out=1e-3, t_j=25, v_g=15,
+    )
+    original_switch = transistor.switch.channel_data[0].graph_v_i.copy()
+    original_diode = transistor.diode.channel_data[0].graph_v_i.copy()
+
+    result = calculate_topology_operating_point(
+        "boost", values, transistor, transistor
+    )
+
+    calculated = result["calculated"]
+    current_out = values["p_out"] / values["v_out"]
+    off_voltage = values["v_out"] - values["v_in"] + 2.0
+    peak = np.sqrt(
+        2 * current_out * off_voltage / (values["l_value"] * values["f_sw"])
+    )
+    expected_duty = (
+        values["l_value"] * values["f_sw"] * peak / (values["v_in"] - 1.0)
+    )
+    expected_diode_fraction = (
+        values["l_value"] * values["f_sw"] * peak / off_voltage
+    )
+    assert calculated["i_l_peak_a"] == pytest.approx(peak, rel=1e-8)
+    assert calculated["duty_cycle"] == pytest.approx(expected_duty, rel=1e-8)
+    assert calculated["switch_conduction_fraction"] == pytest.approx(expected_duty)
+    assert calculated["diode_conduction_fraction"] == pytest.approx(
+        expected_diode_fraction, rel=1e-8
+    )
+    assert calculated["idle_fraction"] == pytest.approx(
+        1 - expected_duty - expected_diode_fraction, rel=1e-8
+    )
+    assert calculated["idle_fraction"] > 0
+    assert calculated["inductor_volt_second_residual_v"] == pytest.approx(0, abs=1e-9)
+    assert calculated["power_balance_residual_w"] == pytest.approx(0, abs=1e-8)
+    assert result["performance"]["p_in_w"] == pytest.approx(
+        values["p_out"] + result["losses"]["total_w"], rel=1e-9
+    )
+    assert calculated["i_out_avg_a"] == pytest.approx(current_out)
+    assert result["model"]["conduction_regime"] == "DCM"
+    assert result["losses"]["loss_scope"] == "channel_conduction_only"
+    assert np.array_equal(transistor.switch.channel_data[0].graph_v_i, original_switch)
+    assert np.array_equal(transistor.diode.channel_data[0].graph_v_i, original_diode)
+    assert min(result["waveforms"]["inductor_current_a"]) == pytest.approx(0)
+    phase = np.asarray(result["waveforms"]["time_s"]) * values["f_sw"]
+    waveform_current = np.asarray(result["waveforms"]["inductor_current_a"])
+    switch_event = np.flatnonzero(np.isclose(phase, expected_duty))[-1]
+    diode_end_event = np.flatnonzero(
+        np.isclose(phase, expected_duty + expected_diode_fraction)
+    )[-1]
+    assert waveform_current[switch_event] == pytest.approx(peak)
+    assert waveform_current[diode_end_event] == pytest.approx(0)
+
+
+def test_loss_balanced_boost_dcm_ripple_uses_solved_nonlinear_diode_ramp() -> None:
+    """Compare ripple with an independent dense integration of nonlinear ramps."""
+    transistor = _flat_dcm_device()
+    currents = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 10.0])
+    transistor.switch.channel_data[0].graph_v_i = np.array(
+        [[1.0, 1.05, 1.2, 1.5, 2.0, 2.5, 3.0], currents]
+    )
+    transistor.diode.channel_data[0].graph_v_i = np.array(
+        [[2.0, 2.2, 2.5, 3.0, 3.5, 4.0, 4.5], currents]
+    )
+    values = point(
+        mode="loss-balanced", topology="boost", conduction_regime="DCM",
+        v_in=100, v_out=200, p_out=100, l_value=1e-3, f_sw=20_000,
+        c_out=1e-3, t_j=25, v_g=15,
+    )
+
+    result = calculate_topology_operating_point(
+        "boost", values, transistor, transistor
+    )
+
+    peak = result["calculated"]["i_l_peak_a"]
+    dense_current = np.linspace(0.0, peak, 100_001)
+    switch_drop = np.interp(
+        dense_current, currents, transistor.switch.channel_data[0].graph_v_i[0]
+    )
+    diode_drop = np.interp(
+        dense_current, currents, transistor.diode.channel_data[0].graph_v_i[0]
+    )
+    inverse_on_voltage = 1.0 / (values["v_in"] - switch_drop)
+    inverse_off_voltage = 1.0 / (
+        values["v_out"] - values["v_in"] + diode_drop
+    )
+
+    def cumulative_trapezoid(integrand: np.ndarray) -> np.ndarray:
+        increments = (
+            0.5 * (integrand[:-1] + integrand[1:])
+            * np.diff(dense_current)
+            * values["l_value"]
+        )
+        return np.concatenate(([0.0], np.cumsum(increments))
+)
+
+    on_time = cumulative_trapezoid(inverse_on_voltage)
+    diode_time = cumulative_trapezoid(inverse_off_voltage)
+    diode_duration = float(diode_time[-1])
+    current_out = values["p_out"] / values["v_out"]
+    charge = -current_out * float(on_time[-1])
+    extrema = [0.0, charge]
+    descending_current = dense_current[::-1]
+    descending_time = diode_duration - diode_time[::-1]
+    capacitor_current = descending_current - current_out
+    diode_charge = np.concatenate(
+        (
+            [0.0],
+            np.cumsum(
+                0.5
+                * (capacitor_current[:-1] + capacitor_current[1:])
+                * np.diff(descending_time)
+            ),
+        )
+    )
+    extrema.extend((charge + diode_charge).tolist())
+    cycle_time = 1.0 / values["f_sw"]
+    idle_charge = -current_out * (cycle_time - on_time[-1] - diode_duration)
+    extrema.append(charge + float(diode_charge[-1]) + idle_charge)
+    independent_ripple = (max(extrema) - min(extrema)) / values["c_out"]
+
+    calculated = result["calculated"]
+    assert calculated["v_out_ripple_pp_v"] == pytest.approx(
+        independent_ripple, rel=2e-5
+    )
+    triangular_estimate = _dcm_output_ripple(
+        "boost",
+        calculated["duty_cycle"],
+        calculated["diode_conduction_fraction"],
+        peak,
+        current_out,
+        values["f_sw"],
+        values["c_out"],
+    )
+    assert abs(calculated["v_out_ripple_pp_v"] - triangular_estimate) > 1e-5
+
+
+def test_loss_balanced_boost_dcm_brackets_before_switch_drop_cutoff() -> None:
+    """Find a valid root below the current where the switch drop reaches Vin."""
+    transistor = _flat_dcm_device(max_current=10.0)
+    currents = np.array([0.0, 2.0, 4.0, 6.0, 8.0, 10.0])
+    transistor.switch.channel_data[0].graph_v_i = np.array(
+        [[1.0, 1.1, 1.2, 1.5, 3.0, 120.0], currents]
+    )
+    transistor.diode.channel_data[0].graph_v_i = np.array(
+        [[2.0, 2.0, 2.0, 2.0, 2.0, 2.0], currents]
+    )
+
+    result = calculate_topology_operating_point(
+        "boost",
+        point(
+            mode="loss-balanced", conduction_regime="DCM", v_in=100,
+            v_out=200, p_out=100, l_value=1e-3, f_sw=20_000,
+            t_j=25, v_g=15,
+        ),
+        transistor,
+        transistor,
+    )
+
+    calculated = result["calculated"]
+    assert 2.0 < calculated["i_l_peak_a"] < 3.0
+    assert calculated["power_balance_residual_w"] == pytest.approx(0, abs=1e-7)
+    assert calculated["inductor_volt_second_residual_v"] == pytest.approx(0, abs=1e-7)
+
+
+def test_loss_balanced_boost_dcm_rejects_ccm_boundary_and_curve_gaps() -> None:
+    """Fail clearly for a non-DCM target or channel curves without zero current."""
+    transistor = _flat_dcm_device()
+    with pytest.raises(ValueError, match="at or above the CCM boundary"):
+        calculate_topology_operating_point(
+            "boost",
+            point(
+                mode="loss-balanced", conduction_regime="DCM", v_in=100,
+                v_out=200, p_out=150, l_value=1e-3, f_sw=20_000,
+                t_j=25, v_g=15,
+            ),
+            transistor,
+            transistor,
+        )
+
+    unsupported = device()
+    unsupported.switch.channel_data[0].graph_v_i[1, 0] = 0.1
+    unsupported.diode.channel_data[0].graph_v_i[1, 0] = 0.1
+    with pytest.raises(ValueError, match="curve supports 0.1 to"):
+        calculate_topology_operating_point(
+            "boost",
+            point(
+                mode="loss-balanced", conduction_regime="DCM", v_in=100,
+                v_out=200, p_out=100, l_value=1e-3, f_sw=20_000,
+                t_j=25, v_g=15,
+            ),
+            unsupported,
+            unsupported,
+        )
+
+    limited = _flat_dcm_device(max_current=2.0)
+    with pytest.raises(ValueError, match="No supported Boost DCM solution inside"):
+        calculate_topology_operating_point(
+            "boost",
+            point(
+                mode="loss-balanced", conduction_regime="DCM", v_in=100,
+                v_out=200, p_out=100, l_value=1e-3, f_sw=20_000,
+                t_j=25, v_g=15,
+            ),
+            limited,
+            limited,
+        )
+
+
+def test_loss_balanced_boost_dcm_rejects_exact_boundary_but_accepts_below() -> None:
+    """Use an analytic flat-drop boundary and check a nearby feasible point."""
+    transistor = _flat_dcm_device()
+    values = point(
+        mode="loss-balanced", topology="boost", conduction_regime="DCM",
+        v_in=100, v_out=200, p_out=100, l_value=1e-3, f_sw=20_000,
+        c_out=1e-3, t_j=25, v_g=15,
+    )
+    l_f = values["l_value"] * values["f_sw"]
+    on_voltage = values["v_in"] - 1.0
+    off_voltage = values["v_out"] - values["v_in"] + 2.0
+    boundary_peak = 1.0 / (l_f * (1.0 / on_voltage + 1.0 / off_voltage))
+    boundary_output_current = (
+        l_f * boundary_peak**2 / (2.0 * off_voltage)
+    )
+    boundary_power = values["v_out"] * boundary_output_current
+
+    with pytest.raises(ValueError, match="at or above the CCM boundary"):
+        calculate_topology_operating_point(
+            "boost", {**values, "p_out": boundary_power}, transistor, transistor
+        )
+
+    near_boundary = calculate_topology_operating_point(
+        "boost",
+        {**values, "p_out": boundary_power * (1.0 - 1e-6)},
+        transistor,
+        transistor,
+    )
+    assert near_boundary["calculated"]["idle_fraction"] > 0
 
 
 @pytest.mark.parametrize(
