@@ -7,7 +7,7 @@ import json
 import re
 import struct
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import numpy as np
 import pytest
@@ -360,6 +360,61 @@ def test_preview_and_trace_selection_handle_mixed_multi_plot_steps(
     assert [item["step_index"] for item in payload["steps"]] == [1]
     assert payload["steps"][0]["sample_count"] == 5
     assert len(payload["steps"][0]["traces"]["V(ds)"]) == 5
+
+
+@pytest.mark.parametrize(
+    ("malformed_fields", "expected_detail"),
+    [
+        (
+            {"same_context_confirmed": False},
+            "Confirm that all selected steps share the entered test conditions",
+        ),
+        (
+            {
+                "turn_on": {"start_s": 0, "end_s": 1e-6},
+                "turn_off": {"start_s": 1e-6, "end_s": 2e-6},
+            },
+            "Use either step_selections or turn_on/turn_off",
+        ),
+    ],
+    ids=["unconfirmed-grouped-context", "mixed-legacy-and-step-windows"],
+)
+def test_trace_preview_rejects_invalid_grouped_import_selection_without_mutation(
+    isolated_database: tuple[TestClient, Path, dict[str, Any]],
+    tmp_path: Path,
+    malformed_fields: dict[str, Any],
+    expected_detail: str,
+) -> None:
+    """Return a client error for grouped selections that cannot be imported."""
+    _client, record_path, _record = isolated_database
+    original_bytes = record_path.read_bytes()
+    selection = {
+        **_trace_selection(),
+        "plot_index": 0,
+        "step_indices": [1],
+        "step_selections": [
+            {
+                "step_index": 1,
+                "i_x": 20,
+                "turn_on": {"start_s": 0, "end_s": 1e-6},
+                "turn_off": {"start_s": 1e-6, "end_s": 2e-6},
+            }
+        ],
+        "same_context_confirmed": True,
+        "metadata": _common_step_metadata(),
+        **malformed_fields,
+    }
+    content = _stepped_raw_bytes(tmp_path)
+    client = TestClient(main.app, raise_server_exceptions=False)
+    response = client.post(
+        f"/api/transistors/{DEVICE_NAME}/dpt_raw_import/trace_preview",
+        files=_upload_file(content),
+        data={"selection_json": json.dumps(selection)},
+    )
+
+    assert response.status_code == 422
+    assert expected_detail in response.json()["detail"]
+    assert record_path.read_bytes() == original_bytes
 
 
 def test_stepped_import_appends_selected_steps_and_preserves_existing_raw_records(
@@ -1374,15 +1429,28 @@ def test_stepped_aggregate_window_limit_preflights_before_signal_read(
     original_parse = main.parse_ltspice_raw
     calls: list[tuple[str, ...] | None] = []
 
-    def capture_trace_selection(content, filename, selected_traces=None, *, plot_index=None):
+    def capture_trace_selection(
+        content: bytes | bytearray | memoryview,
+        filename: str | None,
+        selected_traces: Sequence[str] | None = None,
+        *,
+        plot_index: int | None = None,
+        step_indices: Sequence[int] | None = None,
+    ) -> dpt_raw_import.ParsedRaw:
         calls.append(tuple(selected_traces) if selected_traces else None)
         if selected_traces is None:
-            return original_parse(content, filename, plot_index=plot_index)
+            return original_parse(
+                content,
+                filename,
+                plot_index=plot_index,
+                step_indices=step_indices,
+            )
         return original_parse(
             content,
             filename,
             selected_traces,
             plot_index=plot_index,
+            step_indices=step_indices,
         )
 
     monkeypatch.setattr(main, "parse_ltspice_raw", capture_trace_selection)

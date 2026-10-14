@@ -34,6 +34,7 @@ import numpy as np
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
+from pydantic import ValidationError
 
 from transistordatabase.backend.concrete_services import (
     ConcreteServiceFactory,
@@ -2902,6 +2903,29 @@ def _dpt_raw_trace_selection(
     return request.time_trace, request.vds_trace, request.id_trace
 
 
+def _accumulate_dpt_event_samples(
+    total_event_samples: int,
+    on_bounds: tuple[int, int],
+    off_bounds: tuple[int, int],
+) -> int:
+    """Add two inclusive window spans and enforce the shared persisted-sample cap."""
+    total = (
+        total_event_samples
+        + on_bounds[1]
+        - on_bounds[0]
+        + off_bounds[1]
+        - off_bounds[0]
+    )
+    if total > MAX_TOTAL_EVENT_SAMPLES:
+        raise DptRawImportError(
+            f"The selected event windows contain {total:,} samples combined; the "
+            f"limit is {MAX_TOTAL_EVENT_SAMPLES:,}. Narrow windows or select fewer "
+            "steps.",
+            status_code=413,
+        )
+    return total
+
+
 def _dpt_raw_review_required(plots: list[dict[str, Any]], plot_index: int) -> bool:
     """Require reviewed server binding for stepped or selected multi-plot data."""
     return len(plots) > 1 or bool(plots[plot_index]["is_stepped"])
@@ -3091,9 +3115,19 @@ async def preview_dpt_raw_traces(
         review_required = _dpt_raw_review_required(plots, plot_index)
         review_token = None
         if review_required and selection.step_selections is not None:
-            reviewed_selection = DptRawImportRequest.model_validate(
-                selection.model_dump(mode="python", exclude={"review_token"})
-            )
+            try:
+                reviewed_selection = DptRawImportRequest.model_validate(
+                    selection.model_dump(mode="python", exclude={"review_token"})
+                )
+            except ValidationError as error:
+                messages = "; ".join(
+                    item["msg"].removeprefix("Value error, ")
+                    for item in error.errors()
+                )
+                raise DptRawImportError(
+                    "Invalid grouped DPT trace selection: " + messages,
+                    status_code=422,
+                ) from error
             _require_dpt_raw_common_context(reviewed_selection)
             range_by_index = {
                 item["step_index"]: item for item in (parsed.step_ranges or [])
@@ -3119,16 +3153,11 @@ async def preview_dpt_raw_traces(
                     step_selection.turn_off.start_s,
                     step_selection.turn_off.end_s,
                 )
-                total_event_samples += (
-                    on_bounds[1] - on_bounds[0] + off_bounds[1] - off_bounds[0]
+                total_event_samples = _accumulate_dpt_event_samples(
+                    total_event_samples,
+                    on_bounds,
+                    off_bounds,
                 )
-                if total_event_samples > MAX_TOTAL_EVENT_SAMPLES:
-                    raise DptRawImportError(
-                        f"The selected event windows contain {total_event_samples:,} "
-                        f"samples combined; the limit is {MAX_TOTAL_EVENT_SAMPLES:,}. "
-                        "Narrow windows or select fewer steps.",
-                        status_code=413,
-                    )
             review_token = _issue_dpt_raw_review_token(
                 _dpt_raw_review_signature(
                     transistor_id, content, reviewed_selection
@@ -3239,16 +3268,11 @@ async def import_dpt_raw_measurement(
             off_bounds = event_window_bounds(
                 step_time, turn_off.start_s, turn_off.end_s
             )
-            total_event_samples += (
-                on_bounds[1] - on_bounds[0] + off_bounds[1] - off_bounds[0]
+            total_event_samples = _accumulate_dpt_event_samples(
+                total_event_samples,
+                on_bounds,
+                off_bounds,
             )
-            if total_event_samples > MAX_TOTAL_EVENT_SAMPLES:
-                raise DptRawImportError(
-                    f"The selected event windows contain {total_event_samples:,} "
-                    f"samples combined; the limit is {MAX_TOTAL_EVENT_SAMPLES:,}. "
-                    "Narrow windows or select fewer steps.",
-                    status_code=413,
-                )
             preflight_windows.append(
                 (step, turn_on, turn_off, i_x, on_bounds, off_bounds)
             )
