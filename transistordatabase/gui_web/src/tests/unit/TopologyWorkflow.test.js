@@ -239,7 +239,7 @@ describe('TopologyCalculator API workflow', () => {
       details.get('summary').text() === 'Curve conditions and provenance'
     )).text()).toContain('switch_t_j_c')
     const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
-    expect(comparisonButton.element.disabled).toBe(true)
+    expect(comparisonButton.element.disabled).toBe(false)
   })
 
   it('exposes line DCM sweep coordinates, metric, and residuals in a semantic table', async () => {
@@ -316,8 +316,8 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Power-balance residual: 0.00000000 W')
     expect(wrapper.text()).toContain('Averaged inductor volt-second residual: 0.00000000 V')
     const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
-    expect(comparisonButton.element.disabled).toBe(true)
-    expect(wrapper.text()).toContain('Topology comparison is unavailable for loss-balanced DCM')
+    expect(comparisonButton.element.disabled).toBe(false)
+    expect(wrapper.text()).toContain('Topology comparison evaluates all four converters at this DCM boundary')
   })
 
   it('runs scalar Buck DCM loss-balanced mode and displays its solved metrics', async () => {
@@ -367,11 +367,11 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Power-balance residual: 0.00000000 W')
     expect(wrapper.text()).toContain('Averaged inductor volt-second residual: 0.00000000 V')
     const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
-    expect(comparisonButton.element.disabled).toBe(true)
-    expect(wrapper.text()).toContain('Topology comparison is unavailable for loss-balanced DCM')
+    expect(comparisonButton.element.disabled).toBe(false)
+    expect(wrapper.text()).toContain('Topology comparison evaluates all four converters at this DCM boundary')
   })
 
-  it('runs scalar inverting Buck-Boost DCM with sweeps available and comparison disabled', async () => {
+  it('runs scalar inverting Buck-Boost DCM with sweeps and comparison available', async () => {
     calculateTopology.mockResolvedValueOnce({
       ...estimateResponse,
       topology: 'buck-boost',
@@ -414,7 +414,7 @@ describe('TopologyCalculator API workflow', () => {
     await setSelect('Calculation mode', 'loss-balanced')
     await setSelect('Conduction regime', 'DCM')
     expect(wrapper.text()).toContain(
-      'Scalar operating points and line or contour sweeps are available for Buck, Boost, inverting Buck-Boost, and Flyback.'
+      'Unsupported voltage or curve domains appear as per-topology errors'
     )
 
     const sweepToggle = wrapper.find('.sweep-toggle input')
@@ -436,7 +436,53 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Power-balance residual: 0.00000000 W')
     expect(wrapper.text()).toContain('Averaged inductor volt-second residual: 0.00000000 V')
     const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
-    expect(comparisonButton.element.disabled).toBe(true)
+    expect(comparisonButton.element.disabled).toBe(false)
+  })
+
+  it('submits loss-balanced DCM comparison and shows partial-loss scope and residuals', async () => {
+    compareTopologies.mockResolvedValueOnce({
+      buck: {
+        model: { mode: 'loss-balanced', conduction_regime: 'DCM', assumptions: [] },
+        losses: { loss_scope: 'channel_conduction_only' },
+        calculated: { inductor_volt_second_residual_v: 1e-7 },
+        performance: { efficiency_percent: 98.5, power_balance_residual_w: 2e-7 }
+      },
+      boost: { error: 'Boost requires v_out > v_in > 0' },
+      'buck-boost': { error: 'Buck-Boost curve domain is unsupported' },
+      flyback: { error: 'Flyback requires a positive turns_ratio_nps' },
+      comparison: {
+        efficiencies_percent: { buck: 98.5 },
+        best_topology: 'buck',
+        ranking_available: true,
+        ranking_basis: 'included_channel_conduction_efficiency_proxy',
+        loss_scope: 'channel_conduction_only'
+      }
+    })
+    await setSelect('Calculation mode', 'loss-balanced')
+    await setSelect('Conduction regime', 'DCM')
+    await setInput('Input voltage', 500)
+    await setInput('Output voltage magnitude', 400)
+    await setInput('Flyback turns ratio (Np/Ns)', 2)
+    const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
+    expect(comparisonButton.element.disabled).toBe(false)
+
+    await comparisonButton.trigger('click')
+    await flushPromises()
+
+    expect(compareTopologies).toHaveBeenCalledTimes(1)
+    expect(compareTopologies.mock.calls[0][0].parameters).toMatchObject({
+      mode: 'loss-balanced',
+      conduction_regime: 'DCM',
+      v_in: 500,
+      v_out: 400,
+      turns_ratio_nps: 2
+    })
+    expect(wrapper.text()).toContain('Included channel-loss proxy:')
+    expect(wrapper.text()).toContain('98.500%')
+    expect(wrapper.text()).toContain('Power-balance residual: 0.00000020 W')
+    expect(wrapper.text()).toContain('Averaged inductor volt-second residual: 0.00000010 V')
+    expect(wrapper.text()).toContain('This ranking is an included channel-conduction efficiency proxy, not total converter efficiency.')
+    expect(wrapper.text()).toContain('Boost requires v_out > v_in > 0')
   })
 
   it('shows backend validation errors instead of stale results', async () => {
@@ -495,7 +541,7 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('RMS secondary diode current')
     expect(wrapper.text()).toContain('0.770 A')
     expect(wrapper.find('.sweep-toggle input').element.disabled).toBe(false)
-    expect(wrapper.findAll('button').find(button => button.text().includes('Compare topologies')).element.disabled).toBe(true)
+    expect(wrapper.findAll('button').find(button => button.text().includes('Compare topologies')).element.disabled).toBe(false)
   })
 
   it('calls the comparison endpoint with device ids separated from operating parameters', async () => {
@@ -505,6 +551,7 @@ describe('TopologyCalculator API workflow', () => {
     const request = compareTopologies.mock.calls[0][0]
     expect(request.parameters.mode).toBe('estimate')
     expect(request.parameters.topology).toBeUndefined()
+    expect(request.parameters.turns_ratio_nps).toBeUndefined()
     expect(request.switch_transistor_id).toBeUndefined()
   })
 

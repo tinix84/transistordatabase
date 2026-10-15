@@ -45,7 +45,7 @@
               <option value="DCM">Discontinuous conduction (DCM)</option>
             </select>
           </label>
-          <label v-if="selectedTopology === 'flyback'" class="param-item">Flyback turns ratio (Np/Ns)
+          <label v-if="selectedTopology === 'flyback' || lossBalancedDcm" class="param-item">Flyback turns ratio (Np/Ns)
             <input v-model.number="form.turns_ratio_nps" type="number" min="0.001" step="any">
           </label>
           <label class="param-item">Input voltage
@@ -73,6 +73,7 @@
             <input v-model.number="form.parallel_diodes" type="number" min="1" step="1">
           </label>
         </div>
+        <p v-if="lossBalancedDcm && selectedTopology !== 'flyback'" class="hint">Set the Flyback turns ratio used by this same-boundary comparison.</p>
 
         <div class="param-section">
           <h4>Device selection</h4>
@@ -164,10 +165,10 @@
 
         <div class="calculation-actions">
           <button class="btn btn-primary" type="button" :disabled="loading" @click="calculate">{{ loading ? 'Calculating…' : 'Calculate' }}</button>
-        <button class="btn btn-secondary" type="button" :disabled="loading || (form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM')" @click="compare">Compare topologies</button>
+        <button class="btn btn-secondary" type="button" :disabled="loading" @click="compare">Compare topologies</button>
         </div>
         <div v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</div>
-        <p v-if="lossBalancedDcm" class="hint">Topology comparison is unavailable for loss-balanced DCM. Scalar operating points and line or contour sweeps are available for Buck, Boost, inverting Buck-Boost, and Flyback.</p>
+        <p v-if="lossBalancedDcm" class="hint">Topology comparison evaluates all four converters at this DCM boundary. Unsupported voltage or curve domains appear as per-topology errors; any ranking includes channel-conduction losses only.</p>
       </section>
 
       <section v-if="hasResults" class="results-panel">
@@ -269,6 +270,9 @@
         <p v-if="comparison.comparison?.loss_scope" class="hint">
           Ranking uses {{ comparison.comparison.loss_scope }} losses only.
         </p>
+        <p v-if="comparison.comparison?.ranking_basis === 'included_channel_conduction_efficiency_proxy'" class="hint">
+          This ranking is an included channel-conduction efficiency proxy, not total converter efficiency.
+        </p>
         <div v-for="name in ['buck', 'boost', 'buck-boost', 'flyback']" :key="name" class="comparison-row">
           <div class="comparison-summary">
             <strong>{{ name }}</strong>
@@ -278,9 +282,12 @@
             <span v-else-if="comparison[name]?.performance?.efficiency_percent == null" class="hint">
               {{ comparison[name]?.model?.mode === 'estimate' ? 'Estimate mode; efficiency is not calculated.' : 'Efficiency is not reported for this mode.' }}
             </span>
-            <span v-else>{{ format(comparison[name].performance.efficiency_percent, 3) }}%</span>
+            <span v-else>
+              <span v-if="comparison[name]?.model?.mode === 'loss-balanced' && comparison[name]?.model?.conduction_regime === 'DCM'">Included channel-loss proxy: </span>
+              {{ format(comparison[name].performance.efficiency_percent, 3) }}%
+            </span>
           </div>
-          <div v-if="isLossBalancedCcmComparison(comparison[name])" class="comparison-details">
+          <div v-if="isLossBalancedComparison(comparison[name])" class="comparison-details">
             <p><strong>Power-balance residual:</strong> {{ format(comparison[name].performance?.power_balance_residual_w, 8) }} W</p>
             <p><strong>Averaged inductor volt-second residual:</strong> {{ format(comparison[name].calculated?.inductor_volt_second_residual_v, 8) }} V</p>
             <div v-if="comparison[name].temperatures" class="comparison-thermal">
@@ -448,9 +455,8 @@ function sweepAxisLabel(axis) {
 function sweepMetricLabel(metric) {
   return metrics.find(item => item.id === metric)?.label || metric
 }
-function isLossBalancedCcmComparison(result) {
+function isLossBalancedComparison(result) {
   return result?.model?.mode === 'loss-balanced'
-    && result.model.conduction_regime === 'CCM'
     && !result.error
     && result.supported !== false
 }
@@ -487,12 +493,14 @@ function buildSweep() {
   }
   return sweep
 }
-function buildPayload(includeSweep = true) {
+function buildPayload(includeSweep = true, includeFlybackComparison = false) {
   return {
     topology: selectedTopology.value,
     mode: form.mode,
     conduction_regime: form.conduction_regime,
-    ...(selectedTopology.value === 'flyback' ? { turns_ratio_nps: Number(form.turns_ratio_nps) } : {}),
+    ...(selectedTopology.value === 'flyback' || includeFlybackComparison
+      ? { turns_ratio_nps: Number(form.turns_ratio_nps) }
+      : {}),
     v_in: Number(form.v_in), v_out: Number(form.v_out), p_out: Number(form.p_out),
     f_sw: toSi('f_sw', form.f_sw_khz),
     l_value: toSi('l_value', form.l_value_uh), c_out: toSi('c_out', form.c_out_uf),
@@ -536,7 +544,7 @@ async function compare() {
   loading.value = true
   errorMessage.value = ''
   try {
-    const payload = buildPayload(false)
+    const payload = buildPayload(false, lossBalancedDcm.value)
     const { topology: ignoredTopology, ...parameters } = payload
     const request = {
       parameters,
