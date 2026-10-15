@@ -577,23 +577,30 @@ def test_loss_balanced_flyback_dcm_api_rejects_missing_ratio_and_curve_condition
     assert "Missing required switch channel curve" in wrong_condition.json()["detail"]
 
 
-def test_loss_balanced_flyback_dcm_api_rejects_sweep_and_invalid_ratio(
+def test_loss_balanced_flyback_dcm_api_sweeps_and_rejects_invalid_ratio(
     gate_conditioned_client: TestClient,
 ) -> None:
-    """Reject invalid ratios and keep Flyback DCM feedback scalar-only."""
+    """Expose Flyback DCM sweep results and reject invalid ratios."""
     request = payload(
         topology="flyback", mode="loss-balanced", conduction_regime="DCM",
         turns_ratio_nps=2, v_in=100, v_out=50, p_out=10, f_sw=20_000,
         l_value=0.001, c_out=0.001, t_j=25, v_g=15, diode_v_g=0,
         switch_transistor_id="gated-device", diode_transistor_id="gated-device",
         sweep={
-            "x_axis": "f_sw", "x_min": 20_000, "x_max": 30_000,
+            "x_axis": "f_sw", "x_min": 20_000, "x_max": 21_000,
             "x_points": 2, "metric": "efficiency_percent",
         },
     )
     sweep_response = gate_conditioned_client.post("/api/topology/calculate", json=request)
-    assert sweep_response.status_code == 400
-    assert "Loss-balanced topology sweeps support CCM only" in sweep_response.json()["detail"]
+    assert sweep_response.status_code == 200
+    sweep = sweep_response.json()["sweep"]
+    assert sweep["mode"] == "loss-balanced"
+    assert sweep["conduction_regime"] == "DCM"
+    assert sweep["loss_scope"] == "channel_conduction_only"
+    assert len(sweep["values"]) == 2
+    assert len(sweep["voltage_law_residual_values_v"]) == 2
+    assert len(sweep["power_balance_residual_values_w"]) == 2
+    assert "CCM boundary" in sweep["voltage_law_note"]
     request.pop("sweep")
     request["turns_ratio_nps"] = 0
     invalid_ratio = gate_conditioned_client.post("/api/topology/calculate", json=request)
@@ -671,10 +678,10 @@ def test_loss_balanced_buck_boost_dcm_api_rejects_insufficient_curve_range(
     assert response.status_code == 400
     assert "No supported Buck-Boost DCM solution inside the exact channel-curve range" in response.json()["detail"]
 
-def test_loss_balanced_buck_boost_dcm_api_rejects_sweeps(
+def test_loss_balanced_buck_boost_dcm_api_returns_sweep_residuals(
     gate_conditioned_client: TestClient,
 ) -> None:
-    """Keep Buck-Boost DCM loss feedback scalar-only at the API boundary."""
+    """Expose Buck-Boost DCM sweep values and both balance residuals."""
     response = gate_conditioned_client.post(
         "/api/topology/calculate",
         json=payload(
@@ -683,13 +690,16 @@ def test_loss_balanced_buck_boost_dcm_api_rejects_sweeps(
             l_value=0.001, c_out=0.001, t_j=25, v_g=15, diode_v_g=0,
             switch_transistor_id="gated-device", diode_transistor_id="gated-device",
             sweep={
-                "x_axis": "f_sw", "x_min": 20_000, "x_max": 30_000,
+                "x_axis": "f_sw", "x_min": 20_000, "x_max": 21_000,
                 "x_points": 2, "metric": "efficiency_percent",
             },
         ),
     )
-    assert response.status_code == 400
-    assert "Loss-balanced topology sweeps support CCM only" in response.json()["detail"]
+    assert response.status_code == 200
+    sweep = response.json()["sweep"]
+    assert sweep["kind"] == "line"
+    assert sweep["conduction_regime"] == "DCM"
+    assert len(sweep["values"]) == len(sweep["power_balance_residual_values_w"]) == 2
 
 
 def test_loss_balanced_buck_boost_dcm_api_rejects_ccm_boundary(
@@ -767,6 +777,57 @@ def test_loss_balanced_boost_dcm_api_exposes_both_balance_residuals(
     )
 
 
+def test_loss_balanced_boost_dcm_api_returns_line_sweep_residuals(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Expose Boost DCM line metrics and both scalar-checked residual arrays."""
+    response = gate_conditioned_client.post(
+        "/api/topology/calculate",
+        json=payload(
+            topology="boost", mode="loss-balanced", conduction_regime="DCM",
+            v_in=100, v_out=200, p_out=100, f_sw=20_000,
+            l_value=0.001, c_out=0.001, t_j=25, v_g=15, diode_v_g=0,
+            switch_transistor_id="gated-device", diode_transistor_id="gated-device",
+            sweep={
+                "x_axis": "f_sw", "x_min": 20_000, "x_max": 21_000,
+                "x_points": 3, "metric": "p_loss_total_w",
+            },
+        ),
+    )
+
+    assert response.status_code == 200
+    sweep = response.json()["sweep"]
+    assert sweep["kind"] == "line"
+    assert sweep["conduction_regime"] == "DCM"
+    assert len(sweep["values"]) == 3
+    assert len(sweep["voltage_law_residual_values_v"]) == 3
+    assert len(sweep["power_balance_residual_values_w"]) == 3
+
+
+def test_loss_balanced_boost_dcm_api_reports_unsupported_sweep_coordinate(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Reject a CCM-boundary DCM sweep point with its SI coordinate."""
+    response = gate_conditioned_client.post(
+        "/api/topology/calculate",
+        json=payload(
+            topology="boost", mode="loss-balanced", conduction_regime="DCM",
+            v_in=100, v_out=200, p_out=100, f_sw=20_000,
+            l_value=0.001, c_out=0.001, t_j=25, v_g=15, diode_v_g=0,
+            switch_transistor_id="gated-device", diode_transistor_id="gated-device",
+            sweep={
+                "x_axis": "p_out", "x_min": 100, "x_max": 200,
+                "x_points": 3, "metric": "p_loss_total_w",
+            },
+        ),
+    )
+
+    assert response.status_code == 400
+    detail = response.json()["detail"]
+    assert "Sweep point (x=150 W) is unsupported" in detail
+    assert "at or above the CCM boundary" in detail
+
+
 def test_loss_balanced_boost_dcm_api_rejects_target_at_ccm_boundary(
     gate_conditioned_client: TestClient,
 ) -> None:
@@ -784,10 +845,10 @@ def test_loss_balanced_boost_dcm_api_rejects_target_at_ccm_boundary(
     assert "at or above the CCM boundary" in response.json()["detail"]
 
 
-def test_loss_balanced_buck_dcm_api_rejects_sweeps(
+def test_loss_balanced_buck_dcm_api_returns_sweep_residuals(
     gate_conditioned_client: TestClient,
 ) -> None:
-    """Keep Buck DCM scalar-only at the FastAPI boundary."""
+    """Expose Buck DCM sweep values and both balance residuals."""
     response = gate_conditioned_client.post(
         "/api/topology/calculate",
         json=payload(
@@ -796,13 +857,16 @@ def test_loss_balanced_buck_dcm_api_rejects_sweeps(
             l_value=0.001, c_out=0.001, t_j=25, v_g=15, diode_v_g=0,
             switch_transistor_id="gated-device", diode_transistor_id="gated-device",
             sweep={
-                "x_axis": "f_sw", "x_min": 20_000, "x_max": 30_000,
+                "x_axis": "f_sw", "x_min": 20_000, "x_max": 21_000,
                 "x_points": 2, "metric": "efficiency_percent",
             },
         ),
     )
-    assert response.status_code == 400
-    assert "Loss-balanced topology sweeps support CCM only" in response.json()["detail"]
+    assert response.status_code == 200
+    sweep = response.json()["sweep"]
+    assert sweep["kind"] == "line"
+    assert sweep["conduction_regime"] == "DCM"
+    assert len(sweep["values"]) == len(sweep["power_balance_residual_values_w"]) == 2
 
 
 def test_api_requires_and_passes_gate_condition_for_diode_channel_curves(gate_conditioned_client: TestClient) -> None:

@@ -122,10 +122,10 @@
 
         <div class="param-section">
           <h4>Python generated sweep</h4>
-          <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox" :disabled="lossBalancedDcm"> Include line or contour sweep</label>
-          <p v-if="form.mode === 'loss-balanced'" class="hint">Loss-balanced sweeps solve each CCM point from exact-condition channel curves. Every point must be supported; no curve extrapolation is used.</p>
-          <p v-if="lossBalancedDcm" class="hint">Loss-balanced sweeps support CCM only. Buck, Boost, Buck-Boost, and Flyback DCM feedback are available for scalar operating points.</p>
-          <div v-if="form.sweep_enabled && !lossBalancedDcm" class="param-grid">
+          <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox"> Include line or contour sweep</label>
+          <p v-if="form.mode === 'loss-balanced'" class="hint">Loss-balanced sweeps solve each CCM or DCM point from exact-condition channel curves. DCM uses the scalar ramp and charge solve; every point must be supported and below the CCM boundary. No curve extrapolation is used.</p>
+          <p v-if="lossBalancedDcm" class="hint">DCM sweeps expose the independently checked power-balance and averaged inductor volt-second residuals. Temperature values are one-pass estimates at the selected curve temperature; electrothermal iteration is not implemented.</p>
+          <div v-if="form.sweep_enabled" class="param-grid">
             <label class="param-item">Sweep type
               <select v-model="form.sweep_kind"><option value="line">Line</option><option value="contour">Contour</option></select>
             </label>
@@ -167,7 +167,7 @@
         <button class="btn btn-secondary" type="button" :disabled="loading || (form.mode === 'loss-balanced' && form.conduction_regime !== 'CCM')" @click="compare">Compare topologies</button>
         </div>
         <div v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</div>
-        <p v-if="lossBalancedDcm" class="hint">Topology comparison is unavailable for loss-balanced DCM. Scalar DCM feedback is available for Buck, Boost, Buck-Boost, and Flyback operating points.</p>
+        <p v-if="lossBalancedDcm" class="hint">Topology comparison is unavailable for loss-balanced DCM. Scalar operating points and line or contour sweeps are available for Buck, Boost, inverting Buck-Boost, and Flyback.</p>
       </section>
 
       <section v-if="hasResults" class="results-panel">
@@ -223,7 +223,7 @@
         <div v-if="results.sweep?.kind === 'line'" class="charts-section">
           <h4>{{ results.sweep.metric }} vs {{ results.sweep.x_axis }}</h4>
           <p v-if="results.sweep.loss_scope" class="hint">Sweep scope: {{ results.sweep.loss_scope }}. {{ results.sweep.voltage_law_note }}</p>
-          <p v-if="results.sweep.voltage_law_residual_values_v" class="hint">Hover a point to inspect its averaged volt-second residual on the right-hand axis.</p>
+          <p v-if="results.sweep.voltage_law_residual_values_v" class="hint">Hover a point to inspect its averaged volt-second residual<span v-if="results.sweep.power_balance_residual_values_w"> and power-balance residual</span> in the tooltip.</p>
           <div class="chart-container"><canvas ref="sweepCanvas" role="img" :aria-label="`${results.sweep.metric} vs ${results.sweep.x_axis}`"></canvas></div>
         </div>
         <div v-if="results.sweep?.kind === 'contour'" class="charts-section">
@@ -234,6 +234,32 @@
           </div></div>
           <p class="hint">X: {{ results.sweep.x_axis }} ({{ results.sweep.x_unit }}); Y: {{ results.sweep.y_axis }} ({{ results.sweep.y_unit }}); color shows {{ results.sweep.metric }} ({{ results.sweep.metric_unit }}).</p>
         </div>
+        <details v-if="showDcmSweepData" class="sweep-data-details">
+          <summary>Per-point DCM sweep data ({{ dcmSweepPoints.length }} points)</summary>
+          <div class="sweep-data-scroll" role="region" tabindex="0" aria-label="Loss-balanced DCM sweep point data">
+            <table class="sweep-data-table">
+              <caption>Loss-balanced DCM sweep coordinates, metric values, and balance residuals</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{{ sweepAxisLabel(results.sweep.x_axis) }} ({{ results.sweep.x_unit }})</th>
+                  <th v-if="results.sweep.kind === 'contour'" scope="col">{{ sweepAxisLabel(results.sweep.y_axis) }} ({{ results.sweep.y_unit }})</th>
+                  <th scope="col">{{ sweepMetricLabel(results.sweep.metric) }} ({{ results.sweep.metric_unit }})</th>
+                  <th scope="col">Averaged inductor volt-second residual (V)</th>
+                  <th scope="col">Power-balance residual (W)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="point in dcmSweepPoints" :key="point.key">
+                  <td>{{ formatSweepValue(point.x) }}</td>
+                  <td v-if="results.sweep.kind === 'contour'">{{ formatSweepValue(point.y) }}</td>
+                  <td>{{ formatSweepValue(point.metric) }}</td>
+                  <td>{{ formatSweepValue(point.voltSecondResidual) }}</td>
+                  <td>{{ formatSweepValue(point.powerBalanceResidual) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
         <details v-if="results.model.curve_conditions"><summary>Curve conditions and provenance</summary><pre>{{ JSON.stringify(results.model.curve_conditions, null, 2) }}</pre></details>
       </section>
 
@@ -345,9 +371,11 @@ const hasExportableResults = computed(() => hasResults.value || comparison.value
 const lossBalancedDcm = computed(() => (
   form.mode === 'loss-balanced' && form.conduction_regime === 'DCM'
 ))
-watch(lossBalancedDcm, unsupported => {
-  if (unsupported) form.sweep_enabled = false
-})
+const showDcmSweepData = computed(() => (
+  results.value?.model?.mode === 'loss-balanced'
+  && results.value?.model?.conduction_regime === 'DCM'
+  && ['line', 'contour'].includes(results.value?.sweep?.kind)
+))
 const modelLabel = computed(() => {
   const mode = results.value?.model?.mode
   if (mode === 'loss-balanced') {
@@ -375,9 +403,30 @@ const contourCells = computed(() => {
     return {
       key: `${yIndex}-${xIndex}`,
       color: `hsl(${hue}, 78%, 53%)`,
-      title: `x=${sweep.x_values[xIndex]} ${sweep.x_unit}; y=${sweep.y_values[yIndex]} ${sweep.y_unit}; ${sweep.metric}=${value} ${sweep.metric_unit}${sweep.voltage_law_residual_values_v ? `; inductor_volt_second_residual=${sweep.voltage_law_residual_values_v[yIndex][xIndex]} V` : ''}`
+      title: `x=${sweep.x_values[xIndex]} ${sweep.x_unit}; y=${sweep.y_values[yIndex]} ${sweep.y_unit}; ${sweep.metric}=${value} ${sweep.metric_unit}${sweep.voltage_law_residual_values_v ? `; inductor_volt_second_residual=${sweep.voltage_law_residual_values_v[yIndex][xIndex]} V` : ''}${sweep.power_balance_residual_values_w ? `; power_balance_residual=${sweep.power_balance_residual_values_w[yIndex][xIndex]} W` : ''}`
     }
   }))
+})
+const dcmSweepPoints = computed(() => {
+  const sweep = results.value?.sweep
+  if (!showDcmSweepData.value || !sweep) return []
+  if (sweep.kind === 'line') {
+    return sweep.x_values.map((x, index) => ({
+      key: `line-${index}`,
+      x,
+      metric: sweep.values[index],
+      voltSecondResidual: sweep.voltage_law_residual_values_v?.[index],
+      powerBalanceResidual: sweep.power_balance_residual_values_w?.[index]
+    }))
+  }
+  return sweep.y_values.flatMap((y, yIndex) => sweep.x_values.map((x, xIndex) => ({
+    key: `contour-${yIndex}-${xIndex}`,
+    x,
+    y,
+    metric: sweep.values[yIndex][xIndex],
+    voltSecondResidual: sweep.voltage_law_residual_values_v?.[yIndex]?.[xIndex],
+    powerBalanceResidual: sweep.power_balance_residual_values_w?.[yIndex]?.[xIndex]
+  })))
 })
 
 function deviceId(device) {
@@ -389,6 +438,15 @@ function selectTopology(id) {
 }
 function format(value, digits = 2) {
   return Number.isFinite(value) ? Number(value).toFixed(digits) : '—'
+}
+function formatSweepValue(value) {
+  return Number.isFinite(value) ? String(value) : '—'
+}
+function sweepAxisLabel(axis) {
+  return axes.find(item => item.id === axis)?.label || axis
+}
+function sweepMetricLabel(metric) {
+  return metrics.find(item => item.id === metric)?.label || metric
 }
 function isLossBalancedCcmComparison(result) {
   return result?.model?.mode === 'loss-balanced'
@@ -448,7 +506,7 @@ function buildPayload(includeSweep = true) {
     v_g_off: form.mode === 'detailed' ? optionalNumber(form.v_g_off) : undefined,
     r_g_on: form.mode === 'detailed' ? optionalNumber(form.r_g_on) : undefined,
     r_g_off: form.mode === 'detailed' ? optionalNumber(form.r_g_off) : undefined,
-    ...(includeSweep && !lossBalancedDcm.value && buildSweep()
+    ...(includeSweep && buildSweep()
       ? { sweep: buildSweep() }
       : {})
   }
@@ -543,7 +601,22 @@ async function renderCharts() {
     sweepChart = new Chart(sweepCanvas.value, {
       type: 'line',
       data: { labels: sweep.x_values, datasets },
-      options: { responsive: true, plugins: { legend: { display: true } }, scales }
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true },
+          tooltip: {
+            callbacks: {
+              afterBody: items => {
+                const pointIndex = items[0]?.dataIndex
+                const residual = sweep.power_balance_residual_values_w?.[pointIndex]
+                return residual == null ? [] : [`Power-balance residual: ${residual} W`]
+              }
+            }
+          }
+        },
+        scales
+      }
     })
   }
 }
@@ -982,6 +1055,53 @@ onBeforeUnmount(destroyCharts)
 .contour-grid span {
   display: block;
   min-height: 24px;
+}
+
+.sweep-data-details {
+  padding: 0.75rem;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.sweep-data-details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.sweep-data-scroll {
+  max-height: 20rem;
+  margin-top: 0.75rem;
+  overflow: auto;
+}
+
+.sweep-data-scroll:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+.sweep-data-table {
+  width: 100%;
+  min-width: 42rem;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.sweep-data-table caption {
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.sweep-data-table th,
+.sweep-data-table td {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #dee2e6;
+  text-align: left;
+}
+
+.sweep-data-table th {
+  position: sticky;
+  top: 0;
+  background: #f8f9fa;
 }
 
 .btn {

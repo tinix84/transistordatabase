@@ -1877,11 +1877,7 @@ def calculate_topology_sweep(
 ) -> dict[str, Any]:
     """Generate a Python-side line or contour sweep of one supported metric."""
     loss_balanced = parameters.get("mode") == "loss-balanced"
-    if loss_balanced and parameters.get("conduction_regime", "CCM") != "CCM":
-        raise ValueError(
-            "Loss-balanced topology sweeps support CCM only; "
-            "select conduction_regime='CCM'"
-        )
+    conduction_regime = parameters.get("conduction_regime", "CCM")
     x_axis = sweep.get("x_axis")
     y_axis = sweep.get("y_axis")
     metric = sweep.get("metric")
@@ -1918,7 +1914,7 @@ def calculate_topology_sweep(
 
     def evaluate(
         x_value: float, y_value: float | None
-    ) -> tuple[float, float | None]:
+    ) -> tuple[float, float | None, float | None]:
         changed = dict(parameters)
         changed[_SWEEP_AXES[x_axis][0]] = float(x_value)
         if y_axis is not None and y_value is not None:
@@ -1946,6 +1942,7 @@ def calculate_topology_sweep(
                 "for every operating point"
             )
         residual = None
+        power_residual = None
         if loss_balanced:
             residual = point["calculated"].get("inductor_volt_second_residual_v")
             if residual is None:
@@ -1953,24 +1950,45 @@ def calculate_topology_sweep(
                     f"Sweep point ({coordinate_label(x_value, y_value)}) has no "
                     "inductor volt-second residual"
                 )
-        return float(value[key]), float(residual) if residual is not None else None
+            if conduction_regime == "DCM":
+                power_residual = point["performance"].get(
+                    "power_balance_residual_w"
+                )
+                if power_residual is None:
+                    raise ValueError(
+                        f"Sweep point ({coordinate_label(x_value, y_value)}) "
+                        "has no power-balance residual"
+                    )
+        return (
+            float(value[key]),
+            float(residual) if residual is not None else None,
+            float(power_residual) if power_residual is not None else None,
+        )
 
     if y_values is None:
         evaluated = [evaluate(float(x), None) for x in x_values]
-        values: Any = [metric_value for metric_value, _ in evaluated]
+        values: Any = [metric_value for metric_value, _, _ in evaluated]
         residual_values = (
-            [residual for _, residual in evaluated] if loss_balanced else None
+            [residual for _, residual, _ in evaluated] if loss_balanced else None
+        )
+        power_residual_values = (
+            [power for _, _, power in evaluated]
+            if loss_balanced and conduction_regime == "DCM" else None
         )
     else:
         evaluated = [
             [evaluate(float(x), float(y)) for x in x_values] for y in y_values
         ]
         values = [
-            [metric_value for metric_value, _ in row] for row in evaluated
+            [metric_value for metric_value, _, _ in row] for row in evaluated
         ]
         residual_values = (
-            [[residual for _, residual in row] for row in evaluated]
+            [[residual for _, residual, _ in row] for row in evaluated]
             if loss_balanced else None
+        )
+        power_residual_values = (
+            [[power for _, _, power in row] for row in evaluated]
+            if loss_balanced and conduction_regime == "DCM" else None
         )
     result = {
         "kind": "line" if y_values is None else "contour",
@@ -1988,14 +2006,24 @@ def calculate_topology_sweep(
         result.update(
             {
                 "mode": "loss-balanced",
+                "conduction_regime": conduction_regime,
                 "loss_scope": "channel_conduction_only",
                 "voltage_law_residual_values_v": residual_values,
                 "voltage_law_note": (
+                    "Each point reuses the scalar DCM ramp and charge solve. "
+                    "Exact-condition channel curves must cover zero through "
+                    "the solved branch-current peaks, and points at or above "
+                    "the CCM boundary are rejected. Power-balance and "
+                    "averaged inductor volt-second residuals are independently "
+                    "checked at every point."
+                    if conduction_regime == "DCM" else
                     "Each point solves included channel-loss power balance and "
                     "reports its averaged inductor volt-second residual in "
-                    "voltage_law_residual_values_v; "
-                    "nonlinear curve points may not close both balances exactly."
+                    "voltage_law_residual_values_v; nonlinear curve points may "
+                    "not close both balances exactly."
                 ),
             }
         )
+        if power_residual_values is not None:
+            result["power_balance_residual_values_w"] = power_residual_values
     return result

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Loss-balanced DCM topology sweeps**: Python line and contour sweeps now reuse the scalar DCM solve for Buck, Boost, inverting Buck-Boost, and Flyback. Exact-condition curve requirements, coordinate-specific failures, per-point power/volt-second residuals, channel-only scope, and JSON provenance are shown in the web workflow; the existing 2,500-point contour cap remains.
 - **Boost semiconductor Pareto screen**: Compares channel-conduction loss, package-body volume, and sourced one-unit USD cost at one shared Boost CCM boundary. Invalid catalog metadata and device/curve failures stay local to each candidate; the browser exports request provenance and outcomes.
 - **Web DPT measurement comparison**: Overlays selected stored raw measurements in separate turn-on/off Vds/Id plots, with per-record acquisition selectors, measurement conditions, and non-finite sample gaps.
 - **Web DPT raw waveform viewing**: Displays stored turn-on and turn-off Vds/Id samples by measurement and acquisition with available test conditions. Non-finite samples remain visible as chart gaps; no switching energy is derived.

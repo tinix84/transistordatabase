@@ -162,6 +162,119 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Hover a point to inspect its averaged volt-second residual')
   })
 
+  it('sends a DCM contour sweep and displays both per-point residuals', async () => {
+    calculateTopology.mockResolvedValueOnce({
+      ...estimateResponse,
+      model: {
+        ...estimateResponse.model,
+        mode: 'loss-balanced',
+        conduction_regime: 'DCM',
+        curve_conditions: { switch_t_j_c: 25, switch_v_g_v: 15, diode_v_g_v: 0 }
+      },
+      losses: {
+        conduction_switch_w: 1,
+        conduction_diode_w: 2,
+        total_w: 3,
+        scope: 'channel conduction only',
+        loss_scope: 'channel_conduction_only'
+      },
+      performance: { p_out_w: 10, p_in_w: 13, efficiency_percent: 76.9 },
+      sweep: {
+        kind: 'contour', mode: 'loss-balanced', conduction_regime: 'DCM',
+        loss_scope: 'channel_conduction_only',
+        voltage_law_note: 'Each point reuses the scalar DCM ramp and charge solve.',
+        x_axis: 'f_sw', x_unit: 'Hz', x_values: [50000, 100000],
+        y_axis: 'v_in', y_unit: 'V', y_values: [300, 500],
+        metric: 'i_l_ripple_pp_a', metric_unit: 'A',
+        values: [[1, 2], [3, 4]],
+        voltage_law_residual_values_v: [[0.01, 0.02], [0.03, 0.04]],
+        power_balance_residual_values_w: [[0.1, 0.2], [0.3, 0.4]]
+      }
+    })
+    await setSelect('Calculation mode', 'loss-balanced')
+    await setSelect('Conduction regime', 'DCM')
+    await setInput('Diode channel gate voltage', 0)
+    const sweepToggle = wrapper.find('.sweep-toggle input')
+    expect(sweepToggle.element.disabled).toBe(false)
+    await sweepToggle.setValue(true)
+    await setSelect('Sweep type', 'contour')
+    await setInput('X points', 2)
+    await setInput('Y points', 2)
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+
+    expect(calculateTopology.mock.calls[0][0]).toMatchObject({
+      mode: 'loss-balanced',
+      conduction_regime: 'DCM',
+      diode_v_g: 0,
+      sweep: { x_axis: 'f_sw', y_axis: 'v_in', x_points: 2, y_points: 2 }
+    })
+    expect(wrapper.text()).toContain('channel_conduction_only')
+    expect(wrapper.text()).toContain('independently checked power-balance and averaged inductor volt-second residuals')
+    expect(wrapper.text()).toContain('electrothermal iteration is not implemented')
+    const cells = wrapper.findAll('.contour-grid span')
+    expect(cells).toHaveLength(4)
+    expect(cells[0].attributes('title')).toContain('inductor_volt_second_residual=0.01 V')
+    expect(cells[0].attributes('title')).toContain('power_balance_residual=0.1 W')
+    const pointData = wrapper.find('.sweep-data-details')
+    expect(pointData.get('summary').text()).toBe('Per-point DCM sweep data (4 points)')
+    const pointRegion = pointData.get('[role="region"]')
+    expect(pointRegion.attributes('tabindex')).toBe('0')
+    expect(pointRegion.attributes('aria-label')).toBe('Loss-balanced DCM sweep point data')
+    const pointTable = pointRegion.get('table')
+    expect(pointTable.find('caption').text()).toContain('coordinates, metric values, and balance residuals')
+    expect(pointTable.findAll('thead th').map(header => header.text())).toEqual([
+      'Switching frequency (Hz)',
+      'Input voltage (V)',
+      'Inductor current ripple (A)',
+      'Averaged inductor volt-second residual (V)',
+      'Power-balance residual (W)'
+    ])
+    expect(pointTable.findAll('thead th').every(header => header.attributes('scope') === 'col')).toBe(true)
+    expect(pointTable.findAll('tbody tr')).toHaveLength(4)
+    expect(pointTable.find('tbody tr').findAll('td').map(cell => cell.text())).toEqual([
+      '50000', '300', '1', '0.01', '0.1'
+    ])
+    expect(wrapper.findAll('details').find(details => (
+      details.get('summary').text() === 'Curve conditions and provenance'
+    )).text()).toContain('switch_t_j_c')
+    const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
+    expect(comparisonButton.element.disabled).toBe(true)
+  })
+
+  it('exposes line DCM sweep coordinates, metric, and residuals in a semantic table', async () => {
+    calculateTopology.mockResolvedValueOnce({
+      ...estimateResponse,
+      model: { ...estimateResponse.model, mode: 'loss-balanced', conduction_regime: 'DCM' },
+      sweep: {
+        kind: 'line', mode: 'loss-balanced', conduction_regime: 'DCM',
+        x_axis: 'f_sw', x_unit: 'Hz', x_values: [10000, 20000],
+        metric: 'i_l_ripple_pp_a', metric_unit: 'A', values: [0.4, 0.3],
+        voltage_law_residual_values_v: [2e-10, -1e-10],
+        power_balance_residual_values_w: [3e-9, -2e-9]
+      }
+    })
+    await setSelect('Calculation mode', 'loss-balanced')
+    await setSelect('Conduction regime', 'DCM')
+    await wrapper.find('.sweep-toggle input').setValue(true)
+    await setInput('X points', 2)
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+
+    const pointData = wrapper.find('.sweep-data-details')
+    expect(pointData.get('summary').text()).toBe('Per-point DCM sweep data (2 points)')
+    expect(pointData.findAll('thead th').map(header => header.text())).toEqual([
+      'Switching frequency (Hz)',
+      'Inductor current ripple (A)',
+      'Averaged inductor volt-second residual (V)',
+      'Power-balance residual (W)'
+    ])
+    expect(pointData.findAll('tbody tr')).toHaveLength(2)
+    expect(pointData.find('tbody tr').findAll('td').map(cell => cell.text())).toEqual([
+      '10000', '0.4', '2e-10', '3e-9'
+    ])
+  })
+
   it('runs scalar Boost DCM loss-balanced mode and displays both residuals', async () => {
     calculateTopology.mockResolvedValueOnce({
       ...estimateResponse,
@@ -258,7 +371,7 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Topology comparison is unavailable for loss-balanced DCM')
   })
 
-  it('runs scalar inverting Buck-Boost DCM and disables sweep/comparison', async () => {
+  it('runs scalar inverting Buck-Boost DCM with sweeps available and comparison disabled', async () => {
     calculateTopology.mockResolvedValueOnce({
       ...estimateResponse,
       topology: 'buck-boost',
@@ -301,11 +414,11 @@ describe('TopologyCalculator API workflow', () => {
     await setSelect('Calculation mode', 'loss-balanced')
     await setSelect('Conduction regime', 'DCM')
     expect(wrapper.text()).toContain(
-      'Scalar DCM feedback is available for Buck, Boost, inverting Buck-Boost, and Flyback.'
+      'Scalar operating points and line or contour sweeps are available for Buck, Boost, inverting Buck-Boost, and Flyback.'
     )
 
     const sweepToggle = wrapper.find('.sweep-toggle input')
-    expect(sweepToggle.element.disabled).toBe(true)
+    expect(sweepToggle.element.disabled).toBe(false)
     await wrapper.get('button.btn-primary').trigger('click')
     await flushPromises()
 
@@ -381,7 +494,7 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Peak secondary diode current')
     expect(wrapper.text()).toContain('RMS secondary diode current')
     expect(wrapper.text()).toContain('0.770 A')
-    expect(wrapper.find('.sweep-toggle input').element.disabled).toBe(true)
+    expect(wrapper.find('.sweep-toggle input').element.disabled).toBe(false)
     expect(wrapper.findAll('button').find(button => button.text().includes('Compare topologies')).element.disabled).toBe(true)
   })
 
