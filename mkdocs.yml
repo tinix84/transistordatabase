@@ -110,6 +110,7 @@ nav:
   - Web GUI Migration:
       - Accepted Decision: adr/0001-local-web-gui-replaces-qt.md
       - Topology Migration Sprint: sprints/sprint-web-topology-migration.md
+      - DCM Topology Sweep Sprint: sprints/sprint-web-topology-dcm-sweeps.md
       - Database Backup Sprint: sprints/sprint-web-database-backup.md
       - Curve Workflow Sprint: sprints/sprint-web-curve-workflow.md
       - Saved Curve Editing Sprint: sprints/sprint-web-saved-curve-editing.md

@@ -84,7 +84,7 @@ test.describe('topology migration browser workflow', () => {
     await expect(page.locator('.charts-section canvas')).toHaveCount(1)
 
     const downloadPromise = page.waitForEvent('download')
-    await page.getByRole('button', { name: 'Download JSON' }).click()
+    await page.locator('.calc-header').getByRole('button', { name: 'Download JSON' }).click()
     const download = await downloadPromise
     expect(download.suggestedFilename()).toMatch(/^topology-boost-\d{4}-\d{2}-\d{2}\.json$/)
     const downloadPath = await download.path()
@@ -112,6 +112,46 @@ test.describe('topology migration browser workflow', () => {
     await page.getByRole('button', { name: 'Calculate', exact: true }).click()
     await expect(page.getByRole('alert')).toContainText('at or above the CCM boundary')
     await expect(page.locator('.results-panel')).toHaveCount(0)
+  })
+
+  test('runs a DCM line sweep through FastAPI and exports its request and result', async ({ page }) => {
+    await openTopology(page, 'Buck')
+    await setParameter(page, 'Input voltage', 100)
+    await setParameter(page, 'Output voltage magnitude', 50)
+    await setParameter(page, 'Output power', 10)
+    await setParameter(page, 'Switching frequency', 20)
+    await setParameter(page, 'Inductance', 1000)
+    await page.locator('label.param-item').filter({ hasText: 'Conduction regime' }).locator('select').selectOption('DCM')
+    await page.locator('label.sweep-toggle input').check()
+    await setParameter(page, 'X minimum', 10)
+    await setParameter(page, 'X maximum', 15)
+    await setParameter(page, 'X points', 3)
+
+    const apiResponse = page.waitForResponse(response => (
+      response.url().includes('/api/topology/calculate')
+      && response.request().method() === 'POST'
+    ))
+    await page.getByRole('button', { name: 'Calculate', exact: true }).click()
+    const response = await apiResponse
+    expect(response.status()).toBe(200)
+    const calculation = await response.json()
+    expect(calculation.model).toMatchObject({ mode: 'estimate', conduction_regime: 'DCM' })
+    expect(calculation.sweep).toMatchObject({ kind: 'line', x_axis: 'f_sw', x_unit: 'Hz' })
+    expect(calculation.sweep.x_values).toEqual([10000, 12500, 15000])
+    expect(calculation.sweep.values).toHaveLength(3)
+    await expect(page.locator('.model-label')).toHaveText('Ideal DCM operating-point estimate')
+    await expect(page.getByRole('img', { name: 'i_l_ripple_pp_a vs f_sw' })).toBeVisible()
+
+    const downloadPromise = page.waitForEvent('download')
+    await page.locator('.calc-header').getByRole('button', { name: 'Download JSON' }).click()
+    const download = await downloadPromise
+    const exported = JSON.parse(await readFile(await download.path(), 'utf8'))
+    expect(exported.request).toMatchObject({
+      conduction_regime: 'DCM',
+      sweep: { x_axis: 'f_sw', x_min: 10000, x_max: 15000, x_points: 3 }
+    })
+    expect(exported.result.sweep.values).toEqual(calculation.sweep.values)
+    expect(exported.result.model.assumptions).toEqual(calculation.model.assumptions)
   })
 
   test('submits and exports Boost DCM channel feedback with both residuals', async ({ page }) => {

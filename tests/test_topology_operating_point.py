@@ -2533,14 +2533,120 @@ def test_loss_balanced_sweep_reports_out_of_range_coordinate() -> None:
         )
 
 
-@pytest.mark.parametrize("topology", ["buck", "boost"])
-def test_loss_balanced_sweep_rejects_dcm_with_actionable_error(
+@pytest.mark.parametrize(
+    ("topology", "point_overrides"),
+    [
+        ("buck", {"v_in": 100, "v_out": 50, "p_out": 10}),
+        ("boost", {"v_in": 100, "v_out": 200, "p_out": 100}),
+        ("buck-boost", {"v_in": 100, "v_out": 50, "p_out": 10}),
+        (
+            "flyback",
+            {"v_in": 100, "v_out": 50, "p_out": 10, "turns_ratio_nps": 2},
+        ),
+    ],
+)
+def test_loss_balanced_dcm_line_and_contour_sweeps_match_scalar_points(
     topology: str,
+    point_overrides: dict[str, float],
 ) -> None:
-    """Reject DCM before beginning a loss-balanced sweep."""
-    with pytest.raises(ValueError, match="support CCM only.*conduction_regime='CCM'"):
+    """Each DCM sweep metric and both residuals match its scalar coordinate."""
+    switch = _flat_dcm_device(f"{topology} DCM sweep switch")
+    diode = _flat_dcm_device(f"{topology} DCM sweep diode")
+    parameters = point(
+        mode="loss-balanced", conduction_regime="DCM",
+        f_sw=20_000, l_value=1e-3, c_out=1e-3, t_j=25, v_g=15,
+        **point_overrides,
+    )
+    line = calculate_topology_sweep(
+        topology,
+        parameters,
+        {
+            "x_axis": "f_sw", "x_min": 19_000, "x_max": 20_000,
+            "x_points": 3, "metric": "p_loss_total_w",
+        },
+        switch,
+        diode,
+    )
+
+    assert line["kind"] == "line"
+    assert line["x_unit"] == "Hz"
+    assert line["conduction_regime"] == "DCM"
+    assert line["loss_scope"] == "channel_conduction_only"
+    assert len(line["values"]) == len(line["voltage_law_residual_values_v"]) == 3
+    assert len(line["power_balance_residual_values_w"]) == 3
+    for index, frequency in enumerate(line["x_values"]):
+        scalar = calculate_topology_operating_point(
+            topology,
+            {**parameters, "f_sw": frequency},
+            switch,
+            diode,
+        )
+        assert line["values"][index] == pytest.approx(
+            scalar["losses"]["total_w"]
+        )
+        assert line["voltage_law_residual_values_v"][index] == pytest.approx(
+            scalar["calculated"]["inductor_volt_second_residual_v"]
+        )
+        assert line["power_balance_residual_values_w"][index] == pytest.approx(
+            scalar["performance"]["power_balance_residual_w"]
+        )
+
+    contour = calculate_topology_sweep(
+        topology,
+        parameters,
+        {
+            "x_axis": "f_sw", "x_min": 19_000, "x_max": 20_000,
+            "x_points": 3, "y_axis": "c_out", "y_min": 0.8e-3,
+            "y_max": 1.2e-3, "y_points": 2,
+            "metric": "v_out_ripple_pp_v",
+        },
+        switch,
+        diode,
+    )
+
+    assert contour["kind"] == "contour"
+    assert contour["x_unit"] == "Hz"
+    assert contour["y_unit"] == "F"
+    assert len(contour["values"]) == 2
+    assert all(len(row) == 3 for row in contour["values"])
+    for y_index, capacitance in enumerate(contour["y_values"]):
+        for x_index, frequency in enumerate(contour["x_values"]):
+            scalar = calculate_topology_operating_point(
+                topology,
+                {**parameters, "c_out": capacitance, "f_sw": frequency},
+                switch,
+                diode,
+            )
+            assert contour["values"][y_index][x_index] == pytest.approx(
+                scalar["calculated"]["v_out_ripple_pp_v"]
+            )
+            assert contour["voltage_law_residual_values_v"][y_index][x_index] == pytest.approx(
+                scalar["calculated"]["inductor_volt_second_residual_v"]
+            )
+            assert contour["power_balance_residual_values_w"][y_index][x_index] == pytest.approx(
+                scalar["performance"]["power_balance_residual_w"]
+            )
+
+
+def test_loss_balanced_dcm_sweep_reports_unsupported_coordinate() -> None:
+    """A DCM boundary crossing rejects the sweep with its power coordinate."""
+    transistor = _flat_dcm_device()
+    parameters = point(
+        mode="loss-balanced", conduction_regime="DCM", topology="boost",
+        v_in=100, v_out=200, p_out=100, f_sw=20_000,
+        l_value=1e-3, c_out=1e-3, t_j=25, v_g=15,
+    )
+    with pytest.raises(
+        ValueError,
+        match=r"Sweep point \(x=150 W\) is unsupported: .*at or above the CCM boundary",
+    ):
         calculate_topology_sweep(
-            topology, point(mode="loss-balanced", conduction_regime="DCM"),
-            {"x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000,
-             "x_points": 3, "metric": "i_l_ripple_pp_a"},
+            "boost",
+            parameters,
+            {
+                "x_axis": "p_out", "x_min": 100, "x_max": 200,
+                "x_points": 3, "metric": "p_loss_total_w",
+            },
+            transistor,
+            transistor,
         )
