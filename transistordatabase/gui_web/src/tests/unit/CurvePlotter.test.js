@@ -53,4 +53,38 @@ describe('CurvePlotter tooltip formatting', () => {
       parsed: { x: -0.079445, y: 460 }
     })).toBe('Turn-on Vds: (-0.079445, 460.000)')
   })
+
+  it('uses scientific seconds in tooltips for microsecond thermal samples', () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({})
+
+    wrapper = mount(CurvePlotter, {
+      props: {
+        title: 'Switch transient Zth(j-c)',
+        datasets: [{
+          label: 'Switch transient Zth(j-c)',
+          data: [{ x: 1e-6, y: 0.01 }, { x: 1e-4, y: 0.4 }],
+          borderColor: '#2563eb'
+        }],
+        xLabel: 'Time (s)',
+        xValueScientific: true,
+        yLabel: 'Zth(j-c) (K/W)',
+        yValueScientific: true,
+        showLegend: false
+      }
+    })
+
+    const formatLabel = MockChart.mock.calls[0][1].options.plugins.tooltip.callbacks.label
+    expect(formatLabel({
+      dataset: { label: 'Switch transient Zth(j-c)' },
+      parsed: { x: 1e-6, y: 0.01 }
+    })).toBe('Switch transient Zth(j-c): (1.000e-6, 0.010)')
+    expect(formatLabel({
+      dataset: { label: 'Switch transient Zth(j-c)' },
+      parsed: { x: 1e-4, y: 0.4 }
+    })).toBe('Switch transient Zth(j-c): (1.000e-4, 0.400)')
+    expect(formatLabel({
+      dataset: { label: 'Switch transient Zth(j-c)' },
+      parsed: { x: 1e-4, y: 0.0001 }
+    })).toBe('Switch transient Zth(j-c): (1.000e-4, 1.000e-4)')
+  })
 })

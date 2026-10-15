@@ -69,6 +69,7 @@ from transistordatabase.gui_web.backend.schemas import (
     SOACreate,
     CapacitanceCurveCreate,
     CurveUpdateRequest,
+    ThermalCurveUpdate,
     CurveValidationResult,
     PLECSExportOptions,
     MATLABExportOptions,
@@ -859,6 +860,92 @@ def _curve_edit_token(curve: dict[str, Any]) -> str:
     # same Python JSON representation accepted by JsonTransistorLoader.
     encoded = json.dumps(curve, sort_keys=True, separators=(",", ":"), allow_nan=True)
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def _thermal_curve_token(graph: Any) -> str:
+    """Hash only the stored graph so unrelated Foster values remain patchable."""
+    encoded = json.dumps(graph, separators=(",", ":"), allow_nan=True)
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def _empty_thermal_foster() -> dict[str, Any]:
+    """Return the legacy reader's valid empty Foster defaults."""
+    return {
+        "r_th_vector": None,
+        "r_th_total": 0,
+        "c_th_vector": None,
+        "c_th_total": None,
+        "tau_vector": None,
+        "tau_total": None,
+        "graph_t_rthjc": None,
+    }
+
+
+def _thermal_foster_entry(
+    record: dict[str, Any], component: str, *, create: bool = False
+) -> dict[str, Any]:
+    """Resolve a switch or diode Foster object without rebuilding its raw fields."""
+    if component not in {"switch", "diode"}:
+        raise HTTPException(status_code=400, detail="Component must be switch or diode.")
+    section = record.get(component)
+    if not isinstance(section, dict):
+        raise HTTPException(
+            status_code=409,
+            detail=f"The stored {component} section is unavailable.",
+        )
+    foster = section.get("thermal_foster")
+    if foster is None and create:
+        foster = _empty_thermal_foster()
+        section["thermal_foster"] = foster
+    if foster is None:
+        return {}
+    if not isinstance(foster, dict):
+        raise HTTPException(
+            status_code=409,
+            detail=f"The stored {component} thermal Foster entry is invalid.",
+        )
+    return foster
+
+
+def _patch_thermal_curve_unlocked(
+    name: str,
+    component: str,
+    graph: list[list[float]] | None,
+    expected_token: str,
+    *,
+    require_empty: bool = False,
+) -> None:
+    """Patch only graph_t_rthjc after checking the exact previously read graph."""
+    record_path = _legacy_record_path(name)
+    record = _read_legacy_record_unlocked(name)
+    foster = _thermal_foster_entry(record, component, create=require_empty)
+    previous = foster.get("graph_t_rthjc")
+    if _thermal_curve_token(previous) != expected_token:
+        raise HTTPException(
+            status_code=409,
+            detail="The thermal curve changed since it was loaded; reload the device before editing it.",
+        )
+    if require_empty and previous is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="A thermal curve already exists; reload the device before adding another.",
+        )
+    if not require_empty and previous is None:
+        raise HTTPException(status_code=409, detail="No thermal curve is stored for this component.")
+    foster["graph_t_rthjc"] = graph
+    try:
+        json.dumps(record, allow_nan=True)
+        _json_dict_to_legacy_transistor(copy.deepcopy(record))
+        _write_legacy_record_unlocked(record_path, record)
+    except HTTPException:
+        raise
+    except FileNotFoundError as error:
+        raise HTTPException(status_code=404, detail=f"Transistor '{name}' not found") from error
+    except Exception as error:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot update {component} thermal curve: {error!s}",
+        ) from error
 
 
 def _read_legacy_record_unlocked(
@@ -1925,8 +2012,13 @@ async def plot_gate_charge(transistor_id: str) -> Dict[str, Any]:
 async def get_all_curves(transistor_id: str) -> Dict[str, Any]:
     """Get all curves for a transistor."""
     async with _record_mutation():
-        transistor = _get_transistor(transistor_id)
         raw_record = _read_legacy_record_unlocked(transistor_id)
+        normalized_record = copy.deepcopy(raw_record)
+        for component in ("switch", "diode"):
+            section = normalized_record.get(component)
+            if isinstance(section, dict) and section.get("thermal_foster") is None:
+                section["thermal_foster"] = _empty_thermal_foster()
+        transistor = legacy_to_core(_json_dict_to_legacy_transistor(normalized_record))
 
     def array_to_list(arr):
         """Convert numpy array to nested list for JSON."""
@@ -2069,7 +2161,62 @@ async def get_all_curves(transistor_id: str) -> Dict[str, Any]:
         result["capacitances"][curve_type] = _with_curve_edit_tokens(
             result["capacitances"][curve_type], raw_record, (None, curve_type)
         )
+    result["thermal_foster"] = {}
+    for component in ("switch", "diode"):
+        foster = _thermal_foster_entry(raw_record, component)
+        graph = foster.get("graph_t_rthjc")
+        result["thermal_foster"][component] = {
+            "graph_t_rthjc": graph,
+            "_edit_token": _thermal_curve_token(graph),
+        }
     return result
+
+
+@app.post("/api/transistors/{transistor_id}/curves/thermal/{component}")
+@_record_mutation_endpoint
+async def add_thermal_curve(
+    transistor_id: str,
+    component: str,
+    request: ThermalCurveUpdate,
+) -> Dict[str, Any]:
+    """Create the one transient thermal impedance graph for switch or diode."""
+    _patch_thermal_curve_unlocked(
+        transistor_id,
+        component,
+        request.graph_t_rthjc,
+        request.expected_token,
+        require_empty=True,
+    )
+    return {"message": f"{component} thermal curve added"}
+
+
+@app.put("/api/transistors/{transistor_id}/curves/thermal/{component}")
+@_record_mutation_endpoint
+async def update_thermal_curve(
+    transistor_id: str,
+    component: str,
+    request: ThermalCurveUpdate,
+) -> Dict[str, Any]:
+    """Replace one thermal graph while preserving the containing Foster object."""
+    _patch_thermal_curve_unlocked(
+        transistor_id,
+        component,
+        request.graph_t_rthjc,
+        request.expected_token,
+    )
+    return {"message": f"{component} thermal curve updated"}
+
+
+@app.delete("/api/transistors/{transistor_id}/curves/thermal/{component}")
+@_record_mutation_endpoint
+async def delete_thermal_curve(
+    transistor_id: str,
+    component: str,
+    expected_token: str = Query(..., min_length=64, max_length=64, pattern="^[a-f0-9]{64}$"),
+) -> Dict[str, Any]:
+    """Remove only graph_t_rthjc after checking the token from the curve list."""
+    _patch_thermal_curve_unlocked(transistor_id, component, None, expected_token)
+    return {"message": f"{component} thermal curve deleted"}
 
 
 @app.post("/api/transistors/{transistor_id}/curves/channel")

@@ -61,6 +61,14 @@ export default {
       type: Number,
       default: 3
     },
+    xValueScientific: {
+      type: Boolean,
+      default: false
+    },
+    yValueScientific: {
+      type: Boolean,
+      default: false
+    },
     yLabel: {
       type: String,
       default: 'Y'
@@ -143,7 +151,15 @@ export default {
               callbacks: {
                 label: (context) => {
                   const label = context.dataset.label || ''
-                  return `${label}: (${context.parsed.x.toFixed(this.xValueDecimals)}, ${context.parsed.y.toFixed(3)})`
+                  const xValue = this.xValueScientific
+                    ? context.parsed.x.toExponential(3)
+                    : context.parsed.x.toFixed(this.xValueDecimals)
+                  const needsScientificY = this.yValueScientific &&
+                    context.parsed.y !== 0 && Math.abs(context.parsed.y) < 0.001
+                  const yValue = needsScientificY
+                    ? context.parsed.y.toExponential(3)
+                    : context.parsed.y.toFixed(3)
+                  return `${label}: (${xValue}, ${yValue})`
                 }
               }
             },

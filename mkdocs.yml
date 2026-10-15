@@ -116,6 +116,7 @@ nav:
       - Curve Workflow Sprint: sprints/sprint-web-curve-workflow.md
       - Saved Curve Editing Sprint: sprints/sprint-web-saved-curve-editing.md
       - Transient Thermal Comparison Sprint: sprints/sprint-web-transient-thermal-comparison.md
+      - Transient Thermal Curve Workflow Sprint: sprints/sprint-web-transient-thermal-curve-workflow.md
   - Architecture:
       - Overview: architecture/overview.md
       - Core Design: architecture/core-design.md

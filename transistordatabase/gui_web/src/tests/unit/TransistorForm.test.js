@@ -21,7 +21,10 @@ vi.mock('../../services/api', () => ({
     addSOACurve: vi.fn(),
     addCapacitanceCurve: vi.fn(),
     deleteCurve: vi.fn(),
-    updateCurve: vi.fn()
+    updateCurve: vi.fn(),
+    addThermalCurve: vi.fn(),
+    updateThermalCurve: vi.fn(),
+    deleteThermalCurve: vi.fn()
   }
 }))
 
@@ -57,12 +60,16 @@ const curveApiResponse = {
     c_oss: [{ _edit_token: '1'.repeat(64), t_j: 25, graph_v_c: [[0, 50, 100], [0.00001, 0.000002, 0.000001]] }],
     c_iss: [{ _edit_token: '2'.repeat(64), t_j: 25, graph_v_c: [[0, 50], [0.00002, 0.00001]] }],
     c_rss: [{ _edit_token: '3'.repeat(64), t_j: 25, graph_v_c: [[0, 50], [0.00003, 0.000015]] }]
+  },
+  thermal_foster: {
+    switch: { graph_t_rthjc: [[1e-6, 1e-5, 1e-4], [0.01, 0.12, 0.4]], _edit_token: '4'.repeat(64) },
+    diode: { graph_t_rthjc: null, _edit_token: '5'.repeat(64) }
   }
 }
 
 const curvePlotterStub = {
   name: 'CurvePlotter',
-  props: ['title', 'datasets', 'xLabel', 'yLabel', 'xLogScale', 'yLogScale'],
+  props: ['title', 'datasets', 'xLabel', 'xValueScientific', 'yLabel', 'yValueScientific', 'xLogScale', 'yLogScale'],
   template: '<div data-testid="curve-plotter">{{ title }}</div>'
 }
 
@@ -492,6 +499,89 @@ describe('TransistorForm.vue', () => {
       expect(wrapper.find('[data-testid="curve-viewer"]').exists()).toBe(true)
       await wrapper.find('[aria-label="Close curve view"]').trigger('click')
       expect(wrapper.find('[data-testid="curve-viewer"]').exists()).toBe(false)
+    })
+
+    it('shows unchanged thermal graph points with explicit SI axes and protects edits', async () => {
+      transistorApi.getCurves.mockResolvedValue(curveApiResponse)
+      wrapper = mountForm()
+      await flushPromises()
+      await clickFormTab(wrapper, 'Thermal Curves')
+      await activeCurveTab(wrapper).findAll('button').find(button => button.text() === 'View').trigger('click')
+      const plot = wrapper.findComponent(CurvePlotter)
+      expect(plot.props('xLabel')).toBe('Time (s)')
+      expect(plot.props('xValueScientific')).toBe(true)
+      expect(plot.props('yLabel')).toBe('Zth(j-c) (K/W)')
+      expect(plot.props('yValueScientific')).toBe(true)
+      expect(plot.props('datasets')[0].data).toEqual([
+        { x: 1e-6, y: 0.01 }, { x: 1e-5, y: 0.12 }, { x: 1e-4, y: 0.4 }
+      ])
+      await wrapper.find('[aria-label="Close curve view"]').trigger('click')
+
+      await activeCurveTab(wrapper).findAll('button').find(button => button.text() === 'Edit').trigger('click')
+      const diodeToggle = activeCurveTab(wrapper).findAll('.toggle-btn').find(button => button.text() === 'Diode')
+      expect(diodeToggle.element.disabled).toBe(true)
+      await diodeToggle.trigger('click')
+      expect(activeCurveTab(wrapper).find('.toggle-btn.active').text()).toBe('Switch')
+      await activeCurveTab(wrapper).find('[aria-label="Zth K per W point 2"]').setValue('0.15')
+      await activeCurveTab(wrapper).find('form.thermal-curve-editor').trigger('submit')
+      await flushPromises()
+      expect(transistorApi.updateThermalCurve).toHaveBeenCalledWith(
+        mockTransistor1.metadata.name,
+        'switch',
+        { expected_token: '4'.repeat(64), graph_t_rthjc: [[1e-6, 1e-5, 1e-4], [0.01, 0.15, 0.4]] }
+      )
+    })
+
+    it('adds and deletes a diode thermal graph using its own stale token', async () => {
+      const response = structuredClone(curveApiResponse)
+      transistorApi.getCurves.mockResolvedValue(response)
+      wrapper = mountForm()
+      await flushPromises()
+      await clickFormTab(wrapper, 'Thermal Curves')
+      await activeCurveTab(wrapper).findAll('.toggle-btn').find(button => button.text() === 'Diode').trigger('click')
+      expect(activeCurveTab(wrapper).text()).toContain('No transient thermal curve is stored for this diode.')
+      await activeCurveTab(wrapper).findAll('button').find(button => button.text() === 'Add thermal curve').trigger('click')
+      transistorApi.addThermalCurve.mockImplementation(async (_id, component, request) => {
+        response.thermal_foster[component] = {
+          graph_t_rthjc: structuredClone(request.graph_t_rthjc),
+          _edit_token: '6'.repeat(64)
+        }
+        return {}
+      })
+      await activeCurveTab(wrapper).find('[aria-label="Time seconds point 2"]').setValue('2')
+      await activeCurveTab(wrapper).find('[aria-label="Zth K per W point 2"]').setValue('0.2')
+      await activeCurveTab(wrapper).find('form.thermal-curve-editor').trigger('submit')
+      await flushPromises()
+      expect(transistorApi.addThermalCurve).toHaveBeenCalledWith(
+        mockTransistor1.metadata.name,
+        'diode',
+        { expected_token: '5'.repeat(64), graph_t_rthjc: [[0, 2], [0, 0.2]] }
+      )
+      await activeCurveTab(wrapper).findAll('button').find(button => button.text() === 'View').trigger('click')
+      const thermalPlot = wrapper.findComponent(CurvePlotter)
+      expect(thermalPlot.props('xLogScale')).toBe(false)
+      expect(thermalPlot.props('datasets')[0].data).toEqual([{ x: 0, y: 0 }, { x: 2, y: 0.2 }])
+      await wrapper.find('[aria-label="Close curve view"]').trigger('click')
+
+      await activeCurveTab(wrapper).findAll('button').find(button => button.text() === 'Delete').trigger('click')
+      const switchToggle = activeCurveTab(wrapper).findAll('.toggle-btn').find(button => button.text() === 'Switch')
+      expect(switchToggle.element.disabled).toBe(true)
+      expect(activeCurveTab(wrapper).find('.toggle-btn.active').text()).toBe('Diode')
+      expect(activeCurveTab(wrapper).find('[role="dialog"] h4').text()).toBe('Delete diode thermal curve?')
+      await wrapper.find('[role="dialog"] .btn-danger').trigger('click')
+      await flushPromises()
+      expect(transistorApi.deleteThermalCurve).toHaveBeenCalledWith(
+        mockTransistor1.metadata.name, 'diode', '6'.repeat(64)
+      )
+    })
+
+    it('shows an accessible load error instead of an empty curve state', async () => {
+      transistorApi.getCurves.mockRejectedValue(new Error('offline'))
+      wrapper = mountForm()
+      await flushPromises()
+      await clickFormTab(wrapper, 'Thermal Curves')
+      expect(activeCurveTab(wrapper).find('[role="alert"]').text()).toContain('Unable to load saved curves')
+      expect(activeCurveTab(wrapper).find('[role="status"]').exists()).toBe(false)
     })
   })
 

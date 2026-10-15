@@ -386,6 +386,59 @@
       />
     </div>
 
+    <div v-show="activeTab === 'thermal_curves'" class="curve-tab-content" data-testid="thermal-curve-tab">
+      <h3>Transient Junction-to-Case Thermal Impedance</h3>
+      <p>Stored samples are shown unchanged. Time is seconds; Zth(j-c) is K/W.</p>
+      <div class="component-toggle">
+        <button type="button" :disabled="Boolean(thermalDraft || thermalDeleteComponent)" @click="thermalComponent = 'switch'" :class="['toggle-btn', { active: thermalComponent === 'switch' }]">Switch</button>
+        <button type="button" :disabled="Boolean(thermalDraft || thermalDeleteComponent)" @click="thermalComponent = 'diode'" :class="['toggle-btn', { active: thermalComponent === 'diode' }]">Diode</button>
+      </div>
+
+      <p v-if="curveLoadError" class="curve-viewer-empty" role="alert">{{ curveLoadError }}</p>
+      <section v-else class="thermal-curve-card" :aria-label="`${thermalComponent} thermal curve`">
+        <template v-if="thermalCurves[thermalComponent].graph_t_rthjc">
+          <p>{{ thermalCurves[thermalComponent].graph_t_rthjc[0].length }} stored points</p>
+          <div class="card-actions">
+            <button type="button" class="btn btn-secondary" @click="viewThermalCurve">View</button>
+            <button type="button" class="btn btn-secondary" @click="editThermalCurve">Edit</button>
+            <button type="button" class="btn btn-danger" @click="startThermalDelete">Delete</button>
+          </div>
+        </template>
+        <p v-else role="status">No transient thermal curve is stored for this {{ thermalComponent }}.</p>
+        <button v-if="!thermalCurves[thermalComponent].graph_t_rthjc && !thermalDraft" type="button" class="btn btn-primary" @click="startThermalCurve">Add thermal curve</button>
+      </section>
+
+      <form v-if="thermalDraft" class="thermal-curve-editor" @submit.prevent="saveThermalCurve">
+        <h4>{{ thermalCurves[thermalDraftComponent].graph_t_rthjc ? 'Edit' : 'Add' }} {{ thermalDraftComponent }} thermal curve</h4>
+        <p>Enter time in seconds and thermal impedance in K/W. Time samples must increase.</p>
+        <table>
+          <thead><tr><th>Time (s)</th><th>Zth(j-c) (K/W)</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr v-for="(time, index) in thermalDraft[0]" :key="index">
+              <td><input v-model.number="thermalDraft[0][index]" type="number" step="any" :aria-label="`Time seconds point ${index + 1}`" /></td>
+              <td><input v-model.number="thermalDraft[1][index]" type="number" step="any" :aria-label="`Zth K per W point ${index + 1}`" /></td>
+              <td><button type="button" class="btn btn-secondary" :disabled="thermalDraft[0].length <= 2" :aria-label="`Remove point ${index + 1}`" @click="removeThermalPoint(index)">Remove</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" @click="cancelThermalEdit">Cancel</button>
+          <button type="button" class="btn btn-secondary" @click="addThermalPoint">Add point</button>
+          <button type="submit" class="btn btn-primary">Save thermal curve</button>
+        </div>
+      </form>
+      <div v-if="thermalDeleteComponent" class="modal-overlay" @click="cancelThermalDelete">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="thermal-delete-title" @click.stop>
+          <h4 id="thermal-delete-title">Delete {{ thermalDeleteComponent }} thermal curve?</h4>
+          <p>This clears only the stored graph_t_rthjc samples.</p>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" @click="cancelThermalDelete">Cancel</button>
+            <button type="button" class="btn btn-danger" @click="deleteThermalCurve">Delete thermal curve</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div v-if="selectedCurve" class="curve-viewer" data-testid="curve-viewer" role="region" aria-label="Curve detail">
       <div class="curve-viewer-header">
         <h4>{{ selectedCurve.title }}</h4>
@@ -398,7 +451,9 @@
         :title="selectedCurve.title"
         :datasets="[selectedCurvePlot.dataset]"
         :x-label="selectedCurvePlot.xLabel"
+        :x-value-scientific="selectedCurvePlot.xValueScientific || false"
         :y-label="selectedCurvePlot.yLabel"
+        :y-value-scientific="selectedCurvePlot.yValueScientific || false"
         :x-log-scale="selectedCurvePlot.xLogScale"
         :y-log-scale="selectedCurvePlot.yLogScale"
       />
@@ -455,6 +510,11 @@ const activeTab = ref('general')
 const curveComponent = ref('switch')
 const activeLossType = ref('e_on')
 const activeCapType = ref('c_oss')
+const thermalComponent = ref('switch')
+const thermalDraft = ref(null)
+const thermalDraftComponent = ref(null)
+const thermalDeleteComponent = ref(null)
+const curveLoadError = ref('')
 const showEditor = ref(false)
 const editorCurveType = ref(null)
 const editingCurve = ref(null)
@@ -500,6 +560,10 @@ const curves = reactive({
   capacitance_c_oss: [],
   capacitance_c_iss: [],
   capacitance_c_rss: [],
+})
+const thermalCurves = reactive({
+  switch: { graph_t_rthjc: null, _edit_token: '' },
+  diode: { graph_t_rthjc: null, _edit_token: '' }
 })
 
 const curveWorkflow = {
@@ -562,6 +626,7 @@ const availableTabs = computed(() => {
       { key: 'gate_charge', label: 'Gate Charge' },
       { key: 'soa', label: 'SOA' },
       { key: 'capacitance', label: 'Capacitance' },
+      { key: 'thermal_curves', label: 'Thermal Curves' },
     )
   }
   return tabs
@@ -590,6 +655,7 @@ async function loadCurves() {
   if (!id) return
   try {
     const data = await transistorApi.getCurves(id)
+    curveLoadError.value = ''
     curves.switch_channel = data.switch?.channel_data || []
     curves.switching_e_on = data.switch?.e_on_data || []
     curves.switching_e_off = data.switch?.e_off_data || []
@@ -600,8 +666,114 @@ async function loadCurves() {
     curves.capacitance_c_oss = data.capacitances?.c_oss || []
     curves.capacitance_c_iss = data.capacitances?.c_iss || []
     curves.capacitance_c_rss = data.capacitances?.c_rss || []
+    for (const component of ['switch', 'diode']) {
+      thermalCurves[component] = data.thermal_foster?.[component] || { graph_t_rthjc: null, _edit_token: '' }
+    }
   } catch (error) {
     console.error('Failed to load curves:', error)
+    curveLoadError.value = 'Unable to load saved curves. Reload the device and try again.'
+  }
+}
+
+function startThermalCurve() {
+  thermalDraftComponent.value = thermalComponent.value
+  thermalDraft.value = [[0, 1], [0, 0]]
+}
+
+function editThermalCurve() {
+  const graph = thermalCurves[thermalComponent.value].graph_t_rthjc
+  if (!Array.isArray(graph) || graph.length !== 2) return
+  thermalDraftComponent.value = thermalComponent.value
+  thermalDraft.value = graph.map(row => [...row])
+}
+
+function cancelThermalEdit() {
+  thermalDraft.value = null
+  thermalDraftComponent.value = null
+}
+
+function startThermalDelete() {
+  thermalDeleteComponent.value = thermalComponent.value
+}
+
+function cancelThermalDelete() {
+  thermalDeleteComponent.value = null
+}
+
+function addThermalPoint() {
+  if (!thermalDraft.value) return
+  const times = thermalDraft.value[0]
+  const lastTime = times[times.length - 1]
+  thermalDraft.value[0].push(lastTime + Math.max(Math.abs(lastTime) * 0.1, 1))
+  thermalDraft.value[1].push(thermalDraft.value[1][thermalDraft.value[1].length - 1])
+}
+
+function removeThermalPoint(index) {
+  if (!thermalDraft.value || thermalDraft.value[0].length <= 2) return
+  thermalDraft.value[0].splice(index, 1)
+  thermalDraft.value[1].splice(index, 1)
+}
+
+function viewThermalCurve() {
+  const graph = thermalCurves[thermalComponent.value].graph_t_rthjc
+  const points = graphToPoints(graph)
+  selectedCurve.value = {
+    title: `${thermalComponent.value} transient Zth(j-c)`,
+    plot: points.length ? {
+      points,
+      xLabel: 'Time (s)',
+      yLabel: 'Zth(j-c) (K/W)',
+      xValueScientific: true,
+      yValueScientific: true,
+      xLogScale: false,
+      yLogScale: false
+    } : null
+  }
+}
+
+async function saveThermalCurve() {
+  const id = getTransistorId()
+  if (!id || !thermalDraft.value) return
+  const component = thermalDraftComponent.value
+  if (!component) return
+  const existing = thermalCurves[component]
+  const request = {
+    expected_token: existing._edit_token,
+    graph_t_rthjc: thermalDraft.value.map(row => [...row])
+  }
+  try {
+    if (existing.graph_t_rthjc) await transistorApi.updateThermalCurve(id, component, request)
+    else await transistorApi.addThermalCurve(id, component, request)
+    cancelThermalEdit()
+    showNotification('Thermal curve saved successfully')
+    await loadCurves()
+  } catch (error) {
+    const detail = error.response?.data?.detail
+    showNotification('Failed to save thermal curve: ' + (typeof detail === 'string' ? detail : error.message), 'error')
+    if (error.response?.status === 409) {
+      cancelThermalEdit()
+      await loadCurves()
+    }
+  }
+}
+
+async function deleteThermalCurve() {
+  const id = getTransistorId()
+  const component = thermalDeleteComponent.value
+  if (!id || !component) return
+  try {
+    await transistorApi.deleteThermalCurve(id, component, thermalCurves[component]._edit_token)
+    cancelThermalDelete()
+    selectedCurve.value = null
+    showNotification('Thermal curve deleted')
+    await loadCurves()
+  } catch (error) {
+    const detail = error.response?.data?.detail
+    showNotification('Failed to delete thermal curve: ' + (typeof detail === 'string' ? detail : error.message), 'error')
+    if (error.response?.status === 409) {
+      cancelThermalDelete()
+      await loadCurves()
+    }
   }
 }
 
