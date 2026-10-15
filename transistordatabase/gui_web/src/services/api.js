@@ -239,6 +239,30 @@ export const transistorApi = {
     return response.data
   },
 
+  async addThermalCurve(id, component, update) {
+    const response = await api.post(
+      `/api/transistors/${pathSegment(id)}/curves/thermal/${component}`,
+      update
+    )
+    return response.data
+  },
+
+  async updateThermalCurve(id, component, update) {
+    const response = await api.put(
+      `/api/transistors/${pathSegment(id)}/curves/thermal/${component}`,
+      update
+    )
+    return response.data
+  },
+
+  async deleteThermalCurve(id, component, expectedToken) {
+    const response = await api.delete(
+      `/api/transistors/${pathSegment(id)}/curves/thermal/${component}`,
+      { params: { expected_token: expectedToken } }
+    )
+    return response.data
+  },
+
   // Validate curves
   async validateCurves(id) {
     const response = await api.post(`/api/transistors/${pathSegment(id)}/curves/validate`)

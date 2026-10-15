@@ -61,6 +61,10 @@ export default {
       type: Number,
       default: 3
     },
+    xValueScientific: {
+      type: Boolean,
+      default: false
+    },
     yLabel: {
       type: String,
       default: 'Y'
@@ -143,7 +147,10 @@ export default {
               callbacks: {
                 label: (context) => {
                   const label = context.dataset.label || ''
-                  return `${label}: (${context.parsed.x.toFixed(this.xValueDecimals)}, ${context.parsed.y.toFixed(3)})`
+                  const xValue = this.xValueScientific
+                    ? context.parsed.x.toExponential(3)
+                    : context.parsed.x.toFixed(this.xValueDecimals)
+                  return `${label}: (${xValue}, ${context.parsed.y.toFixed(3)})`
                 }
               }
             },

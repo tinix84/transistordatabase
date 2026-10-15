@@ -6,6 +6,7 @@ Defines data models for curve management and other API operations.
 from __future__ import annotations
 
 from datetime import datetime
+import math
 from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field, StrictInt, field_validator, model_validator
@@ -159,6 +160,36 @@ class CurveUpdateRequest(BaseModel):
     expected_count: int = Field(..., ge=1)
     expected_token: str = Field(..., min_length=64, max_length=64, pattern="^[a-f0-9]{64}$")
     curve: dict[str, Any]
+
+
+class ThermalCurveCreate(BaseModel):
+    """One transient junction-to-case thermal impedance graph in SI units."""
+
+    graph_t_rthjc: List[List[float]] = Field(
+        ..., description="[time in seconds, Zth(j-c) in K/W]", min_length=2, max_length=2
+    )
+
+    @field_validator("graph_t_rthjc")
+    @classmethod
+    def validate_graph(cls, graph: List[List[float]]) -> List[List[float]]:
+        """Require paired, finite SI samples with strictly increasing time."""
+        if len(graph[0]) < 2 or len(graph[0]) != len(graph[1]):
+            raise ValueError("thermal curve rows must have equal length of at least two")
+        if any(not math.isfinite(value) for row in graph for value in row):
+            raise ValueError("thermal curve points must be finite")
+        if any(value < 0 for value in graph[0]) or any(
+            right <= left for left, right in zip(graph[0], graph[0][1:], strict=False)
+        ):
+            raise ValueError("time values must be non-negative and strictly increasing")
+        if any(value < 0 for value in graph[1]):
+            raise ValueError("thermal impedance values must be non-negative")
+        return graph
+
+
+class ThermalCurveUpdate(ThermalCurveCreate):
+    """Optimistically update the one thermal graph on a component."""
+
+    expected_token: str = Field(..., min_length=64, max_length=64, pattern="^[a-f0-9]{64}$")
 
 
 class CurveValidationResult(BaseModel):

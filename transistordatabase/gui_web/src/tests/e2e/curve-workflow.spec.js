@@ -48,6 +48,10 @@ function curveResponse() {
       c_oss: [{ t_j: 25, graph_v_c: [[0, 50, 100], [0.00001, 0.000002, 0.000001]] }],
       c_iss: [],
       c_rss: []
+    },
+    thermal_foster: {
+      switch: { graph_t_rthjc: [[1e-6, 1e-5, 1e-4], [0.01, 0.12, 0.4]], _edit_token: 'c'.repeat(64) },
+      diode: { graph_t_rthjc: null, _edit_token: 'd'.repeat(64) }
     }
   }
 }
@@ -244,6 +248,86 @@ test('switches the open editor to the selected curve and uses its index and toke
       curve: { graph_v_i: [[0, 15, 30], [0, 8, 12]] }
     }
   }])
+})
+
+test('views, edits, adds, and deletes switch and diode thermal graphs with exact units and tokens', async ({ page }) => {
+  const curves = curveResponse()
+  const requests = []
+  const unmatchedRequests = []
+  const thermalPath = component => `${CURVES_PATH}/thermal/${component}`
+  await page.route('**/api/**', async route => {
+    const request = route.request()
+    const url = new URL(request.url())
+    const method = request.method()
+    requests.push({ method, path: url.pathname, query: Object.fromEntries(url.searchParams) })
+    if (method === 'GET' && url.pathname === '/api/transistors') {
+      await route.fulfill({ status: 200, json: [fixtureDevice()] })
+      return
+    }
+    if (method === 'GET' && url.pathname === CURVES_PATH) {
+      await route.fulfill({ status: 200, json: curves })
+      return
+    }
+    if (method === 'PUT' && url.pathname === thermalPath('switch')) {
+      const body = request.postDataJSON()
+      requests.at(-1).body = body
+      curves.thermal_foster.switch = { graph_t_rthjc: body.graph_t_rthjc, _edit_token: 'e'.repeat(64) }
+      await route.fulfill({ status: 200, json: { message: 'switch thermal curve updated' } })
+      return
+    }
+    if (method === 'POST' && url.pathname === thermalPath('diode')) {
+      const body = request.postDataJSON()
+      requests.at(-1).body = body
+      curves.thermal_foster.diode = { graph_t_rthjc: body.graph_t_rthjc, _edit_token: 'f'.repeat(64) }
+      await route.fulfill({ status: 200, json: { message: 'diode thermal curve added' } })
+      return
+    }
+    if (method === 'DELETE' && url.pathname === thermalPath('diode')) {
+      curves.thermal_foster.diode = { graph_t_rthjc: null, _edit_token: '0'.repeat(64) }
+      await route.fulfill({ status: 200, json: { message: 'diode thermal curve deleted' } })
+      return
+    }
+    unmatchedRequests.push(`${method} ${url.pathname}`)
+    await route.fulfill({ status: 501, json: { detail: `Unmocked API request: ${method} ${url.pathname}` } })
+  })
+
+  await page.goto('/')
+  const row = page.getByTestId('transistor-row').filter({ hasText: DEVICE_NAME })
+  await row.getByRole('button', { name: 'Edit' }).click()
+  await page.getByRole('button', { name: 'Thermal Curves' }).click()
+  const thermalTab = page.getByTestId('thermal-curve-tab')
+  await expect(thermalTab).toContainText('Time is seconds; Zth(j-c) is K/W.')
+  await thermalTab.getByRole('button', { name: 'View', exact: true }).click()
+  await expect(page.getByTestId('curve-viewer')).toContainText('switch transient Zth(j-c)')
+  await page.getByRole('button', { name: 'Close curve view' }).click()
+  await thermalTab.getByRole('button', { name: 'Edit', exact: true }).click()
+  await expect(thermalTab.getByRole('button', { name: 'Diode', exact: true })).toBeDisabled()
+  await expect(thermalTab).toContainText('Edit switch thermal curve')
+  await thermalTab.getByRole('spinbutton', { name: 'Zth K per W point 2' }).fill('0.15')
+  await thermalTab.getByRole('button', { name: 'Save thermal curve' }).click()
+  await expect(thermalTab).toContainText('3 stored points')
+  expect(requests.find(request => request.method === 'PUT' && request.path === thermalPath('switch'))).toEqual({
+    method: 'PUT', path: thermalPath('switch'), query: {},
+    body: { expected_token: 'c'.repeat(64), graph_t_rthjc: [[1e-6, 1e-5, 1e-4], [0.01, 0.15, 0.4]] }
+  })
+
+  await thermalTab.getByRole('button', { name: 'Diode' }).click()
+  await expect(thermalTab).toContainText('No transient thermal curve is stored for this diode.')
+  await thermalTab.getByRole('button', { name: 'Add thermal curve' }).click()
+  await thermalTab.getByRole('spinbutton', { name: 'Time seconds point 2' }).fill('2')
+  await thermalTab.getByRole('spinbutton', { name: 'Zth K per W point 2' }).fill('0.2')
+  await thermalTab.getByRole('button', { name: 'Save thermal curve' }).click()
+  await expect(thermalTab).toContainText('2 stored points')
+  const addRequest = requests.find(request => request.method === 'POST' && request.path === thermalPath('diode'))
+  expect(addRequest.body).toEqual({ expected_token: 'd'.repeat(64), graph_t_rthjc: [[0, 2], [0, 0.2]] })
+  await thermalTab.getByRole('button', { name: 'Delete', exact: true }).click()
+  await expect(thermalTab.getByRole('button', { name: 'Switch', exact: true })).toBeDisabled()
+  await expect(thermalTab.getByRole('dialog')).toContainText('Delete diode thermal curve?')
+  await thermalTab.getByRole('dialog').getByRole('button', { name: 'Delete thermal curve' }).click()
+  await expect(thermalTab).toContainText('No transient thermal curve is stored for this diode.')
+  expect(requests.find(request => request.method === 'DELETE' && request.path === thermalPath('diode')).query)
+    .toEqual({ expected_token: 'f'.repeat(64) })
+  expect(unmatchedRequests).toEqual([])
 })
 
 test('keeps the edited route when a selector changes and resets edit state for Add', async ({ page }) => {
