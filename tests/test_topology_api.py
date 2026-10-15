@@ -989,25 +989,40 @@ def test_loss_balanced_comparison_returns_scope_with_efficiency_ranking(
     assert comparison["loss_scope"] == "channel_conduction_only"
 
 
-def test_loss_balanced_dcm_topology_comparison_is_rejected(
+def test_loss_balanced_dcm_topology_comparison_returns_scalar_results_and_residuals(
     gate_conditioned_client: TestClient,
 ) -> None:
-    """Do not rank scalar DCM results across topologies."""
+    """Compare four scalar DCM solves at the same boundary and retain domain errors."""
     response = gate_conditioned_client.post(
         "/api/topology/compare",
         json={
             "parameters": payload(
                 topology="boost", mode="loss-balanced", conduction_regime="DCM",
-                v_in=100, v_out=200, p_out=100, f_sw=20_000,
-                l_value=1e-3, c_out=1e-3, t_j=25, v_g=15, diode_v_g=0,
+                v_in=100, v_out=200, p_out=10, f_sw=20_000,
+                l_value=1e-3, c_out=1e-3, turns_ratio_nps=1,
+                t_j=25, v_g=15, diode_v_g=0,
             ),
             "switch_transistor_id": "gated-device",
             "diode_transistor_id": "gated-device",
         },
     )
-    assert response.status_code == 400
-    assert "does not support loss-balanced DCM" in response.json()["detail"]
-    assert "Flyback DCM operating points are supported individually" in response.json()["detail"]
+    assert response.status_code == 200
+    result = response.json()
+    assert "Buck requires" in result["buck"]["error"]
+    comparison = result["comparison"]
+    assert comparison["ranking_available"] is True
+    assert comparison["loss_scope"] == "channel_conduction_only"
+    assert comparison["ranking_basis"] == "included_channel_conduction_efficiency_proxy"
+    for topology in ("boost", "buck-boost", "flyback"):
+        point = result[topology]
+        assert point["model"]["mode"] == "loss-balanced"
+        assert point["model"]["conduction_regime"] == "DCM"
+        assert point["losses"]["loss_scope"] == "channel_conduction_only"
+        assert abs(point["performance"]["power_balance_residual_w"]) < 1e-5
+        assert abs(point["calculated"]["inductor_volt_second_residual_v"]) < 1e-5
+        assert comparison["efficiencies_percent"][topology] == pytest.approx(
+            point["performance"]["efficiency_percent"]
+        )
 
 
 def test_estimate_comparison_does_not_rank_unmodeled_efficiencies(client: TestClient) -> None:

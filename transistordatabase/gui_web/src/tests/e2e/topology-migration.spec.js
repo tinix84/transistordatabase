@@ -97,7 +97,7 @@ test.describe('topology migration browser workflow', () => {
 
     await setParameter(page, 'Input voltage', 110)
     await expect(page.locator('.results-panel')).toHaveCount(0)
-    await expect(page.getByRole('button', { name: 'Download JSON' })).toBeDisabled()
+    await expect(page.locator('.calc-header').getByRole('button', { name: 'Download JSON' })).toBeDisabled()
   })
 
   test('reports a DCM boundary error in the browser instead of inventing a point', async ({ page }) => {
@@ -212,6 +212,46 @@ test.describe('topology migration browser workflow', () => {
     expect(exported.result.losses.loss_scope).toBe('channel_conduction_only')
     expect(exported.result.calculated.inductor_volt_second_residual_v).toBe(1e-10)
     expect(exported.result.calculated.power_balance_residual_w).toBe(2e-10)
+  })
+
+  test('submits DCM topology comparison and keeps missing-curve outcomes per topology', async ({ page }) => {
+    await openTopology(page)
+    await page.locator('label.param-item').filter({ hasText: 'Calculation mode' }).locator('select').selectOption('loss-balanced')
+    await page.locator('label.param-item').filter({ hasText: 'Conduction regime' }).locator('select').selectOption('DCM')
+    await setParameter(page, 'Flyback turns ratio (Np/Ns)', 2)
+
+    let requestBody
+    await page.route('**/api/topology/compare', async route => {
+      requestBody = route.request().postDataJSON()
+      await route.fulfill({ json: {
+        buck: { error: 'No transistor selected; required device curves are unavailable' },
+        boost: { error: 'No transistor selected; required device curves are unavailable' },
+        'buck-boost': { error: 'No transistor selected; required device curves are unavailable' },
+        flyback: { error: 'No transistor selected; required device curves are unavailable' },
+        comparison: {
+          efficiencies_percent: {},
+          best_topology: null,
+          ranking_available: false,
+          ranking_basis: null,
+          reason: 'No topology produced a comparable efficiency; check the required device curves and operating conditions.',
+          loss_scope: 'channel_conduction_only'
+        }
+      } })
+    })
+
+    const apiResponse = page.waitForResponse(response => (
+      response.url().includes('/api/topology/compare')
+      && response.request().method() === 'POST'
+    ))
+    await page.getByRole('button', { name: 'Compare topologies', exact: true }).click()
+    const response = await apiResponse
+
+    expect(response.status()).toBe(200)
+    expect(requestBody.parameters).toMatchObject({ mode: 'loss-balanced', conduction_regime: 'DCM', turns_ratio_nps: 2 })
+    const comparison = page.locator('.results-panel').last()
+    await expect(comparison).toContainText('Ranking uses channel_conduction_only losses only.')
+    await expect(comparison).toContainText('No transistor selected; required device curves are unavailable')
+    await expect(comparison).toContainText('buck')
   })
 
   test('submits and exports Buck DCM channel feedback with both residuals', async ({ page }) => {
