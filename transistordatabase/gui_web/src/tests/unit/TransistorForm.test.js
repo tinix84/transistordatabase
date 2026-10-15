@@ -69,7 +69,7 @@ const curveApiResponse = {
 
 const curvePlotterStub = {
   name: 'CurvePlotter',
-  props: ['title', 'datasets', 'xLabel', 'xValueScientific', 'yLabel', 'xLogScale', 'yLogScale'],
+  props: ['title', 'datasets', 'xLabel', 'xValueScientific', 'yLabel', 'yValueScientific', 'xLogScale', 'yLogScale'],
   template: '<div data-testid="curve-plotter">{{ title }}</div>'
 }
 
@@ -511,6 +511,7 @@ describe('TransistorForm.vue', () => {
       expect(plot.props('xLabel')).toBe('Time (s)')
       expect(plot.props('xValueScientific')).toBe(true)
       expect(plot.props('yLabel')).toBe('Zth(j-c) (K/W)')
+      expect(plot.props('yValueScientific')).toBe(true)
       expect(plot.props('datasets')[0].data).toEqual([
         { x: 1e-6, y: 0.01 }, { x: 1e-5, y: 0.12 }, { x: 1e-4, y: 0.4 }
       ])

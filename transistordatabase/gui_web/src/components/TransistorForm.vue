@@ -453,6 +453,7 @@
         :x-label="selectedCurvePlot.xLabel"
         :x-value-scientific="selectedCurvePlot.xValueScientific || false"
         :y-label="selectedCurvePlot.yLabel"
+        :y-value-scientific="selectedCurvePlot.yValueScientific || false"
         :x-log-scale="selectedCurvePlot.xLogScale"
         :y-log-scale="selectedCurvePlot.yLogScale"
       />
@@ -723,6 +724,7 @@ function viewThermalCurve() {
       xLabel: 'Time (s)',
       yLabel: 'Zth(j-c) (K/W)',
       xValueScientific: true,
+      yValueScientific: true,
       xLogScale: false,
       yLogScale: false
     } : null

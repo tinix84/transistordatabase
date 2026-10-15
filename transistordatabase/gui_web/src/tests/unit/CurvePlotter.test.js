@@ -68,6 +68,7 @@ describe('CurvePlotter tooltip formatting', () => {
         xLabel: 'Time (s)',
         xValueScientific: true,
         yLabel: 'Zth(j-c) (K/W)',
+        yValueScientific: true,
         showLegend: false
       }
     })
@@ -81,5 +82,9 @@ describe('CurvePlotter tooltip formatting', () => {
       dataset: { label: 'Switch transient Zth(j-c)' },
       parsed: { x: 1e-4, y: 0.4 }
     })).toBe('Switch transient Zth(j-c): (1.000e-4, 0.400)')
+    expect(formatLabel({
+      dataset: { label: 'Switch transient Zth(j-c)' },
+      parsed: { x: 1e-4, y: 0.0001 }
+    })).toBe('Switch transient Zth(j-c): (1.000e-4, 1.000e-4)')
   })
 })
