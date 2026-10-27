@@ -79,9 +79,9 @@ html_theme_options = {
 
 html_context = {
     'display_github': True,
-    'github_user': 'upb-lea',
+    'github_user': 'tinix84',
     'github_repo': 'transistordatabase',
-    'github_version': 'database-edits/docs/',
+    'github_version': 'main/docs/',
 }
 
 templates_path = ["_templates"]

@@ -1,0 +1,2521 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Power semiconductor transistor database and simulation export tool">
+      
+      
+        <meta name="author" content="LEA, University of Paderborn">
+      
+      
+        <link rel="canonical" href="https://tinix84.github.io/transistordatabase/sprints/sprint-web-topology-migration/">
+      
+      
+        <link rel="prev" href="../../adr/0001-local-web-gui-replaces-qt/">
+      
+      
+        <link rel="next" href="../sprint-web-database-backup/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Topology Migration Sprint - Transistor Database</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#local-web-topology-migration-plan" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Transistor Database" class="md-header__button md-logo" aria-label="Transistor Database" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Transistor Database
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Topology Migration Sprint
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/tinix84/transistordatabase" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    tinix84/transistordatabase
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guide/overview/" class="md-tabs__link">
+          
+  
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/core/models/" class="md-tabs__link">
+          
+  
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../adr/0001-local-web-gui-replaces-qt/" class="md-tabs__link">
+          
+  
+  
+  Web GUI Migration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/overview.md" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../development/contributing/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CHANGELOG/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Transistor Database" class="md-nav__button md-logo" aria-label="Transistor Database" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Transistor Database
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/tinix84/transistordatabase" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    tinix84/transistordatabase
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/loading.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loading Transistors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/exporting.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exporting Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/analytical-models.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analytical Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/database.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/web-interface.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web Interface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Core
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/services/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Services
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/repository/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repository
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/adapters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adapters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Backend
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/backend/concrete_services/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concrete Services
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/analytical_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analytical Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/database_manager.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Manager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/helper_functions.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Helper Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web GUI Migration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Web GUI Migration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0001-local-web-gui-replaces-qt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accepted Decision
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Migration Sprint
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Topology Migration Sprint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#verified-starting-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verified starting point
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intended-ownership" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intended ownership
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compatibility-boundary-with-the-ntbees2-goal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compatibility boundary with the ntbees2 goal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delivery-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delivery steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Delivery steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-establish-capability-coverage-and-numerical-expectations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 Establish capability coverage and numerical expectations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-implement-authoritative-python-operating-point-calculations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 Implement authoritative Python operating point calculations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-connect-the-local-web-workflow-through-fastapi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 Connect the local web workflow through FastAPI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-complete-topology-sweeps-and-result-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 Complete topology sweeps and result workflows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-continue-full-web-capability-replacement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 Continue full web capability replacement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#topology-coverage-status-2026-10-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Topology coverage status (2026-10-14)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#completion-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Completion criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accepted-missing-data-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accepted missing data behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accepted-operating-regime-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accepted operating regime behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decisions-still-required-before-dependent-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decisions still required before dependent implementation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sprint-web-database-backup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Backup Sprint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sprint-web-curve-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curve Workflow Sprint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sprint-web-saved-curve-editing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Saved Curve Editing Sprint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sprint-web-transient-thermal-comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transient Thermal Comparison Sprint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/core-design.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/services.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Service Layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/gui.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GUI Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/docs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/releases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#verified-starting-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verified starting point
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intended-ownership" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intended ownership
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compatibility-boundary-with-the-ntbees2-goal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compatibility boundary with the ntbees2 goal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delivery-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delivery steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Delivery steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-establish-capability-coverage-and-numerical-expectations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 Establish capability coverage and numerical expectations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-implement-authoritative-python-operating-point-calculations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 Implement authoritative Python operating point calculations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-connect-the-local-web-workflow-through-fastapi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 Connect the local web workflow through FastAPI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-complete-topology-sweeps-and-result-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 Complete topology sweeps and result workflows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-continue-full-web-capability-replacement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 Continue full web capability replacement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#topology-coverage-status-2026-10-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Topology coverage status (2026-10-14)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#completion-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Completion criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accepted-missing-data-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accepted missing data behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accepted-operating-regime-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accepted operating regime behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decisions-still-required-before-dependent-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decisions still required before dependent implementation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="local-web-topology-migration-plan">Local web topology migration plan<a class="headerlink" href="#local-web-topology-migration-plan" title="Permanent link">&para;</a></h1>
+<p>Prepared on 2026-10-02 following <a href="../../adr/0001-local-web-gui-replaces-qt/">the accepted migration decision</a>. This plan starts full desktop capability replacement with the topology workflow in the local web GUI. Qt contributes screenshots only. A verified Python/FastAPI calculation slice and Vue workflow are implemented; completeness and unverified behavior are tracked below.</p>
+<h2 id="verified-starting-point">Verified starting point<a class="headerlink" href="#verified-starting-point" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>transistordatabase/scripts/tdb_webgui.py</code> starts <code>gui_web.backend.main:app</code> on <code>127.0.0.1:8000</code> and opens a browser.</li>
+<li><code>transistordatabase/gui_web/src/components/TopologyCalculator.vue</code>, in <code>calculate()</code>, computes results locally. Frequency is converted from kHz to Hz, inductance from microhenries and capacitance from microfarads within formulas.</li>
+<li><code>transistordatabase/gui_web/backend/main.py</code> already exposes <code>/api/topology/calculate</code> and <code>/api/topology/compare</code>.</li>
+<li><code>transistordatabase/gui_web/backend/schemas.py</code> defines a request with frequency in Hz, one transistor identifier and optional gate conditions. It lacks the browser's inductance and output-capacitance fields and a complete two-device sweep description.</li>
+<li>Vue uses <code>buck_boost</code>; Python uses <code>buck-boost</code>. Their boost input-current formulas differ: Vue computes <code>(p_out / v_out) / (1 - duty)</code>; the Python implementation computes <code>p_out / v_in / (1 - duty)</code>.</li>
+<li><code>transistordatabase/gui_web/backend/topology_service.py</code> reads gate conditions without using them in its calculations and includes fallback estimates for missing device data. Routing the browser to this implementation unchanged would not establish numerical correctness or parity.</li>
+<li><code>transistordatabase/topologies/converter_common.py</code> contains Buck, Boost and BuckBoost calculations, including vector/mesh losses and thermal results. Its interfaces and transistor assumptions need verification before reuse.</li>
+<li><code>transistordatabase/gui_web/api/topology.py</code> is another calculation path. Determine its callers and deployment role before changing compatibility behavior.</li>
+</ul>
+<p>These findings were static planning observations made before implementation.</p>
+<h2 id="intended-ownership">Intended ownership<a class="headerlink" href="#intended-ownership" title="Permanent link">&para;</a></h2>
+<p>Browser inputs and plots → FastAPI adapter → reusable Python topology module → validated headless calculation implementations.</p>
+<p>A future MCP adapter can call the same Python operations. FastAPI handles request validation and response serialization; scientific validity checks also belong in Python so another adapter cannot bypass them. The browser may format values and convert display units, but must not independently calculate scientific outputs or silently substitute estimates.</p>
+<h2 id="compatibility-boundary-with-the-ntbees2-goal">Compatibility boundary with the ntbees2 goal<a class="headerlink" href="#compatibility-boundary-with-the-ntbees2-goal" title="Permanent link">&para;</a></h2>
+<p>TDB remains a complementary intended ntbees2 library; its integration is incomplete, and the converter that turns valid nonzero TDB curves into zero-valued loss parameters remains a serious known bug outside this sprint. The topology operation reads existing core TDB objects without mutation. Separately, the narrowly scoped DPT RAW import appends one user-reviewed measurement through the existing locked legacy JSON writer because the core adapter drops top-level raw records; it does not change the TDB schema, models, core adapters, or ntbees2 interfaces/adapters/converters. The new equal-current-sharing parallel model is local to the topology operation; parity with Octave parallel-device scaling is not established. No fix or integration-completion claim is made for the separate converter bug.</p>
+<h2 id="delivery-steps">Delivery steps<a class="headerlink" href="#delivery-steps" title="Permanent link">&para;</a></h2>
+<h3 id="1-establish-capability-coverage-and-numerical-expectations">1 Establish capability coverage and numerical expectations<a class="headerlink" href="#1-establish-capability-coverage-and-numerical-expectations" title="Permanent link">&para;</a></h3>
+<p>Create a coverage checklist from existing product documentation, available screenshots and headless calculation capabilities. Include Buck, Boost, Buck-Boost and Flyback operating points; CCM/DCM regimes; transistor selection; parallel-device configurations; gate conditions; losses; temperatures; line and contour sweeps; result comparison; and result export. Confirm each item's documented behavior rather than assuming this preliminary list is exhaustive. Record missing screenshot evidence explicitly; do not launch Qt to obtain it.</p>
+<p>Trace the current web route used by each operation. Define canonical topology names, SI transport units, supported conduction regimes, current definitions and output polarity conventions. Separate ideal estimates from calculations using device curves. Resolve missing-data behavior before implementation rather than silently retaining fallbacks.</p>
+<p>Validation: independently derived operating-point fixtures, documented model assumptions and a traceable capability checklist. For example, an ideal 100 V to 200 V boost at 1000 W has 10 A average input current and 5 A average output current; losses require a separately defined power balance. This fixture and ideal DCM power/current equations are covered by focused tests. Flyback assumes an ideal transformer and requires an explicit primary-to-secondary turns ratio.</p>
+<h3 id="2-implement-authoritative-python-operating-point-calculations">2 Implement authoritative Python operating point calculations<a class="headerlink" href="#2-implement-authoritative-python-operating-point-calculations" title="Permanent link">&para;</a></h3>
+<p>Reuse verified headless implementations where appropriate and concentrate orchestration in the core calculation area, consistent with repository guidance. Keep HTTP objects and Qt imports outside it. Preserve existing core interface conventions; do not add an ABC solely for a hypothetical future MCP adapter.</p>
+<p>Validate finite values, units, topology operating ranges, CCM/DCM boundaries and missing curves. Give outputs explicit model assumptions and actionable errors. Check gate resistance, gate voltage and temperature effects wherever the selected model claims to support them. Do not label simplified estimates as device-accurate results. Keep estimate, channel-conduction-only and detailed partial-loss modes distinct.</p>
+<p>Validation: numerical expectations for all four topologies and the DCM-capable cases; energy/current balance; supported parameter sensitivity; missing-data and invalid-domain cases; existing relevant headless regression tests. A Python calculation must run without importing PyQt5.</p>
+<h3 id="3-connect-the-local-web-workflow-through-fastapi">3 Connect the local web workflow through FastAPI<a class="headerlink" href="#3-connect-the-local-web-workflow-through-fastapi" title="Permanent link">&para;</a></h3>
+<p>Extend the existing request/response contract to cover the agreed operating-point fields and result needs. Connect the Vue calculation action to the endpoint; retain display-unit conversion at a clearly defined location. Move scientific device requirements and ranking calculations to Python where they affect results. Display backend errors and assumptions, and prevent stale requests from replacing newer results.</p>
+<p>Validation: endpoint results agree with direct Python results; explicit unit and topology-name mapping; browser tests verify meaningful numeric output and error states. Run the local web workflow in an environment without Qt. Preserve compatibility for existing web callers or document intentional migrations.</p>
+<h3 id="4-complete-topology-sweeps-and-result-workflows">4 Complete topology sweeps and result workflows<a class="headerlink" href="#4-complete-topology-sweeps-and-result-workflows" title="Permanent link">&para;</a></h3>
+<p>Add the agreed line/contour sweeps, device combinations, parallel configurations, loss and thermal metrics, comparison and export behavior. Keep sweep generation and calculations in Python; browser plotting consumes returned data. Establish sweep limits based on measured local performance rather than adding a job system speculatively. CCM <code>loss-balanced</code> line and contour integration is tracked in the <a href="../sprint-web-topology-loss-balanced-sweeps/">loss-balanced topology sweep sprint</a>; it reuses the scalar operation and retains the bounded point caps.</p>
+<p>Validation: scalar/vector/mesh consistency; axis units and array shapes; reproducible exported results; device-data cases; meaningful browser interaction tests. Every item in the topology coverage checklist needs evidence or an explicitly unresolved gap before topology is declared complete.</p>
+<h3 id="5-continue-full-web-capability-replacement">5 Continue full web capability replacement<a class="headerlink" href="#5-continue-full-web-capability-replacement" title="Permanent link">&para;</a></h3>
+<p>Use the same checklist and vertical-workflow approach for database search, creation/editing, curve management, comparison, import/export, settings and all other documented desktop capabilities. The order after topology remains open. Do not treat completion of the current Vue feature set as proof of full desktop coverage.</p>
+<p>The search-driven general database lifecycle slice is tracked in the <a href="../sprint-web-database-lifecycle/">database lifecycle sprint</a>; it does not close this broader replacement. Full-database raw JSON backup/restore and create-only single-record upload are tracked in the <a href="../sprint-web-database-backup/">database backup sprint</a>; other import/export capabilities remain open.</p>
+<p>The first CCM channel-loss feedback vertical slice across the four supported topologies is tracked in the <a href="../sprint-web-topology-electrothermal/">CCM topology loss-feedback sprint</a>. It power-balances included channel losses and reports a separate averaged inductor volt-second residual; it does not claim exact nonlinear voltage-law closure or electrothermal iteration. The follow-up <a href="../sprint-web-topology-loss-balanced-sweeps/">CCM loss-balanced topology sweep sprint</a> extends that same bounded model through Python-generated line/contour sweeps and the browser workflow; every point still requires exact-condition curves without extrapolation.</p>
+<p>Curve loading, plotting, and add/delete browser routes are tracked in the <a href="../sprint-web-curve-workflow/">web curve workflow sprint</a>. Saved-curve editing for the currently supported categories is tracked in the <a href="../sprint-web-saved-curve-editing/">saved-curve editing sprint</a>. The advanced comparison's read-only transient thermal display is tracked in the <a href="../sprint-web-transient-thermal-comparison/">transient thermal comparison sprint</a>. It includes recorded switch/diode samples and only valid paired Foster models. Read-only DPT raw waveform viewing, comparison, and metadata/condition filtering are implemented with API/Vue coverage and successful production builds; validation detail is in the <a href="../sprint-web-dpt-waveforms/">DPT waveform sprint</a>, <a href="../sprint-web-dpt-comparison/">DPT comparison sprint</a>, and <a href="../sprint-web-dpt-filtering/">DPT filtering sprint</a>. The bounded native LTspice RAW import now previews multiple plots and explicitly selected transient steps, loads only selected value traces, binds import to a one-time server review, and appends through the existing locked legacy JSON writer because the core adapter drops top-level raw measurements; see the <a href="../sprint-web-dpt-raw-import/">single-transient RAW import sprint</a> and <a href="../sprint-web-dpt-stepped-raw-import/">stepped/multi-plot RAW import sprint</a>. Raw-window Eon/Eoff derivation from stored event windows is implemented with exact-sample signed integration, explicit current-axis and polarity inputs, provenance, preview, and confirmed save; see <a href="../sprint-web-dpt-energy-derivation/">the DPT energy derivation sprint</a>. Other source formats, general saved-energy-curve editing, screenshot parity, and broader desktop capability coverage remain open.</p>
+<p>The DPT energy vertical slice has focused evidence: 31 Python/API tests, 20 DPTManager Vue tests, 2 Chromium flows (including stale-target rejection), and a passing Vite production build with the existing large-chunk warning. Extension checks each source acquisition once, compares every stored curve condition and graph point to embedded provenance, binds the previewed target edit token, and caps a merged curve at 50 points. These results complete only the scoped DPT energy workflow; screenshot parity and the broader desktop capability migration remain open.</p>
+<h2 id="topology-coverage-status-2026-10-14">Topology coverage status (2026-10-14)<a class="headerlink" href="#topology-coverage-status-2026-10-14" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Current evidence</th>
+<th>Status and remaining limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Buck, Boost, inverting Buck-Boost, and Flyback operating points</td>
+<td>Reusable SI-unit Python operation; independent CCM/DCM current and power fixtures, piecewise capacitor-charge ripple including diode-current zero crossings, polarity, voltage stress, Flyback ratio, and domain tests</td>
+<td>Implemented as ideal averaged CCM/DCM operating points. Flyback uses an ideal transformer model with explicit Np/Ns; leakage, winding, core, and clamp effects are excluded. DCM channel-loss calculations are supported; detailed DCM Eon lookup can reject zero turn-on current when the measured energy curve does not include it.</td>
+</tr>
+<tr>
+<td>Estimate, conduction-only, detailed, and loss-balanced modes</td>
+<td>Explicit request mode; tests cover ideal estimate labeling, missing-curve rejection, channel-only scope flags, detailed curve lookup, CCM feedback for four topologies, and scalar Buck, Boost, inverting Buck-Boost, and Flyback DCM feedback</td>
+<td>Estimate mode gives ideal electrical quantities only. Conduction-only and detailed retain ideal-point current and partial-loss input-power labels. <code>loss-balanced</code> CCM closes included channel losses and reports its averaged volt-second residual; all four topologies' DCM feedback integrates measured switch/diode current ramps, solves output charge, integrates capacitor ripple from the solved trajectory, and reports both power and volt-second residuals. All DCM feedback remains scalar-only.</td>
+</tr>
+<tr>
+<td>Device selection and combinations</td>
+<td>API and Vue select separate switch/diode TDB devices; curve modes read core TDB objects without mutation. Chromium E2E selects distinct switch/diode fixture names and confirms the curve-backed request carries both IDs separately.</td>
+<td>Implemented. Browser selector-to-request behavior is verified with a deterministic browser API fixture; the test does not load real device records or calculate curves in-browser. Python/API tests cover core TDB curve calculations. Eon/Eoff commutation-device strings and testbench provenance are preserved; matching a recorded name to the selected diode name is only a name comparison, and unknown or conflicting measurement context remains a labeled compatibility limitation.</td>
+</tr>
+<tr>
+<td>Parallel devices</td>
+<td>Separate switch and diode counts; tests verify current sharing and loss scaling while source curves remain unchanged</td>
+<td>Implemented with identical devices and equal current sharing. Exact Octave semantics are not established.</td>
+</tr>
+<tr>
+<td>Gate conditions</td>
+<td>Curve modes require exact junction temperature and switch turn-on gate voltage. Gate-conditioned diode curves require an explicit exact <code>diode_v_g</code>; diode curves with <code>v_g=None</code> remain selectable without it. Detailed mode selects Eon by turn-on gate and Eoff by turn-off gate, accepting both legacy Eoff records that store that condition in <code>v_g</code> and modern explicit <code>v_g_off</code> pairs</td>
+<td>Implemented without nearest-condition substitution or extrapolation. Missing diode gate selection reports available TDB gate conditions; missing or ambiguous Eoff selection reports available turn-off gate conditions; current values outside recorded curve ranges are rejected. Regression coverage uses the checked-in CREE legacy record and explicit modern fixture pairs.</td>
+</tr>
+<tr>
+<td>Device losses</td>
+<td>Conduction-only integrates switch/diode channel curves; detailed additionally interpolates switch turn-on/turn-off energy within recorded current ranges. <code>loss-balanced</code> solves a CCM channel-conduction power balance for Buck, Boost, Buck-Boost, and ideal-transformer Flyback and scalar DCM ramp/charge solves for all four topologies, using exact-condition channel curves. A duplicate-zero regression and the local CREE C3M0060065J 25 °C / 0 V diode curve verify the maximum-voltage envelope behavior.</td>
+<td>Partial. Duplicate channel-current samples use the maximum recorded voltage at that current as a conservative loss-screening envelope. Machine-readable scope identifies excluded switching, recovery, gate-drive, passive and magnetic terms. Detailed energy data require exact voltage/gate/temperature conditions; no extrapolation. Existing curve modes keep the ideal lossless operating point; only <code>loss-balanced</code> feeds included channel losses into duty/current. CCM uses triangular ripple, power-balance root solving, and reports the separate averaged inductor volt-second residual; checked-in nonlinear CCM curves do not prove both balances close exactly. DCM requires exact curves covering zero through each device's branch-current peak and integrates current-dependent drops over both ramps plus idle time; Flyback uses primary magnetizing current with ratio-scaled secondary diode current and reflected off voltage. DCM calculations remain scalar-only, and total losses remain open. See the <a href="../sprint-web-topology-electrothermal/">CCM topology loss-feedback sprint</a>, the <a href="../sprint-web-topology-boost-dcm/">Boost DCM feedback sprint</a>, the <a href="../sprint-web-topology-buck-dcm/">Buck DCM feedback sprint</a>, the <a href="../sprint-web-topology-buck-boost-dcm/">inverting Buck-Boost DCM feedback sprint</a>, and the <a href="../sprint-web-topology-flyback-dcm/">Flyback DCM feedback sprint</a>.</td>
+</tr>
+<tr>
+<td>Temperatures</td>
+<td>Uses recorded Foster junction-to-case resistance, case-to-sink resistance, and an explicitly supplied fixed case/sink temperature</td>
+<td>Partial steady-state estimate only when both resistances are finite and positive. Zero/nonpositive TDB sentinel values report the device temperature as unavailable. <code>loss-balanced</code> CCM and scalar DCM for all four topologies report one-pass temperature from the selected exact curve temperature and mark closure unavailable or not closed; none iterates temperature-dependent curves. No shared heatsink network or electrothermal closure.</td>
+</tr>
+<tr>
+<td>Line and contour sweeps</td>
+<td>Python generates line or 2-D results for voltage, power, frequency, inductance, or capacitance axes; tests verify units, shapes, limits, and unsupported-point errors. The loss-balanced sweep sprint compares each coordinate's selected metric and averaged inductor volt-second residual against a direct scalar call; preserves exact-curve/no-extrapolation behavior; and exposes channel-only scope plus the voltage-law caveat. Chromium E2E checks SI requests, chart/grid rendering, and exported scope/residual metadata.</td>
+<td>Implemented in the API contract for estimate, conduction-only, detailed, and CCM loss-balanced modes; bounded to 2,500 contour points. Each unsupported point rejects the full sweep with coordinate context. Buck, Boost, Buck-Boost, and Flyback DCM feedback are scalar-only; all DCM loss-balanced sweeps fail clearly and the Vue control is disabled. The contour E2E exposed that empty grid cells had zero height; explicit 24 px rows now keep the heatmap visible.</td>
+</tr>
+<tr>
+<td>Comparison</td>
+<td>Endpoint returns per-topology calculations, unsupported-condition errors, ranking availability, and loss scope</td>
+<td>Implemented. Estimate mode is not ranked; conduction-only and detailed rankings cover only their included partial losses, while <code>loss-balanced</code> ranks its CCM channel-conduction power-balance result. None is a total-efficiency ranking. Flyback comparison needs an Np/Ns value. Compare-only results can be exported with their comparison request and response.</td>
+</tr>
+<tr>
+<td>Advanced transient thermal comparison</td>
+<td><code>ComparisonService._plot_thermal_comparison</code> emits the stored <code>graph_t_rthjc</code> samples for switch and diode independently and adds a Foster curve only for finite, positive, non-empty paired vectors; four focused regressions verify both-component curves, missing/unpaired-model behavior, diode-only model display, raw points, axes, and non-mutation</td>
+<td>Implemented as read-only web comparison output with the existing curve/time/Zth response shape and a documented 100-point 1 µs–10 s logarithmic display grid. No total-resistance or other synthetic fallback is generated. Read-only DPT waveform display, overlays, metadata/condition filtering, and a bounded native LTspice stepped/multi-plot RAW import are implemented separately. The RAW parser preflights resource bounds, preserves only selected steps in its temporary trace-load payload, decodes native time markers, binds grouped imports to a one-time review token, and appends through the locked legacy JSON writer without changing the core adapter or schema. Other source formats, general saved-energy-curve editing, screenshot parity, and broader thermal/DPT parity remain open; event-window raw-window Eon/Eoff derivation is implemented in <a href="../sprint-web-dpt-energy-derivation/">the DPT energy derivation sprint</a>. See the <a href="../sprint-web-transient-thermal-comparison/">transient thermal comparison sprint</a>, <a href="../sprint-web-dpt-waveforms/">DPT waveform sprint</a>, <a href="../sprint-web-dpt-comparison/">DPT comparison sprint</a>, <a href="../sprint-web-dpt-filtering/">DPT filtering sprint</a>, <a href="../sprint-web-dpt-raw-import/">DPT RAW import sprint</a>, and <a href="../sprint-web-dpt-stepped-raw-import/">stepped/multi-plot RAW import sprint</a>.</td>
+</tr>
+<tr>
+<td>Result export and stale-result handling</td>
+<td>Vue downloads scalar and comparison requests/results, assumptions, and conditions as JSON; changing an operating input or topology invalidates displayed results and pending requests</td>
+<td>Chromium E2E verifies that changed inputs invalidate stale results and that the downloaded scalar JSON contains its topology, request, and result mode. Focused Vue unit coverage verifies that comparison-only JSON retains the exact comparison request and response.</td>
+</tr>
+<tr>
+<td>Semiconductor Pareto example</td>
+<td><code>examples/topology_semiconductor_pareto.ipynb</code> loads the checked-in CREE and Infineon TDB records and compares one fixed 100 V → 200 V, 1 kW, 20 kHz Boost boundary by channel-conduction loss, package-body volume, and one-unit cost</td>
+<td>Executed and saved with outputs using <code>loss-balanced</code> at this one Boost CCM boundary. All three screened candidates are non-dominated; their averaged inductor volt-second residuals are 0.004662 V, 0.004179 V, and 0.003705 V, respectively. Costs are a dated U.S. DigiKey snapshot; volume is summed package-body bounding-box volume. Losses exclude switching/recovery and passive/magnetic terms; thermal values are unavailable where TDB resistance sentinels are nonpositive. This is a screening example, not a finished design recommendation.</td>
+</tr>
+<tr>
+<td>Vite development launch</td>
+<td><code>dev-server.sh</code> and <code>dev-server.bat</code> help/setup commands pass in WSL and Windows before runtime dependency checks. Chromium Playwright launched Vite on port 5174 and exercised FastAPI on port 8002 from WSL <code>ntbees2</code>.</td>
+<td>Help/setup verified without installing dependencies. The full dual-server launcher was not run; browser E2E used Playwright to start Vite and a separately started WSL FastAPI process. The Python <code>tdb_webgui.py</code> launcher was not exercised.</td>
+</tr>
+<tr>
+<td>Screenshot evidence</td>
+<td>No migration-approved Qt reference screenshot set was available in the inspected docs</td>
+<td>Open. Qt was not launched or used as a dependency. The notebook Pareto plot is generated from the new Python operation and is not legacy parity evidence.</td>
+</tr>
+</tbody>
+</table>
+<p>The ntbees2 compatibility boundary is preserved: this complementary TDB operation consumes core transistor models read-only; no ntbees2 interfaces, adapters, converters, persisted device records, or converter outputs were changed.</p>
+<p>The Chromium browser suite passes all five topology workflows: the existing Boost estimate/export/invalidation and DCM error cases, plus separate switch/diode selection, line sweep chart rendering, and contour cell/tooltip rendering. The new selection and sweep checks use deterministic browser API fixtures; backend calculation and real TDB curve behavior remain covered by the existing Python/API tests. The contour rendering defect found by the browser test is fixed. The Vite production build passes with a chunk-size warning. Help/setup commands pass directly from <code>dev-server.sh</code> in WSL and <code>dev-server.bat</code> in Windows before dependency checks. Full dev-server launcher startup and the Python <code>tdb_webgui.py</code> launcher remain unverified; Playwright started Vite and used a separately launched WSL FastAPI process. The broader frontend unit folder still has 6 failing test files and 19 failed tests (220 passed, 16 unhandled errors); both focused topology Vue suites passed in the earlier run. The Sol-review follow-up is covered by 42 focused Python operating-point tests (run without <code>tests/conftest.py</code>, which imports unavailable PyQt5), 10 focused Vue workflow tests, and clean E/W lint on <code>operating_point.py</code>. It adds exact CCM capacitor-charge integration for the Boost diode-current crossing, legacy CREE Eoff gate matching alongside explicit modern gate pairs, and compare-only JSON export. User-facing launcher instructions and the active test runner now point to Vite's 5174 port. Help/setup output was checked in both WSL and Windows without installing dependencies. The strict MkDocs build now includes the accepted decision and sprint plan in navigation; it still aborts on 15 existing warnings for stale navigation targets, old references, and docstrings. Screenshot evidence remains open because no accepted legacy reference set was available. Full semiconductor loss and thermal coverage also remain open: the selected TDB records lack matched switching/recovery curves and usable positive interface thermal resistances, so the example reports channel-conduction losses only and marks temperature unavailable instead of extrapolating or fabricating data. Qt was not launched or used as a dependency; ntbees2 interfaces, adapters, converters, persisted device records, and converter outputs were not changed.</p>
+<p>The <a href="../sprint-web-topology-electrothermal/">CCM topology loss-feedback sprint</a> now adds a power-balanced <code>loss-balanced</code> mode for CCM on all four topology equations, with an independent volt-second residual exposed in API/UI. Focused validation passed: 78 Python operating-point/API tests using <code>ntbees2</code> with <code>--noconftest</code> (the repository conftest imports unavailable PyQt5); 13 Vue topology workflow tests; Vite production build (existing &gt;500 kB chunk warning); notebook execution from the checked-in TDB records; and Ruff on the modified Python calculation, schemas, and focused tests. Independent flat-drop fixtures close both balances; the notebook’s nonlinear channel-curve candidates have small nonzero volt-second residuals shown in the Pareto table. This is a first averaged CCM vertical slice only: DCM feedback, nonlinear exact volt-second closure, switching/recovery and other loss terms, temperature-dependent curve iteration, usable thermal resistance data, screenshot parity, and broader desktop coverage remain open. Qt was not run. No schema/core models/adapters/ABCs, ntbees2 surfaces, device records, or external user documents were changed.</p>
+<p>The <a href="../sprint-web-topology-loss-balanced-sweeps/">CCM loss-balanced topology sweep sprint</a> extends the scalar CCM mode through line and contour sweeps. Focused validation passed: 66 Python operating-point/API tests (1 skipped; run with <code>--noconftest</code> because the repository conftest imports unavailable PyQt5), 13 Vue topology workflow tests, 6 Chromium topology browser tests, Vite production build, and Ruff on the modified Python implementation/tests. The build retains its existing &gt;500 kB chunk warning. Tests compare each selected metric and per-coordinate voltage-law residual to a direct scalar solve, verify SI shapes and limits, exercise coordinate-specific curve-range failures and DCM rejection, and verify browser display plus JSON export of channel-only scope and residual data. Boost DCM feedback is implemented as a scalar follow-up; other DCM feedback and sweeps, nonlinear exact CCM volt-second closure, total loss coverage, and electrothermal iteration remain open; Qt and ntbees2 surfaces remain untouched.</p>
+<p>The <a href="../sprint-web-topology-boost-dcm/">Boost DCM channel-feedback sprint</a> adds a bounded exact-curve solve for Boost DCM. For each current peak it integrates switch/diode ramp time, output charge, input charge, and channel energy; the target output charge determines peak current, while power and inductor volt-second residuals are checked independently. Output ripple integrates capacitor charge over the solved nonlinear current trajectory. The solver brackets below switch drops that eliminate the positive on-ramp and rejects exact CCM-boundary points. DCM topology comparison is rejected at the service/API boundary because only a scalar Boost case is supported; DCM sweeps are also rejected. Focused validation passed: 93 Python/API tests, 13 Vue workflow tests, one Chromium request/result/export workflow, Vite production build, Ruff on modified Python code/tests, and whitespace checks with the existing CRLF checkout recognized. Independent flat-drop and dense nonlinear-ramp fixtures verify current intervals, output charge, power, volt-second, and ripple calculations. Full DCM sweep feedback, nonlinear exact CCM closure, switching/recovery/passive/magnetic losses, and electrothermal closure remain open. Other DCM topologies are explicitly unsupported; Qt and ntbees2 source surfaces remain untouched.</p>
+<p>The <a href="../sprint-web-topology-buck-dcm/">Buck DCM channel-feedback sprint</a> adds scalar Buck DCM alongside the existing scalar Boost DCM solve. The Buck switch interval integrates <code>L·dI/(Vin−Vout−Vswitch(I))</code>; the diode interval integrates <code>L·dI/(Vout+Vdiode(I))</code>. Peak current is solved from output charge over both ramps, while input charge is taken from the switch interval. The result reports the solved inductor, input, output, and diode currents; separate switch/diode channel losses; and independently integrated power and averaged volt-second residuals. Output ripple uses capacitor charge over the solved nonlinear trajectory. A flat-drop fixture, a dense independent nonlinear-curve integration, and a derived CCM-boundary case cover currents, losses, ripple, residuals, and rejection. Buck and Boost DCM remain scalar-only; Buck-Boost/Flyback DCM, DCM sweeps, and DCM comparison remain unsupported. Focused validation passed: 98 Python/API tests, 17 Vue workflow tests, one Chromium Buck request/result/export workflow, Vite build, and Ruff on modified Python files. A broader suite attempt intended to exclude Qt used <code>conda run -n ntbees2 python -m pytest --import-mode=importlib --noconftest tests/ -q --ignore-glob='test_gui_*.py'</code>; that glob failed to match Windows test paths and the run unexpectedly included Qt-specific modules. It reported 560 passed, 12 failed, 53 errors, 6 skipped, and 2 warnings in 56.26 seconds; legacy GUI <code>app</code> NameErrors, legacy Playwright connection-refused failures, and a DPT RAW async event-loop failure appear in the output. This is not a green broad-suite result and was an accidental validation-scope breach. The plain full repository command was not run separately because the migration instruction excludes Qt tests. Sol review remains pending; no Qt code or ntbees2 surfaces were changed.</p>
+<p>The <a href="../sprint-web-topology-buck-boost-dcm/">inverting Buck-Boost DCM feedback sprint</a> adds scalar channel-loss feedback for the inverting topology. The switch-ramp charge supplies input current, the diode-ramp charge supplies output current, and output voltage remains a positive magnitude with signed output voltage reported negative. Independent flat-drop and dense nonlinear-ramp fixtures verify currents, channel losses, output ripple, power balance, and volt-second closure; API, Vue, and Chromium checks cover the scalar contract and exports. Focused validation passed: 110 Python/API tests, 18 Vue workflow tests, one Chromium Buck-Boost DCM request/result/export workflow, Vite production build, Ruff on changed Python files, and CRLF-aware whitespace checks. Buck-Boost DCM remains scalar-only; DCM sweeps and cross-topology comparison remain unsupported. Complete loss and electrothermal parity, screenshot parity, and broader desktop capability coverage remain open. The ntbees2 converter data-loss issue remains outside this sprint.</p>
+<p>The <a href="../sprint-web-topology-flyback-dcm/">Flyback DCM channel-feedback sprint</a> extends the scalar solve to the ideal-transformer Flyback using explicit <code>Np/Ns</code>. It keeps magnetizing current primary-referred, evaluates diode curves at the ratio-scaled secondary branch current, reflects diode drop into the primary off ramp, and integrates output-capacitor charge with secondary current. Independent flat-drop and dense nonlinear fixtures cover parallel-device sharing, current/loss scaling, output ripple, power and volt-second residuals, curve conditions/ranges, and the strict CCM boundary. FastAPI, Vue, and Chromium checks cover ratio validation, distinct primary/secondary current labels, scalar-only sweep/comparison behavior, and JSON export. Focused validation passed: 117 Python/API tests, 18 Vue workflow tests, one Flyback DCM Chromium request/result/export flow, Ruff, and the Vite production build. The ideal transformer, channel-only losses, no ESR, and one-pass fixed-temperature limits remain explicit; Qt and <code>ntbees2</code> surfaces remain untouched.</p>
+<h2 id="completion-criteria">Completion criteria<a class="headerlink" href="#completion-criteria" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Topology results originate in tested Python operations exposed by FastAPI.</li>
+<li>No Qt runtime, Qt test or Qt implementation is needed to deliver or validate the new workflow.</li>
+<li>All confirmed topology capabilities work through the local browser with explicit units, model assumptions and errors.</li>
+<li>Numerical fixtures, endpoint checks and browser behavior checks provide evidence for parity.</li>
+<li>Existing transistor data and exports remain compatible where promised.</li>
+<li>MCP implementation, shared hosting and filesystem deletion are outside this migration step.</li>
+</ul>
+<h2 id="accepted-missing-data-behavior">Accepted missing data behavior<a class="headerlink" href="#accepted-missing-data-behavior" title="Permanent link">&para;</a></h2>
+<p>Detailed calculations must fail clearly when required device curves are missing, identifying the missing data. Do not silently substitute constants, zero losses or an estimate. Estimates are available only through an explicitly selected estimate mode, and results must identify that mode and its assumptions. Enforce this in reusable Python operations so FastAPI and future MCP callers receive the same behavior.</p>
+<p>Validation must cover missing-curve rejection in detailed mode, explicit estimate-mode selection and labeled estimate results.</p>
+<h2 id="accepted-operating-regime-behavior">Accepted operating regime behavior<a class="headerlink" href="#accepted-operating-regime-behavior" title="Permanent link">&para;</a></h2>
+<p>Calculations must reject unsupported operating regimes with a clear error identifying the unsupported condition and explaining the supported range or regime. Do not silently extrapolate beyond a model's validity. Apply this validation in the reusable Python calculation module, including estimate mode according to that mode's own supported range.</p>
+<p>Validation must exercise supported limits and out-of-range requests, checking that failures explain the relevant range rather than returning plausible-looking numerical results.</p>
+<h2 id="decisions-still-required-before-dependent-implementation">Decisions still required before dependent implementation<a class="headerlink" href="#decisions-still-required-before-dependent-implementation" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Exact model scope and numerical tolerances, to be established from calculation documentation and independent reference cases.</li>
+<li>Any capability ambiguity that documentation and screenshots cannot resolve.</li>
+</ul>
+<p>These are focused follow-up decisions, not reasons to restart the agreed architecture discussion.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 LEA, University of Paderborn
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/tinix84/transistordatabase" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://pypi.org/project/transistordatabase/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
