@@ -162,7 +162,8 @@ export const assemblyApi = {
 export const waveformApi = {
   async allocate(request) { return reviewPost('/api/waveform/gate-allocation', request) },
   async analyze(request) {
-    return (await api.post('/api/waveform/analyze', request)).data
+    const config = typeof request === 'string' ? { headers: { 'Content-Type': 'application/json' }, transformRequest: [value => value] } : undefined
+    return (await api.post('/api/waveform/analyze', request, config)).data
   },
 }
 

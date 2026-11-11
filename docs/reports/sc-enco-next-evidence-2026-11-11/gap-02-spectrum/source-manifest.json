@@ -1,0 +1,65 @@
+{
+  "paths": {
+    "docs/api/waveform-workbench.md": {
+      "bytes": 12466,
+      "sha256": "fc0dab386fb4a7a70741b9043f72c675970cfc90086ff295e2d5f534ee7328be"
+    },
+    "transistordatabase/gui_web/backend/waveform_routes.py": {
+      "bytes": 5769,
+      "sha256": "8ee9c1af813231b9815e7dc30a6f5b55d2556d0ef2f884f4cf568c49028eabc7"
+    },
+    "transistordatabase/gui_web/src/components/WaveformAnalysisView.vue": {
+      "bytes": 19064,
+      "sha256": "e8448552059992ab8e388fed2a447eb2a8a194a4a37a08b6011147e716c26725"
+    },
+    "transistordatabase/gui_web/src/components/WaveformWorkbench.vue": {
+      "bytes": 16731,
+      "sha256": "20cc6a9b75b9f7bc357d5a9515c2117c0a1e778c6764c0756577d38caca54bb4"
+    },
+    "transistordatabase/gui_web/src/services/api.js": {
+      "bytes": 18157,
+      "sha256": "126da3f21aed454bff7707bdb3e33ac0a39f08277a22d182118a94bafb92352a"
+    },
+    "transistordatabase/gui_web/src/tests/unit/GateAllocationApi.test.js": {
+      "bytes": 1870,
+      "sha256": "2353e01aaefbe049d017550523b66f91aebf6469ac47a7d9e503c413e2a6b3ef"
+    },
+    "transistordatabase/gui_web/src/tests/unit/WaveformWorkbench.test.js": {
+      "bytes": 11734,
+      "sha256": "4a61ebcde5a35ae603a0c8fc1b041717da6b2633816e7db2706c90cbc3688464"
+    },
+    "transistordatabase/waveform_losses.py": {
+      "bytes": 35100,
+      "sha256": "36c1776170dc6a17499af16daeb1e208ae99b5a5f42e664d644dded7d7708245"
+    },
+    "transistordatabase/spectrum_analysis.py": {
+      "bytes": 13058,
+      "sha256": "8bf6c2c98b8f92554573f6d72e764f3a5ecd2a741a1f61ce30d0b568c77c4ca8"
+    },
+    "transistordatabase/gui_web/backend/spectrum_policy.py": {
+      "bytes": 2120,
+      "sha256": "7fa1c6681fca7bbd94d75ac4d105b93cb9733e3a2f7e163ae0bbf3dbf7ddfe82"
+    },
+    "transistordatabase/gui_web/src/components/spectrumAnalysis.js": {
+      "bytes": 3615,
+      "sha256": "7983cf23042edf6ff6f5cae43781a19e709a6c647504d3cfb36ab522a4e4506c"
+    },
+    "transistordatabase/gui_web/src/components/SpectrumAnalysisControls.vue": {
+      "bytes": 3174,
+      "sha256": "9ba3cd8b7241891f85640d5c34b3656c8c2a2819a3f91c10ab90dfc45328a676"
+    },
+    "transistordatabase/gui_web/src/components/SpectrumAnalysisView.vue": {
+      "bytes": 5259,
+      "sha256": "38c6309cbe3dbb6b33c5c416e8f1c778957e2a7f755afe151c181cf11f4cd44a"
+    },
+    "transistordatabase/gui_web/src/tests/unit/SpectrumAnalysis.test.js": {
+      "bytes": 6888,
+      "sha256": "4ff0d4b96aa6e1207b86f19451edcc3154c97728d8f6392859278c1985f1aa00"
+    },
+    "tests/test_spectrum_analysis_independent.py": {
+      "bytes": 11205,
+      "sha256": "6a7dd9b99c057e3b00b55e51790f1e87fd222e2dbf4b35ae1a7d23a0c364c17b"
+    }
+  },
+  "scope": "Gap 2 implementation, API, UI, tests, and current API documentation only. Gap 3 test preparation is excluded."
+}

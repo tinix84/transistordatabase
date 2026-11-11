@@ -1,0 +1,357 @@
+{
+  "matched_original_service_commit": "69442d4",
+  "case": "gate",
+  "recaptured_at_utc": "2026-11-11T17:38:09.055063+00:00",
+  "status": 200,
+  "method": "POST",
+  "path": "/api/waveform/analyze",
+  "request": {
+    "waveform": {
+      "time_s": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "current_a": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "gate_v": [
+        0,
+        8,
+        4,
+        6,
+        4,
+        2,
+        10,
+        10
+      ]
+    },
+    "conduction": {
+      "omit": true,
+      "omission_reason": "spectrum calibration fixture"
+    },
+    "events": {
+      "mode": "hysteresis",
+      "digitizer": {
+        "thresholds": {
+          "scale": "absolute",
+          "low_v": 2.5,
+          "high_v": 7.5
+        }
+      }
+    },
+    "switching": {
+      "turn_on": {
+        "omit": true,
+        "omission_reason": "spectrum calibration fixture"
+      },
+      "turn_off": {
+        "omit": true,
+        "omission_reason": "spectrum calibration fixture"
+      }
+    },
+    "spectrum": {
+      "window": "rectangular",
+      "detrend": "none"
+    }
+  },
+  "response": {
+    "duration_s": 0.875,
+    "components": {
+      "conduction": {
+        "status": "omitted",
+        "reason": "spectrum calibration fixture",
+        "energy_j": null,
+        "power_w": null
+      },
+      "turn_on": {
+        "status": "omitted",
+        "reason": "spectrum calibration fixture",
+        "energy_j": null,
+        "power_w": null
+      },
+      "turn_off": {
+        "status": "omitted",
+        "reason": "spectrum calibration fixture",
+        "energy_j": null,
+        "power_w": null
+      }
+    },
+    "known_component_energy_j": 0,
+    "known_component_power_w": 0.0,
+    "total_energy_j": null,
+    "total_power_w": null,
+    "total_status": "partial-explicit-omissions",
+    "power_segments": [],
+    "conduction_plot": [],
+    "events": [],
+    "switching_cumulative_plot": [],
+    "signals": {
+      "time_s": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "current_a": [
+        1.0,
+        -1.0,
+        1.0,
+        -1.0,
+        1.0,
+        -1.0,
+        1.0,
+        -1.0
+      ],
+      "gate_v": [
+        0.0,
+        8.0,
+        4.0,
+        6.0,
+        4.0,
+        2.0,
+        10.0,
+        10.0
+      ]
+    },
+    "current_statistics": {
+      "mean": 0.0,
+      "rms": 0.5773502691896257,
+      "minimum": -1.0,
+      "maximum": 1.0,
+      "interval_derivative": [
+        -16.0,
+        16.0,
+        -16.0,
+        16.0,
+        -16.0,
+        16.0,
+        -16.0
+      ],
+      "interval_start_s": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75
+      ],
+      "interval_end_s": [
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "method": "Exact time-weighted piecewise-linear integrals"
+    },
+    "event_policy": {
+      "mode": "hysteresis",
+      "omission_reason": "",
+      "digitizer": {
+        "thresholds": {
+          "scale": "absolute",
+          "low_v": 2.5,
+          "high_v": 7.5
+        }
+      }
+    },
+    "request": {
+      "waveform": {
+        "time_s": [
+          0.0,
+          0.125,
+          0.25,
+          0.375,
+          0.5,
+          0.625,
+          0.75,
+          0.875
+        ],
+        "current_a": [
+          1.0,
+          -1.0,
+          1.0,
+          -1.0,
+          1.0,
+          -1.0,
+          1.0,
+          -1.0
+        ],
+        "gate_v": [
+          0.0,
+          8.0,
+          4.0,
+          6.0,
+          4.0,
+          2.0,
+          10.0,
+          10.0
+        ]
+      },
+      "conduction": {
+        "omit": true,
+        "omission_reason": "spectrum calibration fixture",
+        "duty": 1.0
+      },
+      "events": {
+        "mode": "hysteresis",
+        "omission_reason": "",
+        "digitizer": {
+          "thresholds": {
+            "scale": "absolute",
+            "low_v": 2.5,
+            "high_v": 7.5
+          }
+        }
+      },
+      "switching": {
+        "turn_on": {
+          "omit": true,
+          "omission_reason": "spectrum calibration fixture"
+        },
+        "turn_off": {
+          "omit": true,
+          "omission_reason": "spectrum calibration fixture"
+        }
+      },
+      "spectrum": {
+        "window": "rectangular",
+        "detrend": "none"
+      }
+    },
+    "waveform_provenance": {
+      "source": null,
+      "calibration_notes": null,
+      "imported_filename": null
+    },
+    "assumptions": [
+      "Piecewise-linear current, voltage-drop curves and duty",
+      "Exact cubic conduction integration; gate does not mask conduction",
+      "Pre-edge event sample i for bracket [i,i+1]; no initial or wrapped event",
+      "Switching energies are event impulses, not finite power pulses",
+      "Power averages use the complete supplied time interval",
+      "Measured device voltage is distinct from switching bus voltage"
+    ],
+    "gate_digitization": {
+      "method": "strict-hysteresis-v1",
+      "threshold_scale": "absolute",
+      "low_v": 2.5,
+      "high_v": 7.5,
+      "calibration_min_v": null,
+      "calibration_max_v": null,
+      "initial_state": false,
+      "initial_state_source": "first-sample-below-low",
+      "states": [
+        false,
+        true,
+        true,
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "turn_on_brackets": [
+        0,
+        5
+      ],
+      "turn_off_brackets": [
+        4
+      ],
+      "semantics": "Strict > high and < low crossings. Equality and deadband hold the previous sampled state. No pre-trace event or interpolated switching time.",
+      "units": {
+        "low_v": "V",
+        "high_v": "V",
+        "calibration_min_v": "V",
+        "calibration_max_v": "V",
+        "states": "boolean",
+        "brackets": "pre-edge sample index"
+      }
+    },
+    "spectrum": {
+      "frequency_hz": [
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0
+      ],
+      "phase_rad": [
+        null,
+        null,
+        null,
+        null,
+        0.0
+      ],
+      "phase_reference": "first supplied sample",
+      "relative_threshold": 0.1,
+      "selected_bin_indices": [
+        4
+      ],
+      "windowed_bin_mean_square_normalized": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "mean_square_normalization": "Multiply normalized bins by amplitude_scale_a squared; RMS is evaluated before squaring that SI scale",
+      "discrete_input_rms_definition": "Discrete samples after selected detrending, before windowing; separate from continuous time-weighted RMS",
+      "n": 8,
+      "sample_interval_s": 0.125,
+      "sequence_period_s": 1.0,
+      "window": "rectangular",
+      "detrend": "none",
+      "coherent_gain": 1.0,
+      "normalization": "One-sided peak amplitude; double interior bins only",
+      "resampling": "none",
+      "amplitude_a": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "real_a": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "imaginary_a": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_square_amplitude_scale_a": 1.0,
+      "discrete_input_rms_a": 1.0,
+      "windowed_discrete_rms_a": 1.0,
+      "parseval_rms_a": 1.0
+    }
+  },
+  "raw_response_sha256": "2f72977addcaf5b8ce43305b917f9d21ba4e5877e7951a50794ad9867968235f",
+  "canonical_response_sha256": "0b870a33042f16789b94d3199eeb5dd424a18d9669948077a48ad2a59b04d3e8"
+}

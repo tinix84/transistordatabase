@@ -1,0 +1,23 @@
+	Command being timed: "/home/tinix/miniconda3/envs/ntbees2/bin/python -B -c import json,pathlib,pytest; files=json.loads(pathlib.Path('/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/spectrum-owner-49185928-f1ba-49a9-8088-7294e0a76886/python-selection.json').read_text()); raise SystemExit(pytest.main(["--noconftest","-p","no:cacheprovider","--import-mode=importlib","--basetemp=/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/spectrum-owner-49185928-f1ba-49a9-8088-7294e0a76886/basetemp","--junitxml=/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/spectrum-owner-49185928-f1ba-49a9-8088-7294e0a76886/python-junit.xml","-q",*files]))"
+	User time (seconds): 12.21
+	System time (seconds): 0.55
+	Percent of CPU this job got: 199%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:06.40
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 292732
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 71929
+	Voluntary context switches: 2292
+	Involuntary context switches: 154
+	Swaps: 0
+	File system inputs: 8
+	File system outputs: 224
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

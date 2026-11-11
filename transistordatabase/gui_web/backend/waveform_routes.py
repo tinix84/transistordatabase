@@ -10,6 +10,7 @@ from transistordatabase.gui_web.backend.parameter_routes import Strict
 from transistordatabase.gui_web.backend.finite_json_route import FiniteJsonRoute
 from transistordatabase.waveform_losses import WaveformResourceLimitError, analyze_waveform
 from transistordatabase.gui_web.backend.gate_policy import HysteresisPolicy
+from transistordatabase.gui_web.backend.spectrum_policy import SpectrumMask, SpectrumBand
 
 Vector = Annotated[list[float], Field(min_length=2, max_length=10000)]
 Conditions = dict[str, float | None]
@@ -127,6 +128,8 @@ class Spectrum(Strict):
     window: Literal["rectangular", "hann"]
     detrend: Literal["none", "mean"]
     relative_threshold: float = Field(default=0.1, ge=0, le=1)
+    mask: SpectrumMask | None = None
+    bands: Annotated[list[SpectrumBand], Field(min_length=1, max_length=32)] | None = None
 
     @model_serializer(mode="wrap")
     def canonical_settings(self, handler):
@@ -134,6 +137,9 @@ class Spectrum(Strict):
         data = handler(self)
         if "relative_threshold" not in self.model_fields_set:
             data.pop("relative_threshold", None)
+        for field in ("mask", "bands"):
+            if field not in self.model_fields_set:
+                data.pop(field, None)
         return data
 
 

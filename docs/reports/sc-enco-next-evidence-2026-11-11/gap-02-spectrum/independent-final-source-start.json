@@ -1,0 +1,9 @@
+{
+  "tests/test_spectrum_analysis_independent.py": "66679b7d7f5e6c7ae63648ea32042e66f7e01a17917a2df225fbe7e342095694",
+  "transistordatabase/spectrum_analysis.py": "b828a8b7a277dfec9ab62e4ae1667068f6a0680ed6d964503e29fadab64126c6",
+  "transistordatabase/waveform_losses.py": "36c1776170dc6a17499af16daeb1e208ae99b5a5f42e664d644dded7d7708245",
+  "transistordatabase/gui_web/backend/spectrum_policy.py": "7fa1c6681fca7bbd94d75ac4d105b93cb9733e3a2f7e163ae0bbf3dbf7ddfe82",
+  "transistordatabase/gui_web/backend/waveform_routes.py": "8ee9c1af813231b9815e7dc30a6f5b55d2556d0ef2f884f4cf568c49028eabc7",
+  "transistordatabase/gui_web/backend/finite_json_route.py": "62452692d3fb93ab05299b96ae1e7db670d855aa9daf16643d47a4089f828218",
+  "transistordatabase/gate_states.py": "9fcf91737e41acee502c625a5fd8d16bb36ce1654f266e04acb6bb32c85b3ed4"
+}

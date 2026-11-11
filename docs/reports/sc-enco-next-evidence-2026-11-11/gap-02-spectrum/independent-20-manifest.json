@@ -1,0 +1,44 @@
+{
+  "scope": "Final 20: canonical peak equality, mask-only subnormal underflow rejection, raw Hann Parseval band RMS and two legacy pinned HTTP responses.",
+  "pytest_seconds": 2.418,
+  "wall_seconds": 4.18,
+  "max_rss_kib": 246484,
+  "source_files_frozen": 7,
+  "passed": 20,
+  "prior_receipt": {
+    "name": "independent-manifest.json",
+    "sha256": "03f0ab0352a09e62993e03eee2815c8463b8ba3d0b3e48c816e9200bed236412"
+  },
+  "entries": [
+    {
+      "name": "independent-20-pytest.log",
+      "bytes": 621,
+      "sha256": "8c5aba0778928459ed56e09eaa64565767b3ba7574192ce4c21ef252fdcbd2c2",
+      "source": "/tmp/tdb-spectrum-independent-6a7ef7c3-4b11-4caf-bbb3-171451fec069/pytest.log"
+    },
+    {
+      "name": "independent-20-source-start.json",
+      "bytes": 833,
+      "sha256": "202e279860169390a719293f816bb54358bb2b9df5738ffc2ec39b1b1501bce7",
+      "source": "/tmp/tdb-spectrum-independent-6a7ef7c3-4b11-4caf-bbb3-171451fec069/source-start.json"
+    },
+    {
+      "name": "independent-20-source-end.json",
+      "bytes": 833,
+      "sha256": "202e279860169390a719293f816bb54358bb2b9df5738ffc2ec39b1b1501bce7",
+      "source": "/tmp/tdb-spectrum-independent-6a7ef7c3-4b11-4caf-bbb3-171451fec069/source-end.json"
+    },
+    {
+      "name": "independent-20-resource.txt",
+      "bytes": 1086,
+      "sha256": "392ea1fcf3ce13756e32d99a173ddacbbf2976e4e26ac40a9e4f01810a8587cc",
+      "source": "/tmp/tdb-spectrum-independent-6a7ef7c3-4b11-4caf-bbb3-171451fec069/resource.txt"
+    },
+    {
+      "name": "independent-20-junit.xml",
+      "bytes": 3221,
+      "sha256": "89488b5b3ede6429e647ebb21b080bcc4b922c96a959751ca0a5616ccc4d8960",
+      "source": "/tmp/tdb-spectrum-independent-6a7ef7c3-4b11-4caf-bbb3-171451fec069/junit.xml"
+    }
+  ]
+}

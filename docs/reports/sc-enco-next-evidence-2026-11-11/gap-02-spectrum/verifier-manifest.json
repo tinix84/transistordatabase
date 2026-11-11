@@ -1,0 +1,96 @@
+{
+  "artifacts": [
+    {
+      "file": "verifier-ruff.log",
+      "bytes": 878,
+      "sha256": "467c36ac6b48f162872ae1febe384eab842a51540f5e7037f54606023b555bba",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-ruff-receipt.json",
+      "bytes": 259,
+      "sha256": "338e1424ad5e1ebaa83e17bd25b75e3963a532bc6435998b0ff2c45663a50a20",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-headless-qt-blocked.json",
+      "bytes": 1844,
+      "sha256": "8267dae0e2044749b40f866cc19160107fcbdfec77b952f0b6df1251f1565508",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-build.log",
+      "bytes": 1619,
+      "sha256": "643cfc33d1aca9270cc638816a6506866d4c35e8cb087457144504cce92a9a75",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-build-receipt.json",
+      "bytes": 304,
+      "sha256": "ed3b2737b0d7d64af51a9aa936867dc1e050840503a9bbeacc4aa6b1961b8436",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-browser.log",
+      "bytes": 2854,
+      "sha256": "066d4f66102a0c95a543fc8e8b8666315c9ef6167dee9ff80c29e49f7072d570",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-browser-receipt.json",
+      "bytes": 969,
+      "sha256": "b559c8627cff44d5b9bfbfdf4a4994d4af3cdfe1382bdf9a0847b5e7045af21b",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-browser-initial.log",
+      "bytes": 8840,
+      "sha256": "ab9ef5b9aea6cb5748895f231326781ba4513a4a34d22931fda2426dfc0b19fe",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-browser-initial-receipt.json",
+      "bytes": 771,
+      "sha256": "0588237159c673947f32d85d9e2fa8e59751a753bde6e83593a96e4407f5081f",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-source-dist-database-proof.json",
+      "bytes": 1916,
+      "sha256": "3589db59f702cb1f61d6891ceb62f072ea2b5d7756499f86eb0d43eceffeaf5f",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-browser-results.json",
+      "bytes": 225194,
+      "sha256": "b0609ca654a5e4ff8584d2bbfdb7762d2fb1188db0733d6658b0e8ff2c1cab61",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-mask-band-desktop.png",
+      "bytes": 864327,
+      "sha256": "59307756cbcdf12c2b42036b24371567ce5ee2da0b758dd1f6a56c6cc46de322",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-mask-band-mobile-390.png",
+      "bytes": 760134,
+      "sha256": "452e4a016a905a1091d6e23d73510fde470cdb0dd3e5abe0594ab9d5f8140502",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-tiny-band-mobile-390.png",
+      "bytes": 738607,
+      "sha256": "5e6041a7e2bb0097825d9fe726e3f07dfc3a252ae6fa5660c09c61d21ca8569e",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-browser-configuration.json",
+      "bytes": 1247,
+      "sha256": "cf5b0807a4374b03ca0ded72748847c5487d4720b197fb4eb016f774b4e3211d",
+      "new_receipt": true
+    }
+  ],
+  "count": 15,
+  "bytes": 2609763
+}

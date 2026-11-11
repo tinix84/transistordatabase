@@ -1,0 +1,37 @@
+
+Running 10 tests using 1 worker
+
+[1A[2K[1/10] [desktop] › src/tests/e2e/gate-hysteresis-acceptance.spec.js:56:1 › actual noisy waveform has two on one off brackets and independent seven millijoule oracle
+[1A[2K[2/10] [desktop] › src/tests/e2e/spectrum-acceptance.spec.js:47:1 › spectrum acceptance actual controls resolve independent peak mask and raw band RMS
+[1A[2K[3/10] [desktop] › src/tests/e2e/spectrum-acceptance.spec.js:81:1 › spectrum acceptance all bins remain independent of display selection gaps and exact canonical equality
+[1A[2K[4/10] [desktop] › src/tests/e2e/spectrum-acceptance.spec.js:104:1 › spectrum acceptance advanced raw JSON preserves rejected coordinate underflow and hysteresis lexemes
+[1A[2K[5/10] [desktop] › src/tests/e2e/spectrum-acceptance.spec.js:121:1 › spectrum acceptance tiny raw band RMS remains nonzero while mask-only peak underflow rejects
+[1A[2K[6/10] [mobile-390] › src/tests/e2e/gate-hysteresis-acceptance.spec.js:56:1 › actual noisy waveform has two on one off brackets and independent seven millijoule oracle
+[1A[2K[7/10] [mobile-390] › src/tests/e2e/spectrum-acceptance.spec.js:47:1 › spectrum acceptance actual controls resolve independent peak mask and raw band RMS
+[1A[2K[8/10] [mobile-390] › src/tests/e2e/spectrum-acceptance.spec.js:81:1 › spectrum acceptance all bins remain independent of display selection gaps and exact canonical equality
+[1A[2K[9/10] [mobile-390] › src/tests/e2e/spectrum-acceptance.spec.js:104:1 › spectrum acceptance advanced raw JSON preserves rejected coordinate underflow and hysteresis lexemes
+[1A[2K[10/10] [mobile-390] › src/tests/e2e/spectrum-acceptance.spec.js:121:1 › spectrum acceptance tiny raw band RMS remains nonzero while mask-only peak underflow rejects
+[1A[2K  10 passed (42.7s)
+	Command being timed: "/usr/bin/node /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/node_modules/@playwright/test/cli.js test --config /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/playwright.spectrum.acceptance.config.js"
+	User time (seconds): 19.82
+	System time (seconds): 5.09
+	Percent of CPU this job got: 54%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:45.70
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 356376
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 340
+	Minor (reclaiming a frame) page faults: 305931
+	Voluntary context switches: 35187
+	Involuntary context switches: 197
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 58280
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

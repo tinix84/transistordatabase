@@ -113,6 +113,73 @@ Discrete/Parseval RMS is separate from continuous interpolated RMS. Normalized
 bin mean-squares and the SI amplitude scale avoid claiming zero representable
 RMS after squared-value underflow. The normalization is returned explicitly.
 
+## Declared spectrum masks and band RMS
+
+The optional spectrum fields `mask` and `bands` use all observed FFT bins.
+They do not use the relative display threshold or the ten-bin selection.
+Omit these fields to retain the existing request, result, and evidence hash.
+
+```json
+{
+  "window": "rectangular",
+  "detrend": "none",
+  "mask": {
+    "unit": "A_peak",
+    "frequency_hz": [0, 1, 2, 4],
+    "limit_peak": [1, 1.5, null, 1],
+    "interpolation": "exact",
+    "source": "Explicit illustrative current limit; no compliance claim"
+  },
+  "bands": [
+    {"name": "Fundamental and second harmonic", "lower_hz": 1,
+     "upper_hz": 2, "endpoints": "closed"}
+  ]
+}
+```
+
+Mask limits use coherent-gain-corrected one-sided peak amplitudes.
+A strict amplitude greater than the limit is a violation. Equality passes.
+`margin_peak` is limit minus amplitude; a negative margin is a violation.
+`excess_peak` is the positive excess, or zero for a covered passing bin.
+Uncovered bins have null limits and margins, and remain unknown.
+A zero amplitude with a zero limit passes.
+There is no implicit dB, RMS, detector, or physical compliance conversion.
+The waveform transport fixes the quantity to current in `A_peak`.
+The reusable engine also accepts an explicitly matching voltage peak mask.
+
+Frequency coordinates must increase strictly and match the accepted binary64
+FFT coordinates exactly. Export the spectrum coordinates before defining exact
+limits. The tool does not join by row, choose a nearby frequency, or use a
+comparison tolerance. Mask values use the same canonical peaks as the spectrum.
+Optional `linear-frequency` and `log-frequency` interpolation operate only
+between adjacent finite, nonnull limits. Null limits break a segment.
+Log-frequency segments require positive endpoints. No mode extrapolates.
+A broader mask may extend past Nyquist, but screening covers only observed bins.
+A passing screen does not establish coverage of the complete physical profile.
+Mask source is required; a filename alone does not establish a standard.
+
+Band endpoints are `closed`, `open`, `left-closed`, or `right-closed`.
+Bounds must remain within the physical Nyquist frequency, including for odd
+sample counts where the final FFT bin is below Nyquist.
+A band containing no bins returns null RMS with `no-bins` status.
+Bands may overlap; their RMS values are independent and must not be added.
+
+Band RMS uses the raw windowed, detrended discrete Parseval basis.
+It does not apply coherent-gain or window-power-gain correction.
+`analysis_basis` records both gains, the window, detrending, units, and the two
+quantity bases. For five constant 1 A samples with a Hann window and no
+detrending, the corrected DC peak is 1 A, the DC-only band RMS is 0.4 A,
+and the all-bin RMS is sqrt(0.3) A. Mean detrending makes these values zero.
+Small representable RMS values remain nonzero even when their squares cannot
+be represented. Unsupported numeric precision is rejected explicitly.
+
+The browser accepts mask and band CSV in the existing FFT section.
+It shows all-bin counts, violations, unknown coverage, and a bounded table
+preview. CSV and JSON downloads retain every bin and the declared basis.
+Band-only results also provide CSV and exact spectrum JSON.
+Any sample, mask, band, or normalization edit invalidates previous results.
+The typed input allows up to 5,001 mask points and 32 bands.
+
 Input arrays are limited to10000 samples per typed field. Exact output expansion
 is limited to10000 polynomial segments /90000 plot records. Exceeding this budget
 raises `WaveformResourceLimitError` (HTTP413); no interval is silently truncated.

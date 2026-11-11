@@ -1,0 +1,29 @@
+{
+  "calculation_mocks": false,
+  "cases": {
+    "new_spectrum": 8,
+    "unchanged_gate_noise": 2,
+    "passed": 10,
+    "skipped": 0,
+    "retries": 0
+  },
+  "app_entrypoint": "http://127.0.0.1:8004/index.html?view=waveform",
+  "workers": 1,
+  "viewports": [
+    "desktop",
+    "390x844"
+  ],
+  "config": "transistordatabase/gui_web/playwright.spectrum.acceptance.config.js",
+  "spec": "transistordatabase/gui_web/src/tests/e2e/spectrum-acceptance.spec.js",
+  "config_sha256": "1920b4f3a0fb24e4cf8fe2dc6e89af039b591550e809e32b72d8f22d0f078b68",
+  "spec_sha256": "386e137042fa9c0218e17e8a7a3b91766d03668fb277d42ceef9ec1a0de2c279",
+  "initial_run_qualification": "8 passed, 2 failed only because the new broad heading locator matched a status h5 and a chart h4. Final test narrows the observed exact accessible status heading. Scientific assertions unchanged. Both runs retained.",
+  "raw_json_transport": "Actual POST bodies exactly matched editor text for rejected frequency precision, negative underflow and gate-hysteresis upper-fraction lexemes.",
+  "private_database_files_copied_into_report": false,
+  "runtime": {
+    "owned_server_pid": 1525110,
+    "port": 8004,
+    "autoreload": false,
+    "original8002_and_main8003": "untouched"
+  }
+}

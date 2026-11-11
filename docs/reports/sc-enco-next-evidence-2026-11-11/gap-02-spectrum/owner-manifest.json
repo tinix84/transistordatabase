@@ -1,0 +1,61 @@
+{
+  "artifacts": [
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-02-spectrum/owner-python-selection.json",
+      "bytes": 362,
+      "sha256": "edfa2f7fad73feb72beb69ee4b295ab9712920d3116dea6f8020fb650272711b"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-02-spectrum/owner-python-source-start.json",
+      "bytes": 27016,
+      "sha256": "af55a927ab6011f64c899bfb0075483ee6422bfe35b24ae4ec003fd7ced3f455"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-02-spectrum/owner-python-source-end.json",
+      "bytes": 27016,
+      "sha256": "af55a927ab6011f64c899bfb0075483ee6422bfe35b24ae4ec003fd7ced3f455"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-02-spectrum/owner-python-junit.xml",
+      "bytes": 32526,
+      "sha256": "4051272651a7e7cbfb2b45860ec853761dd96095099ffb651341b3a0eeeedffd"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-02-spectrum/owner-python-pytest.log",
+      "bytes": 862,
+      "sha256": "8a69a631dbf6db6c037c4116504365a18171ca9683536d2cd6fff04b923c3bb8"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-02-spectrum/owner-python-resource.log",
+      "bytes": 1400,
+      "sha256": "77ab7b9f9176be55ad297db1721df6b698e65e65777f06f057b30bafdc693bbc"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-02-spectrum/owner-vue-selection.json",
+      "bytes": 279,
+      "sha256": "bf902c0a24ab2db3feb85a5a673a22254a71fd96c90794e811946c61a275c4e4"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-02-spectrum/owner-vue-source-start.json",
+      "bytes": 27734,
+      "sha256": "efe8c9d842b6157745a75f09dff9e20d1569c0c21234c7e671b2eb18384382a3"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-02-spectrum/owner-vue-source-end.json",
+      "bytes": 27734,
+      "sha256": "efe8c9d842b6157745a75f09dff9e20d1569c0c21234c7e671b2eb18384382a3"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-02-spectrum/owner-vue-vitest.log",
+      "bytes": 2557,
+      "sha256": "d1c6890e123a72eb565de6f330219959f43074ab3ee09dd75bb49ab0532828b1"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-02-spectrum/owner-vue-resource.log",
+      "bytes": 1033,
+      "sha256": "741139372958f23e40cb8bf97d4027f88f6387e4a1b40733ea1c983b946a55dd"
+    }
+  ],
+  "python_note": "226 adjacent tests include all 20 independent spectrum cases, verified from JUnit test names. The separate final independent run repeats those 20 cases.",
+  "vue_note": "Final frozen 53 tests across six files."
+}

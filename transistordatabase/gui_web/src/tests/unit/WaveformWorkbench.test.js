@@ -80,6 +80,45 @@ describe('signed waveform workflow', () => {
     resolve(response); await flushPromises()
     expect(wrapper.find('[data-testid=waveform-results]').exists()).toBe(false)
   })
+  it('adds spectrum policies only when selected and invalidates stale policy evidence', async () => {
+    const fft = wrapper.findAll('label.check').find(node => node.text().includes('Compute uniform-sample FFT'))
+    await fft.get('input').setValue(true)
+    await submit()
+    expect(analyze.mock.calls.at(-1)[0].spectrum).toEqual({ window: 'rectangular', detrend: 'none' })
+    await wrapper.get('[data-testid=spectrum-mask-enabled]').setValue(true)
+    await wrapper.get('[data-testid=spectrum-mask-source]').setValue('Known specification')
+    await wrapper.get('[data-testid=spectrum-mask-csv]').setValue('frequency_hz,limit_peak\n0,1\n1,2')
+    await wrapper.get('[data-testid=spectrum-bands-enabled]').setValue(true)
+    await wrapper.get('[data-testid=spectrum-bands-csv]').setValue('name,lower_hz,upper_hz,endpoints\nFull,0,1,closed')
+    let resolve
+    analyze.mockImplementationOnce(() => new Promise(done => { resolve = done }))
+    await wrapper.get('form').trigger('submit')
+    expect(analyze.mock.calls.at(-1)[0].spectrum.mask).toMatchObject({ unit: 'A_peak', frequency_hz: [0, 1], limit_peak: [1, 2] })
+    expect(analyze.mock.calls.at(-1)[0].spectrum.bands[0].endpoints).toBe('closed')
+    await wrapper.get('[data-testid=spectrum-mask-source]').setValue('Changed specification')
+    resolve(response); await flushPromises()
+    expect(wrapper.find('[data-testid=waveform-results]').exists()).toBe(false)
+    await submit()
+    expect(wrapper.find('[data-testid=waveform-results]').exists()).toBe(true)
+    await wrapper.get('[data-testid=spectrum-bands-csv]').setValue('name,lower_hz,upper_hz,endpoints\nFull,0,1,open')
+    expect(wrapper.find('[data-testid=waveform-results]').exists()).toBe(false)
+  })
+  it('preserves original advanced numeric lexemes for authoritative backend validation', async () => {
+    const advanced = wrapper.findAll('label.check').find(node => node.text().includes('Use JSON editor'))
+    await advanced.get('input').setValue(true)
+    const editor = wrapper.findAll('label').find(node => node.text().startsWith('Canonical request')).get('textarea')
+    for (const raw of [
+      '{"spectrum":{"mask":{"frequency_hz":[1.0000000000000000001],"limit_peak":[0]}}}',
+      '{"spectrum":{"mask":{"frequency_hz":[1],"limit_peak":[-1e-400]}}}',
+      '{"events":{"mode":"hysteresis","digitizer":{"thresholds":{"scale":"relative","low_fraction":0.25,"high_fraction":1.0000000000000000001,"minimum_v":0,"maximum_v":10}}}}',
+    ]) {
+      await editor.setValue(raw)
+      analyze.mockRejectedValueOnce({ response: { data: { detail: 'Original numeric precision rejected' } } })
+      await submit()
+      expect(analyze.mock.calls.at(-1)[0]).toBe(raw)
+      expect(wrapper.get('[role=alert]').text()).toContain('Original numeric precision rejected')
+    }
+  })
   it('invalidates completed and in-flight results on input edits', async () => {
     await submit()
     await wrapper.get('[data-testid=waveform-csv]').setValue('time_s,current_a\n0,1\n1,1')
