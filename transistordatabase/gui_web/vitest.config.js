@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import { configDefaults } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import { fileURLToPath } from 'node:url'
 
@@ -26,7 +27,7 @@ export default defineConfig({
       }
     },
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
+    exclude: [...configDefaults.exclude, 'dist', '.idea', '.git', '.cache', 'src/tests/e2e/**'],
     setupFiles: ['./src/tests/setup.js']
   },
   resolve: {

@@ -1,6 +1,6 @@
 # Architecture Reference
 
-*Auto-generated from codebase structure on 2026-10-14*
+*Auto-generated from codebase structure on 2026-11-11*
 
 This document provides an overview of the transistordatabase architecture based on the actual code structure.
 
@@ -20,6 +20,7 @@ This document provides an overview of the transistordatabase architecture based 
 - `VoltageDependentCapacitance` — Voltage-dependent capacitance data (C_oss, C_iss, C_rss).
 - `EffectiveOutputCapacitance` — Energy-related or time-related effective output capacitance.
 - `TemperatureDependResistance` — Temperature-dependent on-resistance curve.
+- `MeasurementEvidence` — Source identity and declared conditions for one imported event or trace.
 - `RawMeasurementData` — RAW measurement data, e.g. from double pulse test.
 - `LinearizedModel` — Linearized Switch/Diode model at a specific operating point.
 - `ChannelCharacteristics` — V-I characteristics for a channel at specific conditions.
@@ -48,6 +49,7 @@ This document provides an overview of the transistordatabase architecture based 
 
 **Classes:**
 
+- `RepositoryPathError` — A preserved device identity cannot safely name a repository storage file.
 - `JsonTransistorRepository` — File-based repository using JSON storage.
 - `JsonTransistorLoader` — JSON-based transistor loader.
 - `TransistorFactory` — Factory for creating transistor instances.
@@ -106,14 +108,9 @@ This document provides an overview of the transistordatabase architecture based 
 **Models:**
 
 - `GateChargeModelParams` — Parameters for gate charge switching time model.
-- `GateChargeModel` — Gate charge based switching time estimation model.
+- `GateChargeModel` — Piecewise constant-capacitance RC/Miller timing estimate in SI units.
 - `IgbtModelParams` — Parameters for IGBT turn-off tail current model.
 - `IgbtModel` — IGBT-specific model accounting for minority carrier tail current.
-- `HalfBridgeParams` — Operating conditions and circuit parameters for half-bridge switching.
-- `TransconductanceParams` — Transconductance model parameters from transfer characteristic fit.
-- `ReverseRecoveryParams` — Body diode reverse recovery time constants.
-- `SwitchingEnergyResult` — Detailed switching energy breakdown from Christen-Biela model.
-- `ChristenBielaModel` — Full Christen-Biela analytical switching loss model for half-bridge MOSFETs.
 
 
 ## Module Dependencies

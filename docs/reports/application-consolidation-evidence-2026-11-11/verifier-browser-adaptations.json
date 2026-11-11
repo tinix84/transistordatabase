@@ -1,0 +1,101 @@
+{
+  "suite": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892",
+  "config": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/playwright.config.mjs",
+  "output_directory": "/tmp/tdb-consolidation-browser-57876578-f75f-4604-8bbb-b94717415892",
+  "output_proved_absent": true,
+  "expected_test_count": 13,
+  "cli_file_filters": [
+    "waveform-workbench.spec.js",
+    "dpt-contract.spec.js",
+    "topology-pareto-workflows.spec.js",
+    "circuit-physical-summary.spec.js",
+    "topology-migration.spec.js:68"
+  ],
+  "boost_case_uses_mocked_calculation": true,
+  "reason": "Compiled FastAPI GET / returns API metadata; /index.html loads the actual compiled UI.",
+  "originals_unchanged": true,
+  "copies": [
+    {
+      "source": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/gui_web/src/tests/e2e/waveform-workbench.spec.js",
+      "copy": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/waveform-workbench.spec.js",
+      "source_sha256": "c80c0496a0dc2bf6f63d9096413640a1651c06db26645a05df95efe509be5a78",
+      "copy_sha256": "be6cbba91f79ec5c32c737f3fa631b6ee4e3eee17016e787ea45c2a8d0f8857b",
+      "adaptations": [
+        {
+          "from": "http://localhost:8002",
+          "to": "http://127.0.0.1:8003",
+          "count": 1
+        }
+      ],
+      "functional_assertions_and_selectors_unchanged": true
+    },
+    {
+      "source": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/gui_web/src/tests/e2e/dpt-contract.spec.js",
+      "copy": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/dpt-contract.spec.js",
+      "source_sha256": "2cbe9ede554ed251c7f609c0a24679cecadd4592cf7b14be00af80cd8650c6e9",
+      "copy_sha256": "982e6c9c9fe9c1d5132577b0b03bc3beff8aa701f02ba40adbaeb8a5cfb7bf4d",
+      "adaptations": [
+        {
+          "from": "http://localhost:8002",
+          "to": "http://127.0.0.1:8003",
+          "count": 1
+        },
+        {
+          "from": "async function openDpt(page, url = '/')",
+          "to": "async function openDpt(page, url = '/index.html')",
+          "count": 1
+        }
+      ],
+      "functional_assertions_and_selectors_unchanged": true
+    },
+    {
+      "source": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/gui_web/src/tests/e2e/topology-pareto-workflows.spec.js",
+      "copy": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/topology-pareto-workflows.spec.js",
+      "source_sha256": "57ed4205a2a40813ffe085568abb9a80e85c00198c385cc45c209bd20e086aee",
+      "copy_sha256": "0f25fe615d78e57746f4cebc699b686251231706027eb12decdd1fc56a4f547f",
+      "adaptations": [
+        {
+          "from": "page.goto('/')",
+          "to": "page.goto('/index.html')",
+          "count": 2
+        }
+      ],
+      "functional_assertions_and_selectors_unchanged": true
+    },
+    {
+      "source": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/gui_web/src/tests/e2e/circuit-physical-summary.spec.js",
+      "copy": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/circuit-physical-summary.spec.js",
+      "source_sha256": "cb69643e31a7f316e5325dd30b3cb8ced7558a8f60594dea5c762c3cf4ef667c",
+      "copy_sha256": "32f162c676882aade7b93b59bb983f5e8941f4aa568af796529e9ad9f1aeb22d",
+      "adaptations": [
+        {
+          "from": "http://localhost:8002",
+          "to": "http://127.0.0.1:8003",
+          "count": 1
+        }
+      ],
+      "functional_assertions_and_selectors_unchanged": true
+    },
+    {
+      "source": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/gui_web/src/tests/e2e/topology-migration.spec.js",
+      "copy": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/topology-migration.spec.js",
+      "source_sha256": "d519f8294fa7fae7a1b260a2cd2bc18f256c3b401c0568145dc69abf4609fd7a",
+      "copy_sha256": "148d534dc4794e2acde12aa71d08011c4e7dac0c0f7cd520872e657c7edbbf80",
+      "adaptations": [
+        {
+          "from": "page.goto('/')",
+          "to": "page.goto('/index.html')",
+          "count": 1
+        }
+      ],
+      "functional_assertions_and_selectors_unchanged": true
+    },
+    {
+      "source": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/gui_web/src/tests/fixtures/chartEvidence.js",
+      "copy": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/fixtures/chartEvidence.js",
+      "source_sha256": "21de37dc6160b422937149a2f9c4978a1f0028c8387283045366dcd8a1d66fdc",
+      "copy_sha256": "21de37dc6160b422937149a2f9c4978a1f0028c8387283045366dcd8a1d66fdc",
+      "adaptations": []
+    }
+  ]
+}

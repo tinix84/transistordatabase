@@ -1,0 +1,3270 @@
+{
+  "archive": "/home/tinix/claude_wsl/archive_ntbees2/sc",
+  "method": "Static inventory only; executable bodies and parity need numerical verification.",
+  "files": [
+    {
+      "path": "Doc/.ipynb_checkpoints/Mosfet_switching_losses-checkpoint.ipynb",
+      "sha256": "1faa3b36dad101afed20200303fe9180437aed40c9839800046db1f24500e8a1",
+      "lines": 557,
+      "cells": [
+        {
+          "index": 0,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 1,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 2,
+          "type": "markdown",
+          "headings": [
+            "# Mosfet switching losses",
+            "## Reference docs",
+            "## Mosfet Datasheet data"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 3,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 4,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 5,
+          "type": "markdown",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 6,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 7,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 8,
+          "type": "markdown",
+          "headings": [
+            "## Driver circuit parameters"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 9,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 10,
+          "type": "markdown",
+          "headings": [
+            "## Operating point"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 11,
+          "type": "markdown",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 12,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 13,
+          "type": "markdown",
+          "headings": [
+            "## Time calculation"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 14,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 15,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 16,
+          "type": "markdown",
+          "headings": [
+            "### Turn-On transition"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 17,
+          "type": "markdown",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 18,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 19,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 20,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 21,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 22,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 23,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 24,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 25,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 26,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 27,
+          "type": "code",
+          "headings": [],
+          "output_count": 2
+        },
+        {
+          "index": 28,
+          "type": "markdown",
+          "headings": [
+            "### Turn-Off transition"
+          ],
+          "output_count": 0
+        }
+      ]
+    },
+    {
+      "path": "data/scData/Source_Data/edit_scdata_structs.m",
+      "sha256": "dc3bbd39cb8c5c8d7f787033d03d8c4887ff06601cccbaf8fb7e07a600a74efb",
+      "lines": 30,
+      "definitions": []
+    },
+    {
+      "path": "db/scData/src_data/edit_scdata_structs.m",
+      "sha256": "dc3bbd39cb8c5c8d7f787033d03d8c4887ff06601cccbaf8fb7e07a600a74efb",
+      "lines": 30,
+      "definitions": []
+    },
+    {
+      "path": "docs/.ipynb_checkpoints/Mosfet_switching_losses-checkpoint.ipynb",
+      "sha256": "1faa3b36dad101afed20200303fe9180437aed40c9839800046db1f24500e8a1",
+      "lines": 557,
+      "cells": [
+        {
+          "index": 0,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 1,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 2,
+          "type": "markdown",
+          "headings": [
+            "# Mosfet switching losses",
+            "## Reference docs",
+            "## Mosfet Datasheet data"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 3,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 4,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 5,
+          "type": "markdown",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 6,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 7,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 8,
+          "type": "markdown",
+          "headings": [
+            "## Driver circuit parameters"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 9,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 10,
+          "type": "markdown",
+          "headings": [
+            "## Operating point"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 11,
+          "type": "markdown",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 12,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 13,
+          "type": "markdown",
+          "headings": [
+            "## Time calculation"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 14,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 15,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 16,
+          "type": "markdown",
+          "headings": [
+            "### Turn-On transition"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 17,
+          "type": "markdown",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 18,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 19,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 20,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 21,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 22,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 23,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 24,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 25,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 26,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 27,
+          "type": "code",
+          "headings": [],
+          "output_count": 2
+        },
+        {
+          "index": 28,
+          "type": "markdown",
+          "headings": [
+            "### Turn-Off transition"
+          ],
+          "output_count": 0
+        }
+      ]
+    },
+    {
+      "path": "docs/Mosfet_switching_losses.ipynb",
+      "sha256": "a8c1ce8cc7b16df267feef82f9fa24823da7ebf926759069bd2d2ebe3ff6cacf",
+      "lines": 640,
+      "cells": [
+        {
+          "index": 0,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 1,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 2,
+          "type": "markdown",
+          "headings": [
+            "# Mosfet switching losses",
+            "## Reference docs",
+            "## Mosfet Datasheet data"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 3,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 4,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 5,
+          "type": "markdown",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 6,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 7,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 8,
+          "type": "markdown",
+          "headings": [
+            "## Driver circuit parameters"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 9,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 10,
+          "type": "markdown",
+          "headings": [
+            "## Operating point"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 11,
+          "type": "markdown",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 12,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 13,
+          "type": "markdown",
+          "headings": [
+            "## Time calculation"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 14,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 15,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 16,
+          "type": "markdown",
+          "headings": [
+            "### Turn-On transition"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 17,
+          "type": "markdown",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 18,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 19,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 20,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 21,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 22,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 23,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 24,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 25,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 26,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 27,
+          "type": "code",
+          "headings": [],
+          "output_count": 2
+        },
+        {
+          "index": 28,
+          "type": "markdown",
+          "headings": [
+            "### Turn-Off transition"
+          ],
+          "output_count": 0
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/Bridgeless_PFC/calc_bridgeless_semiconductor_loss.m",
+      "sha256": "160c93e2970f3a6b24358abde867b226ee01611e66197789271c725d611c658d",
+      "lines": 98,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function SCLosses = calc_bridgeless_semiconductor_loss(waveforms, mosfet_scData, diode_scData, IGBT_scData)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/Bridgeless_PFC/calc_bridgeless_semiconductor_loss.py",
+      "sha256": "33cca9cada06e204b237526c7f0bb979fabd5ca00485e774b25f53a30d140ffa",
+      "lines": 98,
+      "parse_error": "expected '(', line 1"
+    },
+    {
+      "path": "matlab_func/Bridgeless_PFC/test_calc_bridgeless_semiconductor_loss.m",
+      "sha256": "4f72a16b6c52586ec8c5967ede98a491afd43a6bcfeac3fc5a51f3dc13f83a74",
+      "lines": 36,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/Bridgeless_PFC/test_calc_bridgeless_semiconductor_loss.py",
+      "sha256": "fa90b4893a6f46011b5e99c9149c01e7989c27aa839cec56917f600356f95ceb",
+      "lines": 36,
+      "parse_error": "invalid syntax, line 1"
+    },
+    {
+      "path": "matlab_func/ConvertscDataFileFormatFrom00To01.m",
+      "sha256": "2c89abd8cf6697edd2d25bac9ce3c86237f8dcf5377d3d3ba2a11c6ee4761af7",
+      "lines": 57,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function ConvertscDataFileFormatFrom00To01()"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/ConvertscDataFileFormatFrom01To02.m",
+      "sha256": "13094ae0e36009fc6f2d8447df608a11ff53ce4d04aff24b96d6798b1c1f4c0d",
+      "lines": 49,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function ConvertscDataFileFormatFrom01To02()"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/DCDC_DAB/internalFunctions/calc_DAB_Psemi.m",
+      "sha256": "aa70b49971c365a0619d5e9dd8aace95a9fdbeb2e1667368c83f992cb2a3d079",
+      "lines": 76,
+      "definitions": [
+        {
+          "line": 16,
+          "signature": "function [p_semi_cond,p_semi_sw] = calc_DAB_Psemi(waveforms,scData_s12,scData_s34,scData_s56,scData_s78,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/DCDC_DAB/internalFunctions/calc_Pcond_Semi.m",
+      "sha256": "9d8e3508e61bfc50fc4690a4a54a5d4d1186ef9b6b2ad93d431bf335196b9e20",
+      "lines": 43,
+      "definitions": [
+        {
+          "line": 15,
+          "signature": "function [p_cond_avg,irms] = calc_Pcond_Semi(i,scData,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/DCDC_DAB/internalFunctions/calc_Psw_Semi.m",
+      "sha256": "97137bf8a3a23c93a45009684aafc0975d68691a545a8140b33e9b6d67158d8a",
+      "lines": 48,
+      "definitions": [
+        {
+          "line": 25,
+          "signature": "function [P_sw_tot, P_sw_on,P_sw_off,eon,eoff] = calc_Psw_Semi(time,vdc,isw_on,isw_off,scData,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/DCDC_DAB/test_calc_DAB_Psemi.m",
+      "sha256": "eb94fd35ebeb53945923021cb2a1d99ce4b0eaea2a44ccc3c6e8d6b961521dce",
+      "lines": 62,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/DCDC_SRC_ZCS/internalFunctions/calc_Psw_Semi_v2.m",
+      "sha256": "16cdac833b90d288930f4ac2866a1e1a53d1b5f36186d58221ffa13868b14727",
+      "lines": 56,
+      "definitions": [
+        {
+          "line": 27,
+          "signature": "function [P_sw_tot, P_sw_on,P_sw_off,eon,eoff] = calc_Psw_Semi_v2(time,vdc,g,i,scData,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/DCDC_SRC_ZCS/internalFunctions/calc_SRCZCS_Psemi.m",
+      "sha256": "51200c48614377229bf8a9d14b01c94381b1385732ac074574e30a9dbd41c8cd",
+      "lines": 62,
+      "definitions": [
+        {
+          "line": 17,
+          "signature": "function [p_semi_cond,p_semi_sw] = calc_SRCZCS_Psemi(waveforms,invhb1_scData,invhb2_scData,rechb1_scData,rechb2_scData,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/DCDC_SRC_ZCS/test_calc_SRCZCS_Psemi.m",
+      "sha256": "10b62f2896380c8cc196c2bc2d939b8926cb597d42591ee640c18ee31d8a4b41",
+      "lines": 64,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/DCDC_SRC_ZVS/internalFunctions/calc_Psw_Semi.m",
+      "sha256": "bd0fd364b0d2f43d74ac2401620edd77ff47aadf0fa29b8b22311e3e3fc3731e",
+      "lines": 49,
+      "definitions": [
+        {
+          "line": 25,
+          "signature": "function [P_sw_tot, P_sw_on,P_sw_off,eon,eoff] = calc_Psw_Semi(time,vdc,isw_on,isw_off,scData,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/DCDC_SRC_ZVS/internalFunctions/calc_SRCZVS_Psemi.m",
+      "sha256": "5de0946e2eafe1eebefca15713d75690e761e9366934b62de9e88b9d100c4575",
+      "lines": 65,
+      "definitions": [
+        {
+          "line": 17,
+          "signature": "function [p_semi_cond,p_semi_sw] = calc_SRCZVS_Psemi(waveforms,scData_invhb1,scData_invhb2,scData_rechb1,scData_rechb2,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/DCDC_SRC_ZVS/test_calc_SRCZVS_Psemi.m",
+      "sha256": "af0dd91eec439dba37e597dda97b9f81dc3848f2ec4e2eb970f20d120620e166",
+      "lines": 59,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/Doc/EXAMPLE_TwoLevelInverter.m",
+      "sha256": "d2785344ae99207948b8dfd65257770ec4777219d2c57dc881dbcb20f0ccf856",
+      "lines": 122,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/EditHsData.m",
+      "sha256": "8331fc7b71a7fb6197d6f9c6f54d2bd8d54930529bddfb31eb9c481d2383e21e",
+      "lines": 13,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/EditInverterSemiconductorPack.m",
+      "sha256": "0f27c6d02fc5ab3494734141f5038784422faf51c9d4188824088769904129f2",
+      "lines": 63,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/HardSwitchedSemiconductorLoss.m",
+      "sha256": "e0580248f1c1b2f316709949a1b9dc1d7edce6788eedbef5d6d0f2bc9cb6fa82",
+      "lines": 9,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [onStateLoss,turnOnLoss,turnOffLoss] = HardSwitchedSemiconductorLoss(offStateVoltage,onStateCurrent,dutyCycle,switchingFrequency,scData)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/LLC/internalFunctions/calc_Psw_Semi_v2.m",
+      "sha256": "cf529c9b6df029ecd14bfffe59d5fc381838620a3d26a0561504debdb9d9ca2e",
+      "lines": 56,
+      "definitions": [
+        {
+          "line": 27,
+          "signature": "function [P_sw_tot, P_sw_on,P_sw_off,eon,eoff] = calc_Psw_Semi_v2(time,vdc,g,i,scData,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/LLC/internalFunctions/calc_llc_Psemi.m",
+      "sha256": "a7fa0534dcf7ac915a0625a4a0f806c31c48b517cc1ae16915769b726956fb80",
+      "lines": 61,
+      "definitions": [
+        {
+          "line": 17,
+          "signature": "function [p_semi_cond,p_semi_sw] = calc_llc_Psemi(waveforms,invhb1_scData,invhb2_scData,rechb1_scData,rechb2_scData,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/LLC/test_calc_llc_Psemi.m",
+      "sha256": "cb1167f4588f8daa8375625f01de7c3a0dc4ae5d91a00ec5b5048300b8f34aef",
+      "lines": 61,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/PFC-SixSwitch/test_three_phase_totempole_semiconductor_loss.m",
+      "sha256": "fb95df36e14a55fd50b623e3f44160380783e3c99033086b955aa05fc17e62d0",
+      "lines": 33,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/PFC-SixSwitch/three_phase_totempole_pfc_semiconductor_loss.m",
+      "sha256": "98f33bd318ece3df8680e13b1a6345ed51fe0381f7f7d7b812a43a131b565565",
+      "lines": 95,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function SCLosses = three_phase_totempole_pfc_semiconductor_loss(waveforms,mosfet_scData,IGBT_scData)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/PFC_IVR/calc_vr_semiconductor_loss.m",
+      "sha256": "75439552d85cde8bf8a41e7ffc7074ef17d44f588bd7ea64518a6cb0d74cf500",
+      "lines": 137,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function SCLosses = calc_vr_semiconductor_loss(waveforms,mosfet_scData,pfc_diode_scData,Lrect_diode_scData,Nrect_diode_scData)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/PFC_IVR/test_calc_vr_semiconductor_loss.m",
+      "sha256": "ad153a375bd0748274092053645a2c67b3398c2fafe35fddea1735d623aed754",
+      "lines": 42,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/ParallelIGBTandDiode.m",
+      "sha256": "1465c74c4f492a32e6234248fc7aa9b82f6fba1454aadf3620b8f836edda507a",
+      "lines": 37,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function scData = ParallelIGBTandDiode(scDataIGBT,scDataDiode)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/ParallelSemiconductors.m",
+      "sha256": "2e50f4ac0c00d691c45bb7121ae16900fbc167da1bd10964934107fe0ef960d3",
+      "lines": 22,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function scData = ParallelSemiconductors(scData,numberOfDevices)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/SemiconductorTemperature.m",
+      "sha256": "50cdf6127bce51709451e3ef372259d58d8803b9ddccd6b2733f40cd881d40c2",
+      "lines": 42,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [tempRiseForward,tempRiseReverse] = SemiconductorTemperature(loss,currentSign,scData,hsData)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/calc_Pcond_Semi.m",
+      "sha256": "582383d9343e35e79dbc5b20087687af7d2c55740b4d4bb58e050276ffa0ce41",
+      "lines": 51,
+      "definitions": [
+        {
+          "line": 15,
+          "signature": "function [p_cond_avg,irms] = calc_Pcond_Semi(i,scData,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/calc_Psw_Semi.m",
+      "sha256": "3be032f212d90fc0d460664035361786b13f4eb6f049c02d6e83ec13b494edb6",
+      "lines": 48,
+      "definitions": [
+        {
+          "line": 25,
+          "signature": "function [P_sw_tot, P_sw_on,P_sw_off,eon,eoff] = calc_Psw_Semi(time,vdc,isw_on,isw_off,scData,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/calc_switching_voltage_current.m",
+      "sha256": "6241b1cd73628bb412ccf53f3ded8f2dcb5133e7e772ec2c2aa0233f1bd257a8",
+      "lines": 39,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [uswon,uswoff,iswon,iswoff]= calc_switching_voltage_current(d, u, i)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/convertPlecsXmlToscData02.m",
+      "sha256": "cc92b9daea9494a6d0bb32a7a72a2ba275e99936f12b84feab8de4f7a74bc3c2",
+      "lines": 75,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function scData = convertPlecsXmlToscData02(xmlPlecsMdlFile, Tj, Vsw, Rg)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/double_pulse/importfile_Eoff.m",
+      "sha256": "d8c4324039c1cadf52fa70f2318e1b66333182c8d335a15c7e2caf728663ba12",
+      "lines": 53,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function Eoff = importfile_Eoff(filename, startRow, endRow)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/double_pulse/importfile_Eon.m",
+      "sha256": "4e644434bd017e4f85c231480f5b9d262647173c4113bf32cf5ec03dfa878b5e",
+      "lines": 53,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function Eon = importfile_Eon(filename, startRow, endRow)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/double_pulse/importfile_step_descr.m",
+      "sha256": "86bf435cee28c02c6e84cea9d4beacf55951d4d15e3feb5f79f1104e9f8e6cf9",
+      "lines": 80,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function step_descr = importfile_step_descr(filename, startRow, endRow)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/double_pulse/runme_switching_losses.m",
+      "sha256": "0074ad0cf6b6b67724217381ddae25ca1ddb4b396ca095c1ba1e0e5721273c66",
+      "lines": 59,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/double_pulse/xyz2grid.m",
+      "sha256": "d2e02f263a6433f84272a9b9470ca11942871e455d86c5f53ee817229e8b6951",
+      "lines": 114,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function varargout = xyz2grid(varargin)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/double_pulse/xyzread.m",
+      "sha256": "e7eb5c32225086847469b1ab9e0f3697bad0dc4f19129a3a36327f6e0b982679",
+      "lines": 45,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [x,y,z] = xyzread(filename,varargin)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/extract_linear_model_IGBT.m",
+      "sha256": "35487bdc4dec96de5b9f60606dd89beab2bbbda5ea4ced0b648e0c4827f5e1b6",
+      "lines": 10,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [Vf,ron]=extract_linear_model_IGBT(Vce,Ic,Ic_max,Ic_min)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/igbt_utils.py",
+      "sha256": "aa8a107143485b905a6f37096ef48c6f4bd05e18841b6de37516afef51515ff7",
+      "lines": 45,
+      "definitions": [
+        {
+          "symbol": "dicdt_at_turnoff",
+          "line": 12,
+          "end_line": 16,
+          "stub": false
+        },
+        {
+          "symbol": "dicdt_at_turnon",
+          "line": 18,
+          "end_line": 22,
+          "stub": false
+        },
+        {
+          "symbol": "dvcedt_at_turnoff",
+          "line": 24,
+          "end_line": 28,
+          "stub": false
+        },
+        {
+          "symbol": "dvcedt_at_turnon",
+          "line": 30,
+          "end_line": 34,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/mosfet_switching_losses.py",
+      "sha256": "3554e5de19456bf47ed78b290eb5db1d43e80700c8b314b6e94a8c417a1ab020",
+      "lines": 162,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/mosfet_switching_losses_refactor.py",
+      "sha256": "89b98635f37f8188720ebefd51ee56d4ea99c6dcbabcae45f110c08270e4f23e",
+      "lines": 248,
+      "definitions": [
+        {
+          "symbol": "GateDriver.__init__",
+          "line": 14,
+          "end_line": 18,
+          "stub": false
+        },
+        {
+          "symbol": "SwitchingPoint.__init__",
+          "line": 22,
+          "end_line": 25,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.__init__",
+          "line": 29,
+          "end_line": 37,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_GE_mosfet_capacitances",
+          "line": 39,
+          "end_line": 48,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_terminal_capacitors",
+          "line": 50,
+          "end_line": 54,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_on_voltage",
+          "line": 56,
+          "end_line": 58,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_Tg",
+          "line": 60,
+          "end_line": 63,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_forcing_voltage",
+          "line": 65,
+          "end_line": 68,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_t1",
+          "line": 70,
+          "end_line": 73,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_t2",
+          "line": 75,
+          "end_line": 90,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_t3",
+          "line": 92,
+          "end_line": 98,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_turnon_interval_0t1",
+          "line": 100,
+          "end_line": 108,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_turnon_interval_t1t2",
+          "line": 110,
+          "end_line": 117,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_turnon_interval_t2t3",
+          "line": 119,
+          "end_line": 127,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_turnon_interval_t3tend",
+          "line": 129,
+          "end_line": 138,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_miller_plateau_static",
+          "line": 140,
+          "end_line": 142,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_miller_plateau_from_t2",
+          "line": 144,
+          "end_line": 147,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_turnon_transition",
+          "line": 149,
+          "end_line": 174,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_gate_current_waveform",
+          "line": 176,
+          "end_line": 179,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_exp_approx_Vgs",
+          "line": 181,
+          "end_line": 183,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.plot_turnon_transition_matlplotlib",
+          "line": 185,
+          "end_line": 198,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/reverseTurnedOnMOSFET.m",
+      "sha256": "2fbb2051961b22d7b50bbc5e71672bc3a5510cbaef18368f8bd1e8b99fdc9ff3",
+      "lines": 32,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [scData] = reverseTurnedOnMOSFET(scData)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/save7.m",
+      "sha256": "8a6bc318d28531f4299f3584362426e1e31b3e8ca3ed51a0def1910ff887f8bc",
+      "lines": 13,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function save7(varargin)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/scDataByName.m",
+      "sha256": "745472d348d026e59903f3ab1205e9b606837e9a39cdb8e770b1f3dd15af7898",
+      "lines": 45,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [foundscData] = scDataByName(search_directory,scName)"
+        },
+        {
+          "line": 26,
+          "signature": "function [foundscData] = SinglescDataByName(search_directory,scName)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/struct2xml.m",
+      "sha256": "27c5b919fb054c70f295fc6367ca5a74e3f1b22cb4302bac0486b243a443b6c1",
+      "lines": 199,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function varargout = struct2xml( s, varargin )"
+        },
+        {
+          "line": 85,
+          "signature": "function [] = parseStruct(s,docNode,curNode,pName)"
+        },
+        {
+          "line": 164,
+          "signature": "function [str,succes] = val2str(val)"
+        }
+      ]
+    },
+    {
+      "path": "matlab_func/test_convertPlecsXmlToscData02.m",
+      "sha256": "62515278c0e2a9330f2e6fd5a9d601d5f4c93dab9d34b710e7e9e4455e6e360f",
+      "lines": 15,
+      "definitions": []
+    },
+    {
+      "path": "matlab_func/xml2struct.m",
+      "sha256": "2dd3e43612d3c57528a322baf837e17c60376ed06b262ae6f34c494204ffd618",
+      "lines": 192,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function  outStruct  = xml2struct(input)"
+        },
+        {
+          "line": 51,
+          "signature": "function [children, ptext, textflag] = parseChildNodes(theNode)"
+        },
+        {
+          "line": 133,
+          "signature": "function [text,name,attr,childs,textflag] = getNodeData(theNode)"
+        },
+        {
+          "line": 164,
+          "signature": "function attributes = parseAttributes(theNode)"
+        },
+        {
+          "line": 185,
+          "signature": "function xmlroot = xmlFromString(iString)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/ConvertscDataFileFormatFrom00To01.m",
+      "sha256": "2c89abd8cf6697edd2d25bac9ce3c86237f8dcf5377d3d3ba2a11c6ee4761af7",
+      "lines": 57,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function ConvertscDataFileFormatFrom00To01()"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/ConvertscDataFileFormatFrom01To02.m",
+      "sha256": "13094ae0e36009fc6f2d8447df608a11ff53ce4d04aff24b96d6798b1c1f4c0d",
+      "lines": 49,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function ConvertscDataFileFormatFrom01To02()"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/DataPicker.m",
+      "sha256": "8326c5eb3bffd8f6fb1b83959c262027e1de7fd7eb20af8256270138d76981d1",
+      "lines": 354,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function xyTrace = DataPicker(varargin)"
+        },
+        {
+          "line": 287,
+          "signature": "function plotImage(xyTrace)"
+        },
+        {
+          "line": 300,
+          "signature": "function [dph] = plotDataPoints(xyTrace)"
+        },
+        {
+          "line": 309,
+          "signature": "function [cph] = plotCornerLocations(xyTrace)"
+        },
+        {
+          "line": 320,
+          "signature": "function xyTrace = updateValues(xyTrace)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/Doc/EXAMPLE_TwoLevelInverter.m",
+      "sha256": "d2785344ae99207948b8dfd65257770ec4777219d2c57dc881dbcb20f0ccf856",
+      "lines": 122,
+      "definitions": []
+    },
+    {
+      "path": "mfiles/EXAMPLE_TwoLevelInverter.m",
+      "sha256": "47885fb7bbdadd62cd809d73da014d50516f188902fc849d26230a1500799048",
+      "lines": 121,
+      "definitions": []
+    },
+    {
+      "path": "mfiles/EditHsData.m",
+      "sha256": "8331fc7b71a7fb6197d6f9c6f54d2bd8d54930529bddfb31eb9c481d2383e21e",
+      "lines": 13,
+      "definitions": []
+    },
+    {
+      "path": "mfiles/EditInverterSemiconductorPack.m",
+      "sha256": "0f27c6d02fc5ab3494734141f5038784422faf51c9d4188824088769904129f2",
+      "lines": 63,
+      "definitions": []
+    },
+    {
+      "path": "mfiles/HardSwitchedSemiconductorLoss.m",
+      "sha256": "e0580248f1c1b2f316709949a1b9dc1d7edce6788eedbef5d6d0f2bc9cb6fa82",
+      "lines": 9,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [onStateLoss,turnOnLoss,turnOffLoss] = HardSwitchedSemiconductorLoss(offStateVoltage,onStateCurrent,dutyCycle,switchingFrequency,scData)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/ParallelIGBTandDiode.m",
+      "sha256": "1465c74c4f492a32e6234248fc7aa9b82f6fba1454aadf3620b8f836edda507a",
+      "lines": 37,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function scData = ParallelIGBTandDiode(scDataIGBT,scDataDiode)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/ParallelSemiconductors.m",
+      "sha256": "2e50f4ac0c00d691c45bb7121ae16900fbc167da1bd10964934107fe0ef960d3",
+      "lines": 22,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function scData = ParallelSemiconductors(scData,numberOfDevices)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/RgCalculator.m",
+      "sha256": "2c39fe9d8977d53872eb51a06ed98626e480788d7ff15baee6984d4dd48d4d91",
+      "lines": 212,
+      "definitions": []
+    },
+    {
+      "path": "mfiles/SemiconductorEditor.m",
+      "sha256": "85a3653d8d1947de6675371bb2906020035a9f02898bca78f793406a9e4a78b4",
+      "lines": 850,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function SemiconductorEditor()"
+        },
+        {
+          "line": 687,
+          "signature": "function [scData] = newScData()"
+        },
+        {
+          "line": 716,
+          "signature": "function [scData] = updateScData(scData)"
+        },
+        {
+          "line": 723,
+          "signature": "function [scData,FileName,PathName] = openScData()"
+        },
+        {
+          "line": 742,
+          "signature": "function [conductionTrace] = newConductionTrace()"
+        },
+        {
+          "line": 762,
+          "signature": "function [switchTrace] = newSwitchTrace()"
+        },
+        {
+          "line": 783,
+          "signature": "function [xValues,yValues,testVoltage] = combineTraces(forwardTrace,reverseTrace)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/SemiconductorTemperature.m",
+      "sha256": "50cdf6127bce51709451e3ef372259d58d8803b9ddccd6b2733f40cd881d40c2",
+      "lines": 42,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [tempRiseForward,tempRiseReverse] = SemiconductorTemperature(loss,currentSign,scData,hsData)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/analyze_image.m",
+      "sha256": "0e00c287059d05810ed15269ecf7562cca2ae091eccf0b0d052343c6e9856050",
+      "lines": 75,
+      "definitions": [
+        {
+          "line": 4,
+          "signature": "function [ X,Y ] = analyze_image( imagefile )"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/calcRg.m",
+      "sha256": "30203bb070f4fd6d4bbe0b14e049a6f1ccd4e658f52f686f4b99bc927ddb1cd3",
+      "lines": 8,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [Rg_on,Rg_off] = calcRg(dV_dt,Crss_min,Vg_p,Vg_m,Vgs_min,Vgs_max)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/calc_Pcond_Semi.m",
+      "sha256": "582383d9343e35e79dbc5b20087687af7d2c55740b4d4bb58e050276ffa0ce41",
+      "lines": 51,
+      "definitions": [
+        {
+          "line": 15,
+          "signature": "function [p_cond_avg,irms] = calc_Pcond_Semi(i,scData,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/calc_Psw_Semi.m",
+      "sha256": "3be032f212d90fc0d460664035361786b13f4eb6f049c02d6e83ec13b494edb6",
+      "lines": 48,
+      "definitions": [
+        {
+          "line": 25,
+          "signature": "function [P_sw_tot, P_sw_on,P_sw_off,eon,eoff] = calc_Psw_Semi(time,vdc,isw_on,isw_off,scData,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/calc_Psw_Semi_v2.m",
+      "sha256": "cf529c9b6df029ecd14bfffe59d5fc381838620a3d26a0561504debdb9d9ca2e",
+      "lines": 56,
+      "definitions": [
+        {
+          "line": 27,
+          "signature": "function [P_sw_tot, P_sw_on,P_sw_off,eon,eoff] = calc_Psw_Semi_v2(time,vdc,g,i,scData,printval=0)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/calc_switching_voltage_current.m",
+      "sha256": "6241b1cd73628bb412ccf53f3ded8f2dcb5133e7e772ec2c2aa0233f1bd257a8",
+      "lines": 39,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [uswon,uswoff,iswon,iswoff]= calc_switching_voltage_current(d, u, i)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/convertPlecsXmlToscData02.m",
+      "sha256": "cc92b9daea9494a6d0bb32a7a72a2ba275e99936f12b84feab8de4f7a74bc3c2",
+      "lines": 75,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function scData = convertPlecsXmlToscData02(xmlPlecsMdlFile, Tj, Vsw, Rg)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/edit_scdata_structs.m",
+      "sha256": "dc3bbd39cb8c5c8d7f787033d03d8c4887ff06601cccbaf8fb7e07a600a74efb",
+      "lines": 30,
+      "definitions": []
+    },
+    {
+      "path": "mfiles/extract_linear_model_IGBT.m",
+      "sha256": "35487bdc4dec96de5b9f60606dd89beab2bbbda5ea4ced0b648e0c4827f5e1b6",
+      "lines": 10,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [Vf,ron]=extract_linear_model_IGBT(Vce,Ic,Ic_max,Ic_min)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/reverseTurnedOnMOSFET.m",
+      "sha256": "2fbb2051961b22d7b50bbc5e71672bc3a5510cbaef18368f8bd1e8b99fdc9ff3",
+      "lines": 32,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [scData] = reverseTurnedOnMOSFET(scData)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/save7.m",
+      "sha256": "8a6bc318d28531f4299f3584362426e1e31b3e8ca3ed51a0def1910ff887f8bc",
+      "lines": 13,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function save7(varargin)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/scDataByName.m",
+      "sha256": "745472d348d026e59903f3ab1205e9b606837e9a39cdb8e770b1f3dd15af7898",
+      "lines": 45,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [foundscData] = scDataByName(search_directory,scName)"
+        },
+        {
+          "line": 26,
+          "signature": "function [foundscData] = SinglescDataByName(search_directory,scName)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/struct2xml.m",
+      "sha256": "27c5b919fb054c70f295fc6367ca5a74e3f1b22cb4302bac0486b243a443b6c1",
+      "lines": 199,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function varargout = struct2xml( s, varargin )"
+        },
+        {
+          "line": 85,
+          "signature": "function [] = parseStruct(s,docNode,curNode,pName)"
+        },
+        {
+          "line": 164,
+          "signature": "function [str,succes] = val2str(val)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/test_convertPlecsXmlToscData02.m",
+      "sha256": "62515278c0e2a9330f2e6fd5a9d601d5f4c93dab9d34b710e7e9e4455e6e360f",
+      "lines": 15,
+      "definitions": []
+    },
+    {
+      "path": "mfiles/test_save7.m",
+      "sha256": "4608558cc693ceebd6c24560df1d4c391237ef1f5bcd0298685763d55e1a2852",
+      "lines": 12,
+      "definitions": []
+    },
+    {
+      "path": "mfiles/test_scDataValues.m",
+      "sha256": "3d292da05474a8f2c5b800074981414564868d411158431e8f1e190132859611",
+      "lines": 55,
+      "definitions": []
+    },
+    {
+      "path": "mfiles/transistor/calc_conducting_power.m",
+      "sha256": "1ca9b354322106b3acb4887462ebf2f56c93c9c19a9b83e65bf6cd348bcf7ab9",
+      "lines": 56,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [mean_power] = calc_conducting_power(this, current)"
+        },
+        {
+          "line": 31,
+          "signature": "function power = calc_single_conduction_power(ds,current)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/transistor/calc_dicdt_at_turnoff.m",
+      "sha256": "6b852a2828013847a9c570ba18ffd6f330b7e6a7f2d7ea583f9149723e1e87ee",
+      "lines": 19,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function dicdt_off=calc_dicdt_at_turnoff(vgoff, rgoff, vGeth, il, gm_s, Cies)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/transistor/calc_dicdt_at_turnon.m",
+      "sha256": "d12618a3050caec854ee0806e2f965d9de42659a0f362b546eef41dd260f928e",
+      "lines": 11,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function dicdt_on=calc_dicdt_at_turnon(vgon, rgon, vGeth, il, gm_s, Cies)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/transistor/calc_dvcedt_at_turnoff.m",
+      "sha256": "26e95d5bd6011d10c14ad86440fccd760e2361f0a7534a2fc2d908b7374a351c",
+      "lines": 11,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function dvcedt_off = calc_dvcedt_at_turnoff(vgoff, rgoff, vGeth, iL, gm_s, Cgcs)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/transistor/calc_dvcedt_at_turnon.m",
+      "sha256": "6dce3258d297e211a40f89d225f6d2ea4b23aace32abadee691a307a00fc75d4",
+      "lines": 12,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function dvcedt_on = calc_dvcedt_at_turnon(vgon, rgon, vGeth, iL, gm_s, Cgcs)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/transistor/calc_switching_energy.m",
+      "sha256": "b10b4c4359f190ea30caa6811af6d7d4826a45d00d15226c891e3f1fea729c8a",
+      "lines": 87,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function out_struct = calc_switching_energy(this, voltage_mat, current_mat)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/transistor/display.m",
+      "sha256": "d5496f66ca9d44e82bdd93661bd79826f28f54673701bdb08e8a7c9d8dd02684",
+      "lines": 38,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function display(this)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/transistor/transistor.m",
+      "sha256": "7067a501636864ad4232065aa90d5788115f54947ac53191e418082d8ac3cd60",
+      "lines": 210,
+      "definitions": [
+        {
+          "line": 23,
+          "signature": "function this = transistor(parameters)"
+        },
+        {
+          "line": 29,
+          "signature": "function varargout = get.name(this)"
+        },
+        {
+          "line": 38,
+          "signature": "function varargout = get.type(this)"
+        },
+        {
+          "line": 49,
+          "signature": "function varargout = get.switching_data(this)"
+        },
+        {
+          "line": 56,
+          "signature": "function varargout = get.conducting_data(this)"
+        },
+        {
+          "line": 63,
+          "signature": "function varargout = get.capacity(this)"
+        },
+        {
+          "line": 70,
+          "signature": "function varargout = get.break_down_voltage(this)"
+        },
+        {
+          "line": 77,
+          "signature": "function varargout = get.thermal_data(this)"
+        },
+        {
+          "line": 85,
+          "signature": "function varargout = get.calc_switching_energy(this)"
+        },
+        {
+          "line": 89,
+          "signature": "function varargout = get.calc_conducting_power(this)"
+        },
+        {
+          "line": 93,
+          "signature": "function set.name(this, varargin)"
+        },
+        {
+          "line": 100,
+          "signature": "function set.type(this, varargin)"
+        },
+        {
+          "line": 107,
+          "signature": "function set.switching_data(this, varargin)"
+        },
+        {
+          "line": 136,
+          "signature": "function set.conducting_data(this, varargin)"
+        },
+        {
+          "line": 166,
+          "signature": "function set.capacity(this, varargin)"
+        },
+        {
+          "line": 174,
+          "signature": "function set.break_down_voltage(this, varargin)"
+        },
+        {
+          "line": 182,
+          "signature": "function set.thermal_data(this, varargin)"
+        }
+      ]
+    },
+    {
+      "path": "mfiles/xml2struct.m",
+      "sha256": "2dd3e43612d3c57528a322baf837e17c60376ed06b262ae6f34c494204ffd618",
+      "lines": 192,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function  outStruct  = xml2struct(input)"
+        },
+        {
+          "line": 51,
+          "signature": "function [children, ptext, textflag] = parseChildNodes(theNode)"
+        },
+        {
+          "line": 133,
+          "signature": "function [text,name,attr,childs,textflag] = getNodeData(theNode)"
+        },
+        {
+          "line": 164,
+          "signature": "function attributes = parseAttributes(theNode)"
+        },
+        {
+          "line": 185,
+          "signature": "function xmlroot = xmlFromString(iString)"
+        }
+      ]
+    },
+    {
+      "path": "run_all_tests.py",
+      "sha256": "b86d49efea670c1100730719169f91cce13f19869e3f3a13c4b9b06629351fd9",
+      "lines": 5,
+      "definitions": []
+    },
+    {
+      "path": "semiconductors/__init__.py",
+      "sha256": "43a7847fb38e42fcd2753eeb704cd67a6c315b3112cfdd586558d0f9eea139a5",
+      "lines": 8,
+      "definitions": []
+    },
+    {
+      "path": "semiconductors/biela_swlosses.py",
+      "sha256": "0ad2a8246ef79100d27cf239d014404b02d8fdad9ef899656fa7855c6164d885",
+      "lines": 230,
+      "parse_error": "expected argument value expression, line 56"
+    },
+    {
+      "path": "semiconductors/diode.py",
+      "sha256": "fc11de5895b3024ac46496f9772fc39dc9841820c71acad44a1b686e25791a18",
+      "lines": 17,
+      "definitions": [
+        {
+          "symbol": "DiodeElectrical.__init__",
+          "line": 2,
+          "end_line": 4,
+          "stub": false
+        },
+        {
+          "symbol": "DiodeElectrical.fit_diode_params",
+          "line": 7,
+          "end_line": 16,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "semiconductors/gate_driver.py",
+      "sha256": "d2f67559d9149cecf9dd7a77391182793c085bafe86702cd93310ee0cb9f67f9",
+      "lines": 6,
+      "definitions": [
+        {
+          "symbol": "GateDriver.__init__",
+          "line": 2,
+          "end_line": 6,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "semiconductors/helpers.py",
+      "sha256": "28ac6976fb1d5c535d6a17b829c2c717b077f800c21a3afb36002f83ed8da47d",
+      "lines": 200,
+      "definitions": [
+        {
+          "symbol": "rms",
+          "line": 7,
+          "end_line": 8,
+          "stub": false
+        },
+        {
+          "symbol": "find_nearest",
+          "line": 10,
+          "end_line": 13,
+          "stub": false
+        },
+        {
+          "symbol": "run_double_pulse_sim",
+          "line": 15,
+          "end_line": 45,
+          "stub": false
+        },
+        {
+          "symbol": "calc_sw_losses_ltspice",
+          "line": 48,
+          "end_line": 74,
+          "stub": false
+        },
+        {
+          "symbol": "calc_Pcond_Semi",
+          "line": 77,
+          "end_line": 112,
+          "stub": false
+        },
+        {
+          "symbol": "calc_Psw_Semi_v2",
+          "line": 137,
+          "end_line": 171,
+          "stub": false
+        },
+        {
+          "symbol": "HardSwitchSemicondutorLoss",
+          "line": 173,
+          "end_line": 185,
+          "stub": false
+        },
+        {
+          "symbol": "calc_derating_current_frequency",
+          "line": 187,
+          "end_line": 188,
+          "stub": true
+        },
+        {
+          "symbol": "SwitchingPoint.__init__",
+          "line": 192,
+          "end_line": 195,
+          "stub": false
+        },
+        {
+          "symbol": "SwitchElectrical.__init__",
+          "line": 199,
+          "end_line": 200,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "semiconductors/helpers_plot.py",
+      "sha256": "ddddf44cfdb04f3edc0685fc7168f8e2ca8cc8d32fa7684abdc6dce37960fbe1",
+      "lines": 189,
+      "definitions": [
+        {
+          "symbol": "DoublePulseViewerBokeh.__init__",
+          "line": 18,
+          "end_line": 30,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerBokeh.add_time_wfm",
+          "line": 32,
+          "end_line": 35,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerBokeh.show",
+          "line": 37,
+          "end_line": 38,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly_old.__init__",
+          "line": 42,
+          "end_line": 55,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly_old.add_time_wfm",
+          "line": 57,
+          "end_line": 65,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly_old.add_surface",
+          "line": 67,
+          "end_line": 94,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly_old.show",
+          "line": 96,
+          "end_line": 114,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.__init__",
+          "line": 118,
+          "end_line": 129,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.add_time_wfm",
+          "line": 132,
+          "end_line": 140,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.add_surface",
+          "line": 142,
+          "end_line": 169,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.show",
+          "line": 171,
+          "end_line": 189,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "semiconductors/igbt.py",
+      "sha256": "e130cc2863b6c35798870c60367998b0171761f8c5b6912552248707432f4a1e",
+      "lines": 58,
+      "definitions": [
+        {
+          "symbol": "extract_linear_model",
+          "line": 4,
+          "end_line": 15,
+          "stub": false
+        },
+        {
+          "symbol": "dicdt_at_turnoff",
+          "line": 17,
+          "end_line": 25,
+          "stub": false
+        },
+        {
+          "symbol": "dicdt_at_turnon",
+          "line": 28,
+          "end_line": 36,
+          "stub": false
+        },
+        {
+          "symbol": "dvcedt_at_turnoff",
+          "line": 39,
+          "end_line": 47,
+          "stub": false
+        },
+        {
+          "symbol": "dvcedt_at_turnon",
+          "line": 50,
+          "end_line": 58,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "semiconductors/mosfet.py",
+      "sha256": "4633f1d5e2138d100851444adad137d7acc694bb9f857417dfeb8622b12e96a9",
+      "lines": 182,
+      "definitions": [
+        {
+          "symbol": "Mosfet.__init__",
+          "line": 12,
+          "end_line": 20,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_GE_mosfet_capacitances",
+          "line": 22,
+          "end_line": 31,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_terminal_capacitors",
+          "line": 33,
+          "end_line": 38,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_on_voltage",
+          "line": 40,
+          "end_line": 42,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_Tg",
+          "line": 44,
+          "end_line": 47,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_forcing_voltage",
+          "line": 49,
+          "end_line": 52,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_t1",
+          "line": 54,
+          "end_line": 57,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_t2",
+          "line": 59,
+          "end_line": 74,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_t3",
+          "line": 76,
+          "end_line": 82,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_turnon_interval_0t1",
+          "line": 84,
+          "end_line": 92,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_turnon_interval_t1t2",
+          "line": 94,
+          "end_line": 101,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_turnon_interval_t2t3",
+          "line": 103,
+          "end_line": 111,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_turnon_interval_t3tend",
+          "line": 113,
+          "end_line": 122,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_miller_plateau_static",
+          "line": 124,
+          "end_line": 126,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_miller_plateau_from_t2",
+          "line": 128,
+          "end_line": 131,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_turnon_transition",
+          "line": 133,
+          "end_line": 158,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_gate_current_waveform",
+          "line": 160,
+          "end_line": 163,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.calc_exp_approx_Vgs",
+          "line": 165,
+          "end_line": 167,
+          "stub": false
+        },
+        {
+          "symbol": "Mosfet.plot_turnon_transition_matlplotlib",
+          "line": 169,
+          "end_line": 182,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "semiconductors/scdata.py",
+      "sha256": "de6c08f358c1b8a00bca0080c10514eaf422f5c244f1357d0a29eb4af5ad0bd7",
+      "lines": 209,
+      "definitions": [
+        {
+          "symbol": "ScDataGeneric.__init__",
+          "line": 8,
+          "end_line": 27,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataGeneric.__repr__",
+          "line": 29,
+          "end_line": 32,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataGeneric.save_plecs_xml",
+          "line": 35,
+          "end_line": 36,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataGeneric.calc_conducting_power",
+          "line": 39,
+          "end_line": 40,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataGeneric.calc_switching_power",
+          "line": 43,
+          "end_line": 44,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataGeneric.calc_switching_voltage_current",
+          "line": 47,
+          "end_line": 48,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataGeneric.parallel_mosfet_diode",
+          "line": 50,
+          "end_line": 51,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataGeneric.parallel_igbt_diode",
+          "line": 53,
+          "end_line": 54,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataGeneric.parallel_semicondutors",
+          "line": 56,
+          "end_line": 57,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataGeneric.scData_by_name",
+          "line": 59,
+          "end_line": 60,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataGeneric._extract_switching_losses",
+          "line": 62,
+          "end_line": 93,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataGeneric.load_plecs_xml",
+          "line": 95,
+          "end_line": 108,
+          "stub": false
+        },
+        {
+          "symbol": "ScData01.__init__",
+          "line": 111,
+          "end_line": 126,
+          "stub": false
+        },
+        {
+          "symbol": "ScData01.convertscDataFileFormatFrom00To01",
+          "line": 129,
+          "end_line": 130,
+          "stub": true
+        },
+        {
+          "symbol": "ScData02.__init__",
+          "line": 133,
+          "end_line": 148,
+          "stub": false
+        },
+        {
+          "symbol": "ScData02.convertscDataFileFormatFrom01To02",
+          "line": 151,
+          "end_line": 152,
+          "stub": true
+        },
+        {
+          "symbol": "ScData03.__init__",
+          "line": 155,
+          "end_line": 170,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "semiconductors/scplecs.py",
+      "sha256": "f0090f3093330d88f02b69cf6a64a663dc8062023d3215a3f9e995586a04f0aa",
+      "lines": 304,
+      "definitions": [
+        {
+          "symbol": "ScDataPlecs.__init__",
+          "line": 42,
+          "end_line": 47,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.load_plecs_xml_to_dict",
+          "line": 58,
+          "end_line": 61,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.load_plecs_xml_variables",
+          "line": 63,
+          "end_line": 67,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.partnumber",
+          "line": 70,
+          "end_line": 71,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.vendor",
+          "line": 74,
+          "end_line": 75,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.package_class",
+          "line": 78,
+          "end_line": 79,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.semiconductor_type",
+          "line": 82,
+          "end_line": 83,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.temperature_axis_conduction_loss",
+          "line": 86,
+          "end_line": 89,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.current_axis_conduction_loss",
+          "line": 92,
+          "end_line": 95,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.scale_conduction_loss",
+          "line": 98,
+          "end_line": 101,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.voltage_drop_lut",
+          "line": 104,
+          "end_line": 110,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.conduction_loss",
+          "line": 113,
+          "end_line": 114,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataPlecs.forwardThermalResistance",
+          "line": 117,
+          "end_line": 121,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.forwardThermalResistance_at_fsw",
+          "line": 124,
+          "end_line": 125,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataPlecs.reverseThermalResistance",
+          "line": 128,
+          "end_line": 129,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataPlecs.forwardThermalInterfaceArea",
+          "line": 132,
+          "end_line": 133,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataPlecs.reverseThermalInterfaceArea",
+          "line": 136,
+          "end_line": 137,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataPlecs.commonThermalInterfaceArea",
+          "line": 140,
+          "end_line": 141,
+          "stub": true
+        },
+        {
+          "symbol": "ScDataPlecs.temperature_axis_Eon",
+          "line": 144,
+          "end_line": 147,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.current_axis_Eon",
+          "line": 150,
+          "end_line": 153,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.voltage_axis_Eon",
+          "line": 156,
+          "end_line": 159,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.temperature_axis_Eoff",
+          "line": 162,
+          "end_line": 165,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.current_axis_Eoff",
+          "line": 168,
+          "end_line": 171,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.voltage_axis_Eoff",
+          "line": 174,
+          "end_line": 177,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.formula_Eon",
+          "line": 180,
+          "end_line": 182,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.formula_Eoff",
+          "line": 185,
+          "end_line": 187,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.scale_Eon",
+          "line": 190,
+          "end_line": 192,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.scale_Eoff",
+          "line": 195,
+          "end_line": 197,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.Eon_lut",
+          "line": 200,
+          "end_line": 207,
+          "stub": false
+        },
+        {
+          "symbol": "ScDataPlecs.Eoff_lut",
+          "line": 210,
+          "end_line": 217,
+          "stub": false
+        },
+        {
+          "symbol": "calc_Esw_mesh",
+          "line": 219,
+          "end_line": 231,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "semiconductors/switch.py",
+      "sha256": "5344554e4cf7743e837212504f8272667309060c9f25a69f1bddb6d6a1c472b5",
+      "lines": 3,
+      "definitions": [
+        {
+          "symbol": "SwitchElectrical.__init__",
+          "line": 2,
+          "end_line": 3,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "semiconductors/transistor.py",
+      "sha256": "8d9c9f619e77744d05d577b03497819c931ba14b4a5e53b43f57b5b09e049a87",
+      "lines": 129,
+      "definitions": [
+        {
+          "symbol": "calc_dicdt_at_turnoff",
+          "line": 4,
+          "end_line": 17,
+          "stub": false
+        },
+        {
+          "symbol": "calc_pcond_semi",
+          "line": 19,
+          "end_line": 53,
+          "stub": false
+        },
+        {
+          "symbol": "Transistor.__init__",
+          "line": 60,
+          "end_line": 67,
+          "stub": false
+        },
+        {
+          "symbol": "Transistor.name",
+          "line": 70,
+          "end_line": 73,
+          "stub": false
+        },
+        {
+          "symbol": "Transistor.name",
+          "line": 76,
+          "end_line": 79,
+          "stub": false
+        },
+        {
+          "symbol": "Transistor.type",
+          "line": 82,
+          "end_line": 85,
+          "stub": false
+        },
+        {
+          "symbol": "Transistor.type",
+          "line": 88,
+          "end_line": 91,
+          "stub": false
+        },
+        {
+          "symbol": "Transistor.switching_data",
+          "line": 94,
+          "end_line": 97,
+          "stub": false
+        },
+        {
+          "symbol": "Transistor.conducting_data",
+          "line": 100,
+          "end_line": 103,
+          "stub": false
+        },
+        {
+          "symbol": "Transistor.capacity",
+          "line": 106,
+          "end_line": 109,
+          "stub": false
+        },
+        {
+          "symbol": "Transistor.break_down_voltage",
+          "line": 112,
+          "end_line": 115,
+          "stub": false
+        },
+        {
+          "symbol": "Transistor.thermal_data",
+          "line": 118,
+          "end_line": 121,
+          "stub": false
+        },
+        {
+          "symbol": "Transistor.calc_switching_energy",
+          "line": 123,
+          "end_line": 125,
+          "stub": true
+        },
+        {
+          "symbol": "Transistor.calc_conducting_power",
+          "line": 127,
+          "end_line": 129,
+          "stub": true
+        }
+      ]
+    },
+    {
+      "path": "setup.py",
+      "sha256": "60e3103ebdfb86566b2aaf9c17a48db0e6108fa993498ae44d528f071d1abc3b",
+      "lines": 23,
+      "definitions": []
+    },
+    {
+      "path": "tests/EXAMPLE_TwoLevelInverter.m",
+      "sha256": "47885fb7bbdadd62cd809d73da014d50516f188902fc849d26230a1500799048",
+      "lines": 121,
+      "definitions": []
+    },
+    {
+      "path": "tests/OLD/mosfet_switching_losses.py",
+      "sha256": "3554e5de19456bf47ed78b290eb5db1d43e80700c8b314b6e94a8c417a1ab020",
+      "lines": 162,
+      "definitions": []
+    },
+    {
+      "path": "tests/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lines": 0,
+      "definitions": []
+    },
+    {
+      "path": "tests/biela_swlosses.py",
+      "sha256": "69f09aa44eaf69664c32228c48be41e38781a91930fd7fa83709cd78a08a2c62",
+      "lines": 231,
+      "parse_error": "invalid syntax, line 37"
+    },
+    {
+      "path": "tests/context.py",
+      "sha256": "e3d43d7d78dc51f6a522e45d97b111f6b407230c88149271a79b579527241c82",
+      "lines": 10,
+      "definitions": []
+    },
+    {
+      "path": "tests/mfiles/test_scDataValues.m",
+      "sha256": "ba449d021b2ed56cf964ecbd88380e8c0e0ec5a6ef87e933a5da8f6d4a2e0e76",
+      "lines": 40,
+      "definitions": []
+    },
+    {
+      "path": "tests/pareto_sc.ipynb",
+      "sha256": "986d0459a34b87f043a7e43580b8056025609d3a82cadde6d1c6cd7c3c8effc6",
+      "lines": 450,
+      "cells": [
+        {
+          "index": 0,
+          "type": "code",
+          "headings": [
+            "# TOOLS = \"box_select,lasso_select,hover,help\"",
+            "# from bokeh.sampledata.autompg import autompg",
+            "# from bokeh.transform import jitter"
+          ],
+          "output_count": 2
+        },
+        {
+          "index": 1,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 2,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 3,
+          "type": "markdown",
+          "headings": [
+            "# SiC devices market survey mouser 2020.06"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 4,
+          "type": "code",
+          "headings": [
+            "# data preparation"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 5,
+          "type": "code",
+          "headings": [
+            "# TOOLTIPS = [(\"index\", \"@index\"), (\"PN\", \"@{Hersteller-Teilenummer}\")]",
+            "# options = dict(plot_width=600, plot_height=600, tools=TOOLS, tooltips=TOOLTIPS, )",
+            "# # create a column data source for the plots to share",
+            "# source = ColumnDataSource(df)",
+            "# # create a new plot and add a renderer",
+            "# left = figure(**options, title=None)",
+            "# left.circle(x='Rdson (Ohm)', y='Spalte1', source=source, size=10)",
+            "# # create another new plot and add a renderer",
+            "# right = figure(**options, title=None)",
+            "# right.circle(x='Rdson (Ohm)', y='Stückpreis (CHF)', source=source, size=10)",
+            "# p = gridplot([[left, right]])",
+            "# show(p)"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 6,
+          "type": "markdown",
+          "headings": [
+            "# GaN devices market survey digikey 2020.12.10"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 7,
+          "type": "code",
+          "headings": [
+            "# data preparation",
+            "#FIXME: this will be converted in nan",
+            "# create a column data source for the plots to share"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 8,
+          "type": "code",
+          "headings": [
+            "# df['Rds On (Max) @ Id, Vgs'].unique()",
+            "# df['Current - Continuous Drain (Id) @ 25°C'].unique()",
+            "# df['Drain to Source Voltage (Vdss)'].unique()"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 9,
+          "type": "code",
+          "headings": [],
+          "output_count": 1
+        },
+        {
+          "index": 10,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        },
+        {
+          "index": 11,
+          "type": "code",
+          "headings": [],
+          "output_count": 2
+        },
+        {
+          "index": 12,
+          "type": "code",
+          "headings": [],
+          "output_count": 3
+        },
+        {
+          "index": 13,
+          "type": "markdown",
+          "headings": [
+            "# SiC devices market survey mouser 2020.12.10"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 14,
+          "type": "code",
+          "headings": [
+            "# data preparation",
+            "#FIXME: '10mA (Ta)' not working -> nan",
+            "#df['Drain to Source Voltage (Vdss)'].unique()",
+            "#FIXME: this will be converted in nan",
+            "# create a column data source for the plots to share"
+          ],
+          "output_count": 0
+        },
+        {
+          "index": 15,
+          "type": "code",
+          "headings": [],
+          "output_count": 2
+        },
+        {
+          "index": 16,
+          "type": "code",
+          "headings": [],
+          "output_count": 3
+        },
+        {
+          "index": 17,
+          "type": "code",
+          "headings": [],
+          "output_count": 0
+        }
+      ]
+    },
+    {
+      "path": "tests/pareto_sc.py",
+      "sha256": "32d4d5e5665067870fbb06b4412ebc3c2cce9d3e657072023dcdf1eaf4a7a890",
+      "lines": 40,
+      "definitions": [
+        {
+          "symbol": "test1",
+          "line": 35,
+          "end_line": 36,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "tests/read_raw_upgrade.py",
+      "sha256": "f997506c1b930467f2f085bfdb02a98cda50f1a9352d78cb10534fce2374a17a",
+      "lines": 207,
+      "definitions": [
+        {
+          "symbol": "find_nearest",
+          "line": 24,
+          "end_line": 27,
+          "stub": false
+        },
+        {
+          "symbol": "calc_sw_losses_ltspice",
+          "line": 29,
+          "end_line": 53,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerBokeh.__init__",
+          "line": 56,
+          "end_line": 68,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerBokeh.add_time_wfm",
+          "line": 71,
+          "end_line": 74,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerBokeh.show",
+          "line": 76,
+          "end_line": 77,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.__init__",
+          "line": 80,
+          "end_line": 93,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.add_time_wfm",
+          "line": 95,
+          "end_line": 103,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.add_surface",
+          "line": 105,
+          "end_line": 130,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.show",
+          "line": 133,
+          "end_line": 151,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "tests/subplots_plotly.py",
+      "sha256": "ed840acc28b151fba9a41b41243aed8d1dfa3b96f3d0b80df24c450768ddeea8",
+      "lines": 33,
+      "definitions": []
+    },
+    {
+      "path": "tests/test_basic.py",
+      "sha256": "19c99111fc9ec2dd36d8a0780581b64d92052c7610a709619ad5ede0f9fc39da",
+      "lines": 157,
+      "definitions": [
+        {
+          "symbol": "test_xmlplecs_to_scdata02",
+          "line": 22,
+          "end_line": 28,
+          "stub": false
+        },
+        {
+          "symbol": "test_xmlplecs_igbt_to_scdata02",
+          "line": 31,
+          "end_line": 37,
+          "stub": false
+        },
+        {
+          "symbol": "test_ScDataGeneric",
+          "line": 39,
+          "end_line": 40,
+          "stub": false
+        },
+        {
+          "symbol": "test_ScData01",
+          "line": 42,
+          "end_line": 43,
+          "stub": false
+        },
+        {
+          "symbol": "test_ScData01_convertscDataFileFormatFrom00To01",
+          "line": 45,
+          "end_line": 46,
+          "stub": true
+        },
+        {
+          "symbol": "test_ScData02",
+          "line": 48,
+          "end_line": 49,
+          "stub": true
+        },
+        {
+          "symbol": "test_ScData02_convertscDataFileFormatFrom01To02",
+          "line": 51,
+          "end_line": 52,
+          "stub": true
+        },
+        {
+          "symbol": "test_ScData03",
+          "line": 54,
+          "end_line": 55,
+          "stub": true
+        },
+        {
+          "symbol": "test_ScDataPlecsobj_C2M0025120D",
+          "line": 58,
+          "end_line": 60,
+          "stub": false
+        },
+        {
+          "symbol": "test_ScDataPlecs_load_plecs_xml_to_dict",
+          "line": 63,
+          "end_line": 65,
+          "stub": false
+        },
+        {
+          "symbol": "test_ScDataPlecs_C2M0025120D_parameters",
+          "line": 68,
+          "end_line": 95,
+          "stub": false
+        },
+        {
+          "symbol": "test_ScDataPlecs_vendor",
+          "line": 98,
+          "end_line": 99,
+          "stub": true
+        },
+        {
+          "symbol": "test_ScDataPlecs_package_class",
+          "line": 101,
+          "end_line": 102,
+          "stub": true
+        },
+        {
+          "symbol": "test_ScDataPlecs_semiconductor_type",
+          "line": 104,
+          "end_line": 105,
+          "stub": true
+        },
+        {
+          "symbol": "test_ScDataPlecs_temperature_axis_conduction_loss",
+          "line": 107,
+          "end_line": 108,
+          "stub": true
+        },
+        {
+          "symbol": "test_ScDataPlecs_current_axis_conduction_loss",
+          "line": 110,
+          "end_line": 111,
+          "stub": true
+        },
+        {
+          "symbol": "test_ScDataPlecs_voltage_conduction_loss",
+          "line": 113,
+          "end_line": 114,
+          "stub": true
+        },
+        {
+          "symbol": "test_ScDataPlecs_dict_to_numpy",
+          "line": 116,
+          "end_line": 117,
+          "stub": true
+        },
+        {
+          "symbol": "test_ScDataPlecs_conduction_loss",
+          "line": 119,
+          "end_line": 120,
+          "stub": true
+        },
+        {
+          "symbol": "test_ScDataPlecs_ScDataPlecs2scData0x",
+          "line": 122,
+          "end_line": 123,
+          "stub": true
+        },
+        {
+          "symbol": "TestXmlPlecsConversion.test_xmlplecs_to_scdata02",
+          "line": 147,
+          "end_line": 149,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "tests/test_convertPlecsXmlToscData02.m",
+      "sha256": "62515278c0e2a9330f2e6fd5a9d601d5f4c93dab9d34b710e7e9e4455e6e360f",
+      "lines": 15,
+      "definitions": []
+    },
+    {
+      "path": "tests/test_igbt.py",
+      "sha256": "29e45c7ddd8a4033201fe7a4c3198976a1a2f0f4d2d6f8edc7693a00f67efb8a",
+      "lines": 71,
+      "parse_error": "expected an indented block after 'if' statement on line 70, line 71"
+    },
+    {
+      "path": "tests/test_xmlplecs.py",
+      "sha256": "df6f9c83a6ad2dd6b6150d59d21e8f1312520d75ea6dcd7834520c5c9e978770",
+      "lines": 101,
+      "definitions": [
+        {
+          "symbol": "find_nearest",
+          "line": 5,
+          "end_line": 8,
+          "stub": false
+        },
+        {
+          "symbol": "ScData02.__init__",
+          "line": 13,
+          "end_line": 20,
+          "stub": false
+        },
+        {
+          "symbol": "ScData02._extract_swithching_losses",
+          "line": 22,
+          "end_line": 53,
+          "stub": false
+        },
+        {
+          "symbol": "ScData02.load_plecs_xml",
+          "line": 55,
+          "end_line": 94,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "utils/dpt/OLD/ltspice_switching_losses.py",
+      "sha256": "58d5b39d5f9c18024f7cb4abf6e0c0f528b38bb8a9fb9ef048519f6c212aa039",
+      "lines": 305,
+      "definitions": [
+        {
+          "symbol": "find_nearest",
+          "line": 33,
+          "end_line": 36,
+          "stub": false
+        },
+        {
+          "symbol": "calc_sw_losses_ltspice",
+          "line": 39,
+          "end_line": 65,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerBokeh.__init__",
+          "line": 69,
+          "end_line": 81,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerBokeh.add_time_wfm",
+          "line": 83,
+          "end_line": 86,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerBokeh.show",
+          "line": 88,
+          "end_line": 89,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.__init__",
+          "line": 93,
+          "end_line": 106,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.add_time_wfm",
+          "line": 108,
+          "end_line": 116,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.show",
+          "line": 118,
+          "end_line": 124,
+          "stub": false
+        },
+        {
+          "symbol": "plot_switching_energy_map",
+          "line": 126,
+          "end_line": 175,
+          "stub": false
+        },
+        {
+          "symbol": "import_ltspice_log",
+          "line": 177,
+          "end_line": 200,
+          "stub": false
+        },
+        {
+          "symbol": "plot_switching_energy_map_scatter",
+          "line": 202,
+          "end_line": 253,
+          "stub": false
+        },
+        {
+          "symbol": "test_extract_switching_losses_from_wfm",
+          "line": 256,
+          "end_line": 289,
+          "stub": false
+        },
+        {
+          "symbol": "test_extract_switching_losses_from_log_file",
+          "line": 291,
+          "end_line": 298,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "utils/dpt/__init__.py",
+      "sha256": "bb616541e2d29eaadaeefe247f063a99948ed0d15bff6f25b92d0d35dd0fcc2f",
+      "lines": 8,
+      "definitions": []
+    },
+    {
+      "path": "utils/dpt/helpers_plot.py",
+      "sha256": "561c64277fa4e1b0a6df3027b409fc7b917721da0d0af7d21e08b6bc33cbe44b",
+      "lines": 224,
+      "definitions": [
+        {
+          "symbol": "DoublePulseViewerBokeh.__init__",
+          "line": 23,
+          "end_line": 35,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerBokeh.add_time_wfm",
+          "line": 37,
+          "end_line": 40,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerBokeh.show",
+          "line": 42,
+          "end_line": 43,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.__init__",
+          "line": 47,
+          "end_line": 60,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.add_time_wfm",
+          "line": 62,
+          "end_line": 70,
+          "stub": false
+        },
+        {
+          "symbol": "DoublePulseViewerPlotly.show",
+          "line": 72,
+          "end_line": 78,
+          "stub": false
+        },
+        {
+          "symbol": "plot_single_switching_energy_map",
+          "line": 81,
+          "end_line": 115,
+          "stub": false
+        },
+        {
+          "symbol": "plot_switching_energy_map",
+          "line": 121,
+          "end_line": 170,
+          "stub": false
+        },
+        {
+          "symbol": "plot_switching_energy_map_scatter",
+          "line": 173,
+          "end_line": 224,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "utils/dpt/ltspice_dpt.py",
+      "sha256": "662f63dd9d1993e8a5aa1f0eb5196ae8b9c1a3eaa13676a2ecef16b660c2c743",
+      "lines": 83,
+      "definitions": [
+        {
+          "symbol": "find_nearest",
+          "line": 17,
+          "end_line": 20,
+          "stub": false
+        },
+        {
+          "symbol": "calc_sw_losses_ltspice",
+          "line": 23,
+          "end_line": 49,
+          "stub": false
+        },
+        {
+          "symbol": "import_ltspice_log",
+          "line": 52,
+          "end_line": 75,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "utils/dpt/mfiles/importfile_Eoff.m",
+      "sha256": "d8c4324039c1cadf52fa70f2318e1b66333182c8d335a15c7e2caf728663ba12",
+      "lines": 53,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function Eoff = importfile_Eoff(filename, startRow, endRow)"
+        }
+      ]
+    },
+    {
+      "path": "utils/dpt/mfiles/importfile_Eon.m",
+      "sha256": "4e644434bd017e4f85c231480f5b9d262647173c4113bf32cf5ec03dfa878b5e",
+      "lines": 53,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function Eon = importfile_Eon(filename, startRow, endRow)"
+        }
+      ]
+    },
+    {
+      "path": "utils/dpt/mfiles/importfile_step_descr.m",
+      "sha256": "86bf435cee28c02c6e84cea9d4beacf55951d4d15e3feb5f79f1104e9f8e6cf9",
+      "lines": 80,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function step_descr = importfile_step_descr(filename, startRow, endRow)"
+        }
+      ]
+    },
+    {
+      "path": "utils/dpt/mfiles/runme_switching_losses.m",
+      "sha256": "9f2e7897d38d77776acb838f4add26e97cf84ec4b983d12f29ee8d92d6d2e7c9",
+      "lines": 65,
+      "definitions": []
+    },
+    {
+      "path": "utils/dpt/mfiles/xyz2grid.m",
+      "sha256": "d2e02f263a6433f84272a9b9470ca11942871e455d86c5f53ee817229e8b6951",
+      "lines": 114,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function varargout = xyz2grid(varargin)"
+        }
+      ]
+    },
+    {
+      "path": "utils/dpt/mfiles/xyzread.m",
+      "sha256": "e7eb5c32225086847469b1ab9e0f3697bad0dc4f19129a3a36327f6e0b982679",
+      "lines": 45,
+      "definitions": [
+        {
+          "line": 1,
+          "signature": "function [x,y,z] = xyzread(filename,varargin)"
+        }
+      ]
+    },
+    {
+      "path": "utils/dpt/read_raw_upgrade.py",
+      "sha256": "c8ed7a60a5440faa3e94cbd9b14bd4d94a29a2fdd6296c3d5d64f27f69381345",
+      "lines": 124,
+      "definitions": [
+        {
+          "symbol": "find_nearest",
+          "line": 26,
+          "end_line": 29,
+          "stub": false
+        },
+        {
+          "symbol": "calc_sw_losses_ltspice",
+          "line": 31,
+          "end_line": 57,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "utils/dpt/tests_basic.py",
+      "sha256": "fd3fe2796a7ed68ec9923635c0f0726fc6db95da7a39e5026537ee8539733fd5",
+      "lines": 58,
+      "definitions": [
+        {
+          "symbol": "test_extract_switching_losses_from_wfm",
+          "line": 13,
+          "end_line": 44,
+          "stub": false
+        },
+        {
+          "symbol": "test_extract_switching_losses_from_log_file",
+          "line": 47,
+          "end_line": 50,
+          "stub": false
+        }
+      ]
+    },
+    {
+      "path": "utils/semiconductor.m",
+      "sha256": "cfd309d3c4f2b87af7d8eb15ed6c29c58c2d66a3e44ab0b6e450fabe9655d601",
+      "lines": 193,
+      "definitions": [
+        {
+          "line": 86,
+          "signature": "function obj = mosfet(vendor, partnumber, Qg, Coss, ron, Rth)"
+        },
+        {
+          "line": 113,
+          "signature": "function loadPropertiesFromFilev01(obj, vendor, partnumber)"
+        },
+        {
+          "line": 186,
+          "signature": "function Eon=generateEonTable(); end"
+        },
+        {
+          "line": 187,
+          "signature": "function Eoff=generateEoffTable(); end"
+        },
+        {
+          "line": 188,
+          "signature": "function Von=generateVonTable(); end"
+        },
+        {
+          "line": 189,
+          "signature": "function Ron=generateRonTable(); end"
+        }
+      ]
+    }
+  ]
+}

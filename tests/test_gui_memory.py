@@ -5,6 +5,7 @@ os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 import pytest
 import gc
 import sys
+from PyQt5.QtWidgets import QWidget
 from transistordatabase.gui.gui import MainWindow
 
 
@@ -67,7 +68,7 @@ def test_window_close_cleans_up(qtbot):
     qtbot.addWidget(window)
 
     # Get widget count before
-    initial_widgets = len(window.findChildren(type))
+    initial_widgets = len(window.findChildren(QWidget))
 
     # Show and hide
     window.show()
@@ -76,7 +77,7 @@ def test_window_close_cleans_up(qtbot):
     qtbot.wait(50)
 
     # Get widget count after
-    final_widgets = len(window.findChildren(type))
+    final_widgets = len(window.findChildren(QWidget))
 
     # Widgets should still be present
     assert final_widgets > 0
@@ -130,7 +131,7 @@ def test_widget_cleanup(qtbot):
     qtbot.addWidget(window)
 
     # Get initial widget count
-    children = window.findChildren(type)
+    children = window.findChildren(QWidget)
     initial_count = len(children)
 
     # Access widgets
@@ -139,7 +140,7 @@ def test_widget_cleanup(qtbot):
     window.centralWidget()
 
     # Get final widget count
-    children = window.findChildren(type)
+    children = window.findChildren(QWidget)
     final_count = len(children)
 
     # Widget count should be stable

@@ -22,137 +22,22 @@ from transistordatabase.analytical_models import (
 
 
 class TestChristenBielaModel:
-    """Tests for the Christen-Biela half-bridge switching loss model."""
+    """Public import compatibility; detailed physical fixtures are in test_biela_contract."""
 
-    @pytest.fixture
-    def c2m_model(self) -> ChristenBielaModel:
-        """C2M0080120D-like model from paper Section III."""
-        # Approximate paper parameters for C2M0080120D
-        return ChristenBielaModel(
-            c_gs=1080e-12,
-            c_ds=130e-12,
-            c_gd=14.5e-12,
-            q_oss=86.56e-9,
-            gm_params=TransconductanceParams(k_1=0.1319, k_2=-0.076, x=3.80, v_th=4.5),
-            rr_params=ReverseRecoveryParams(
-                tau_rr=8.6e-9, tau_c=16e-9, t_m=18.6e-9, q_rr_star=88e-9
-            ),
-        )
-
-    @pytest.fixture
-    def default_params(self) -> HalfBridgeParams:
-        """C2M0080120D operating point from paper Table I."""
-        return HalfBridgeParams(
-            v_0=600, i_0=20, v_g_on=20, v_g_off=-5, r_g=7.1, l_s=4e-9, l_d=10e-9
-        )
-
-    def test_e_off_reference_point(
-        self, c2m_model: ChristenBielaModel, default_params: HalfBridgeParams
-    ) -> None:
-        """E_T,off should be in reasonable range (paper: 14.1uJ)."""
-        result = c2m_model.calc_switching_energy(default_params)
-        # Wide tolerance due to parameter uncertainty
-        assert 5e-6 < result.e_off < 30e-6
-
-    def test_e_on_reference_point(
-        self, c2m_model: ChristenBielaModel, default_params: HalfBridgeParams
-    ) -> None:
-        """E_T,on should be in reasonable range (paper: 274uJ)."""
-        result = c2m_model.calc_switching_energy(default_params)
-        assert 150e-6 < result.e_on < 600e-6
-
-    def test_e_on_much_greater_than_e_off(
-        self, c2m_model: ChristenBielaModel, default_params: HalfBridgeParams
-    ) -> None:
-        """E_on / E_off > 5 for SiC MOSFETs (paper shows ~20x)."""
-        result = c2m_model.calc_switching_energy(default_params)
-        assert result.e_on / result.e_off > 5
-
-    def test_energy_increases_with_voltage(
-        self, c2m_model: ChristenBielaModel
-    ) -> None:
-        """E_total increases with DC bus voltage."""
-        params_400v = HalfBridgeParams(
-            v_0=400, i_0=20, v_g_on=20, v_g_off=-5, r_g=7.1
-        )
-        params_800v = HalfBridgeParams(
-            v_0=800, i_0=20, v_g_on=20, v_g_off=-5, r_g=7.1
-        )
-        e_400 = c2m_model.calc_switching_energy(params_400v).e_total
-        e_800 = c2m_model.calc_switching_energy(params_800v).e_total
-        assert e_800 > e_400
-
-    def test_energy_positive_nonzero_current(
-        self, c2m_model: ChristenBielaModel
-    ) -> None:
-        """E_total > 0 for nonzero current."""
-        params_10a = HalfBridgeParams(
-            v_0=600, i_0=10, v_g_on=20, v_g_off=-5, r_g=7.1
-        )
-        params_30a = HalfBridgeParams(
-            v_0=600, i_0=30, v_g_on=20, v_g_off=-5, r_g=7.1
-        )
-        e_10 = c2m_model.calc_switching_energy(params_10a).e_total
-        e_30 = c2m_model.calc_switching_energy(params_30a).e_total
-        # Both should be positive
-        assert e_10 > 0
-        assert e_30 > 0
-
-    def test_zero_current(self, c2m_model: ChristenBielaModel) -> None:
-        """E_on = 0, E_off = 0 for I_0 = 0."""
-        params = HalfBridgeParams(v_0=600, i_0=0, v_g_on=20, v_g_off=-5, r_g=7.1)
-        result = c2m_model.calc_switching_energy(params)
-        assert result.e_on == 0.0
-        assert result.e_off == 0.0
-
-    def test_zvs_boundary(
-        self, c2m_model: ChristenBielaModel, default_params: HalfBridgeParams
-    ) -> None:
-        """I_0_zvs > 0 and reasonable."""
-        result = c2m_model.calc_switching_energy(default_params)
-        assert 0 < result.i_0_zvs < 20
-
-    def test_detailed_result(
-        self, c2m_model: ChristenBielaModel, default_params: HalfBridgeParams
-    ) -> None:
-        """Detailed result returns SwitchingEnergyResult."""
-        result = c2m_model.calc_switching_energy(default_params)
+    def test_corrected_public_model(self):
+        """Keep the public model import numerically tied to the independent fixture."""
+        model = ChristenBielaModel(1e-9, 1e-9, 1e-9, 200e-9,
+                                  TransconductanceParams(10, 0, 1, 3))
+        result = model.calc_switching_energy(HalfBridgeParams(100, 10, 15, 0, 10, 0, 0))
         assert isinstance(result, SwitchingEnergyResult)
-        assert result.t_rv > 0
-        assert result.t_fi >= 0
-        assert result.t_ri > 0
-        assert result.t_fv > 0
-        assert result.i_oss_off > 0
-        assert result.i_oss_on <= 0  # Zero or negative for turn-on
+        assert result.e_total == pytest.approx(178.7589668316306e-6)
 
-    def test_switching_loss_curve(self, c2m_model: ChristenBielaModel) -> None:
-        """Curve returns arrays of correct length."""
-        currents = np.linspace(5, 50, 10)
-        e_on, e_off, e_total = c2m_model.calc_switching_loss_curve(
-            v_0=600, currents=currents, v_g_on=20, v_g_off=-5, r_g=7.1
-        )
-        assert len(e_on) == 10
-        assert len(e_off) == 10
-        assert len(e_total) == 10
-        # All values should be non-negative
-        assert all(e_on >= 0)
-        assert all(e_off >= 0)
-        assert all(e_total >= 0)
-
-    def test_no_reverse_recovery(self) -> None:
-        """Model without rr_params works and has smaller E_on."""
-        model_no_rr = ChristenBielaModel(
-            c_gs=1080e-12,
-            c_ds=130e-12,
-            c_gd=14.5e-12,
-            q_oss=86.56e-9,
-            gm_params=TransconductanceParams(k_1=0.1319, k_2=-0.076, x=3.80, v_th=4.5),
-            rr_params=None,
-        )
-        params = HalfBridgeParams(v_0=600, i_0=20, v_g_on=20, v_g_off=-5, r_g=7.1)
-        result = model_no_rr.calc_switching_energy(params)
-        assert result.e_on > 0
-        assert result.e_rr_s2 == 0.0
+    def test_charge_control_constants_are_not_arbitrary(self):
+        """Reject inconsistent lifetime/transit constants instead of silently using them."""
+        with pytest.raises(ValueError, match='satisfy'):
+            ChristenBielaModel(1e-9, 1e-9, 1e-9, 200e-9,
+                              TransconductanceParams(10, 0, 1, 3),
+                              ReverseRecoveryParams(8.6e-9, 16e-9, 18.6e-9, 88e-9))
 
 
 class TestCapacitanceFunctions:

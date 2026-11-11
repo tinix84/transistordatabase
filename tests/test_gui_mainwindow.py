@@ -18,7 +18,7 @@ def main_window(qtbot):
 def test_mainwindow_initializes(main_window):
     """Test that MainWindow initializes without errors."""
     assert main_window is not None
-    assert main_window.windowTitle() == "Transistor Database"
+    assert main_window.windowTitle() == "Transistordatabase"
 
 
 def test_mainwindow_has_menu_bar(main_window):

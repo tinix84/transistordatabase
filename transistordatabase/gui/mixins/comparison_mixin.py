@@ -62,7 +62,7 @@ class ComparisonToolsMixin:
 
         try:
             matplotlibwidget.axis_cm.remove()
-        except:
+        except Exception:
             pass
 
         try:
@@ -233,7 +233,7 @@ class ComparisonToolsMixin:
                                                        transistor2=transistor2,
                                                        transistor3=transistor3,
                                                        matplotlibwidget=matplotlibwidget)
-        except:
+        except Exception:
             self.show_popup_message("Error: Inputs are missing or not numeric!")
 
     def compare_update_plots(self):
@@ -468,13 +468,13 @@ class ComparisonToolsMixin:
                 slider_compare_r_g_on_transistor.setValue(int(r_g_on_max * 100))
                 label_compare_r_g_on_value_transistor.setText(str(r_g_on_max))
 
-            except:
+            except Exception:
                 try:
                     r_g_on = max([i for i in [e_on.r_g for e_on in transistor.switch.e_on] if i is not None])
                     slider_compare_r_g_on_transistor.setMinimum(int(r_g_on * 100))
                     slider_compare_r_g_on_transistor.setMaximum(int(r_g_on * 100))
                     # self.show_popup_message(f"No energy data for different turn on gate resistor for <b>{transistor.name}</b> available!")
-                except:
+                except Exception:
                     # self.show_popup_message(f"No turn-on energy data for <b>{transistor.name}</b> available!")
                     slider_compare_r_g_on_transistor.setMinimum(0)
                     slider_compare_r_g_on_transistor.setMaximum(0)
@@ -525,13 +525,13 @@ class ComparisonToolsMixin:
                 slider_compare_r_g_off_transistor.setMaximum(int(r_g_off_max * 100))
                 slider_compare_r_g_off_transistor.setValue(int(r_g_off_max * 100))
                 label_compare_r_g_off_value_transistor.setText(str(r_g_off_max))
-            except:
+            except Exception:
                 try:
                     r_g_off = max([i for i in [e_off.r_g for e_off in transistor.switch.e_off] if i is not None])
                     slider_compare_r_g_off_transistor.setMinimum(int(r_g_off * 100))
                     slider_compare_r_g_off_transistor.setMaximum(int(r_g_off * 100))
                     # self.show_popup_message(f"No energy data for different turn off gate resistor for <b>{transistor.name}</b> available!")
-                except:
+                except Exception:
                     # self.show_popup_message(f"No turn-off energy data for <b>{transistor.name}</b> available!")
                     slider_compare_r_g_off_transistor.setMinimum(0)
                     slider_compare_r_g_off_transistor.setMaximum(0)

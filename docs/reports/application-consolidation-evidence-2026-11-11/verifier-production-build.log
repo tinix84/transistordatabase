@@ -1,0 +1,18 @@
+
+> transistor-database-web@1.0.0 build
+> vite build --emptyOutDir false
+
+vite v7.0.6 building for production...
+transforming...
+✓ 204 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     0.48 kB │ gzip:   0.31 kB
+dist/assets/index-C0FW12Zz.css    142.07 kB │ gzip:  23.59 kB
+dist/assets/index-BxNnU9yB.js   1,081.02 kB │ gzip: 331.72 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 4.32s

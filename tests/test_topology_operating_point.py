@@ -68,6 +68,280 @@ def device(
     return transistor
 
 
+def test_switching_loss_balanced_boost_closes_power_and_reports_one_pass_temperature() -> None:
+    """Feed exact-condition Eon/Eoff losses back into the scalar CCM solve."""
+    transistor = device(max_current=100.0)
+    for curve in transistor.switch.e_on_data + transistor.switch.e_off_data:
+        curve.v_supply = 200
+    transistor.switch.thermal_foster = FosterThermalModel(r_th_total=0.3)
+    transistor.diode.thermal_foster = FosterThermalModel(r_th_total=0.4)
+    result = calculate_topology_operating_point(
+        "boost",
+        point(
+            mode="switching-loss-balanced",
+            v_in=100,
+            v_out=200,
+            p_out=1000,
+            f_sw=20_000,
+            l_value=0.001,
+            c_out=0.001,
+            t_j=25,
+            t_case=60,
+            v_g=15,
+            v_g_off=-5,
+            r_g_on=10,
+            r_g_off=10,
+        ),
+        transistor,
+        transistor,
+    )
+    losses = result["losses"]
+    assert losses["switching_on_w"] > 0
+    assert losses["switching_off_w"] > losses["switching_on_w"]
+    assert losses["loss_scope"] == "channel_conduction_and_switch_turn_on_turn_off"
+    assert losses["reverse_recovery_losses_included"] is False
+    assert any("Reverse recovery is excluded because Eon provenance" in item
+               for item in result["model"]["assumptions"])
+    assert result["calculated"]["power_balance_residual_w"] == pytest.approx(0, abs=1e-6)
+    assert result["performance"]["p_in_w"] == pytest.approx(
+        1000 + losses["total_w"], rel=1e-7
+    )
+    assert result["temperatures"]["switch_c"] > 60
+    assert result["temperatures"]["diode_c"] > 60
+
+
+@pytest.mark.parametrize(
+    ("topology", "overrides", "message"),
+    [
+        ("buck", {}, "scalar Boost CCM only"),
+        ("boost", {"conduction_regime": "DCM"}, "scalar Boost CCM only"),
+        ("boost", {"r_g_on": None}, "requires exact r_g_on and r_g_off"),
+        ("boost", {"v_out": 220}, "Missing required e_on graph_i_e curve"),
+    ],
+)
+def test_switching_loss_balanced_rejects_out_of_scope_or_unmatched_conditions(
+    topology: str, overrides: dict[str, Any], message: str
+) -> None:
+    """Reject unsupported topologies/regimes and mismatched blocking voltage."""
+    transistor = device(max_current=100.0)
+    for curve in transistor.switch.e_on_data + transistor.switch.e_off_data:
+        curve.v_supply = 200
+    values = point(
+        mode="switching-loss-balanced",
+        v_in=100,
+        v_out=200,
+        p_out=1000,
+        f_sw=20_000,
+        l_value=0.001,
+        c_out=0.001,
+        t_j=25,
+        v_g=15,
+        v_g_off=-5,
+        r_g_on=10,
+        r_g_off=10,
+    )
+    values.update(overrides)
+    with pytest.raises(ValueError, match=message):
+        calculate_topology_operating_point(topology, values, transistor, transistor)
+
+
+def test_switching_loss_balanced_rejects_current_curve_extrapolation() -> None:
+    """Reject a solved current outside the measured switching curve range."""
+    transistor = device(max_current=9.0)
+    for curve in transistor.switch.e_on_data + transistor.switch.e_off_data:
+        curve.v_supply = 200
+    values = point(
+        mode="switching-loss-balanced",
+        v_in=100,
+        v_out=200,
+        p_out=1000,
+        f_sw=20_000,
+        l_value=0.001,
+        c_out=0.001,
+        t_j=25,
+        v_g=15,
+        v_g_off=-5,
+        r_g_on=10,
+        r_g_off=10,
+    )
+    with pytest.raises(ValueError, match="curve supports .* requested"):
+        calculate_topology_operating_point("boost", values, transistor, transistor)
+
+
+def test_switching_loss_balanced_finds_root_above_switching_curve_floor() -> None:
+    """A below-domain ideal trial must not hide a supported power-balance root."""
+    transistor = device(max_current=100.0)
+    for curve in transistor.switch.e_on_data + transistor.switch.e_off_data:
+        curve.v_supply = 200
+    transistor.switch.e_on_data[0].graph_i_e = np.array(
+        [[9.5, 100.0], [0.0095, 0.1]]
+    )
+    transistor.switch.e_off_data[0].graph_i_e = np.array(
+        [[9.5, 100.0], [0.019, 0.2]]
+    )
+
+    result = calculate_topology_operating_point(
+        "boost",
+        point(
+            mode="switching-loss-balanced", v_in=100, v_out=200,
+            p_out=1000, f_sw=20_000, l_value=0.001, c_out=0.001,
+            t_j=25, v_g=15, v_g_off=-5, r_g_on=10, r_g_off=10,
+        ),
+        transistor,
+        transistor,
+    )
+
+    assert result["calculated"]["duty_cycle"] > 0.5
+    assert result["calculated"]["i_l_valley_a"] >= 9.5
+    assert result["calculated"]["power_balance_residual_w"] == pytest.approx(
+        0, abs=1e-6
+    )
+
+
+def test_switching_loss_balanced_brackets_root_before_curve_ceiling() -> None:
+    """An overshooting upper probe must not abort a root inside measured data."""
+    transistor = device(max_current=100.0)
+    for curve in transistor.switch.e_on_data + transistor.switch.e_off_data:
+        curve.v_supply = 200
+    transistor.switch.e_on_data[0].graph_i_e = np.array(
+        [[0.1, 35.0], [0.0001, 0.035]]
+    )
+    transistor.switch.e_off_data[0].graph_i_e = np.array(
+        [[0.1, 35.0], [0.0002, 0.07]]
+    )
+
+    result = calculate_topology_operating_point(
+        "boost",
+        point(
+            mode="switching-loss-balanced", v_in=100, v_out=200,
+            p_out=1000, f_sw=20_000, l_value=0.001, c_out=0.001,
+            t_j=25, v_g=15, v_g_off=-5, r_g_on=10, r_g_off=10,
+        ),
+        transistor,
+        transistor,
+    )
+
+    assert result["calculated"]["duty_cycle"] == pytest.approx(0.8202, abs=1e-3)
+    assert result["calculated"]["i_l_peak_a"] < 35.0
+    assert result["calculated"]["power_balance_residual_w"] == pytest.approx(
+        0, abs=1e-6
+    )
+
+
+def test_switching_loss_balanced_solves_when_ideal_ccm_valley_is_nonpositive() -> None:
+    """Loss feedback can move an ideal boundary point back into valid CCM."""
+    transistor = device(max_current=100.0)
+    for curve in transistor.switch.e_on_data + transistor.switch.e_off_data:
+        curve.v_supply = 200
+
+    result = calculate_topology_operating_point(
+        "boost",
+        point(
+            mode="switching-loss-balanced", v_in=100, v_out=200,
+            p_out=1000, f_sw=20_000, l_value=100e-6, c_out=0.001,
+            t_j=25, v_g=15, v_g_off=-5, r_g_on=10, r_g_off=10,
+        ),
+        transistor,
+        transistor,
+    )
+
+    assert result["calculated"]["duty_cycle"] > 0.5
+    assert result["calculated"]["i_l_valley_a"] > 0
+    assert result["calculated"]["power_balance_residual_w"] == pytest.approx(
+        0, abs=1e-6
+    )
+
+
+def test_switching_loss_balanced_finds_narrow_supported_current_window() -> None:
+    """Duty search must not jump over a narrow measured current interval."""
+    transistor = device(max_current=100.0)
+    for curve in transistor.switch.e_on_data + transistor.switch.e_off_data:
+        curve.v_supply = 200
+    transistor.switch.e_on_data[0].graph_i_e = np.array(
+        [[25.8053457282, 25.8253457282], [0.0258053457282, 0.0258253457282]]
+    )
+    transistor.switch.e_off_data[0].graph_i_e = np.array(
+        [[29.7923064397, 29.8123064397], [0.0595846128794, 0.0596246128794]]
+    )
+
+    result = calculate_topology_operating_point(
+        "boost",
+        point(
+            mode="switching-loss-balanced", v_in=100, v_out=200,
+            p_out=1000, f_sw=20_000, l_value=0.001, c_out=0.001,
+            t_j=25, v_g=15, v_g_off=-5, r_g_on=10, r_g_off=10,
+        ),
+        transistor,
+        transistor,
+    )
+
+    assert result["calculated"]["duty_cycle"] == pytest.approx(
+        0.8202009684, abs=2e-5
+    )
+    assert result["calculated"]["power_balance_residual_w"] == pytest.approx(
+        0, abs=1e-6
+    )
+
+
+def test_switching_loss_balanced_legacy_eoff_gate_record_is_ambiguous() -> None:
+    """Reject legacy Eoff records that omit the turn-on gate condition."""
+    transistor = device(max_current=100.0)
+    for curve in transistor.switch.e_on_data + transistor.switch.e_off_data:
+        curve.v_supply = 200
+    transistor.switch.e_off_data[0].v_g = -5
+    transistor.switch.e_off_data[0].v_g_off = None
+    with pytest.raises(ValueError, match="Eoff data with explicit turn-on and turn-off"):
+        calculate_topology_operating_point(
+            "boost",
+            point(
+                mode="switching-loss-balanced", v_in=100, v_out=200,
+                p_out=1000, f_sw=20_000, l_value=0.001, c_out=0.001,
+                t_j=25, v_g=15, v_g_off=-5, r_g_on=10, r_g_off=10,
+            ),
+            transistor,
+            transistor,
+        )
+
+
+def test_switching_loss_balanced_rejects_eon_without_explicit_turn_off_gate() -> None:
+    """Eon without the measured off-gate condition is ambiguous for feedback."""
+    transistor = device(max_current=100.0)
+    for curve in transistor.switch.e_on_data + transistor.switch.e_off_data:
+        curve.v_supply = 200
+    transistor.switch.e_on_data[0].v_g_off = None
+
+    with pytest.raises(ValueError, match="Eon data with an explicit turn-off gate"):
+        calculate_topology_operating_point(
+            "boost",
+            point(
+                mode="switching-loss-balanced", v_in=100, v_out=200,
+                p_out=1000, f_sw=20_000, l_value=0.001, c_out=0.001,
+                t_j=25, v_g=15, v_g_off=-5, r_g_on=10, r_g_off=10,
+            ),
+            transistor,
+            transistor,
+        )
+
+
+def test_switching_loss_balanced_marks_missing_thermal_output_unavailable() -> None:
+    """Return unavailable thermal fields instead of inventing resistance data."""
+    transistor = device(max_current=100.0)
+    for curve in transistor.switch.e_on_data + transistor.switch.e_off_data:
+        curve.v_supply = 200
+    result = calculate_topology_operating_point(
+        "boost",
+        point(
+            mode="switching-loss-balanced", v_in=100, v_out=200,
+            p_out=1000, f_sw=20_000, l_value=0.001, c_out=0.001,
+            t_j=25, v_g=15, v_g_off=-5, r_g_on=10, r_g_off=10,
+        ),
+        transistor,
+        transistor,
+    )
+    assert result["temperatures"]["switch_c"] is None
+    assert result["temperatures"]["unavailable_reason"]
+
+
 @pytest.mark.parametrize(
     ("topology", "values", "duty", "i_in", "i_out"),
     [

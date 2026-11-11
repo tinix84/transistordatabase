@@ -39,11 +39,33 @@ describe('SearchDatabase.vue', () => {
     })
 
     it('should render results table', () => {
-      expect(wrapper.find('.search-results').exists()).toBe(true)
+      expect(wrapper.get('.results-panel h3').text()).toContain('Search Results (3 devices)')
+      expect(wrapper.findAll('.results-table tbody tr')).toHaveLength(3)
+      expect(wrapper.get('.results-table').text()).toContain(mockTransistors[0].metadata.name)
     })
   })
 
   describe('Props Handling', () => {
+    it.each([[null, 'Unknown'], [undefined, 'Unknown'], [NaN, 'Unknown'], [Infinity, 'Unknown'], [0, '0.000'], [-.2, '-0.200']])(
+      'preserves recorded thermal value %s and formats unknown evidence safely', async (value, shown) => {
+        const device = structuredClone(mockTransistors[0])
+        device.thermal.r_th_cs = value
+        await wrapper.setProps({ transistors: [device] })
+        expect(wrapper.get('.results-table tbody tr').findAll('td')[5].text()).toBe(shown + ' K/W')
+        await wrapper.findAll('button').find(button => button.text().includes('Cards')).trigger('click')
+        await vi.waitFor(() => {
+          const thermal = wrapper.get('.cards-view').findAll('.card-info p')
+            .find(row => row.get('strong').text() === 'Thermal Resistance:')
+          expect(thermal.text()).toBe('Thermal Resistance: ' + shown + ' K/W')
+        })
+        expect(Object.is(wrapper.props('transistors')[0].thermal.r_th_cs, value)).toBe(true)
+        wrapper.vm.filters.r_th_cs.enabled = true
+        wrapper.vm.filters.r_th_cs.min = -1
+        wrapper.vm.filters.r_th_cs.max = 1
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.filteredTransistors).toHaveLength(Number.isFinite(value) && typeof value === 'number' ? 1 : 0)
+      })
+
     it('should accept transistors prop', () => {
       expect(wrapper.props('transistors')).toEqual(mockTransistors)
     })
@@ -323,15 +345,17 @@ describe('SearchDatabase.vue', () => {
 
   describe('Export Results', () => {
     it('should have export button', () => {
-      const exportButton = wrapper.find('button:contains("Export Results")')
+      const exportButton = wrapper.findAll('button').find(button => button.text().includes('Export Results'))
       expect(exportButton.exists()).toBe(true)
+      expect(exportButton.element.disabled).toBe(false)
     })
 
     it('should disable export when no results', async () => {
       await wrapper.setProps({ transistors: [] })
 
-      const exportButton = wrapper.find('button:contains("Export Results")')
+      const exportButton = wrapper.findAll('button').find(button => button.text().includes('Export Results'))
       expect(exportButton.attributes('disabled')).toBeDefined()
+      expect(wrapper.findAll('.results-table tbody tr')).toHaveLength(0)
     })
   })
 })

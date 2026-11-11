@@ -1,0 +1,68 @@
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 11%]
+........................................................................ [ 15%]
+........................................................................ [ 19%]
+........................................................................ [ 23%]
+........................................................................ [ 26%]
+........................................................................ [ 30%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 50%]
+........................................................................ [ 53%]
+........................................................................ [ 57%]
+.......s................................................................ [ 61%]
+........................................................................ [ 65%]
+........................................................................ [ 69%]
+........................................................................ [ 73%]
+........................................................................ [ 77%]
+........................................................................ [ 80%]
+........................................................................ [ 84%]
+........................................................................ [ 88%]
+........................................................................ [ 92%]
+........................................................................ [ 96%]
+......................................................................   [100%]
+=============================== warnings summary ===============================
+../../miniconda3/envs/ntbees2/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /home/tinix/miniconda3/envs/ntbees2/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_grid_analysis.py::test_derived_overflow_is_pair_failure
+  /home/tinix/claude_wsl/transistordatabase/transistordatabase/waveform_losses.py:146: RuntimeWarning: overflow encountered in scalar multiply
+    return model["offset"] + model["resistance"] * magnitude
+
+tests/test_grid_analysis.py::test_derived_overflow_is_pair_failure
+  /home/tinix/claude_wsl/transistordatabase/transistordatabase/waveform_losses.py:215: RuntimeWarning: invalid value encountered in scalar subtract
+    [magnitude_a, magnitude_b - magnitude_a], [va, vb - va]),
+
+tests/test_grid_analysis.py::test_derived_overflow_is_pair_failure
+  /home/tinix/claude_wsl/transistordatabase/transistordatabase/waveform_losses.py:230: RuntimeWarning: invalid value encountered in multiply
+    coefficients * u ** np.arange(1, 5) / np.arange(1, 5)))})
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1869 passed, 1 skipped, 4 warnings in 112.31s (0:01:52)
+	Command being timed: "/home/tinix/miniconda3/envs/ntbees2/bin/python -m pytest tests/test_biela_contract.py tests/test_catalog_fom_extension.py tests/test_catalog_fom.py tests/test_catalog_sources.py tests/test_circuit_summary_independent_review.py tests/test_circuit_summary.py tests/test_converter_independent_review.py tests/test_converter_losses.py tests/test_core_models.py tests/test_core_native_serialization.py tests/test_core_services.py tests/test_current_allocation.py tests/test_data_adapter_independent_review.py tests/test_device_model_execution_review.py tests/test_device_model_fitting.py tests/test_device_model_unknown_temperature_review.py tests/test_device_parameters.py tests/test_digitization_independent_review.py tests/test_digitization.py tests/test_dpt_contract.py tests/test_energy_maps.py tests/test_extraction_adapters.py tests/test_extraction_independent_review.py tests/test_fom_sources_independent_review.py tests/test_gate_allocation_independent_review.py tests/test_gate_charge_intervals.py tests/test_gate_resistance_api.py tests/test_gate_resistance.py tests/test_grid_analysis.py tests/test_grid_energy_independent_review.py tests/test_grid_merit_boundaries.py tests/test_grid_merit.py tests/test_grouped_harmonic_independent.py tests/test_harmonics_grouped_series.py tests/test_legacy_comparison_closure.py tests/test_legacy_mat.py tests/test_ltspice_dpt.py tests/test_mat_migration_independent.py tests/test_measurement_import_independent.py tests/test_measurement_import.py tests/test_native_json_api_import.py tests/test_phase6_independent_review.py tests/test_plecs_core_export.py tests/test_plecs_document.py tests/test_public_calculation_exports.py tests/test_public_export_independent_review.py tests/test_reverse_current_sharing.py tests/test_reverse_sharing_independent_review.py tests/test_rg_energy_access_independent_review.py tests/test_rg_energy_access.py tests/test_rg_energy_independent.py tests/test_rg_formula.py tests/test_semiconductor_assemblies.py tests/test_semiconductor_stress.py tests/test_stress_independent_review.py tests/test_thermal_workbench.py tests/test_waveform_losses.py tests/test_waveform_workbench.py tests/test_web_export_independent_review.py tests/test_web_native_exports.py tests/test_workbook_fom_independent.py tests/test_workbook_fom.py tests/test_xyz_energy_import_oracles.py tests/test_xyz_energy_import.py -q --color=no --maxfail=1 --noconftest -p no:cacheprovider --basetemp=/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776-tests --junitxml=/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776.xml"
+	User time (seconds): 122.08
+	System time (seconds): 6.66
+	Percent of CPU this job got: 109%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:57.99
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 566244
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 11
+	Minor (reclaiming a frame) page faults: 759781
+	Voluntary context switches: 25114
+	Involuntary context switches: 1100
+	Swaps: 0
+	File system inputs: 526528
+	File system outputs: 7712
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

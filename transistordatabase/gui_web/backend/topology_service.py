@@ -35,6 +35,10 @@ class TopologyCalculatorService:
             diode_transistor = diode_transistor or transistor
         values = dict(parameters)
         sweep = values.pop("sweep", None)
+        if sweep is not None and values.get("mode") == "switching-loss-balanced":
+            raise ValueError(
+                "switching-loss-balanced supports scalar Boost CCM only; sweeps are unsupported"
+            )
         result = calculate_topology_operating_point(
             topology, values, switch_transistor, diode_transistor
         )
@@ -53,6 +57,10 @@ class TopologyCalculatorService:
         diode_transistor: Transistor | None = None,
     ) -> Dict[str, Any]:
         """Compare supported topologies and retain per-topology domain errors."""
+        if parameters.get("mode") == "switching-loss-balanced":
+            raise ValueError(
+                "switching-loss-balanced supports scalar Boost CCM only; comparison is unsupported"
+            )
         results: Dict[str, Any] = {}
         for topology in TopologyCalculatorService.SUPPORTED_TOPOLOGIES:
             try:

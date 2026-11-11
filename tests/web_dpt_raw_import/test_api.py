@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+from importlib.metadata import version
 import json
 import re
 import struct
@@ -11,10 +12,10 @@ from typing import Any, Sequence
 
 import numpy as np
 import pytest
-import PyLTSpice
+import spicelib
 import starlette.requests
 from fastapi.testclient import TestClient
-from PyLTSpice import RawWrite, Trace
+from spicelib import RawWrite, Trace
 
 from transistordatabase.core.repository import JsonTransistorLoader
 from transistordatabase.gui_web.backend import dpt_raw_import, main
@@ -926,6 +927,8 @@ def test_import_appends_exact_window_samples_and_preserves_legacy_fields(
         "turn_on": [1e-6, 3e-6], "turn_off": [4e-6, 6e-6]
     }
     assert "source_sha256" in imported["import_provenance"]
+    assert imported["import_provenance"]["parser"] == "spicelib.RawRead"
+    assert imported["import_provenance"]["parser_version"] == version("spicelib")
 
 
 def test_import_rejects_cumulative_raw_payload_over_limit_without_mutation(
@@ -1154,7 +1157,7 @@ def test_ascii_huge_count_rejects_before_rawread_allocation(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Reject hostile ASCII declarations before PyLTSpice allocates vectors."""
+    """Reject hostile ASCII declarations before spicelib allocates vectors."""
     valid = _ascii_raw_bytes(tmp_path)
     encoding = "utf_16_le" if valid[1] == 0 else "utf-8"
     marker = "Values:".encode(encoding)
@@ -1169,7 +1172,7 @@ def test_ascii_huge_count_rejects_before_rawread_allocation(
     def forbidden_rawread(*_args: Any, **_kwargs: Any) -> None:
         pytest.fail("ASCII declarations must be bounded before RawRead allocation")
 
-    monkeypatch.setattr(PyLTSpice, "RawRead", forbidden_rawread)
+    monkeypatch.setattr(spicelib, "RawRead", forbidden_rawread)
     with pytest.raises(dpt_raw_import.DptRawImportError, match="contains 1000001 samples"):
         dpt_raw_import.parse_ltspice_raw(
             malformed, "measurement.raw", ("time", "V(ds)", "I(M1)")
@@ -1194,7 +1197,7 @@ def test_complex_transient_is_rejected_before_numeric_conversion(
         dpt_raw_import.parse_ltspice_raw(malformed, "measurement.raw")
 
 
-def test_second_order_time_markers_decode_like_pyltspice(
+def test_second_order_time_markers_decode_like_spicelib(
     tmp_path: Path,
 ) -> None:
     """Decode LTspice negative time markers without changing signal samples."""
@@ -1293,7 +1296,7 @@ def test_parser_checks_sample_limit_before_loading_selected_waveforms(
     def forbidden_rawread(*_args: Any, **_kwargs: Any) -> None:
         pytest.fail("RawRead must not see data before point-budget preflight")
 
-    monkeypatch.setattr(PyLTSpice, "RawRead", forbidden_rawread)
+    monkeypatch.setattr(spicelib, "RawRead", forbidden_rawread)
     monkeypatch.setattr(dpt_raw_import, "MAX_RAW_POINTS", 2)
 
     with pytest.raises(dpt_raw_import.DptRawImportError, match="contains 3 samples"):

@@ -323,6 +323,17 @@ describe('DPTManager raw waveform viewing', () => {
     expect(section.text()).toContain('Added E_on curve #1 with 2 measured points.')
   })
 
+  it('keeps recorded curves visible without claiming qualified DPT evidence', async () => {
+    getDPTData.mockResolvedValueOnce({ ...dptResponse,
+      has_e_on: false, has_e_off: false, has_e_rr: false,
+      has_recorded_e_on: true, has_recorded_e_off: true, has_recorded_e_rr: false,
+      legacy_source_status: 'unknown-without-structured-evidence' })
+    await wrapper.vm.loadDPTData()
+    await flushPromises()
+    expect(wrapper.findAll('.status-card')[0].text()).toContain('Available (source unknown)')
+    expect(wrapper.get('[data-testid="dpt-curve-source-status"]').text()).toContain('source is unknown')
+  })
+
   it('invalidates a reviewed energy preview when a source selection changes', async () => {
     const section = wrapper.get('[data-testid="dpt-energy-derivation"]')
     for (const index of [0, 1]) {
@@ -1218,11 +1229,15 @@ describe('DPTManager raw waveform viewing', () => {
 
   it('keeps the existing netlist and validation tabs available', async () => {
     await wrapper.get('button.tab-btn:nth-of-type(2)').trigger('click')
+    expect(wrapper.get('.btn-generate').element.disabled).toBe(true)
+    expect(generateDPTNetlist).not.toHaveBeenCalled()
+    await wrapper.get('.model-choice input[type="checkbox"]').setValue(true)
+    expect(wrapper.get('.btn-generate').element.disabled).toBe(false)
     await wrapper.get('.btn-generate').trigger('click')
     await flushPromises()
     expect(generateDPTNetlist).toHaveBeenCalledWith(
       'Waveform Device',
-      expect.objectContaining({ v_dc: 400, i_target: 20 })
+      expect.objectContaining({ v_dc: 400, i_target: 20, model_kind: 'generic_nmos' })
     )
     expect(wrapper.text()).toContain('test netlist')
 

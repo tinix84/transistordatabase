@@ -1,0 +1,74 @@
+{
+  "full": {
+    "files": 76,
+    "passed": 2219,
+    "skipped": 1,
+    "failed": 0,
+    "errors": 0,
+    "pytest_seconds": 141.19,
+    "wall_seconds": 144.58,
+    "peak_rss_kib": 566804,
+    "skip": "TDB_GENERIC_DPT_RAW was unavailable for the November 10 capture."
+  },
+  "focused": {
+    "files": 6,
+    "passed": 145,
+    "failed": 0,
+    "skipped": 0,
+    "pytest_seconds": 15.45
+  },
+  "source_manifest": {
+    "paths": 237,
+    "changed_paths": 0
+  },
+  "artifacts": [
+    {
+      "path": "python-selection.json",
+      "source": "/tmp/tdb-consolidation-final-24c61db6-e70c-4b3e-adab-0972086e3c05/selection.json",
+      "bytes": 3126,
+      "sha256": "de192b994a79cfb350ddc96e5bb4eab829400d4e436c483997d96ff8c02ddcae"
+    },
+    {
+      "path": "python-source-start.json",
+      "source": "/tmp/tdb-consolidation-final-24c61db6-e70c-4b3e-adab-0972086e3c05/source-start.json",
+      "bytes": 26491,
+      "sha256": "6e3e41a2a3d4e11f94f12e29a29a8aab2c1ef5b60d6b80c5504928d800566439"
+    },
+    {
+      "path": "python-source-end.json",
+      "source": "/tmp/tdb-consolidation-final-24c61db6-e70c-4b3e-adab-0972086e3c05/source-end.json",
+      "bytes": 26491,
+      "sha256": "6e3e41a2a3d4e11f94f12e29a29a8aab2c1ef5b60d6b80c5504928d800566439"
+    },
+    {
+      "path": "python-junit.xml",
+      "source": "/tmp/tdb-consolidation-final-24c61db6-e70c-4b3e-adab-0972086e3c05/junit.xml",
+      "bytes": 309734,
+      "sha256": "53aad2ec0b9073793c54130ebcebdc4fef8e02b69beff53057bca47b6b10b9d4"
+    },
+    {
+      "path": "python-pytest.log",
+      "source": "/tmp/tdb-consolidation-final-24c61db6-e70c-4b3e-adab-0972086e3c05/pytest.log",
+      "bytes": 3987,
+      "sha256": "588f6483217931227b96b676054bb1c053c0ff76cec0a37d34378f49f3f6de32"
+    },
+    {
+      "path": "python-resource.log",
+      "source": "/tmp/tdb-consolidation-final-24c61db6-e70c-4b3e-adab-0972086e3c05/resource.log",
+      "bytes": 3795,
+      "sha256": "4ac2aee05bd2f4ae09c1784fbca325e108f430dabbb4fd0a90a66ade4fecf19c"
+    },
+    {
+      "path": "python-focused-selection.json",
+      "source": "/tmp/tdb-consolidation-native-62b1cc1c-6a49-41b5-9cc3-814fcb3d1a48/selection.json",
+      "bytes": 248,
+      "sha256": "328c87029bfa3104fbc0831028ada47cae608bc0d370f36dea7c15ccde2e8dc9"
+    },
+    {
+      "path": "python-focused-pytest.log",
+      "source": "/tmp/tdb-consolidation-native-62b1cc1c-6a49-41b5-9cc3-814fcb3d1a48/pytest.log",
+      "bytes": 793,
+      "sha256": "8ab258b9f62d863a81a764a8929426e0ef60e0f9afa8f72d19b3528c9ec22a51"
+    }
+  ]
+}

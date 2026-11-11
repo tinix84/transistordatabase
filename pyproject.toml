@@ -1,11 +1,11 @@
 [project]
 name = "transistordatabase"
-version = "0.6.0"
+version = "1.0.1"
 authors = [
     { name = "UPB-LEA" },
 ]
 description = "Transistor Database"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -21,6 +21,9 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
 ]
 dynamic = ["dependencies"]
+
+[project.optional-dependencies]
+legacy-qt = ["PyQt5", "PyQtWebEngine"]
 
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }

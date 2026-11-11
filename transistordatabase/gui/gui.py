@@ -55,7 +55,7 @@ class MainWindow(
 
         sys.stdout = EmittingStream(text_written=self.standard_output_written)
 
-        self.tray_icon = QSystemTrayIcon(QIcon(resource_path("window_icon.png")), parent=app)
+        self.tray_icon = QSystemTrayIcon(QIcon(resource_path("window_icon.png")), parent=QApplication.instance())
         self.tray_icon.setToolTip("Transistordatabase")
         self.tray_icon.show()
         self.tray_icon.activated.connect(self.show)
@@ -85,7 +85,7 @@ class MainWindow(
         self.action_clear_comparison_tools.triggered.connect(self.clear_comparison_tools)
         self.action_clear_topology_calculator.triggered.connect(self.clear_topology_calculator)
         self.action_clear_create_transistor.triggered.connect(self.clear_create_transistor)
-        self.action_exit.triggered.connect(app.exit)
+        self.action_exit.triggered.connect(QApplication.instance().exit)
 
         # Actions for 'Transistor' #
         self.action_delete_transistor.triggered.connect(self.delete_marked_transistor_search_database_from_local_tdb)

@@ -10,6 +10,8 @@ import numpy as np
 from transistordatabase.core.models import (
     ChannelCharacteristics,
     ElectricalRatings,
+    FosterThermalModel,
+    SwitchingLossData,
     ThermalProperties,
     Transistor,
     TransistorMetadata,
@@ -51,12 +53,22 @@ def gate_conditioned_client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     device = Transistor(
         TransistorMetadata("gated-device", "MOSFET", "test", "vendor", "package"),
         ElectricalRatings(1200, 100, 50, 175),
-        ThermalProperties(0.001, 0.001),
+        ThermalProperties(0.001, 0.001, r_th_switch_cs=0.2, r_th_diode_cs=0.2),
     )
     switch_graph = np.array([[0.01, 10.0], [0.0, 100.0]])
     diode_graph = np.array([[0.4, 5.4], [0.0, 100.0]])
     device.switch.channel_data.append(ChannelCharacteristics(25, switch_graph, 15))
     device.diode.channel_data.append(ChannelCharacteristics(25, diode_graph, 0))
+    device.switch.e_on_data.append(SwitchingLossData(
+        "graph_i_e", 25, 200, 15, r_g=10, v_g_off=-5,
+        graph_i_e=np.array([[0.1, 100.0], [0.0001, 0.1]]),
+    ))
+    device.switch.e_off_data.append(SwitchingLossData(
+        "graph_i_e", 25, 200, 15, r_g=10, v_g_off=-5,
+        graph_i_e=np.array([[0.1, 100.0], [0.0002, 0.2]]),
+    ))
+    device.switch.thermal_foster = FosterThermalModel(r_th_total=0.3)
+    device.diode.thermal_foster = FosterThermalModel(r_th_total=0.4)
     monkeypatch.setattr(backend, "_repo", InMemoryRepo({"gated-device": device}))
     return TestClient(backend.app)
 
@@ -193,6 +205,62 @@ def test_loss_balanced_boost_api_returns_power_closed_channel_result(
     assert result["performance"]["p_in_w"] == pytest.approx(
         1000 + result["losses"]["total_w"], rel=1e-7
     )
+
+
+def test_switching_loss_balanced_boost_api_closes_power_and_exports_scope(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Expose switching-inclusive feedback, exact curves and thermal result."""
+    request = payload(
+        topology="boost", mode="switching-loss-balanced", v_in=100,
+        v_out=200, p_out=1000, f_sw=20_000, l_value=0.001, c_out=0.001,
+        t_j=25, t_case=60, v_g=15, diode_v_g=0, v_g_off=-5,
+        r_g_on=10, r_g_off=10,
+        switch_transistor_id="gated-device", diode_transistor_id="gated-device",
+    )
+    response = gate_conditioned_client.post("/api/topology/calculate", json=request)
+    assert response.status_code == 200, response.text
+    result = response.json()
+    assert result["model"]["mode"] == "switching-loss-balanced"
+    assert result["losses"]["switching_on_w"] > 0
+    assert result["losses"]["switching_off_w"] > 0
+    assert result["losses"]["reverse_recovery_losses_included"] is False
+    assert result["calculated"]["power_balance_residual_w"] == pytest.approx(0, abs=1e-6)
+    assert result["performance"]["p_in_w"] == pytest.approx(
+        1000 + result["losses"]["total_w"], rel=1e-7
+    )
+    assert result["temperatures"]["switch_c"] > 60
+    assert result["model"]["curve_conditions"]["e_on"]["v_supply"] == 200
+
+
+def test_switching_loss_balanced_api_rejects_bad_gates_sweeps_and_comparison(
+    gate_conditioned_client: TestClient,
+) -> None:
+    """Keep the exact-condition scalar workflow outside unsupported endpoints."""
+    request = payload(
+        topology="boost", mode="switching-loss-balanced", v_in=100,
+        v_out=200, p_out=1000, f_sw=20_000, l_value=0.001, c_out=0.001,
+        t_j=25, v_g=15, diode_v_g=0, v_g_off=-6, r_g_on=10, r_g_off=10,
+        switch_transistor_id="gated-device", diode_transistor_id="gated-device",
+    )
+    response = gate_conditioned_client.post("/api/topology/calculate", json=request)
+    assert response.status_code == 400
+    assert "Missing required e_on graph_i_e curve" in response.json()["detail"]
+
+    request["v_g_off"] = -5
+    request["sweep"] = {
+        "x_axis": "f_sw", "x_min": 10_000, "x_max": 20_000,
+        "x_points": 2, "metric": "i_l_ripple_pp_a",
+    }
+    response = gate_conditioned_client.post("/api/topology/calculate", json=request)
+    assert response.status_code == 400
+    assert "scalar Boost CCM only; sweeps are unsupported" in response.json()["detail"]
+
+    response = gate_conditioned_client.post(
+        "/api/topology/compare", json={**request, "sweep": None}
+    )
+    assert response.status_code == 400
+    assert "scalar Boost CCM only; comparison is unsupported" in response.json()["detail"]
 
 
 def test_boost_pareto_api_keeps_candidate_errors_local(

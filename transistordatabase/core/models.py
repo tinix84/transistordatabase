@@ -74,15 +74,12 @@ class FosterThermalModel:
         :param time: Time point in seconds.
         :return: Thermal impedance Z_th(t) in K/W.
         """
-        if self.r_th_vector is None or self.tau_vector is None:
-            if self.r_th_total is not None:
-                return self.r_th_total
-            raise ValueError("No Foster model parameters available")
+        from transistordatabase.thermal import thermal_impedance
 
-        z_th = 0.0
-        for r_th, tau in zip(self.r_th_vector, self.tau_vector, strict=True):
-            z_th += r_th * (1.0 - np.exp(-time / tau))
-        return z_th
+        return thermal_impedance({
+            "r_th_vector": self.r_th_vector, "tau_vector": self.tau_vector,
+            "c_th_vector": self.c_th_vector, "r_th_total": self.r_th_total,
+        }, time)
 
 
 @dataclass
@@ -136,6 +133,41 @@ class TemperatureDependResistance:
 
 
 @dataclass
+class MeasurementEvidence:
+    """Source identity and declared conditions for one imported event or trace."""
+
+    source_kind: str = "unknown"
+    filename: Optional[str] = None
+    sha256: Optional[str] = None
+    parser: Optional[str] = None
+    parser_version: Optional[str] = None
+    original_base64: Optional[str] = None
+    companion_log_base64: Optional[str] = None
+    companion_log_filename: Optional[str] = None
+    companion_log_sha256: Optional[str] = None
+    step_index: Optional[int] = None
+    step_values: Dict[str, Any] = field(default_factory=dict)
+    trace_mapping: Dict[str, Any] = field(default_factory=dict)
+    parser_normalizations: List[str] = field(default_factory=list)
+    event: Optional[str] = None
+    method: str = "unknown"
+    window_s: Optional[tuple[float, float]] = None
+    convention: Optional[str] = None
+    thresholds: Dict[str, Any] = field(default_factory=dict)
+    local_current_a: Optional[float] = None
+    bus_voltage_v: Optional[float] = None
+    t_j: Optional[float] = None
+    v_g_on: Optional[float] = None
+    v_g_off: Optional[float] = None
+    r_g_on: Optional[float] = None
+    r_g_off: Optional[float] = None
+    commutation_device: Optional[str] = None
+    manual_override: Optional[str] = None
+    disclosure: Optional[str] = None
+    expression: Optional[str] = None
+
+
+@dataclass
 class RawMeasurementData:
     """RAW measurement data, e.g. from double pulse test."""
 
@@ -156,6 +188,11 @@ class RawMeasurementData:
     dpt_on_id: Optional[list[npt.NDArray[np.float64]]] = None
     dpt_off_vds: Optional[list[npt.NDArray[np.float64]]] = None
     dpt_off_id: Optional[list[npt.NDArray[np.float64]]] = None
+    time_s: Optional[npt.NDArray[np.float64]] = None
+    voltage_v: Optional[npt.NDArray[np.float64]] = None
+    current_a: Optional[npt.NDArray[np.float64]] = None
+    gate_v: Optional[npt.NDArray[np.float64]] = None
+    evidence: Optional[MeasurementEvidence] = None
 
 
 @dataclass
@@ -228,6 +265,8 @@ class SwitchingLossData:
     load_inductance: Optional[float] = None
     commutation_inductance: Optional[float] = None
 
+    evidence: Optional[MeasurementEvidence] = None
+
 
 class ITransistorComponent(ABC):
     """Interface for transistor components (Switch/Diode)."""
@@ -240,7 +279,7 @@ class ITransistorComponent(ABC):
 
     @abstractmethod
     def linearize_at_operating_point(
-        self, t_j: float, v_g: float, i_channel: float
+        self, t_j: float, v_g: Optional[float], i_channel: float
     ) -> LinearizedModel:
         """Linearize component at a specific operating point."""
 
@@ -263,59 +302,23 @@ class Switch(ITransistorComponent):
     def get_channel_data(
         self, t_j: float, v_g: Optional[float] = None
     ) -> List[ChannelCharacteristics]:
-        """Get channel data for specific temperature and gate voltage."""
-        return [
-            ch for ch in self.channel_data
-            if ch.t_j == t_j and (v_g is None or ch.v_g == v_g)
-        ]
+        """Get exact conditions. None selects an explicitly unknown gate voltage."""
+        from transistordatabase.channel_models import channel_records
+
+        return channel_records(self.channel_data, t_j, v_g)
 
     def linearize_at_operating_point(
-        self, t_j: float, v_g: float, i_channel: float
+        self, t_j: float, v_g: Optional[float], i_channel: float
     ) -> LinearizedModel:
-        """Linearize switch at operating point.
+        """Calculate the bounded local line at one exact recorded condition.
 
-        Uses V-I curve to find voltage at given current, then calculates
-        r_channel (slope) and v0_channel (intercept) of the linear model:
-        v = v0_channel + r_channel * i
-
-        :param t_j: Junction temperature in deg C.
-        :param v_g: Gate voltage in V.
-        :param i_channel: Channel current in A.
-        :return: LinearizedModel with r_channel and v0_channel.
-        :raises ValueError: If no matching channel data is found.
+        Interior knots use the right segment. Endpoints use a one-sided segment.
         """
-        channel_data = self.get_channel_data(t_j, v_g)
-        if not channel_data:
-            raise ValueError(
-                f"No channel data found for t_j={t_j}, v_g={v_g}"
-            )
+        from transistordatabase.channel_models import local_channel_model
 
-        ch = channel_data[0]
-        voltages = ch.graph_v_i[0]
-        currents = ch.graph_v_i[1]
-
-        # Interpolate voltage at operating current
-        v_at_i = float(np.interp(i_channel, currents, voltages))
-
-        # Calculate linearized parameters using two-point method
-        # Use a small delta around operating point
-        delta = max(i_channel * 0.01, 0.1)
-        i_low = max(i_channel - delta, float(np.min(currents)))
-        i_high = min(i_channel + delta, float(np.max(currents)))
-
-        v_low = float(np.interp(i_low, currents, voltages))
-        v_high = float(np.interp(i_high, currents, voltages))
-
-        r_channel = (v_high - v_low) / (i_high - i_low) if i_high != i_low else 0.0
-        v0_channel = v_at_i - r_channel * i_channel
-
-        return LinearizedModel(
-            t_j=t_j,
-            v_g=v_g,
-            i_channel=i_channel,
-            r_channel=r_channel,
-            v0_channel=v0_channel,
-        )
+        resistance, offset = local_channel_model(self.channel_data, t_j, v_g, i_channel)
+        return LinearizedModel(t_j=t_j, v_g=v_g, i_channel=i_channel,
+                               r_channel=resistance, v0_channel=offset)
 
 
 class Diode(ITransistorComponent):
@@ -338,47 +341,20 @@ class Diode(ITransistorComponent):
     def get_channel_data(
         self, t_j: float, v_g: Optional[float] = None
     ) -> List[ChannelCharacteristics]:
-        """Get channel data for specific temperature."""
-        return [ch for ch in self.channel_data if ch.t_j == t_j]
+        """Get exact conditions, including a known or explicitly unknown gate voltage."""
+        from transistordatabase.channel_models import channel_records
+
+        return channel_records(self.channel_data, t_j, v_g)
 
     def linearize_at_operating_point(
-        self, t_j: float, v_g: float, i_channel: float
+        self, t_j: float, v_g: Optional[float], i_channel: float
     ) -> LinearizedModel:
-        """Linearize diode at operating point.
+        """Calculate the bounded local diode line at exact recorded conditions."""
+        from transistordatabase.channel_models import local_channel_model
 
-        :param t_j: Junction temperature in deg C.
-        :param v_g: Gate voltage in V (may be unused for standard diodes).
-        :param i_channel: Channel current in A.
-        :return: LinearizedModel with r_channel and v0_channel.
-        :raises ValueError: If no matching channel data is found.
-        """
-        channel_data = self.get_channel_data(t_j)
-        if not channel_data:
-            raise ValueError(f"No channel data found for t_j={t_j}")
-
-        ch = channel_data[0]
-        voltages = ch.graph_v_i[0]
-        currents = ch.graph_v_i[1]
-
-        v_at_i = float(np.interp(i_channel, currents, voltages))
-
-        delta = max(i_channel * 0.01, 0.1)
-        i_low = max(i_channel - delta, float(np.min(currents)))
-        i_high = min(i_channel + delta, float(np.max(currents)))
-
-        v_low = float(np.interp(i_low, currents, voltages))
-        v_high = float(np.interp(i_high, currents, voltages))
-
-        r_channel = (v_high - v_low) / (i_high - i_low) if i_high != i_low else 0.0
-        v0_channel = v_at_i - r_channel * i_channel
-
-        return LinearizedModel(
-            t_j=t_j,
-            v_g=v_g,
-            i_channel=i_channel,
-            r_channel=r_channel,
-            v0_channel=v0_channel,
-        )
+        resistance, offset = local_channel_model(self.channel_data, t_j, v_g, i_channel)
+        return LinearizedModel(t_j=t_j, v_g=v_g, i_channel=i_channel,
+                               r_channel=resistance, v0_channel=offset)
 
 
 class Transistor:
@@ -408,10 +384,12 @@ class Transistor:
         return self._working_point
 
     def update_working_point(
-        self, t_j: float, v_g: float, i_channel: float,
+        self, t_j: float, v_g: Optional[float], i_channel: float,
         component: str = "both",
     ) -> None:
-        """Update working point for calculations."""
+        """Replace the working point only after every selected component succeeds."""
+        if component not in ("switch", "diode", "both"):
+            raise ValueError("component must be switch, diode, or both")
         wp_data: Dict[str, Any] = {}
 
         if component in ("switch", "both"):

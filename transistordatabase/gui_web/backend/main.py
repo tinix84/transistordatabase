@@ -31,7 +31,7 @@ from pathlib import Path, PureWindowsPath
 from typing import Any, AsyncIterator, Callable, Dict, List, Optional
 
 import numpy as np
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, BackgroundTasks
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, BackgroundTasks, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import ValidationError
@@ -60,6 +60,8 @@ from transistordatabase.core.repository import (
     JsonTransistorRepository,
     _load_data_file,
     _json_dict_to_legacy_transistor,
+    JsonTransistorLoader,
+    RepositoryPathError,
 )
 from transistordatabase.transistor import Transistor as LegacyTransistor
 from transistordatabase.gui_web.backend.schemas import (
@@ -73,7 +75,6 @@ from transistordatabase.gui_web.backend.schemas import (
     CurveValidationResult,
     PLECSExportOptions,
     MATLABExportOptions,
-    BatchExportRequest,
     TopologyCalculationRequest,
     AdvancedSearchRequest,
     UserSettings,
@@ -110,6 +111,29 @@ from transistordatabase.gui_web.backend.topology_service import TopologyCalculat
 from transistordatabase.topologies.semiconductor_pareto import (
     calculate_boost_semiconductor_pareto,
 )
+from transistordatabase.gui_web.backend.catalog_routes import router as catalog_router
+from transistordatabase.gui_web.backend.catalog_source_routes import router as catalog_source_router
+from transistordatabase.gui_web.backend.parameter_routes import (
+    ParameterRoute, router as parameter_router,
+)
+from transistordatabase.gui_web.backend.current_allocation_routes import router as current_allocation_router
+from transistordatabase.gui_web.backend.current_sharing_routes import router as current_sharing_router
+from transistordatabase.gui_web.backend.waveform_routes import router as waveform_router
+from transistordatabase.gui_web.backend.stress_routes import router as stress_router
+from transistordatabase.gui_web.backend.analysis_routes import router as analysis_router
+from transistordatabase.gui_web.backend.measurement_routes import router as measurement_router
+from transistordatabase.gui_web.backend.converter_routes import router as converter_router
+from transistordatabase.gui_web.backend.thermal_routes import router as thermal_router
+from transistordatabase.gui_web.backend.assembly_routes import router as assembly_router
+from transistordatabase.gui_web.backend.plecs_routes import router as plecs_router
+from transistordatabase.gui_web.backend.plecs_routes import plecs_repository
+from transistordatabase.gui_web.backend.digitizer_routes import router as digitizer_router
+from transistordatabase.gui_web.backend.mat_routes import router as mat_router
+from transistordatabase.gui_web.backend.export_routes import create_export_router
+from transistordatabase.gui_web.backend.rg_energy_routes import create_rg_energy_router
+from transistordatabase.gui_web.backend.model_fit_routes import router as model_fit_router
+from transistordatabase.gui_web.backend.xyz_energy_routes import router as xyz_energy_router
+from transistordatabase.gui_web.backend.comparison_contract import ComparisonRequest
 
 logger = logging.getLogger(__name__)
 _DATABASE_BACKUP_FORMAT = "transistordatabase.database-backup"
@@ -132,6 +156,23 @@ app = FastAPI(
     description="REST API for managing transistor data",
     version="1.0.0",
 )
+app.include_router(catalog_router)
+app.include_router(catalog_source_router)
+app.include_router(parameter_router)
+app.include_router(model_fit_router)
+app.include_router(xyz_energy_router)
+app.include_router(waveform_router)
+app.include_router(current_allocation_router)
+app.include_router(current_sharing_router)
+app.include_router(stress_router)
+app.include_router(analysis_router)
+app.include_router(measurement_router)
+app.include_router(converter_router)
+app.include_router(thermal_router)
+app.include_router(assembly_router)
+app.include_router(plecs_router)
+app.include_router(digitizer_router)
+app.include_router(mat_router)
 
 # Bound the legacy JSON parse required for raw DPT persistence and waveform reads.
 MAX_DPT_LEGACY_RECORD_FILE_BYTES = 64 * 1024 * 1024
@@ -276,6 +317,8 @@ class _LazyRepository:
 
 
 _repo = _LazyRepository(lambda: JsonTransistorRepository(_default_db_dir))
+_loader = JsonTransistorLoader()
+app.dependency_overrides[plecs_repository] = lambda: _repo
 
 # Default switching pairs directory
 _default_pairs_dir = Path(__file__).resolve().parent.parent.parent.parent / "switching_pairs"
@@ -416,7 +459,10 @@ def _record_mutation_endpoint(endpoint: Callable[..., Any]) -> Callable[..., Any
 
 def _get_transistor(name: str) -> Transistor:
     """Get transistor by name, raise 404 if not found."""
-    t = _repo.get_by_name(name)
+    try:
+        t = _repo.get_by_name(name)
+    except RepositoryPathError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     if t is None:
         raise HTTPException(status_code=404, detail=f"Transistor '{name}' not found")
     return t
@@ -581,16 +627,53 @@ def _strict_json_loads(content: str | bytes) -> Any:
     )
 
 
+def _record_view(record: Any) -> Any:
+    """Retain native evidence while exposing existing mutable editor fields."""
+    if _is_native_record(record):
+        from transistordatabase.gui_web.backend.native_record_view import NativeRecordView
+
+        try:
+            return NativeRecordView(_loader.load_from_dict(record))
+        except (TypeError, ValueError) as error:
+            raise HTTPException(status_code=422, detail=f"Native record cannot be projected to the browser: {error!s}") from error
+    return record
+
+
+def _validate_record_view(record: Any) -> Any:
+    """Validate the target format without converting native evidence to legacy."""
+    from transistordatabase.gui_web.backend.native_record_view import NativeRecordView
+
+    if isinstance(record, NativeRecordView):
+        return _loader.load_from_dict(record.document()).metadata
+    return _json_dict_to_legacy_transistor(copy.deepcopy(record))
+
+
+def _is_native_record(record: Any) -> bool:
+    """Recognize versioned records before the legacy compatibility branch."""
+    return isinstance(record, dict) and (
+        "schema" in record or ("version" in record and "transistor" in record)
+    )
+
+
+def _raw_record_name(record: Any) -> Any:
+    """Read the exact identity from either supported JSON representation."""
+    if _is_native_record(record):
+        return _loader.load_from_dict(record).metadata.name
+    return record.get("name") if isinstance(record, dict) else None
+
+
 def _validate_raw_legacy_record(record: Any) -> Transistor:
     """Validate one raw JSON record without changing the object to be stored."""
     if not isinstance(record, dict):
         raise ValueError("Each database record must be a JSON object.")
-    name = record.get("name")
+    name = _raw_record_name(record)
     if not isinstance(name, str):
         raise ValueError("Record identity must be a string in the 'name' field.")
     try:
         _validate_web_record_name(name)
     except HTTPException as error:
+        if _is_native_record(record):
+            raise HTTPException(status_code=422, detail=error.detail) from error
         raise ValueError(str(error.detail)) from error
 
     try:
@@ -598,8 +681,15 @@ def _validate_raw_legacy_record(record: Any) -> Transistor:
     except (TypeError, ValueError, UnicodeEncodeError) as error:
         raise ValueError(f"Record cannot be safely serialized as UTF-8 JSON: {error!s}") from error
 
+    if _is_native_record(record):
+        try:
+            JsonTransistorRepository._storage_path(_repo, name)
+        except RepositoryPathError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from error
+        return _loader.load_from_dict(record)
+
     try:
-        transistor = legacy_to_core(_json_dict_to_legacy_transistor(copy.deepcopy(record)))
+        transistor = legacy_to_core(_validate_record_view(record))
     except Exception as error:
         raise ValueError(f"Legacy transistor validation failed: {error!s}") from error
     if transistor.metadata.name != name:
@@ -628,7 +718,11 @@ def _parse_backup_document(content: bytes) -> tuple[list[dict[str, Any]], list[d
     errors: list[dict[str, Any]] = []
     seen_names: set[str] = set()
     for index, raw_record in enumerate(raw_records):
-        name = raw_record.get("name") if isinstance(raw_record, dict) else None
+        name = None
+        try:
+            name = _raw_record_name(raw_record)
+        except ValueError:
+            pass
         label = name if isinstance(name, str) else f"record {index + 1}"
         if isinstance(name, str):
             identity_key = _record_identity_key(name)
@@ -669,7 +763,7 @@ def _read_database_raw_records_unlocked() -> tuple[list[dict[str, Any]], list[di
             record = _strict_json_loads(record_path.read_bytes())
             if not isinstance(record, dict):
                 raise ValueError("Record must be a JSON object.")
-            if record.get("name") != record_path.stem:
+            if _raw_record_name(record) != record_path.stem:
                 raise ValueError("Record name does not exactly match its filename identity.")
             _validate_raw_legacy_record(record)
             records.append(record)
@@ -680,7 +774,7 @@ def _read_database_raw_records_unlocked() -> tuple[list[dict[str, Any]], list[di
 
 def _write_raw_record_create_unlocked(record: dict[str, Any]) -> None:
     """Atomically publish a raw record without replacing an existing identity."""
-    record_path = _legacy_record_path(record["name"])
+    record_path = _legacy_record_path(_raw_record_name(record))
     descriptor, temporary_name = tempfile.mkstemp(
         prefix=f".{record_path.name}.", suffix=".tmp", dir=record_path.parent
     )
@@ -709,8 +803,8 @@ def _patch_legacy_record_unlocked(name: str, transistor_data: Dict[str, Any]) ->
 
         record_path = _legacy_record_path(name)
         with record_path.open("r", encoding="utf-8") as record_file:
-            record = json.load(record_file)
-        if not isinstance(record, dict) or record.get("name") != name:
+            record = _record_view(json.load(record_file))
+        if not isinstance(record, dict) or _raw_record_name(record) != name:
             raise HTTPException(
                 status_code=409,
                 detail="The stored record name does not match the requested device name.",
@@ -747,7 +841,7 @@ def _patch_legacy_record_unlocked(name: str, transistor_data: Dict[str, Any]) ->
         # persisting. It enforces manufacturer/housing catalogs and legacy
         # record constraints while the deep copy prevents array conversion
         # from changing the raw JSON object we intend to write.
-        validated_legacy = _json_dict_to_legacy_transistor(copy.deepcopy(record))
+        validated_legacy = _validate_record_view(record)
         record["manufacturer"] = validated_legacy.manufacturer
         record["housing_type"] = validated_legacy.housing_type
         # Replace the populated record atomically so an interrupted write or a
@@ -757,7 +851,10 @@ def _patch_legacy_record_unlocked(name: str, transistor_data: Dict[str, Any]) ->
         )
         temporary_path = Path(temporary_name)
         with os.fdopen(descriptor, "w", encoding="utf-8") as record_file:
-            json.dump(record, record_file, indent=2)
+            from transistordatabase.gui_web.backend.native_record_view import NativeRecordView
+
+            stored_record = record.document() if isinstance(record, NativeRecordView) else record
+            json.dump(stored_record, record_file, indent=2)
             record_file.flush()
             os.fsync(record_file.fileno())
         os.replace(temporary_path, record_path)
@@ -935,7 +1032,7 @@ def _patch_thermal_curve_unlocked(
     foster["graph_t_rthjc"] = graph
     try:
         json.dumps(record, allow_nan=True)
-        _json_dict_to_legacy_transistor(copy.deepcopy(record))
+        _validate_record_view(record)
         _write_legacy_record_unlocked(record_path, record)
     except HTTPException:
         raise
@@ -979,12 +1076,12 @@ def _read_legacy_record_unlocked(
         )
     except FileNotFoundError as error:
         raise HTTPException(status_code=404, detail=f"Transistor '{name}' not found") from error
-    if not isinstance(record, dict) or record.get("name") != name:
+    if not isinstance(record, dict) or _raw_record_name(record) != name:
         raise HTTPException(
             status_code=409,
             detail="The stored record name does not match the requested device name.",
         )
-    return record
+    return _record_view(record)
 
 
 def _with_curve_edit_tokens(
@@ -1001,7 +1098,7 @@ def _with_curve_edit_tokens(
         )
     return [
         {**curve, "_edit_token": _curve_edit_token(raw_curve)}
-        for curve, raw_curve in zip(curves, raw_curves)
+        for curve, raw_curve in zip(curves, raw_curves, strict=True)
     ]
 
 
@@ -1045,7 +1142,7 @@ def _update_legacy_curve_unlocked(
             detail="This curve changed since it was loaded; reload the device before editing it.",
         )
 
-    updated_curve = dict(original_curve)
+    updated_curve = copy.deepcopy(original_curve)
     updated_curve.update(patch)
     curves[index] = updated_curve
     try:
@@ -1054,7 +1151,7 @@ def _update_legacy_curve_unlocked(
         # Unrelated legacy fields may contain non-finite sentinel values that
         # the legacy reader accepts. Patch values were checked separately.
         json.dumps(record, allow_nan=True)
-        _json_dict_to_legacy_transistor(copy.deepcopy(record))
+        _validate_record_view(record)
         _write_legacy_record_unlocked(record_path, record)
     except HTTPException:
         raise
@@ -1085,6 +1182,13 @@ def _encoded_json_size_up_to(
     indent: int | None = None,
 ) -> int:
     """Count compact JSON UTF-8 bytes without building a duplicate JSON string."""
+    from transistordatabase.gui_web.backend.native_record_view import NativeRecordView
+
+    if isinstance(value, NativeRecordView):
+        try:
+            value = value.document()
+        except (TypeError, ValueError) as error:
+            raise HTTPException(status_code=400, detail=f"Native record mutation is not representable: {error!s}") from error
     encoder = json.JSONEncoder(
         allow_nan=True,
         default=_legacy_json_default,
@@ -1113,7 +1217,11 @@ def _write_legacy_record_unlocked(
     *,
     newline: str | None = None,
 ) -> None:
-    """Atomically replace a validated legacy record."""
+    """Atomically replace a validated record in its original JSON format."""
+    from transistordatabase.gui_web.backend.native_record_view import NativeRecordView
+
+    if isinstance(record, NativeRecordView):
+        record = record.document()
     descriptor, temporary_name = tempfile.mkstemp(
         prefix=f".{record_path.name}.", suffix=".tmp", dir=record_path.parent
     )
@@ -1144,8 +1252,8 @@ def _append_legacy_curve_unlocked(
     try:
         record_path = _legacy_record_path(name)
         with record_path.open("r", encoding="utf-8") as record_file:
-            record = json.load(record_file)
-        if not isinstance(record, dict) or record.get("name") != name:
+            record = _record_view(json.load(record_file))
+        if not isinstance(record, dict) or _raw_record_name(record) != name:
             raise HTTPException(
                 status_code=409,
                 detail="The stored record name does not match the requested device name.",
@@ -1157,7 +1265,7 @@ def _append_legacy_curve_unlocked(
                 detail="The stored curve list changed or cannot be represented safely.",
             )
         curves.append(curve)
-        _json_dict_to_legacy_transistor(copy.deepcopy(record))
+        _validate_record_view(record)
         _write_legacy_record_unlocked(record_path, record)
         return len(curves)
     except HTTPException:
@@ -1181,8 +1289,8 @@ def _delete_legacy_curve_unlocked(
     try:
         record_path = _legacy_record_path(name)
         with record_path.open("r", encoding="utf-8") as record_file:
-            record = json.load(record_file)
-        if not isinstance(record, dict) or record.get("name") != name:
+            record = _record_view(json.load(record_file))
+        if not isinstance(record, dict) or _raw_record_name(record) != name:
             raise HTTPException(
                 status_code=409,
                 detail="The stored record name does not match the requested device name.",
@@ -1194,7 +1302,7 @@ def _delete_legacy_curve_unlocked(
                 detail="The stored curve list changed or cannot be represented safely.",
             )
         del curves[index]
-        _json_dict_to_legacy_transistor(copy.deepcopy(record))
+        _validate_record_view(record)
         _write_legacy_record_unlocked(record_path, record)
         return len(curves)
     except HTTPException:
@@ -1330,8 +1438,10 @@ def transistor_to_dict(transistor: Transistor) -> Dict[str, Any]:
 def dict_to_transistor(data: Dict[str, Any]) -> Transistor:
     """Convert dictionary to Transistor object.
 
-    Handles both nested format (from web interface) and flat format (TDB files).
+    Preserve native archives and complete flat legacy files; retain nested forms.
     """
+    if "schema" in data or ("version" in data and "transistor" in data):
+        return _loader.load_from_dict(data)
     if "metadata" in data and "electrical" in data and "thermal" in data:
         metadata = TransistorMetadata(
             name=data["metadata"]["name"],
@@ -1355,30 +1465,7 @@ def dict_to_transistor(data: Dict[str, Any]) -> Transistor:
             cooling_area=data["thermal"]["cooling_area"],
         )
     else:
-        metadata = TransistorMetadata(
-            name=data.get("name", "Unknown"),
-            type=data.get("type", "Unknown"),
-            manufacturer=data.get("manufacturer", "Unknown"),
-            housing_type=data.get("housing_type", "Unknown"),
-            author=data.get("author", ""),
-            comment=data.get("comment", ""),
-        )
-        t_j_max = data.get("t_j_max", data.get("t_c_max", 150))
-        if t_j_max is None:
-            t_j_max = 150
-        electrical = ElectricalRatings(
-            v_abs_max=data.get("v_abs_max", 0),
-            i_abs_max=data.get("i_abs_max", 0),
-            i_cont=data.get("i_cont", 0),
-            t_j_max=t_j_max,
-        )
-        thermal = ThermalProperties(
-            r_th_cs=data.get("r_th_cs", 0),
-            r_th_switch_cs=data.get("r_th_switch_cs"),
-            r_th_diode_cs=data.get("r_th_diode_cs"),
-            housing_area=data.get("housing_area", 0),
-            cooling_area=data.get("cooling_area", 0),
-        )
+        return _loader.load_from_dict(data)
 
     return Transistor(metadata=metadata, electrical=electrical, thermal=thermal)
 
@@ -1439,9 +1526,20 @@ async def create_transistor(transistor_data: Dict[str, Any]) -> Dict[str, Any]:
                     )
 
             transistor = dict_to_transistor(transistor_data)
+            if _is_native_record(transistor_data):
+                _validate_raw_legacy_record(transistor_data)
             _validate_web_record_name(transistor.metadata.name)
             record_path = _legacy_record_path(transistor.metadata.name)
-            serialized_record = _serialize_new_transistor(transistor)
+            if _is_native_record(transistor_data) or "name" in transistor_data:
+                _validate_raw_legacy_record(transistor_data)
+                serialized_record = json.dumps(transistor_data, indent=2, allow_nan=False)
+            else:
+                try:
+                    serialized_record = _serialize_new_transistor(transistor)
+                except ValueError:
+                    from transistordatabase.core.serialization import core_to_json_document
+
+                    serialized_record = json.dumps(core_to_json_document(transistor), indent=2, allow_nan=False)
             descriptor, temporary_name = tempfile.mkstemp(
                 prefix=f".{record_path.name}.",
                 suffix=".tmp",
@@ -1533,277 +1631,29 @@ async def compare_transistors(transistor_ids: List[str]) -> Dict[str, Any]:
     return _comparison.compare_transistors(transistors)
 
 
-@app.post("/api/comparison/advanced")
-async def advanced_comparison(request: Dict[str, Any]) -> Dict[str, Any]:
-    """Advanced comparison with 9 plot types and configuration.
+comparison_router = APIRouter(route_class=ParameterRoute)
 
-    Request body:
-    {
-        "transistor_ids": ["id1", "id2", "id3"],
-        "config": {
-            "t_j": 25,
-            "v_supply": [600, 600, 600],
-            "r_g_on": [10, 15, 20],
-            "r_g_off": [10, 15, 20],
-            "parallel_count": [1, 2, 1],
-            "i_channel": 50
-        }
-    }
-    """
-    transistor_ids = request.get('transistor_ids', [])
-    config = request.get('config', {})
 
-    if not 2 <= len(transistor_ids) <= 3:
-        raise HTTPException(
-            status_code=400,
-            detail="Advanced comparison requires 2-3 transistors"
-        )
+@comparison_router.post("/api/comparison/advanced")
+async def advanced_comparison(request: ComparisonRequest) -> Dict[str, Any]:
+    """Compare actual recorded slices and optional explicit held-current estimates."""
+    try:
+        transistors = [_get_transistor(tid) for tid in request.transistor_ids]
+        return _comparison.generate_advanced_comparison(
+            transistors, request.config.model_dump(exclude_unset=True))
+    except (ValueError, OverflowError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    transistors = [_get_transistor(tid) for tid in transistor_ids]
-    return _comparison.generate_advanced_comparison(transistors, config)
+
+app.include_router(comparison_router)
 
 
 # ---------------------------------------------------------------------------
 # Export endpoints
 # ---------------------------------------------------------------------------
 
-@app.post("/api/transistors/{transistor_id}/export/{format}")
-async def export_transistor(transistor_id: str, format: str) -> FileResponse:
-    """Export a transistor in the specified format.
-
-    Supported formats: json, csv, spice, plecs, matlab, gecko, ltspice.
-    """
-    transistor = _get_transistor(transistor_id)
-    supported = ("json", "csv", "spice", "plecs", "matlab", "gecko", "ltspice")
-    if format not in supported:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported format '{format}'. Supported: {', '.join(supported)}",
-        )
-
-    tmp_dir = Path(tempfile.mkdtemp(prefix="tdb_export_"))
-    try:
-        if format == "json":
-            out = tmp_dir / f"{transistor_id}.json"
-            _export.export_to_json(transistor, out)
-            return FileResponse(out, media_type="application/json", filename=out.name)
-
-        if format == "csv":
-            out = tmp_dir / f"{transistor_id}.csv"
-            _export.export_to_csv([transistor], out)
-            return FileResponse(out, media_type="text/csv", filename=out.name)
-
-        if format == "spice":
-            out = tmp_dir / f"{transistor_id}.spice"
-            _export.export_to_spice(transistor, out)
-            return FileResponse(out, media_type="text/plain", filename=out.name)
-
-        if format == "plecs":
-            _export.export_to_plecs(transistor, tmp_dir)
-            xml_files = list(tmp_dir.glob("*.xml"))
-            if not xml_files:
-                raise HTTPException(status_code=500, detail="PLECS export produced no files")
-            return FileResponse(xml_files[0], media_type="application/xml", filename=xml_files[0].name)
-
-        if format == "matlab":
-            _export.export_to_matlab(transistor, tmp_dir)
-            mat_files = list(tmp_dir.glob("*.mat"))
-            if not mat_files:
-                raise HTTPException(status_code=500, detail="MATLAB export produced no files")
-            return FileResponse(mat_files[0], media_type="application/octet-stream", filename=mat_files[0].name)
-
-        if format == "gecko":
-            _export.export_to_gecko_circuits(transistor, {"output_path": str(tmp_dir)})
-            scl_files = list(tmp_dir.glob("*.scl"))
-            if not scl_files:
-                raise HTTPException(status_code=500, detail="GeckoCIRCUITS export produced no files")
-            return FileResponse(scl_files[0], media_type="text/plain", filename=scl_files[0].name)
-
-        if format == "ltspice":
-            out = tmp_dir / f"{transistor_id}.asc"
-            _export.export_to_ltspice(transistor, out)
-            return FileResponse(out, media_type="text/plain", filename=out.name)
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Export failed: {e!s}")
-
-
-@app.get("/api/transistors/{transistor_id}/export/{format}/preview")
-async def export_preview(transistor_id: str, format: str) -> Dict[str, Any]:
-    """Preview export content (first 100 lines for text formats).
-
-    Returns preview text and metadata about the export.
-    """
-    transistor = _get_transistor(transistor_id)
-    supported = ("json", "csv", "spice", "plecs", "ltspice")
-    if format not in supported:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Preview not supported for '{format}'. Supported: {', '.join(supported)}",
-        )
-
-    tmp_dir = Path(tempfile.mkdtemp(prefix="tdb_preview_"))
-    try:
-        preview_lines = []
-        file_size = 0
-        file_name = ""
-
-        if format == "json":
-            out = tmp_dir / f"{transistor_id}.json"
-            _export.export_to_json(transistor, out)
-            content = out.read_text()
-            lines = content.split('\n')
-            preview_lines = lines[:100]
-            file_size = len(content)
-            file_name = out.name
-
-        elif format == "csv":
-            out = tmp_dir / f"{transistor_id}.csv"
-            _export.export_to_csv([transistor], out)
-            content = out.read_text()
-            lines = content.split('\n')
-            preview_lines = lines[:100]
-            file_size = len(content)
-            file_name = out.name
-
-        elif format == "spice":
-            out = tmp_dir / f"{transistor_id}.spice"
-            _export.export_to_spice(transistor, out)
-            content = out.read_text()
-            lines = content.split('\n')
-            preview_lines = lines[:100]
-            file_size = len(content)
-            file_name = out.name
-
-        elif format == "plecs":
-            _export.export_to_plecs(transistor, tmp_dir)
-            xml_files = list(tmp_dir.glob("*.xml"))
-            if not xml_files:
-                raise HTTPException(status_code=500, detail="PLECS export produced no files")
-            content = xml_files[0].read_text()
-            lines = content.split('\n')
-            preview_lines = lines[:100]
-            file_size = len(content)
-            file_name = xml_files[0].name
-
-        elif format == "ltspice":
-            out = tmp_dir / f"{transistor_id}.asc"
-            _export.export_to_ltspice(transistor, out)
-            content = out.read_text()
-            lines = content.split('\n')
-            preview_lines = lines[:100]
-            file_size = len(content)
-            file_name = out.name
-
-        return {
-            "preview": '\n'.join(preview_lines),
-            "total_lines": len(lines) if 'lines' in locals() else 0,
-            "preview_lines": len(preview_lines),
-            "file_size": file_size,
-            "file_name": file_name,
-            "truncated": len(lines) > 100 if 'lines' in locals() else False,
-        }
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Preview failed: {e!s}")
-
-
-@app.post("/api/transistors/batch_export")
-async def batch_export(request: BatchExportRequest, background_tasks: BackgroundTasks) -> StreamingResponse:
-    """Export multiple transistors in a ZIP archive.
-
-    Request body:
-    {
-        "transistor_ids": ["id1", "id2", "id3"],
-        "format": "json",
-        "options": {}
-    }
-
-    Returns a ZIP file containing all exports.
-    """
-    if not request.transistor_ids:
-        raise HTTPException(status_code=400, detail="No transistor IDs provided")
-
-    if request.format not in ("json", "csv", "spice", "plecs", "matlab", "gecko", "ltspice"):
-        raise HTTPException(status_code=400, detail=f"Unsupported format: {request.format}")
-
-    # Create ZIP in memory
-    zip_buffer = io.BytesIO()
-
-    try:
-        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-            tmp_dir = Path(tempfile.mkdtemp(prefix="tdb_batch_"))
-
-            for transistor_id in request.transistor_ids:
-                try:
-                    transistor = _get_transistor(transistor_id)
-                    export_dir = tmp_dir / transistor_id
-
-                    if request.format == "json":
-                        out = export_dir / f"{transistor_id}.json"
-                        out.parent.mkdir(parents=True, exist_ok=True)
-                        _export.export_to_json(transistor, out)
-                        zip_file.write(out, arcname=f"{transistor_id}.json")
-
-                    elif request.format == "csv":
-                        out = export_dir / f"{transistor_id}.csv"
-                        out.parent.mkdir(parents=True, exist_ok=True)
-                        _export.export_to_csv([transistor], out)
-                        zip_file.write(out, arcname=f"{transistor_id}.csv")
-
-                    elif request.format == "spice":
-                        out = export_dir / f"{transistor_id}.spice"
-                        out.parent.mkdir(parents=True, exist_ok=True)
-                        _export.export_to_spice(transistor, out)
-                        zip_file.write(out, arcname=f"{transistor_id}.spice")
-
-                    elif request.format == "plecs":
-                        export_dir.mkdir(parents=True, exist_ok=True)
-                        _export.export_to_plecs(transistor, export_dir)
-                        for xml_file in export_dir.glob("*.xml"):
-                            zip_file.write(xml_file, arcname=f"{transistor_id}/{xml_file.name}")
-
-                    elif request.format == "matlab":
-                        export_dir.mkdir(parents=True, exist_ok=True)
-                        _export.export_to_matlab(transistor, export_dir)
-                        for mat_file in export_dir.glob("*.mat"):
-                            zip_file.write(mat_file, arcname=f"{transistor_id}/{mat_file.name}")
-
-                    elif request.format == "gecko":
-                        export_dir.mkdir(parents=True, exist_ok=True)
-                        _export.export_to_gecko_circuits(transistor, {"output_path": str(export_dir)})
-                        for scl_file in export_dir.glob("*.scl"):
-                            zip_file.write(scl_file, arcname=f"{transistor_id}/{scl_file.name}")
-
-                    elif request.format == "ltspice":
-                        out = export_dir / f"{transistor_id}.asc"
-                        out.parent.mkdir(parents=True, exist_ok=True)
-                        _export.export_to_ltspice(transistor, out)
-                        zip_file.write(out, arcname=f"{transistor_id}.asc")
-
-                except Exception as e:
-                    # Add error file to ZIP
-                    error_content = f"Export failed for {transistor_id}: {e!s}"
-                    zip_file.writestr(f"{transistor_id}_ERROR.txt", error_content)
-
-        # Seek to beginning of buffer
-        zip_buffer.seek(0)
-
-        # Return ZIP file
-        return StreamingResponse(
-            io.BytesIO(zip_buffer.read()),
-            media_type="application/zip",
-            headers={
-                "Content-Disposition": f"attachment; filename=transistor_exports_{request.format}.zip"
-            }
-        )
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Batch export failed: {e!s}")
+app.include_router(create_export_router(lambda name: _get_transistor(name)))
+app.include_router(create_rg_energy_router(lambda name: _get_transistor(name)))
 
 
 # ---------------------------------------------------------------------------
@@ -1850,17 +1700,17 @@ async def validate_database_backup(file: UploadFile = File(...)) -> Dict[str, An
         )
 
     async with _record_mutation():
-        record_paths = [_legacy_record_path(record["name"]) for record in records]
+        record_paths = [_legacy_record_path(_raw_record_name(record)) for record in records]
         existing_name_keys = _existing_record_name_keys_unlocked()
         conflicts = []
-        for record, record_path in zip(records, record_paths):
-            if _record_identity_key(record["name"]) in existing_name_keys or record_path.exists():
-                conflicts.append(record["name"])
+        for record, record_path in zip(records, record_paths, strict=True):
+            if _record_identity_key(_raw_record_name(record)) in existing_name_keys or record_path.exists():
+                conflicts.append(_raw_record_name(record))
     conflict_keys = {_record_identity_key(name) for name in conflicts}
     restore_names = [
-        record["name"]
+        _raw_record_name(record)
         for record in records
-        if _record_identity_key(record["name"]) not in conflict_keys
+        if _record_identity_key(_raw_record_name(record)) not in conflict_keys
     ]
     return {
         "valid": True,
@@ -1889,10 +1739,10 @@ async def restore_database_backup(file: UploadFile = File(...)) -> Dict[str, Any
     conflicts: list[str] = []
     errors: list[dict[str, str]] = []
     async with _record_mutation():
-        record_paths = [_legacy_record_path(record["name"]) for record in records]
+        record_paths = [_legacy_record_path(_raw_record_name(record)) for record in records]
         existing_name_keys = _existing_record_name_keys_unlocked()
-        for record, record_path in zip(records, record_paths):
-            name = record["name"]
+        for record, record_path in zip(records, record_paths, strict=True):
+            name = _raw_record_name(record)
             name_key = _record_identity_key(name)
             if name_key in existing_name_keys or record_path.exists():
                 conflicts.append(name)
@@ -2018,13 +1868,21 @@ async def get_all_curves(transistor_id: str) -> Dict[str, Any]:
             section = normalized_record.get(component)
             if isinstance(section, dict) and section.get("thermal_foster") is None:
                 section["thermal_foster"] = _empty_thermal_foster()
-        transistor = legacy_to_core(_json_dict_to_legacy_transistor(normalized_record))
+        from transistordatabase.gui_web.backend.native_record_view import NativeRecordView
+
+        transistor = (raw_record.source if isinstance(raw_record, NativeRecordView)
+                      else legacy_to_core(_json_dict_to_legacy_transistor(normalized_record)))
 
     def array_to_list(arr):
         """Convert numpy array to nested list for JSON."""
         if arr is None:
             return None
-        return arr.tolist() if hasattr(arr, 'tolist') else arr
+        from transistordatabase.gui_web.backend.native_record_view import browser_projection
+
+        try:
+            return browser_projection(arr)
+        except (TypeError, ValueError) as error:
+            raise HTTPException(status_code=422, detail=f"Curve values cannot be projected to the browser: {error!s}") from error
 
     result = {
         "switch": {
@@ -2857,105 +2715,97 @@ async def list_favorites(user_id: str = "default") -> List[str]:
 
 @app.post("/api/import/plecs", response_model=PLECSImportResponse)
 async def import_plecs(file: UploadFile) -> PLECSImportResponse:
-    """Import transistors from PLECS XML semiconductor library file.
-
-    :param file: Uploaded PLECS XML file
-    :return: Import results with transistor IDs
-    """
-    from transistordatabase.plecs_importer import import_plecs_xml
-    errors = []
-    warnings = []
-    transistor_ids = []
+    """Inspect source safely; persistence requires explicit metadata finalization."""
+    from transistordatabase.plecs_document import parse_plecs_document, MAX_XML_BYTES
 
     try:
-        content = await file.read()
-        # Save uploaded file to temp location
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.xml') as tmp:
-            tmp.write(content)
-            tmp.flush()
-
-            # Import transistors
-            transistors = import_plecs_xml(tmp.name)
-
-            # Save to repository
-            async with _record_mutation():
-                for transistor in transistors:
-                    try:
-                        _repo.save(transistor)
-                        transistor_ids.append(transistor.metadata.name)
-                    except Exception as e:
-                        errors.append(f"Failed to save {transistor.metadata.name}: {str(e)}")
-
-            return PLECSImportResponse(
-                success=len(transistor_ids) > 0,
-                transistors_imported=len(transistor_ids),
-                transistor_ids=transistor_ids,
-                errors=errors,
-                warnings=warnings
-            )
-
-    except Exception as e:
+        content = await file.read(MAX_XML_BYTES + 1)
+        document = parse_plecs_document(content, file.filename)
         return PLECSImportResponse(
-            success=False,
-            transistors_imported=0,
-            transistor_ids=[],
-            errors=[str(e)]
-        )
+            success=False, transistors_imported=0, transistor_ids=[],
+            errors=["No device was saved: PLECS tables do not establish absolute ratings. "
+                    "Use /api/plecs/preview and /api/plecs/finalize with explicit metadata."],
+            warnings=[f"{d.path}: {d.message}" for d in document.diagnostics])
+    except (ValueError, TypeError, OverflowError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+biela_router = APIRouter(route_class=ParameterRoute)
 
 
-@app.post("/api/analytical/biela")
+@biela_router.post("/api/analytical/biela")
 async def calculate_biela(request: BielaModelRequest) -> Dict[str, Any]:
-    """Calculate switching losses using Biela analytical model.
-
-    :param request: Biela model parameters and operating conditions
-    :return: Calculated energies and optional curve data
-    """
-    from transistordatabase.analytical_models import BielaModel, BielaModelParams
-
-    # Create model
-    params = BielaModelParams(
-        c_oss=request.c_oss,
-        q_g=request.q_g,
-        v_plateau=request.v_plateau,
-        r_g_on=request.r_g_on,
-        r_g_off=request.r_g_off,
-        v_driver_on=request.v_driver_on,
-        v_driver_off=request.v_driver_off
+    """Run the actual half-bridge estimate with per-point sweep diagnostics."""
+    from dataclasses import replace
+    from transistordatabase.gui_web.backend.parameter_routes import validate_biela_extraction_evidence
+    from transistordatabase.biela import (
+        BielaConvergenceError, ChristenBielaModel, HalfBridgeParams,
+        ReverseRecoveryParams, TransconductanceParams,
     )
-    model = BielaModel(params)
 
-    # Calculate at single operating point
-    e_on = model.calc_e_on(request.v_dc, request.i_load, request.t_j)
-    e_off = model.calc_e_off(request.v_dc, request.i_load, request.t_j)
-
-    result = {
-        'operating_point': {
-            'v_dc': request.v_dc,
-            'i_load': request.i_load,
-            't_j': request.t_j,
-        },
-        'results': {
-            'e_on': e_on,
-            'e_off': e_off,
-            'e_total': e_on + e_off,
+    try:
+        if not request.source.strip():
+            raise ValueError('Provide parameter source/provenance')
+        extraction_evidence = validate_biela_extraction_evidence(
+            request.extraction_evidence, request.model_dump())
+        if request.parameter_t_j != request.t_j:
+            raise ValueError('Parameter temperature must equal requested Tj; no temperature scaling is inferred')
+        if request.q_oss_v_ref != request.v_dc:
+            raise ValueError('Single-device Qoss reference voltage must equal Vdc; nonlinear charge is not scaled')
+        if request.gm_i_min >= request.gm_i_max:
+            raise ValueError('Require gm_i_min < gm_i_max for declared transfer-current coverage')
+        if (request.i_min is None) != (request.i_max is None):
+            raise ValueError('Provide both sweep current bounds or neither')
+        if request.i_min is not None and request.i_min >= request.i_max:
+            raise ValueError('Require sweep minimum < maximum')
+        recovery_values = [request.tau_rr, request.tau_c, request.t_m, request.q_rr_star]
+        if request.recovery_mode == 'charge_control' and any(v is None for v in recovery_values):
+            raise ValueError('Charge-control recovery requires tau_rr, tau_c, Tm and corrected Qrr')
+        if request.recovery_mode == 'omit' and any(v is not None for v in recovery_values):
+            raise ValueError('Recovery constants supplied with omitted recovery; select charge_control explicitly')
+        rr = ReverseRecoveryParams(*recovery_values) if request.recovery_mode == 'charge_control' else None
+        gm = TransconductanceParams(request.k_1, request.k_2, request.x, request.v_th,
+                                   request.gm_i_min, request.gm_i_max)
+        model = ChristenBielaModel(request.c_gs, request.c_ds, request.c_gd, request.q_oss, gm, rr,
+                                   v_ref=request.q_oss_v_ref, t_j=request.parameter_t_j, source=request.source)
+        params = HalfBridgeParams(request.v_dc, request.i_load, request.v_driver_on,
+                                  request.v_driver_off, request.r_g, request.l_s, request.l_d, request.t_j)
+        result = model.calc_switching_energy(params).to_dict()
+        output = {
+            'mode': 'estimate', 'model': 'Christen-Biela manuscript with six published errata',
+            'parameter_inputs_si': request.model_dump(),
+            'operating_point': {'v_dc': request.v_dc, 'i_load': request.i_load, 't_j': request.t_j},
+            'results': result,
+            'extraction_evidence': extraction_evidence,
+            'assumptions': [
+                'Constant charge-equivalent capacitances and single-device Qoss at the stated Vdc/Tj.',
+                'Qoss must match (Cgd+Cds)*Vdc within 1% relative source rounding, reported in diagnostics.',
+                'Secant gm = I/(Vgs-Vth); manual coefficients and declared current coverage come from the supplied source.',
+                'Hard-switching phase approximation; ZVS-region points are unsupported and failed iterations are reported separately.',
+                'No measured waveform, parasitic ringing, temperature scaling or device-accuracy claim.',
+                'Reverse recovery is omitted by selection.' if rr is None else 'Recovery uses the charge-control estimate and infinite exponential tail.',
+                'A failed estimate point does not establish that the actual circuit or device is impossible.',
+            ],
         }
-    }
+        if request.i_min is not None:
+            points = []
+            for current in np.linspace(request.i_min, request.i_max, request.i_points):
+                point = {'current_a': float(current)}
+                try:
+                    point.update(status='supported', results=model.calc_switching_energy(
+                        replace(params, i_0=float(current))).to_dict())
+                except BielaConvergenceError as exc:
+                    point.update(status='numerical_failure', error=str(exc))
+                except (ValueError, OverflowError, FloatingPointError) as exc:
+                    point.update(status='unsupported', error=str(exc))
+                points.append(point)
+            output['sweep'] = {'points': points, 'supported_points': sum(
+                p['status'] == 'supported' for p in points), 'requested_points': len(points)}
+        return output
+    except (ValueError, OverflowError, FloatingPointError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    # If curve requested, calculate over current range
-    if request.i_min is not None and request.i_max is not None:
-        currents = np.linspace(request.i_min, request.i_max, request.i_points)
-        e_on_curve, e_off_curve, e_total_curve = model.calc_switching_loss_curve(
-            request.v_dc, currents, request.t_j
-        )
 
-        result['curve'] = {
-            'currents': currents.tolist(),
-            'e_on': e_on_curve.tolist(),
-            'e_off': e_off_curve.tolist(),
-            'e_total': e_total_curve.tolist(),
-        }
-
-    return result
+app.include_router(biela_router)
 
 
 @app.post("/api/analytical/gate_charge")
@@ -2967,89 +2817,58 @@ async def calculate_gate_charge(request: GateChargeModelRequest) -> Dict[str, An
     """
     from transistordatabase.analytical_models import GateChargeModel, GateChargeModelParams
 
-    # Create model
-    params = GateChargeModelParams(
-        q_gs=request.q_gs,
-        q_gd=request.q_gd,
-        q_g=request.q_g,
-        v_th=request.v_th,
-        v_plateau=request.v_plateau,
-        r_g=request.r_g,
-        r_g_int=request.r_g_int
-    )
-    model = GateChargeModel(params)
-
-    # Calculate turn-on times
-    turn_on = model.calc_turn_on_times(request.v_driver)
-
-    # Calculate turn-off times
-    turn_off = model.calc_turn_off_times(request.v_driver, request.v_off)
+    try:
+        params = GateChargeModelParams(
+            q_gs=request.q_gs, q_gd=request.q_gd, q_g=request.q_g,
+            v_th=request.v_th, v_plateau=request.v_plateau,
+            r_g=request.r_g, r_g_int=request.r_g_int,
+        )
+        estimate = GateChargeModel(params).calc_switching_estimate(
+            request.v_driver, request.v_off
+        )
+        timing_ns = {
+            key + '_times': {k: v * 1e9 for k, v in estimate[key]['times_s'].items()}
+            for key in ('turn_on', 'turn_off')
+        }
+        if not all(np.isfinite(v) for times in timing_ns.values() for v in times.values()):
+            raise ValueError('Switching intervals exceed the finite nanosecond API range')
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     return {
         'parameters': {
-            'q_gs': request.q_gs,
-            'q_gd': request.q_gd,
-            'q_g': request.q_g,
-            'v_th': request.v_th,
-            'v_plateau': request.v_plateau,
+            'q_gs': request.q_gs, 'q_gd': request.q_gd, 'q_g': request.q_g,
+            'v_th': request.v_th, 'v_plateau': request.v_plateau,
             'r_g_total': request.r_g + request.r_g_int,
+            'v_driver': request.v_driver, 'v_off': request.v_off,
         },
-        'turn_on_times': {
-            't_delay': turn_on['t_delay'] * 1e9,  # Convert to ns
-            't_rise': turn_on['t_rise'] * 1e9,
-            't_fall_v': turn_on['t_fall_v'] * 1e9,
-            't_total': turn_on['t_total'] * 1e9,
-        },
-        'turn_off_times': {
-            't_delay': turn_off['t_delay'] * 1e9,
-            't_rise_v': turn_off['t_rise_v'] * 1e9,
-            't_fall_i': turn_off['t_fall_i'] * 1e9,
-            't_total': turn_off['t_total'] * 1e9,
-        }
+        # Keep the existing web timing contract in ns; traces remain explicit SI.
+        **timing_ns,
+        'estimate': estimate,
     }
-
 
 @app.post("/api/dpt/generate_netlist")
 async def generate_dpt_netlist(
-    transistor_id: str,
-    config: DPTConfigRequest
-) -> Dict[str, str]:
-    """Generate LTspice Double Pulse Test netlist for a transistor.
-
-    :param transistor_id: ID of transistor to test
-    :param config: DPT configuration parameters
-    :return: Generated netlist as text
-    """
-    from transistordatabase.utils.ltspice_dpt import LTspiceDPT, DPTConfig
+    transistor_id: str, config: DPTConfigRequest,
+) -> Dict[str, Any]:
+    """Render a disclosed generic DPT template; no writes or simulation."""
+    from transistordatabase.utils.ltspice_dpt import DPTConfig, LTspiceDPT
 
     transistor = _get_transistor(transistor_id)
-
-    # Create DPT configuration
-    dpt_config = DPTConfig(
-        v_dc=config.v_dc,
-        i_target=config.i_target,
-        l_load=config.l_load,
-        r_g_on=config.r_g_on,
-        r_g_off=config.r_g_off,
-        v_g_on=config.v_g_on,
-        v_g_off=config.v_g_off,
-        t_dead=config.t_dead,
-        t_pulse2=config.t_pulse2
-    )
-
-    # Generate netlist
-    dpt = LTspiceDPT()
-    netlist = dpt.generate_netlist(transistor, dpt_config)
-
+    try:
+        dpt = LTspiceDPT(DPTConfig(**config.model_dump()))
+        netlist = dpt.render_netlist(transistor)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
     return {
         'netlist': netlist,
+        'filename': dpt.netlist_filename(transistor),
         'transistor_name': transistor.metadata.name,
-        'config': {
-            'v_dc': config.v_dc,
-            'i_target': config.i_target,
-            'r_g_on': config.r_g_on,
-            'r_g_off': config.r_g_off,
-        }
+        'model_kind': config.model_kind,
+        'model_disclosure': dpt.MODEL_DISCLOSURE,
+        'config': config.model_dump(),
+        'pulse_schedule': dpt.pulse_schedule(),
+        'ideal_first_pulse_s': dpt.config.t_pulse1,
     }
 
 
@@ -3545,14 +3364,14 @@ async def import_dpt_raw_measurement(
         raise _dpt_raw_upload_error(error) from error
 
     try:
-        parser_version = importlib.metadata.version("PyLTSpice")
+        parser_version = importlib.metadata.version("spicelib")
     except importlib.metadata.PackageNotFoundError:
         parser_version = "unknown"
     imported_at = datetime.now(timezone.utc).isoformat()
     provenance = {
         "source_filename": parsed.filename,
         "source_sha256": hashlib.sha256(content).hexdigest(),
-        "parser": "PyLTSpice.RawRead",
+        "parser": "spicelib.RawRead",
         "parser_version": parser_version,
         "imported_at": imported_at,
         "source_plot_index": plot_index,
@@ -3649,7 +3468,8 @@ async def import_dpt_raw_measurement(
                 ),
             )
 
-        candidate = {**record, "raw_measurement_data": candidate_raw_records}
+        candidate = copy.copy(record)
+        candidate["raw_measurement_data"] = candidate_raw_records
         candidate_file_size = _encoded_json_size_up_to(
             candidate,
             MAX_DPT_LEGACY_RECORD_FILE_BYTES,
@@ -3676,7 +3496,12 @@ async def import_dpt_raw_measurement(
         try:
             # Validate the legacy transistor while the raw measurement payload
             # stays on its established top-level JSON persistence path.
-            _json_dict_to_legacy_transistor(model_candidate)
+            from transistordatabase.gui_web.backend.native_record_view import NativeRecordView
+
+            if isinstance(candidate, NativeRecordView):
+                _validate_record_view(candidate)
+            else:
+                _json_dict_to_legacy_transistor(model_candidate)
             _write_legacy_record_unlocked(
                 record_path,
                 candidate,
@@ -3935,16 +3760,30 @@ async def get_dpt_data(
         else:
             transistor = _get_transistor(transistor_id)
 
-    # Extract DPT data from switching loss data
+    # Provenance-free legacy curves do not establish a DPT source.
+    def dpt_records(records):
+        return [record for record in records if record.evidence is not None and
+                record.evidence.method in ("waveform-local-edge", "supplied-log-integral")]
+    on = dpt_records(transistor.switch.e_on_data)
+    off = dpt_records(transistor.switch.e_off_data)
+    rr = dpt_records(transistor.diode.e_rr_data) if transistor.diode else []
     dpt_data = {
-        'has_e_on': len(transistor.switch.e_on_data) > 0,
-        'has_e_off': len(transistor.switch.e_off_data) > 0,
-        'has_e_rr': len(transistor.diode.e_rr_data) > 0 if transistor.diode else False,
+        'has_e_on': bool(on),
+        'has_e_off': bool(off),
+        'has_e_rr': bool(rr),
+        'has_recorded_e_on': bool(transistor.switch.e_on_data),
+        'has_recorded_e_off': bool(transistor.switch.e_off_data),
+        'has_recorded_e_rr': bool(transistor.diode and transistor.diode.e_rr_data),
+        'legacy_source_status': 'unknown-without-structured-evidence',
+        'recorded_switching_curves': len(transistor.switch.e_on_data) + len(transistor.switch.e_off_data),
     }
 
     # Get measurement metadata from first dataset if available
-    if transistor.switch.e_on_data:
-        first = transistor.switch.e_on_data[0]
+    metadata_records = on or transistor.switch.e_on_data
+    dpt_data['metadata'] = {}
+    if metadata_records:
+        first = metadata_records[0]
+        dpt_data['metadata_source_status'] = 'qualified-evidence' if on else 'recorded-conditions-source-unknown'
         dpt_data['metadata'] = {
             't_j': first.t_j,
             'v_supply': first.v_supply,
@@ -4534,6 +4373,16 @@ async def validate_dpt_data(transistor_id: str) -> Dict[str, Any]:
 
     errors = []
     warnings = []
+    all_loss_data = transistor.switch.e_on_data + transistor.switch.e_off_data
+    dpt_count = sum(data.evidence is not None and data.evidence.method in (
+        "waveform-local-edge", "supplied-log-integral") for data in all_loss_data)
+    if dpt_count == 0:
+        warnings.append("No structured DPT evidence is available. This check covers recorded switching data only.")
+    coverage = {field: sum(getattr(data, field) is not None for data in all_loss_data)
+                for field in ("t_j", "v_supply", "v_g", "r_g")}
+    incomplete = [field for field, count in coverage.items() if count < len(all_loss_data)]
+    if incomplete:
+        warnings.append("Some recorded conditions are unknown: " + ", ".join(incomplete))
 
     # Check if transistor has switching loss data
     if not transistor.switch.e_on_data and not transistor.switch.e_off_data:
@@ -4542,8 +4391,9 @@ async def validate_dpt_data(transistor_id: str) -> Dict[str, Any]:
 
     # Check voltage consistency
     v_supplies = set()
-    for loss_data in transistor.switch.e_on_data + transistor.switch.e_off_data:
-        v_supplies.add(loss_data.v_supply)
+    for loss_data in all_loss_data:
+        if loss_data.v_supply is not None:
+            v_supplies.add(loss_data.v_supply)
 
     if transistor.electrical_ratings.v_abs_max > 0:
         for v_supply in v_supplies:
@@ -4555,9 +4405,11 @@ async def validate_dpt_data(transistor_id: str) -> Dict[str, Any]:
 
     # Check current levels
     max_currents = []
-    for loss_data in transistor.switch.e_on_data:
-        if loss_data.graph_i_e and len(loss_data.graph_i_e[0]) > 0:
+    for loss_data in all_loss_data:
+        if loss_data.graph_i_e is not None and np.asarray(loss_data.graph_i_e).size > 0:
             max_currents.append(max(loss_data.graph_i_e[0]))
+        elif loss_data.i_x is not None:
+            max_currents.append(loss_data.i_x)
 
     if max_currents and transistor.electrical_ratings.i_abs_max > 0:
         max_test_current = max(max_currents)
@@ -4569,8 +4421,9 @@ async def validate_dpt_data(transistor_id: str) -> Dict[str, Any]:
 
     # Check temperature range
     temperatures = set()
-    for loss_data in transistor.switch.e_on_data + transistor.switch.e_off_data:
-        temperatures.add(loss_data.t_j)
+    for loss_data in all_loss_data:
+        if loss_data.t_j is not None:
+            temperatures.add(loss_data.t_j)
 
     if temperatures:
         if min(temperatures) < -55:
@@ -4583,12 +4436,16 @@ async def validate_dpt_data(transistor_id: str) -> Dict[str, Any]:
 
     return {
         'valid': len(errors) == 0,
+        'scope': 'recorded-switching-data-consistency',
+        'dpt_evidence_count': dpt_count,
+        'status': 'partial' if incomplete else 'complete-recorded-conditions',
+        'condition_coverage': {"record_count": len(all_loss_data), **coverage},
         'errors': errors,
         'warnings': warnings,
         'statistics': {
-            'v_supply_range': [min(v_supplies), max(v_supplies)] if v_supplies else [0, 0],
-            'i_max_tested': max(max_currents) if max_currents else 0,
-            't_j_range': [min(temperatures), max(temperatures)] if temperatures else [0, 0],
+            'v_supply_range': [min(v_supplies), max(v_supplies)] if v_supplies else None,
+            'i_max_tested': max(max_currents) if max_currents else None,
+            't_j_range': [min(temperatures), max(temperatures)] if temperatures else None,
         }
     }
 

@@ -36,6 +36,22 @@ const api = axios.create({
   },
 })
 
+// Blob downloads also receive JSON validation errors from the backend.
+async function downloadBlob(request) {
+  try { return (await request).data }
+  catch (error) {
+    let data = error.response?.data
+    if (data instanceof Blob) {
+      try { data = JSON.parse(await data.text()) } catch { /* Keep the transport error. */ }
+    }
+    const detail = data?.detail
+    if (detail) {
+      error.message = typeof detail === 'string' ? detail : detail.map(item => item.msg || String(item)).join('\n')
+    }
+    throw error
+  }
+}
+
 // Request interceptor for debugging
 api.interceptors.request.use(
   (config) => {
@@ -48,6 +64,127 @@ api.interceptors.request.use(
   }
 )
 
+export const catalogApi = {
+  async sources() {
+    return (await api.get('/api/catalog/sources')).data
+  },
+  async screen(request) {
+    return (await api.post('/api/catalog/screen', request)).data
+  },
+}
+
+export const converterApi = {
+  async presets() {
+    return (await api.get('/api/converters/presets')).data
+  },
+  async analyze(request) {
+    return (await api.post('/api/converters/analyze', request)).data
+  },
+}
+
+export const plecsDataApi = {
+  async preview(request) {
+    return (await api.post('/api/plecs/preview', request)).data
+  },
+  async export(request) {
+    return (await api.post('/api/plecs/export', request, { responseType: 'blob' })).data
+  },
+  async finalize(request) {
+    return (await api.post('/api/plecs/finalize', request)).data
+  },
+  async contexts(id) {
+    return (await api.get(`/api/plecs/core/${encodeURIComponent(id)}/contexts`)).data
+  },
+  async previewCore(id, request) {
+    return (await api.post(`/api/plecs/core/${encodeURIComponent(id)}/preview`, request)).data
+  },
+  async exportCore(id, request) {
+    return (await api.post(`/api/plecs/core/${encodeURIComponent(id)}/export`, request, { responseType: 'blob' })).data
+  },
+}
+
+export const measurementApi = {
+  async capabilities() { return (await api.get('/api/measurement/capabilities')).data },
+  async preview(request) { return (await api.post('/api/measurement/preview', request)).data },
+  async extract(request) { return (await api.post('/api/measurement/extract', request)).data },
+}
+
+async function reviewPost(path, request, config = {}) {
+  try {
+    const response = await api.post(path, request, { ...config, responseType: 'text', transformResponse: [value => value] })
+    return { data: JSON.parse(response.data), rawJson: response.data }
+  } catch (error) {
+    if (typeof error.response?.data === 'string') {
+      try { error.response.data = JSON.parse(error.response.data) } catch { /* Keep the transport error. */ }
+    }
+    throw error
+  }
+}
+
+export const stressApi = {
+  async calculate(request) { return reviewPost('/api/stress/calculate', request) },
+}
+
+export const deviceModelApi = {
+  async train(request) { return reviewPost('/api/models/train', request) },
+  async evaluate(request) { return reviewPost('/api/models/evaluate', request) },
+  async evaluateModelJson(modelJson, queries) {
+    return reviewPost('/api/models/evaluate', `{"model":${modelJson},"queries":${JSON.stringify(queries)}}`, { transformRequest: [value => value] })
+  },
+}
+
+export const rgEnergyApi = {
+  async inventory(id) { return (await api.get(`/api/transistors/${encodeURIComponent(id)}/rg-energy`)).data },
+  async calculate(id, request) { return reviewPost(`/api/transistors/${encodeURIComponent(id)}/rg-energy`, request) },
+}
+
+export const matApi = {
+  async preview(request) { return (await api.post('/api/mat/preview', request)).data },
+  async array(request) { return (await api.post('/api/mat/array', request)).data },
+  async export(request) { return (await api.post('/api/mat/export', request, { responseType: 'blob' })).data },
+  async finalize(request) { return (await api.post('/api/mat/finalize', request)).data },
+  async calculate(request) { return (await api.post('/api/mat/calculate', request)).data },
+}
+
+export const thermalApi = {
+  async analyze(request) {
+    return (await api.post('/api/thermal/analyze', request)).data
+  }
+}
+
+export const assemblyApi = {
+  async reverseSharing(request) { return reviewPost('/api/assemblies/reverse-sharing', request) },
+  async analyze(request) {
+    return (await api.post('/api/assemblies/analyze', request)).data
+  }
+}
+
+export const waveformApi = {
+  async allocate(request) { return reviewPost('/api/waveform/gate-allocation', request) },
+  async analyze(request) {
+    return (await api.post('/api/waveform/analyze', request)).data
+  },
+}
+
+export const analysisApi = {
+  async grid(request) {
+    const config = typeof request === 'string' ? { headers: { 'Content-Type': 'application/json' }, transformRequest: [value => value] } : undefined
+    return (await api.post('/api/analysis/grid', request, config)).data
+  },
+  async energyMap(request) { return (await api.post('/api/analysis/energy-map', request)).data },
+  async importXyzEnergy(request) { return reviewPost('/api/analysis/energy-map/xyz', request) },
+  async thermalHandoff(request) { return (await api.post('/api/analysis/thermal-handoff', request)).data },
+}
+
+export const digitizerApi = {
+  async image(request) {
+    return (await api.post('/api/digitizer/image', request)).data
+  },
+  async transform(request) {
+    return (await api.post('/api/digitizer/transform', request)).data
+  },
+}
+
 // Transistor API service
 export const transistorApi = {
   // Get all transistors
@@ -55,6 +192,7 @@ export const transistorApi = {
     console.log('[transistorApi.getAll] Fetching all transistors...')
     try {
       const response = await api.get('/api/transistors')
+      if (!Array.isArray(response.data)) throw new Error('Invalid transistor list response')
       console.log('[transistorApi.getAll] Success! Received', response.data?.length || 0, 'transistors')
       console.log('[transistorApi.getAll] Sample data:', response.data?.[0])
       return response.data
@@ -110,11 +248,10 @@ export const transistorApi = {
   },
 
   // Export transistor in specified format
-  async export(id, format) {
-    const response = await api.post(`/api/transistors/${pathSegment(id)}/export/${format}`, {}, {
+  async export(id, format, selection = {}) {
+    return downloadBlob(api.post(`/api/transistors/${pathSegment(id)}/export/${encodeURIComponent(format)}`, selection, {
       responseType: 'blob'
-    })
-    return response.data
+    }))
   },
 
   // Preview export before downloading
@@ -125,14 +262,13 @@ export const transistorApi = {
 
   // Batch export multiple transistors
   async batchExport(transistorIds, format, options = {}) {
-    const response = await api.post('/api/transistors/batch_export', {
+    return downloadBlob(api.post('/api/transistors/batch_export', {
       transistor_ids: transistorIds,
       format: format,
       options: options
     }, {
       responseType: 'blob'
-    })
-    return response.data
+    }))
   },
 
   // Upload transistor from file
@@ -406,5 +542,13 @@ api.interceptors.response.use(
     throw error
   }
 )
+
+export const catalogSourceApi = {
+  async preview(payload) { return (await api.post('/api/catalog-sources/preview', payload)).data },
+  async snapshot(payload) { return (await api.post('/api/catalog-sources/snapshot', payload)).data },
+  async links(payload) { return (await api.post('/api/catalog-sources/links', payload)).data },
+  async coefficients(payload) { return (await api.post('/api/catalog-sources/coefficients', payload)).data },
+  async diff(payload) { return (await api.post('/api/catalog-sources/diff', payload)).data },
+}
 
 export default api

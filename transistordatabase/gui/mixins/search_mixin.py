@@ -45,7 +45,7 @@ class SearchDatabaseMixin:
 
             return self.tdb.load_transistor(selected_transistor_name)
 
-        except:
+        except Exception:
             self.show_popup_message("Error: No transistor selected!")
 
     def delete_marked_transistor_search_database_from_local_tdb(self):
@@ -128,7 +128,7 @@ class SearchDatabaseMixin:
                 for i in range(len(r_th_vector_list)):
                     r_th_vector = r_th_vector + str(r_th_vector_list[i]) + " "
                 self.lineEdit_create_transistor_switch_r_th_vector.setText(r_th_vector)
-            except:
+            except Exception:
                 self.lineEdit_create_transistor_switch_r_th_vector.setText("None")
 
             self.lineEdit_create_transistor_switch_r_th_total.setText(
@@ -140,7 +140,7 @@ class SearchDatabaseMixin:
                 for i in range(len(c_th_vector_list)):
                     c_th_vector = c_th_vector + str(c_th_vector_list[i]) + " "
                 self.lineEdit_create_transistor_switch_c_th_vector.setText(c_th_vector)
-            except:
+            except Exception:
                 self.lineEdit_create_transistor_switch_c_th_vector.setText("None")
 
             self.lineEdit_create_transistor_switch_c_th_total.setText(
@@ -152,7 +152,7 @@ class SearchDatabaseMixin:
                 for i in range(len(tau_vector_list)):
                     tau_vector = tau_vector + str(tau_vector_list[i]) + " "
                 self.lineEdit_create_transistor_switch_tau_vector.setText(tau_vector)
-            except:
+            except Exception:
                 self.lineEdit_create_transistor_switch_tau_vector.setText("None")
 
             self.lineEdit_create_transistor_switch_tau_total.setText(
@@ -171,7 +171,7 @@ class SearchDatabaseMixin:
                 for i in range(len(r_th_vector_list)):
                     r_th_vector = r_th_vector + str(r_th_vector_list[i]) + " "
                 self.lineEdit_create_transistor_diode_r_th_vector.setText(r_th_vector)
-            except:
+            except Exception:
                 self.lineEdit_create_transistor_diode_r_th_vector.setText("None")
 
             self.lineEdit_create_transistor_diode_r_th_total.setText(
@@ -183,7 +183,7 @@ class SearchDatabaseMixin:
                 for i in range(len(c_th_vector_list)):
                     c_th_vector = c_th_vector + str(c_th_vector_list[i]) + " "
                 self.lineEdit_create_transistor_diode_c_th_vector.setText(c_th_vector)
-            except:
+            except Exception:
                 self.lineEdit_create_transistor_diode_c_th_vector.setText("None")
 
             self.lineEdit_create_transistor_diode_c_th_total.setText(
@@ -195,7 +195,7 @@ class SearchDatabaseMixin:
                 for i in range(len(tau_vector_list)):
                     tau_vector = tau_vector + str(tau_vector_list[i]) + " "
                 self.lineEdit_create_transistor_diode_tau_vector.setText(tau_vector)
-            except:
+            except Exception:
                 self.lineEdit_create_transistor_diode_tau_vector.setText("None")
 
             self.lineEdit_create_transistor_diode_tau_total.setText(
@@ -385,7 +385,7 @@ class SearchDatabaseMixin:
                         widget.clear()
 
             self.show_popup_message(f"<b>{transistor.name}</b> successfully loaded into Create Transistor!")
-        except:
+        except Exception:
             self.show_popup_message("Error: No transistor selected!")
 
     def load_from_search_database_into_exporting_tools(self):
@@ -403,7 +403,7 @@ class SearchDatabaseMixin:
 
             self.comboBox_export_transistor.setCurrentText(selected_transistor_name)
             self.show_popup_message(f"<b>{selected_transistor_name}</b> successfully loaded into Exporting Tools!")
-        except:
+        except Exception:
             self.show_popup_message("Error: No transistor selected!")
 
     def load_from_search_database_into_comparison_tools(self):
@@ -432,7 +432,7 @@ class SearchDatabaseMixin:
 
             self.show_popup_message(
                 f"<b>{selected_transistor_name}</b> successfully loaded as {target_transistor} into Comparison Tools!")
-        except:
+        except Exception:
             self.show_popup_message("Error: No transistor selected!")
 
     def load_from_search_database_into_topology_calculator(self):
@@ -459,13 +459,12 @@ class SearchDatabaseMixin:
             self.show_popup_message(
                 f"<b>{selected_transistor_name}</b> successfully loaded as {target_transistor} into Topology Calculator!")
 
-        except:
+        except Exception:
             self.show_popup_message("Error: No transistor selected!")
 
-    def check_value_is_in_between(self, min, max, value):
+    def check_value_is_in_between(self, min_value: float, max_value: float, current_value: float) -> bool:
         """Check if value is between min and max."""
-        # TODO Could be put in tdb functions?
-        if not value or (float(min) < float(value) < float(max)):
+        if not current_value or (float(min_value) < float(current_value) < float(max_value)):
             return True
 
         return False
@@ -904,7 +903,7 @@ class SearchDatabaseMixin:
                 item = QtWidgets.QTableWidgetItem()
                 try:
                     item.setData(QtCore.Qt.DisplayRole, float(transistor[key]))
-                except:
+                except Exception:
                     item.setData(QtCore.Qt.DisplayRole, str(transistor[key]))
                 self.tableWidget_search_database.setItem(row, column, item)
                 column = column + 1

@@ -1,0 +1,757 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-11-11",
+  "record_type": "point-in-time verification report",
+  "version": "1.0",
+  "scope": "Acceptance evidence closes the ten selected workflows in the frozen version 1.1 queue at this snapshot. Full numerical equivalence across all 3144 inventory definitions remains unverified.",
+  "historical_scope": {
+    "inventory_definitions": 3144,
+    "capabilities": 25,
+    "target_definitions": 88,
+    "evidence_files": 171,
+    "python_passed": 1417,
+    "vue_passed": 368,
+    "qualification": "Sealed November 10 counts only."
+  },
+  "frozen_record_sha256": {
+    "docs/reports/semiconductor-parity-verification-2026-11-10.md": "4047c867b5ad25ea025949290c5779a36a56f211cc4b494b1bdf8419eb259ae6",
+    "docs/reports/semiconductor-parity-verification-2026-11-10.json": "2968a2fb9097ed965d6a052033828ee92cadd0954c371b16cc85c157fd1701fb",
+    "docs/reports/semiconductor-remaining-gaps-2026-11-10.md": "7560a628de28911ef7d9a7832ed26a2a8de24ffc17f8b653a47431c7b5198e38",
+    "docs/reports/semiconductor-remaining-gaps-2026-11-10.json": "b8e82ec034a89a9aa58f977db24eb184c04c251a1ae31ab0e26100f9ad6f04c3"
+  },
+  "receipt_preservation": {
+    "previous_receipts": 9,
+    "final_receipts": 10,
+    "previous_file_sha256": "82e59f3aff47a4ebb8d317af17ddbf246daffc4c8a095fb77c234018755f86b2",
+    "unchanged_prefix_bytes": 71645,
+    "unchanged_prefix_sha256": "d6cd7a00df2ecb1dce37eb8d6bcd85f8eabe87746f4e8041ee5d833768590781",
+    "original_suffix_utf8": "\n  ]\n}\n",
+    "reconstruction": "Hash unchanged prefix plus original suffix to reconstruct the previous file digest.",
+    "final_file_sha256": "4a20096e3eb969acf77de7e1ae6a2aed711e8859058d71980168270b5f03329c"
+  },
+  "workflow_results": [
+    {
+      "order": 1,
+      "queue_id": "stress-indices",
+      "title": "Electrical stress indices",
+      "accepted_date": "2026-11-10",
+      "finding": "Four screening indices retain formulas, units and denominator checks. Cost and volume remain electrical proxies.",
+      "basis": [
+        "M",
+        "C"
+      ],
+      "source_ids": [
+        "enco-e5bb43a4c901c9c4",
+        "enco-f9693f97fd609cb8",
+        "enco-1708782b7484876c",
+        "enco-827a8a60d4655502"
+      ],
+      "receipt_index_1based": 1
+    },
+    {
+      "order": 2,
+      "queue_id": "gate-mask",
+      "title": "Gate-state current allocation",
+      "accepted_date": "2026-11-10",
+      "finding": "Signed gate-state traces conserve supplied samples. Command-state partition remains distinct from physical branch sharing.",
+      "basis": [
+        "M",
+        "C"
+      ],
+      "source_ids": [
+        "enco-396842419c21b91e",
+        "enco-d4607f37d0a79c85"
+      ],
+      "receipt_index_1based": 2
+    },
+    {
+      "order": 3,
+      "queue_id": "reverse-sharing",
+      "title": "Reverse channel and diode current sharing",
+      "accepted_date": "2026-11-10",
+      "finding": "Bounded common-voltage channel and diode sharing retains conditions, unsupported domains and current conservation.",
+      "basis": [
+        "M",
+        "C"
+      ],
+      "source_ids": [
+        "enco-e11ddebd7e4b83f8",
+        "sc-690e0248306e4f30"
+      ],
+      "receipt_index_1based": 3
+    },
+    {
+      "order": 4,
+      "queue_id": "rg-energy",
+      "title": "Gate-resistance energy queries in the browser",
+      "accepted_date": "2026-11-10",
+      "finding": "Browser forward and inverse gate-resistance energy queries retain source inventory and unique bounded crossings.",
+      "basis": [
+        "M",
+        "C"
+      ],
+      "source_ids": [
+        "current-59e9f089825867c8",
+        "current-0e55819a38865760"
+      ],
+      "receipt_index_1based": 4
+    },
+    {
+      "order": 5,
+      "queue_id": "fit",
+      "title": "Conditioned MOSFET training and fit inspection",
+      "accepted_date": "2026-11-10",
+      "finding": "Conditioned resistance, diode and switching-energy fits retain observations, bounded predictions and separate fit diagnostics.",
+      "basis": [
+        "M",
+        "C"
+      ],
+      "source_ids": [
+        "enco-b1ff841464ea2d09",
+        "enco-130c2a2161139100",
+        "enco-efa374abcdd83d03",
+        "enco-b340fe16ac4ea5d2",
+        "enco-f1716ce1915dc7fd",
+        "enco-cfddec9c175640d4",
+        "enco-785acc0270427985",
+        "enco-b7d91944a862d149"
+      ],
+      "receipt_index_1based": 5
+    },
+    {
+      "order": 6,
+      "queue_id": "xyz-import",
+      "title": "Three-column energy-map import",
+      "accepted_date": "2026-11-11",
+      "finding": "XYZ import retains source bytes, SI conversion, duplicate coordinates, zero, missing observations and grid holes.",
+      "basis": [
+        "M",
+        "C"
+      ],
+      "source_ids": [
+        "sc-7496258f50c32467",
+        "sc-4d62fb1625d590c7"
+      ],
+      "receipt_index_1based": 6
+    },
+    {
+      "order": 7,
+      "queue_id": "surface",
+      "title": "Three-axis switching-energy view",
+      "accepted_date": "2026-11-11",
+      "finding": "Three-axis Canvas views retain original observations, source-connected faces and explicit drawing limits.",
+      "basis": [
+        "M",
+        "C"
+      ],
+      "source_ids": [
+        "sc-0c9501bd111cf4da",
+        "sc-217d191b91bf2329"
+      ],
+      "receipt_index_1based": 7
+    },
+    {
+      "order": 8,
+      "queue_id": "series-output",
+      "title": "Thresholded spectrum and grouped series export",
+      "accepted_date": "2026-11-11",
+      "finding": "Complex spectra retain phase and strict first-ten qualifying bins. Grouped exports distinguish discrete and time-weighted statistics.",
+      "basis": [
+        "M",
+        "C"
+      ],
+      "source_ids": [
+        "enco-6918ddd45dbe2531",
+        "enco-1c6b96e97d0a62f2",
+        "enco-4b36c6af1581b780"
+      ],
+      "receipt_index_1based": 8
+    },
+    {
+      "order": 9,
+      "queue_id": "merit",
+      "title": "Multi-indicator merit across operating points",
+      "accepted_date": "2026-11-11",
+      "finding": "Weighted objectives retain a common complete population, exclusions, contributions, extrema and deterministic tied ranks.",
+      "basis": [
+        "M",
+        "C"
+      ],
+      "source_ids": [
+        "enco-35deec4ca946d64d",
+        "enco-ff0e2cb8fd29ffd5",
+        "enco-1345987de071cc7d"
+      ],
+      "receipt_index_1based": 9
+    },
+    {
+      "order": 10,
+      "queue_id": "device-thermal-rollup",
+      "title": "Per-device circuit loss and thermal summary",
+      "accepted_date": "2026-11-11",
+      "finding": "Physical member, die and junction ownership links losses to independent fixed-sink temperatures, null coverage and tied maxima.",
+      "basis": [
+        "M",
+        "C"
+      ],
+      "source_ids": [
+        "enco-6201203722e7f211",
+        "sc-ae25213abbd6b0bf"
+      ],
+      "receipt_index_1based": 10
+    }
+  ],
+  "final_verification": {
+    "date": "2026-11-11",
+    "branch": "codex/semiconductor-parity-20261110",
+    "status": "verified",
+    "python": {
+      "passed": 1869,
+      "skipped": 1,
+      "failed": 0,
+      "errors": 0,
+      "files": 64,
+      "duration_seconds": 112.31,
+      "measured_seconds": 117.99,
+      "peak_rss_kib": 566244,
+      "swaps": 0,
+      "junit_tests": 1870,
+      "junit_time_seconds": 112.176,
+      "log": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776.log",
+      "junit": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776.xml",
+      "selection": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776-selection.json",
+      "skip_name": "tests.test_measurement_import_independent::test_fresh_ltspice_binary_complete_waveform_and_native_archive",
+      "skip_reason": "TDB_GENERIC_DPT_RAW is not configured; original November 10 RAW fixture is unavailable for this run. Previous pass remains historical evidence only."
+    },
+    "vue": {
+      "passed": 504,
+      "failed": 0,
+      "files": 50,
+      "duration_seconds": 57.1,
+      "measured_seconds": 60.98,
+      "peak_rss_kib": 362148,
+      "swaps": 0,
+      "log": "/tmp/tdb-vue-final-20261111-143408-circuit.log"
+    },
+    "build": {
+      "passed": true,
+      "duration_seconds": 17.07,
+      "measured_seconds": 18.45,
+      "peak_rss_kib": 534324,
+      "assets": {
+        "index.html": "ab6606e3fd9d486a99d94af29b77890565ee00c46d30edc638e3f985a0c59059",
+        "assets/index-CcpTzzUv.css": "253325253c0dd9d59bb752dcce3c3080d6cf77f580e6bce27c45601535980663",
+        "assets/index-C38dULHp.js": "e626230ff4add851354693df94f4692663eeda371bf518230f6214e27fa97f7b"
+      },
+      "warning": "Existing Vite chunk-size warning above 500 kB"
+    },
+    "phase10_browser": {
+      "passed": 8,
+      "duration_seconds": 43.6,
+      "measured_seconds": 52.69,
+      "peak_rss_kib": 354376,
+      "artifact_root": "/tmp/tdb-parity-browser-1ca4d127-0a8d-44f4-9ad4-41b94006821f"
+    },
+    "final_post_guard_browser": {
+      "passed": 3,
+      "duration_seconds": 14.4,
+      "measured_seconds": 16.9,
+      "peak_rss_kib": 316148,
+      "swaps": 0,
+      "log": "/tmp/tdb-browser-final-20261111-f3fa0e35-15e1-4f92-a958-b03636001441.log",
+      "scope": "Compiled desktop/mobile physical summary and DAB distinct-signal charts/exports after final backend restart"
+    },
+    "headless": {
+      "pass": true,
+      "core": "transistordatabase.core.models.Transistor",
+      "science_modules": [
+        "catalog_fom",
+        "catalog_sources",
+        "grid_analysis",
+        "energy_maps",
+        "biela",
+        "channel_models",
+        "semiconductor_assemblies",
+        "converter_losses",
+        "plecs_document",
+        "measurement_import",
+        "static_losses",
+        "device_parameters",
+        "thermal",
+        "condition_tables",
+        "digitization",
+        "plecs_core_export",
+        "native_export",
+        "legacy_mat",
+        "waveform_losses",
+        "analytical_models",
+        "gate_resistance",
+        "workbook_fom",
+        "rg_formula",
+        "semiconductor_stress",
+        "current_allocation",
+        "reverse_current_sharing",
+        "rg_energy_access",
+        "device_model_fitting",
+        "xyz_energy_import",
+        "grouped_series",
+        "grid_merit",
+        "circuit_summary"
+      ],
+      "science_module_count": 32,
+      "routes": 94,
+      "qt_loaded": []
+    },
+    "headless_artifact": "/tmp/tdb-headless-final-20261111-e6c30199-e643-4bf0-83a7-36293132e340.json",
+    "ruff": {
+      "passed": true,
+      "findings": 0,
+      "scope": "All transistordatabase production Python plus final converter/circuit test files"
+    },
+    "whitespace": {
+      "scoped_passed": true,
+      "crlf_aware": true,
+      "whole_tree_clean": false,
+      "limitation": "Whole-tree check includes mixed-EOL working state. Broader GUI scope flags an existing extra EOF blank line in App.vue. App.vue was not changed during this continuation after the WSL restart. Narrowed final tracked implementation paths pass."
+    },
+    "runtime": {
+      "url": "http://localhost:8002/index.html",
+      "pid": 474359,
+      "autoreload": false,
+      "session": 68430
+    },
+    "excluded_runs": [
+      "Interrupted 9b9b9f11 aggregate run is not final proof",
+      "Browser CLI pipe-quoting attempt 15850c1b is not application/test evidence"
+    ]
+  },
+  "test_selection": [
+    "tests/test_biela_contract.py",
+    "tests/test_catalog_fom_extension.py",
+    "tests/test_catalog_fom.py",
+    "tests/test_catalog_sources.py",
+    "tests/test_circuit_summary_independent_review.py",
+    "tests/test_circuit_summary.py",
+    "tests/test_converter_independent_review.py",
+    "tests/test_converter_losses.py",
+    "tests/test_core_models.py",
+    "tests/test_core_native_serialization.py",
+    "tests/test_core_services.py",
+    "tests/test_current_allocation.py",
+    "tests/test_data_adapter_independent_review.py",
+    "tests/test_device_model_execution_review.py",
+    "tests/test_device_model_fitting.py",
+    "tests/test_device_model_unknown_temperature_review.py",
+    "tests/test_device_parameters.py",
+    "tests/test_digitization_independent_review.py",
+    "tests/test_digitization.py",
+    "tests/test_dpt_contract.py",
+    "tests/test_energy_maps.py",
+    "tests/test_extraction_adapters.py",
+    "tests/test_extraction_independent_review.py",
+    "tests/test_fom_sources_independent_review.py",
+    "tests/test_gate_allocation_independent_review.py",
+    "tests/test_gate_charge_intervals.py",
+    "tests/test_gate_resistance_api.py",
+    "tests/test_gate_resistance.py",
+    "tests/test_grid_analysis.py",
+    "tests/test_grid_energy_independent_review.py",
+    "tests/test_grid_merit_boundaries.py",
+    "tests/test_grid_merit.py",
+    "tests/test_grouped_harmonic_independent.py",
+    "tests/test_harmonics_grouped_series.py",
+    "tests/test_legacy_comparison_closure.py",
+    "tests/test_legacy_mat.py",
+    "tests/test_ltspice_dpt.py",
+    "tests/test_mat_migration_independent.py",
+    "tests/test_measurement_import_independent.py",
+    "tests/test_measurement_import.py",
+    "tests/test_native_json_api_import.py",
+    "tests/test_phase6_independent_review.py",
+    "tests/test_plecs_core_export.py",
+    "tests/test_plecs_document.py",
+    "tests/test_public_calculation_exports.py",
+    "tests/test_public_export_independent_review.py",
+    "tests/test_reverse_current_sharing.py",
+    "tests/test_reverse_sharing_independent_review.py",
+    "tests/test_rg_energy_access_independent_review.py",
+    "tests/test_rg_energy_access.py",
+    "tests/test_rg_energy_independent.py",
+    "tests/test_rg_formula.py",
+    "tests/test_semiconductor_assemblies.py",
+    "tests/test_semiconductor_stress.py",
+    "tests/test_stress_independent_review.py",
+    "tests/test_thermal_workbench.py",
+    "tests/test_waveform_losses.py",
+    "tests/test_waveform_workbench.py",
+    "tests/test_web_export_independent_review.py",
+    "tests/test_web_native_exports.py",
+    "tests/test_workbook_fom_independent.py",
+    "tests/test_workbook_fom.py",
+    "tests/test_xyz_energy_import_oracles.py",
+    "tests/test_xyz_energy_import.py"
+  ],
+  "test_counts_by_file": {
+    "tests/test_biela_contract.py": 102,
+    "tests/test_catalog_fom_extension.py": 8,
+    "tests/test_catalog_fom.py": 34,
+    "tests/test_catalog_sources.py": 26,
+    "tests/test_circuit_summary_independent_review.py": 7,
+    "tests/test_circuit_summary.py": 27,
+    "tests/test_converter_independent_review.py": 37,
+    "tests/test_converter_losses.py": 37,
+    "tests/test_core_models.py": 14,
+    "tests/test_core_native_serialization.py": 12,
+    "tests/test_core_services.py": 27,
+    "tests/test_current_allocation.py": 46,
+    "tests/test_data_adapter_independent_review.py": 41,
+    "tests/test_device_model_execution_review.py": 9,
+    "tests/test_device_model_fitting.py": 48,
+    "tests/test_device_model_unknown_temperature_review.py": 3,
+    "tests/test_device_parameters.py": 30,
+    "tests/test_digitization_independent_review.py": 20,
+    "tests/test_digitization.py": 31,
+    "tests/test_dpt_contract.py": 56,
+    "tests/test_energy_maps.py": 22,
+    "tests/test_extraction_adapters.py": 32,
+    "tests/test_extraction_independent_review.py": 22,
+    "tests/test_fom_sources_independent_review.py": 14,
+    "tests/test_gate_allocation_independent_review.py": 13,
+    "tests/test_gate_charge_intervals.py": 61,
+    "tests/test_gate_resistance_api.py": 20,
+    "tests/test_gate_resistance.py": 88,
+    "tests/test_grid_analysis.py": 28,
+    "tests/test_grid_energy_independent_review.py": 7,
+    "tests/test_grid_merit_boundaries.py": 5,
+    "tests/test_grid_merit.py": 19,
+    "tests/test_grouped_harmonic_independent.py": 8,
+    "tests/test_harmonics_grouped_series.py": 15,
+    "tests/test_legacy_comparison_closure.py": 21,
+    "tests/test_legacy_mat.py": 26,
+    "tests/test_ltspice_dpt.py": 26,
+    "tests/test_mat_migration_independent.py": 15,
+    "tests/test_measurement_import_independent.py": 31,
+    "tests/test_measurement_import.py": 7,
+    "tests/test_native_json_api_import.py": 15,
+    "tests/test_phase6_independent_review.py": 30,
+    "tests/test_plecs_core_export.py": 11,
+    "tests/test_plecs_document.py": 22,
+    "tests/test_public_calculation_exports.py": 57,
+    "tests/test_public_export_independent_review.py": 33,
+    "tests/test_reverse_current_sharing.py": 64,
+    "tests/test_reverse_sharing_independent_review.py": 8,
+    "tests/test_rg_energy_access_independent_review.py": 7,
+    "tests/test_rg_energy_access.py": 60,
+    "tests/test_rg_energy_independent.py": 8,
+    "tests/test_rg_formula.py": 136,
+    "tests/test_semiconductor_assemblies.py": 38,
+    "tests/test_semiconductor_stress.py": 36,
+    "tests/test_stress_independent_review.py": 9,
+    "tests/test_thermal_workbench.py": 33,
+    "tests/test_waveform_losses.py": 11,
+    "tests/test_waveform_workbench.py": 37,
+    "tests/test_web_export_independent_review.py": 9,
+    "tests/test_web_native_exports.py": 40,
+    "tests/test_workbook_fom_independent.py": 14,
+    "tests/test_workbook_fom.py": 34,
+    "tests/test_xyz_energy_import_oracles.py": 7,
+    "tests/test_xyz_energy_import.py": 56
+  },
+  "current_file_sha256": {
+    "docs/api/semiconductor-circuit-summary.md": "c5d5abbc6aff97bee955ba92eeb4cccadc1ca155bbc3421097a0f42af81afd92",
+    "tests/test_biela_contract.py": "a0a6c6a4c5d5a7b9e182eb47086a9e02318838ca6acefead315a58ad61fcf70e",
+    "tests/test_catalog_fom.py": "75ff68dce67bad854b0395ce6f9fdc5a7fe3b1716f301e27aa23cd2ea8e85748",
+    "tests/test_catalog_fom_extension.py": "b7c110bad7c0fb98447329c75c176040b3a38df96c0a879351fc607cb101bc4c",
+    "tests/test_catalog_sources.py": "b2849b3605a5a50c03e8b0b06ed6c7ff4a51aff7a4c7469a703a31d76687b927",
+    "tests/test_circuit_summary.py": "79307096675cf80caffccf97616e0e7b21b6c092c8249908a9b6608373e6af2b",
+    "tests/test_circuit_summary_independent_review.py": "413860e7f5d98763f603f2366917507175daaa4c8f3bc09725f93e5068e8b5bf",
+    "tests/test_converter_independent_review.py": "d36191ca68a8db6e235086111dc106ad1be12924f96c6285b68ec70ade751c4a",
+    "tests/test_converter_losses.py": "d3e6e878846568170a7dd99ad69489ef9f85b9c841a16f187ebf96e409313448",
+    "tests/test_core_models.py": "60b23d32f8e5e39c247bbf016096f39ebb8d8a1055cbd212aceb726489d46ac0",
+    "tests/test_core_native_serialization.py": "d0777b41976902208527f65cd640dbf420ce470ca6c36c51d692e8e579cae44c",
+    "tests/test_core_services.py": "c176449c9418e6886e35ea3f0792aafa09f2ce7e99594d9ddda7f1e9ba2eeea0",
+    "tests/test_current_allocation.py": "5197cb8bcf7893608c8281a6782ba8e875e4d7fcd2284fc67245c05be28529eb",
+    "tests/test_data_adapter_independent_review.py": "0cd4c5e67cef984d26680bb6c9e3691aacd878d1a69244e9822962c4eea833a7",
+    "tests/test_device_model_execution_review.py": "0424a6cf3b7b591c66ace2f68733f1b1b62f1d07946aca548f75a184b6bc36fe",
+    "tests/test_device_model_fitting.py": "567928f54a5875b18930737f6f36f2c8ca329bdbeeeef2c8217801a6b2575e83",
+    "tests/test_device_model_unknown_temperature_review.py": "d773bdaa3ea4081b2f724da892b865555e7f379d8ceb8a6ec62150f3c79d74db",
+    "tests/test_device_parameters.py": "1728d62f46dcd9969d28fc9c1c18432a49f1c4a60d3c7588f1d381b55ca38001",
+    "tests/test_digitization.py": "de01ea57020bdb63a27700182dc91f3509e43e919da5541d27a600e7e96c408b",
+    "tests/test_digitization_independent_review.py": "1915f72cf660e50380c31a5b877b57ac07eafad118c04ee80f859ff13bf6793f",
+    "tests/test_dpt_contract.py": "431623acb077f9a21d9ce62ea132b2636659e29ea51c457e28d89c91fde259c4",
+    "tests/test_energy_maps.py": "dc2d4afd29e982f86e125eb7799996bb54fa81126a44e6dbd065d0c42658a864",
+    "tests/test_extraction_adapters.py": "e111a1317456c37a9e1f5e4caa14e34d5341a78cd6b09638505cb795c9cd3ed3",
+    "tests/test_extraction_independent_review.py": "1ccc07e55230e38b407d4c3ebd3cce175a026ce3d53106df8b99c7d1b48b9ed2",
+    "tests/test_fom_sources_independent_review.py": "08cf3ab48010dba21eaee8dc71aec03376b27111dad5e8cd9e394669d879146a",
+    "tests/test_gate_allocation_independent_review.py": "29dcaed7c439d4c35af805fdeb51216172f776f4de3d6ed269630ed865c9e1a3",
+    "tests/test_gate_charge_intervals.py": "92753e65a72c0e594289e9b77044289fa6acf87a0aa95aebfabb145514696948",
+    "tests/test_gate_resistance.py": "68688c3dbe0fd3eb613122bee5e9d5f6291371759ca1ae37a027746d069fa197",
+    "tests/test_gate_resistance_api.py": "1a5b1d890260f5b8312b6008bbcc959dc7f732fd93e3c6f1d006ac737c78efd4",
+    "tests/test_grid_analysis.py": "4592122d3de57bd5a06cb52e2b79b59e077e842b72345d723fa25891de1b9edb",
+    "tests/test_grid_energy_independent_review.py": "0f8c8000a76308c4b87c96ce9812885eb7f43b60864bf198042382654d5d2373",
+    "tests/test_grid_merit.py": "685805f4cb868834df134d31e95cc59d1c39f914f1c405946f9d19d89fb9f351",
+    "tests/test_grid_merit_boundaries.py": "baeea83f319af744b3974d03866d7bb7cdacc496162e654052273e5b95c68f06",
+    "tests/test_grouped_harmonic_independent.py": "4560942bf34e921878789ef275b359a3fd6b915f948296118c7b389bbecd954d",
+    "tests/test_harmonics_grouped_series.py": "f9c6c36a8585b2a35cf4e7e1312be738956cedf9648d4de1a501e94f790f975d",
+    "tests/test_legacy_comparison_closure.py": "12594575bc1ba689e4e2eefade3a2b8f67408c4cbaee536bcb0afe8d723a8159",
+    "tests/test_legacy_mat.py": "dd9d88e1d2f4db8af7ede101ab34f2227c6cbce1b9b18f4627999a14ad82e81d",
+    "tests/test_ltspice_dpt.py": "9c5a55ee62d46379bce9c76c2b8f3174d4d57a28fb162b6a0d1a0e137c31820e",
+    "tests/test_mat_migration_independent.py": "c1176cbe1cf78306b59e68fc2a649b2e9a66401adc69b65dd0bedae46cfd7006",
+    "tests/test_measurement_import.py": "a78683fb7783e01a2312c56150fcde4c3c6274fb93ed01670082484217291021",
+    "tests/test_measurement_import_independent.py": "fd36a60eb67f31c3fc3917f7ffb2d57b801a5ac7a017eba94623ce51fdb7b209",
+    "tests/test_native_json_api_import.py": "127a6cea12f75da9403eaa584de2a066d8df0cfc2d19029243eed1e1a2784fc7",
+    "tests/test_phase6_independent_review.py": "261a805034327e53a376f5a4db6f1a169cd2179a166994dfa6c5256ac3224cb3",
+    "tests/test_plecs_core_export.py": "49c57e9457ac00f75e5b499d8ecd6bba6ba02eb945af5e19f76614ba49fdafc9",
+    "tests/test_plecs_document.py": "a482669c05b7f05f2bfd85d8519809b72e085ceaa373d2dee8810b34fdbce24f",
+    "tests/test_public_calculation_exports.py": "4976a29d4606e5664bf23a8841f283590941391843000b4c3dfdd0278ff4e982",
+    "tests/test_public_export_independent_review.py": "e7b6697643e19553941bf9f352b9a82a2cbafa1f049144bb8ecdbdecc7278832",
+    "tests/test_reverse_current_sharing.py": "69d4dfb19360d5fa974567c9df71b07d076360f3ad3deef64141fa1ab3af3667",
+    "tests/test_reverse_sharing_independent_review.py": "f9e2adbaa2b7a473906e973eac368714e8a5b98baa8a6b302379856d359f3dba",
+    "tests/test_rg_energy_access.py": "f8e75700f47be71c854c1900e6186131363c25919252caa0d5d4c5eca3845461",
+    "tests/test_rg_energy_access_independent_review.py": "d52f4c4c9b297303cf6979166cef6fb7628523a38cdfd2be0f69e1862ce7b299",
+    "tests/test_rg_energy_independent.py": "8fc2a7d4f770615767f737fb58dd4de5e3d9d5925f9902562cb152e1bf499053",
+    "tests/test_rg_formula.py": "8acd935bee65e9aaa56ed16afa916694cf3752b4d2f1c8bf78d33efd96abd5a4",
+    "tests/test_semiconductor_assemblies.py": "680fb226cd30518f2b6fd28143acaff75a76f9a6ce9d90adad5cddd4ba4a5bc8",
+    "tests/test_semiconductor_stress.py": "7ba0818f07f007bc37941ecf74faba1e184b15bb669401a1a0e4fa7d66e50748",
+    "tests/test_stress_independent_review.py": "3cd05ab5cb62fc61b99b9d5b8c8a1693318a51d917b24b9352eeb2b586354761",
+    "tests/test_thermal_workbench.py": "deb4a9e2edf2f26411db272df1ec6948bf57d429e6cfc8f6024252aeee354b0a",
+    "tests/test_waveform_losses.py": "d5f57acd53e4984f252acf64c9834e67e6ed03f021f168be4523ec9de5eb02af",
+    "tests/test_waveform_workbench.py": "b26684cc502a20ebed22e692c3365a78e8a1db40b1083acd4d45bcf26d406e30",
+    "tests/test_web_export_independent_review.py": "b406182a911ad77adbceff09b7d3725bb90d0d4539939449b81a0bb12798dcb9",
+    "tests/test_web_native_exports.py": "4e06b22a737ff20b6ae2a4bbf501db88d795503d5cf746baa61b12a3d2b613c2",
+    "tests/test_workbook_fom.py": "c14ecc2de7dca2d4fcb3f1fc47c6286e6999ded9ab564adfaa87270cce49f345",
+    "tests/test_workbook_fom_independent.py": "adfcb0dd5d08373a1e0f4a0316b4ab763ee2abf1d39a1d5c57f7525e7c54ad2f",
+    "tests/test_xyz_energy_import.py": "49ac7bc3121df12f0bac3732e02f12a683ebd391f6f5016d3d774848b03d3735",
+    "tests/test_xyz_energy_import_oracles.py": "09adc0968b901805a9ad84d2874cb3464ff355c896942ad55b2a9a6aa2f515ed",
+    "transistordatabase/analytical_models.py": "dd3c159cb2e92c5edd316f9e7c42d807e2e1035a100a2167d5a56d1899996600",
+    "transistordatabase/biela.py": "9b90701f2f41c49a5c1b3ac19a80a35bcfa65e7fed2601cd8568dffce845e979",
+    "transistordatabase/catalog_fom.py": "4065cb46138f382428daf50300ef5f12c7eddf006af3200843f1496c313b6a83",
+    "transistordatabase/catalog_sources.py": "445312c6f99951db871f20a8f48d9d39515fc933f97c633ff3660aa213ae010c",
+    "transistordatabase/channel_models.py": "9c8334715dfda4809e24e28badffc8fdf76ff8cabc900dceda57553bc0ce2b39",
+    "transistordatabase/circuit_summary.py": "79e0f5a72cc67cc213b540532d57cfc427d7a9881776b7ec040532277c917165",
+    "transistordatabase/condition_tables.py": "5c08322fa87d0d08fa4ebfa6d143228c07e4a8a53bfa50ac9bf9db9400fb5d40",
+    "transistordatabase/converter_losses.py": "5a30a7f06f3cd33e0c38a048c0647566cc36df953ddc4c57d2031e82dac2357d",
+    "transistordatabase/current_allocation.py": "9148d94bab751532e447658396c71a1af7a8ebe4dad9dd9857401b665e54951b",
+    "transistordatabase/device_model_fitting.py": "9fc0925b3ab3ef07119b09d18bf83ddb3b027ea5c15918795cbc38d9c0b25a68",
+    "transistordatabase/device_parameters.py": "432df1a5524ce528a1ee2d0af467d576896bad90d6d596921ab2490dc8bf4982",
+    "transistordatabase/digitization.py": "a0a24741352000af593bc2c2520ed0c9f4d0cb997e47dbf0677a5a8d28c86158",
+    "transistordatabase/energy_maps.py": "047d8a226fb6d6b9f5698874534c64fe0c6a66f6834c2ad75659eae7f94168b1",
+    "transistordatabase/gate_resistance.py": "e1fbb3d3441ebe6a8a9374edbf165b4cb29a808c36f53921767f56ffac3d295f",
+    "transistordatabase/grid_analysis.py": "4dd4fcefdc3914c4e951bc649b746cb034642c95575408517cbe12c5038dd485",
+    "transistordatabase/grid_merit.py": "5a734f327b4f0c29123c1eec0216480d9ae87c851a274655de5a882d92c0a238",
+    "transistordatabase/grouped_series.py": "8eaaef49ac14bd6ccfaba510df8a5d7f6cf6585c8914dec96dd2ae376b6d5fea",
+    "transistordatabase/gui_web/backend/analysis_routes.py": "d19e581613d2706388825715d069aa3898ea931f7ee496bcfb17e096f0de9dc9",
+    "transistordatabase/gui_web/backend/converter_routes.py": "9c1e40fff7eb63ef2d100173f25231a69ff0121dc9b367facd6b099479c12498",
+    "transistordatabase/gui_web/backend/finite_json_route.py": "62452692d3fb93ab05299b96ae1e7db670d855aa9daf16643d47a4089f828218",
+    "transistordatabase/gui_web/backend/model_fit_routes.py": "275a4345df7a8914ac8bc64770f4c68875fccc5f49dc5f6875e99b84b204cfff",
+    "transistordatabase/gui_web/backend/rg_energy_routes.py": "12fc31db6394c01fb74dea389df8b9a99c42b049e7075df2d4fdf94f9d2ea635",
+    "transistordatabase/gui_web/backend/waveform_routes.py": "5b5abbfb2cd5c495ef6ba806fbf10e17cdc2b2b93c523101f032e3375fe53e85",
+    "transistordatabase/gui_web/backend/xyz_energy_routes.py": "c89d99a46c3714f397f533ba92bdae1f80dca797a8bb4c28d29368b231d4a731",
+    "transistordatabase/gui_web/src/components/CircuitPhysicalSummary.vue": "71ba4c29c34c3d3639dc3077ac1a2f606d08c4d85fafc684e26f5e2a27e5f136",
+    "transistordatabase/gui_web/src/components/ConverterWorkbench.vue": "31e8a4b61cb23d830025d41b601f555020744871429876d41b1ab4cc105580e1",
+    "transistordatabase/gui_web/src/components/GridWorkbench.vue": "ef6116a9161bbeaef64c29fd2a7e04c622c6e1a9103113c3ed4f177bb8b30ebe",
+    "transistordatabase/gui_web/src/components/GroupedSeriesEvidence.vue": "dacb79bb68d306ed301b2e5e530fe051d47c1ce300266696aec315a75f98370c",
+    "transistordatabase/gui_web/src/components/MeritAnalysisEvidence.vue": "21709c48895881395b77942d251908fd800c07b9866815ae1e49898e14fc7355",
+    "transistordatabase/gui_web/src/components/WaveformAnalysisView.vue": "fe63a31e602a97a8a24f2fcc2d2e1194f9c94c8661c21e12feec0ad89aae0375",
+    "transistordatabase/gui_web/src/components/WaveformWorkbench.vue": "84bd2f6c4ec0c31e042f65efa7ed8a7d5f6e6f2b85b9bf48c0b7f365ea57a6a6",
+    "transistordatabase/gui_web/src/components/circuitSummaryForm.js": "7e34d5e30d841b02074d172fe098d00e19a993ce2985307abe5fa3c5232aeb0c",
+    "transistordatabase/gui_web/src/components/converterForm.js": "60f0030aa0062183ad52d6d1f826720dc46418235e9d34bfba6661f140325047",
+    "transistordatabase/gui_web/src/services/api.js": "3c4754a2dcb547f8255f2bcf8da4680e5b20d22a34ac0954e5de7613b1c41899",
+    "transistordatabase/gui_web/src/services/circuitSummaryApi.js": "f85843f02370316da9f40bc964fc9241165adfffc64dec106dc932ce657e159b",
+    "transistordatabase/gui_web/src/tests/e2e/circuit-physical-summary.spec.js": "cb69643e31a7f316e5325dd30b3cb8ced7558a8f60594dea5c762c3cf4ef667c",
+    "transistordatabase/gui_web/src/tests/e2e/converter-workbench.spec.js": "c045b414219afa9833a62db0fb933e4fc58e4b587390db009b626e3d9842a468",
+    "transistordatabase/gui_web/src/tests/e2e/grid-merit.spec.js": "bf01d1128c673b6db123443ee5b78328aecef97e951bae35dc8144ae6b6bb3c3",
+    "transistordatabase/gui_web/src/tests/unit/CircuitPhysicalSummary.test.js": "8b3917b90308de69955ee5b7738e77fd0410391e0afea4c766058738aade85e0",
+    "transistordatabase/gui_web/src/tests/unit/CircuitSummaryApi.test.js": "83c40f78a63fe88785b786d8c8f7aa9f8a84fc5960b2bbca397dfc3b62c9a6af",
+    "transistordatabase/gui_web/src/tests/unit/ConverterWorkbench.test.js": "1b4c55a63cbfe607cc3083a1e4613bd912dbc5645bf31b2ea30a222fc0ec9b21",
+    "transistordatabase/gui_web/src/tests/unit/MeritAnalysis.test.js": "e5031ced22de4cdbf5f4047ec6cd0b08ba16b654c6ce0aa785aa4c9c127e9fde",
+    "transistordatabase/gui_web/src/tests/unit/MeritAnalysisApi.test.js": "a434eec2f4596c0bcf8d538b27bc6a0b13af0822cd6c3d0500a2ecbe752e7013",
+    "transistordatabase/legacy_mat.py": "c6056c0eb687e5642bf4f58138b21819092d3d6a893197a5fc2e162d3dab9e49",
+    "transistordatabase/measurement_import.py": "d4420ab07ba424934d1ccb8ffc4d9532d797f92ff47e020f0a8fd08748939aaf",
+    "transistordatabase/native_export.py": "73eab272d9048d6af2ddd0dc13b0c5aef7228496d1698a97591db755bb63b169",
+    "transistordatabase/plecs_core_export.py": "d7fff7dfb07983123f5176fb8cb0d25c68e0cf35bd2e15f3305c30f971d4a5e8",
+    "transistordatabase/plecs_document.py": "42657785fbe214e00c752f402b2a92c323bda3d04d401bf9c73160535970ce79",
+    "transistordatabase/reverse_current_sharing.py": "bdfa533809ac7fa7c90e88a2f1a6189756428ec27a673b8533963ce7f65d8cc8",
+    "transistordatabase/rg_energy_access.py": "1d0db9b6f3e035eac0a78a33ebd8c4858e83d07cb8e5df39b66d6c4002b8ae8f",
+    "transistordatabase/rg_formula.py": "6f08bb1a4f2c084f3f55000b6f55c93d58114c0983d114388fb2c0fd65d242e1",
+    "transistordatabase/semiconductor_assemblies.py": "408d16d5ccc73f37af0d8d4d0c3593666e8988e81bd95e5fd97d7f7d3e704d30",
+    "transistordatabase/semiconductor_stress.py": "3c02b02af9111ba18e0f12b5007ae79d532c7d0d0d2b6f9b592fcfe1c816b641",
+    "transistordatabase/static_losses.py": "fe85b008252b2bc1788c86abc0b4ea0312f9875e41eac2248c0722e1f2c3573c",
+    "transistordatabase/thermal.py": "3feae846500afd05bbf4b2a5e27a92ffa2ebd55f2f342d04511da5e55d10c4ad",
+    "transistordatabase/waveform_losses.py": "3d51d76cd0dafc4aa426ce9320b99acf80d310d6712af010f3752e2ba206800e",
+    "transistordatabase/workbook_fom.py": "cd788403b06892848ad5eb0bdf99669ca2fe90030fa500abf7bb3d755155ec27",
+    "transistordatabase/xyz_energy_import.py": "2bb062cab74a102ba98c5d875c9c5279e993cbfe5d1cfd5161991fdb379a3704"
+  },
+  "retained_artifacts": [
+    {
+      "source_path": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776.log",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-python.log",
+      "bytes": 6870,
+      "sha256": "667fc3834fa96060dc203037f66d486fab8ad2ffefcc51fa981579ed00bd5965"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776.xml",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-python.xml",
+      "bytes": 256057,
+      "sha256": "158d698ce152a86efe4b8b457c068dabe34e1a702b90f3f7bb790c75ebcf491b"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776-selection.json",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-python-selection.json",
+      "bytes": 2703,
+      "sha256": "a7752d531c86c73dd2ae0a676716ecbf1d7cc203a0a0f32abeb85daa289baccf"
+    },
+    {
+      "source_path": "/tmp/tdb-vue-final-20261111-143408-circuit.log",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-vue.log",
+      "bytes": 15523,
+      "sha256": "4bb4827c1314c42166a0196afc6d9b7a1c38bea091a8dc11f14d7eebc0f30002"
+    },
+    {
+      "source_path": "/tmp/tdb-headless-final-20261111-e6c30199-e643-4bf0-83a7-36293132e340.json",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-headless.json",
+      "bytes": 889,
+      "sha256": "e5c16445785e6bf5d032e260ad2d8ba41c4857da71e8cbfa3563eab697a9a124"
+    },
+    {
+      "source_path": "/tmp/tdb-browser-final-20261111-f3fa0e35-15e1-4f92-a958-b03636001441.log",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-post-guard-browser.log",
+      "bytes": 1574,
+      "sha256": "ad078b631e6208b3d4ed69dca629e4f1b504630e8cf1246bb621b92130957159"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-97415a89-f2d5-433d-a1f5-094f641f8e21/energy-scene-3d-compiled-o-6d15a-ation-and-surface-at-1440px-chromium/energy-3d-complete-1440.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/surface-energy-3d-complete-1440.png",
+      "bytes": 143002,
+      "sha256": "8dce24e505dff37df690a6a847945ce3a38b0dccfd4c1d22a1ae7098dd569e09"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-97415a89-f2d5-433d-a1f5-094f641f8e21/energy-scene-3d-compiled-o-de026-tation-and-surface-at-390px-chromium/energy-3d-complete-390.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/surface-energy-3d-complete-390.png",
+      "bytes": 138280,
+      "sha256": "e9311f007e4d135db64f440b7f7d8bb87f4cda092b5869d718d0a5451076d0f9"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-97415a89-f2d5-433d-a1f5-094f641f8e21/energy-scene-3d-compiled-o-067b7-pages-and-exact-source-hash-chromium/energy-3d-explicit-cap-and-identities.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/surface-energy-3d-explicit-cap-and-identities.png",
+      "bytes": 533215,
+      "sha256": "1650a49d65cf0c5b9a120a39a17b26f9d86ef2ff09d82e622b11637ccd3a7429"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-c6f42af5-cf20-47be-9569-00cc3b718aba/grouped-harmonics-compiled-b4a2b-and-raw-downloads-at-1440px-chromium/current-spectrum-1440.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/series-output-current-spectrum-1440.png",
+      "bytes": 119482,
+      "sha256": "f76f2dc3a714bd904fc00a95c12bd90d889baf19dd1a93264d8ff9b7d1bc953d"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-c6f42af5-cf20-47be-9569-00cc3b718aba/grouped-harmonics-compiled-fb269--and-raw-downloads-at-390px-chromium/current-spectrum-390.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/series-output-current-spectrum-390.png",
+      "bytes": 55805,
+      "sha256": "b5bae8e9656088c9bd2e97068e60286678905ae268106a4100381253866365ad"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e/grid-merit-compiled-weight-982c4-omplete-population-at-390px-chromium/merit-definition-390.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/merit-merit-definition-390.png",
+      "bytes": 77513,
+      "sha256": "f66d5733217ba540d7c1e03258fd0fdc1573f28b1d8ec687aef206ac46bae696"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e/grid-merit-compiled-weight-982c4-omplete-population-at-390px-chromium/merit-ranking-390.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/merit-merit-ranking-390.png",
+      "bytes": 49066,
+      "sha256": "aa6d16861e05ec679ccb8c11ffe922aca980cb55cb8acca85c792abdfaa9e26f"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e/grid-merit-compiled-weight-982c4-omplete-population-at-390px-chromium/merit-values-390.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/merit-merit-values-390.png",
+      "bytes": 64024,
+      "sha256": "86193d7cddcccf6a2bd9c2ce92380210a27b1b20f869c9e0a80d89f3c4f16eff"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e/grid-merit-compiled-weight-a2f38-mplete-population-at-1440px-chromium/merit-definition-1440.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/merit-merit-definition-1440.png",
+      "bytes": 172021,
+      "sha256": "f8d54f270ff64fed5cb0ca7b8d50b644b85e708d5e3de7feeed3c2866f5fdf58"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e/grid-merit-compiled-weight-a2f38-mplete-population-at-1440px-chromium/merit-ranking-1440.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/merit-merit-ranking-1440.png",
+      "bytes": 136068,
+      "sha256": "5291e6ec89ef004846c2d362c4debe503652c0e3e6d09fa106af8849e4389bb7"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e/grid-merit-compiled-weight-a2f38-mplete-population-at-1440px-chromium/merit-values-1440.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/merit-merit-values-1440.png",
+      "bytes": 133755,
+      "sha256": "235623b6553a2684d32cb52af4d95e9d89e7235d399f16a9246c648cd5001a53"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-ba2243cc-58aa-4d68-adfd-d9f90c267220/circuit-physical-summary-c-640e9-e-and-exact-audit-downloads-chromium/circuit-desktop.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/circuit-desktop.png",
+      "bytes": 119540,
+      "sha256": "0fd2d50d2380a19726e6198522c13ff15bc8528452c292de0d3555df949b5274"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-ba2243cc-58aa-4d68-adfd-d9f90c267220/circuit-physical-summary-c-14ede-e-and-exact-audit-downloads-chromium/circuit-mobile.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/circuit-mobile.png",
+      "bytes": 90223,
+      "sha256": "2f86f2967da7f611a6e584e4b686985fb9c5aea3ed9c0190cf392a38422e1ea7"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-ba2243cc-58aa-4d68-adfd-d9f90c267220/circuit-physical-summary-c-8af5a--and-negative-channel-owner-chromium/circuit-partial-known-heat-ack.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/circuit-partial-known-heat-ack.png",
+      "bytes": 143866,
+      "sha256": "675fc6ead25c9743aa611307ee49ac4acd51faca6edf1277c75d2269ff811241"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776-summary.json",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-verification-summary.json",
+      "bytes": 4306,
+      "sha256": "6b9054c6f81cd283326f931729292cabcb7de3235fffbfcbf5f1464d62e7570b"
+    },
+    {
+      "source_path": "C:\\Users\\tinix\\.codex\\visualizations\\2026\\10\\15\\01a14167-12e0-7b50-8854-30a2da5da2fe\\wsl-diagnosis-20261111\\ubuntu-memory-incident.md",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/ubuntu-memory-incident.md",
+      "bytes": 4360,
+      "sha256": "05df3d72970e49ea10d1df3c6ae4a639442eb4b6d8552482121ee2dfef160cea"
+    }
+  ],
+  "artifact_manifest": {
+    "path": "docs/reports/semiconductor-parity-evidence-2026-11-11/artifact-manifest.json",
+    "sha256": "28354936b42a139e1e170e8d39df8426c9c279870ef7e7c4b618321274c19c69"
+  },
+  "limitations": [
+    "Acceptance concerns ten selected operation contracts. Full definition-level numerical equivalence remains unverified.",
+    "Commercial device accuracy requires independent measurements and calibration under declared conditions.",
+    "General Excel formula evaluation, VBA execution and Power Query refresh remain outside the verified source-preview workflows.",
+    "General SPICE device or Simulink model interchange and universal simulator compatibility remain unsupported. Bounded native, MAT, PLECS and conditional Gecko formats retain their documented limits.",
+    "Version-specific PLECS and Gecko consumer qualification requires separate evidence.",
+    "TDB_GENERIC_DPT_RAW is not configured; original November 10 RAW fixture is unavailable for this run. Previous pass remains historical evidence only.",
+    "Whole-tree check includes mixed-EOL working state. Broader GUI scope flags an existing extra EOF blank line in App.vue. App.vue was not changed during this continuation after the WSL restart. Narrowed final tracked implementation paths pass.",
+    "Existing Vite chunk-size warning above 500 kB",
+    "The raw eight-case browser log was not retained. Its owner-verified result and reviewed captures accompany the retained final three-case browser log.",
+    "Earlier unavailable artifacts remain explicitly unavailable in their historical receipts."
+  ],
+  "memory_incident": {
+    "retained_report": {
+      "source_path": "C:\\Users\\tinix\\.codex\\visualizations\\2026\\10\\15\\01a14167-12e0-7b50-8854-30a2da5da2fe\\wsl-diagnosis-20261111\\ubuntu-memory-incident.md",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/ubuntu-memory-incident.md",
+      "bytes": 4360,
+      "sha256": "05df3d72970e49ea10d1df3c6ae4a639442eb4b6d8552482121ee2dfef160cea"
+    },
+    "observed": "Guest out-of-memory event with 16 GB RAM and 8 GB swap. Three Python processes reached about 14.7 GB combined RSS at 11:09 CET.",
+    "uncertain": "Historical Python command lines are unknown. A causal link to Windows E_UNEXPECTED is not established.",
+    "final_response": "Final checks ran serially. Largest recorded final process peak was 566244 KiB. No RAM setting changed.",
+    "verified_controls": "Separate bounded review confirmed a reachable converter metadata-expansion path. Shared preflight, 4000000-byte streamed request and 24000000-byte response bounds now protect it. Six bounded regressions passed. No memory-exhaustion reproducer was run. The historical culprit remains unidentified."
+  },
+  "context_recovery": {
+    "bridge": "Unavailable during earlier context recovery. The final bounded canonical read and updates succeeded. Automatic capture health remains unverified.",
+    "transcripts": "No matching recent Ubuntu main-project or worktree transcript was recovered.",
+    "canonical_state_update": "Succeeded: four exact remaining task names marked done with current/evidence/work_product fields and remaining fields cleared. Both canonical lists are closed. Runtime current URL/PID 474359/session 68430, verification, guard and remaining fields were reconciled. Historical diagnostic uncertainty remains preserved. Server remains live."
+  },
+  "decision": {
+    "id": "D-001",
+    "date": "2026-11-11",
+    "scope": "Reporting method only. Preserve sealed records and issue separate dated ten-workflow acceptance evidence."
+  }
+}

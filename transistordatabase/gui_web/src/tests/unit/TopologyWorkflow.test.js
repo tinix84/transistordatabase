@@ -86,9 +86,13 @@ describe('TopologyCalculator API workflow', () => {
     const contourToggle = wrapper.findAll('input[type="checkbox"]')[0]
     await contourToggle.setValue(true)
     await wrapper.findAll('select').find(select => select.element.value === 'f_sw').setValue('f_sw')
+    await flushPromises()
+    expect(wrapper.get('button.btn-primary').element.disabled).toBe(false)
     await wrapper.get('button.btn-primary').trigger('click')
     await flushPromises()
 
+    expect(wrapper.find('[role=alert]').exists()).toBe(false)
+    expect(calculateTopology).toHaveBeenCalledTimes(1)
     const request = calculateTopology.mock.calls[0][0]
     expect(request.mode).toBe('detailed')
     expect(request.switch_transistor_id).toBe('TDB switch')
@@ -132,6 +136,68 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Averaged inductor volt-second residual: 0.00000000 V')
     const comparisonButton = wrapper.findAll('button').find(button => button.text().includes('Compare topologies'))
     expect(comparisonButton.element.disabled).toBe(false)
+  })
+
+  it('sends the exact switching conditions and renders switching-loss-balanced Boost results', async () => {
+    calculateTopology.mockResolvedValueOnce({
+      ...estimateResponse,
+      topology: 'boost',
+      model: {
+        ...estimateResponse.model,
+        mode: 'switching-loss-balanced',
+        assumptions: ['Reverse recovery is excluded because Eon provenance is ambiguous.']
+      },
+      losses: {
+        conduction_switch_w: 4, conduction_diode_w: 6,
+        switching_on_w: 2, switching_off_w: 3, total_w: 15,
+        loss_scope: 'channel_conduction_and_switch_turn_on_turn_off',
+        scope: 'reverse recovery excluded'
+      },
+      performance: {
+        p_out_w: 500, p_in_w: 515, efficiency_percent: 97.087,
+        power_balance_residual_w: 0, input_power_scope: 'switching-loss balance'
+      }
+    })
+    await wrapper.findAll('button.topology-card').find(button => button.text().includes('Boost')).trigger('click')
+    await setSelect('Calculation mode', 'switching-loss-balanced')
+    expect(wrapper.find('.sweep-toggle input').element.disabled).toBe(true)
+    expect(wrapper.findAll('button').find(button => button.text().includes('Compare topologies')).element.disabled).toBe(true)
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+
+    expect(calculateTopology.mock.calls[0][0]).toMatchObject({
+      topology: 'boost', mode: 'switching-loss-balanced',
+      t_j: 25, v_g: 15, v_g_off: -5, r_g_on: 10, r_g_off: 10
+    })
+    expect(wrapper.text()).toContain('Boost CCM TDB switching-loss-balanced model')
+    expect(wrapper.text()).toContain('Switching on')
+    expect(wrapper.text()).toContain('Switching off')
+    expect(wrapper.text()).toContain('Reverse recovery is excluded')
+  })
+
+  it('guards switching feedback to Boost CCM and hides retained sweep settings', async () => {
+    const modeOption = wrapper.find('option[value="switching-loss-balanced"]')
+    expect(modeOption.element.disabled).toBe(true)
+
+    await wrapper.findAll('button.topology-card').find(button => button.text().includes('Boost')).trigger('click')
+    expect(modeOption.element.disabled).toBe(false)
+    await setSelect('Conduction regime', 'DCM')
+    expect(modeOption.element.disabled).toBe(true)
+    await setSelect('Conduction regime', 'CCM')
+
+    await setSelect('Calculation mode', 'loss-balanced')
+    const sweepToggle = wrapper.find('.sweep-toggle input')
+    await sweepToggle.setValue(true)
+    expect(wrapper.text()).toContain('Sweep type')
+
+    await setSelect('Calculation mode', 'switching-loss-balanced')
+    expect(sweepToggle.element.disabled).toBe(true)
+    expect(wrapper.text()).not.toContain('Sweep type')
+    expect(wrapper.text()).toContain('Saved sweep settings are hidden and will not be submitted')
+
+    await wrapper.findAll('button.topology-card').find(button => button.text().includes('Buck')).trigger('click')
+    expect(wrapper.get('button.btn-primary').element.disabled).toBe(true)
+    expect(wrapper.text()).toContain('requires Boost with CCM selected')
   })
 
   it('sends loss-balanced sweep and renders its scope and voltage-law caveat', async () => {
@@ -754,7 +820,10 @@ describe('TopologyCalculator API workflow', () => {
       const label = wrapper.findAll('label.param-item').find(item => item.text().includes(labelText))
       await label.get('input').setValue('')
     }
+    await vi.waitFor(() => expect(wrapper.get('button.btn-primary').element.disabled).toBe(false))
+    expect(wrapper.findAll('label').find(label => label.text().includes('Calculation mode')).get('select').element.value).toBe('detailed')
     await wrapper.get('button.btn-primary').trigger('click')
+    await vi.waitFor(() => expect(calculateTopology).toHaveBeenCalledOnce())
     await flushPromises()
 
     const request = calculateTopology.mock.calls[0][0]

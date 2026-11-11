@@ -35,8 +35,8 @@ jobs:
         run: |
           echo Start testing...
           cd tests/
-          pytest test_tdb_classes.py
-          pytest test_database_manager.py
+          pytest test_tdb_classes.py --noconftest
+          pytest test_database_manager.py --noconftest
           pytest test_web_database_lifecycle_api.py --noconftest
           echo tests finished.
           

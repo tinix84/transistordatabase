@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, shallowRef, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import TransistorList from './components/TransistorList.vue'
 import TransistorForm from './components/TransistorForm.vue'
 import TransistorComparison from './components/TransistorComparison.vue'
@@ -13,9 +13,36 @@ import PLECSImporter from './components/PLECSImporter.vue'
 import AnalyticalCalculator from './components/AnalyticalCalculator.vue'
 import DPTManager from './components/DPTManager.vue'
 import DatabaseBackupManager from './components/DatabaseBackupManager.vue'
+import CatalogFom from './components/CatalogFom.vue'
+import CatalogSourceWorkbench from './components/CatalogSourceWorkbench.vue'
+import WaveformWorkbench from './components/WaveformWorkbench.vue'
+import ThermalWorkbench from './components/ThermalWorkbench.vue'
+import GridWorkbench from './components/GridWorkbench.vue'
+import EnergyMapWorkbench from './components/EnergyMapWorkbench.vue'
+import SemiconductorAssemblyWorkbench from './components/SemiconductorAssemblyWorkbench.vue'
+import ConverterWorkbench from './components/ConverterWorkbench.vue'
+import PlecsWorkbench from './components/PlecsWorkbench.vue'
+import DigitizerWorkbench from './components/DigitizerWorkbench.vue'
+import LegacyMatWorkbench from './components/LegacyMatWorkbench.vue'
+import MeasurementWorkbench from './components/MeasurementWorkbench.vue'
+import StressIndicesWorkbench from './components/StressIndicesWorkbench.vue'
 import { transistorApi } from './services/api.js'
 
-const currentView = ref('search')
+const initialView = new URLSearchParams(window.location.search).get('view')
+const currentView = ref(['catalog-fom', 'catalog-sources', 'waveform', 'thermal', 'analysis-grid', 'energy-map', 'assemblies', 'converter', 'plecs-data', 'dpt', 'compare-advanced', 'digitizer', 'legacy-mat', 'measurements', 'stress-indices', 'analytical'].includes(initialView) ? initialView : 'search')
+const stagedThermal = shallowRef(null)
+function stageThermal(handoff) {
+  stagedThermal.value = JSON.parse(JSON.stringify(handoff))
+  currentView.value = 'thermal'
+}
+function navigateWorkbench(view) {
+  if (['plecs-data', 'dpt'].includes(view)) currentView.value = view
+}
+const suppliedCatalog = shallowRef(null)
+function exploreCatalog(catalog) {
+  suppliedCatalog.value = catalog
+  currentView.value = 'catalog-fom'
+}
 const transistors = ref([])
 const selectedTransistor = ref(null)
 const selectedForExport = ref([])
@@ -24,6 +51,49 @@ const isLoading = ref(false)
 const isDarkTheme = ref(false)
 const showMoreMenu = ref(false)
 const operationMessage = ref(null)
+const moreMenuTrigger = ref(null), moreMenuPopup = ref(null), moreMenuStyle = ref({})
+let moreMenuAnchor = null
+function closeMoreMenu(returnFocus = false) {
+  showMoreMenu.value = false
+  if (returnFocus === true) moreMenuTrigger.value?.focus({ preventScroll: true })
+}
+async function toggleMoreMenu() {
+  if (showMoreMenu.value) { closeMoreMenu(); return }
+  const box = moreMenuTrigger.value.getBoundingClientRect(), margin = 8
+  moreMenuAnchor = { left: box.left, top: box.top }
+  const below = window.innerHeight - box.bottom - margin, above = box.top - margin
+  const openBelow = below >= Math.min(240, above)
+  const height = Math.min(560, openBelow ? below : above), width = Math.min(270, window.innerWidth - margin * 2)
+  moreMenuStyle.value = { left: `${Math.max(margin, Math.min(box.left, window.innerWidth - width - margin))}px`, width: `${width}px`, maxHeight: `${Math.max(1, height)}px`,
+    ...(openBelow ? { top: `${box.bottom}px` } : { bottom: `${window.innerHeight - box.top}px` }) }
+  showMoreMenu.value = true
+  await nextTick()
+  moreMenuPopup.value?.querySelector('button')?.focus({ preventScroll: true })
+}
+function outsideMenu(event) {
+  if (!moreMenuTrigger.value?.contains(event.target) && !moreMenuPopup.value?.contains(event.target)) closeMoreMenu()
+}
+function menuKey(event) { if (event.key === 'Escape' && showMoreMenu.value) { event.preventDefault(); closeMoreMenu(true) } }
+function menuScroll(event) {
+  if (!showMoreMenu.value || moreMenuPopup.value?.contains(event.target)) return
+  if (event.target === moreMenuTrigger.value?.closest('nav')) {
+    const box = moreMenuTrigger.value.getBoundingClientRect()
+    if (moreMenuAnchor && Math.abs(box.left - moreMenuAnchor.left) < .5 && Math.abs(box.top - moreMenuAnchor.top) < .5) return
+  }
+  closeMoreMenu()
+}
+onMounted(() => {
+  document.addEventListener('pointerdown', outsideMenu)
+  document.addEventListener('keydown', menuKey)
+  document.addEventListener('scroll', menuScroll, true)
+  window.addEventListener('resize', closeMoreMenu)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', outsideMenu)
+  document.removeEventListener('keydown', menuKey)
+  document.removeEventListener('scroll', menuScroll, true)
+  window.removeEventListener('resize', closeMoreMenu)
+})
 
 onMounted(async () => {
   console.log('[App.vue] Component mounted, loading transistors...')
@@ -296,15 +366,32 @@ function handleOpenDatabaseSearch() {
       >
         Database Backup
       </button>
+      <button @click="currentView = 'catalog-fom'" :class="{ active: currentView === 'catalog-fom' }" class="nav-btn">
+        FOM &amp; Pareto
+      </button>
+      <button @click="currentView = 'catalog-sources'" :class="{ active: currentView === 'catalog-sources' }" class="nav-btn">Catalog source import</button>
+      <button @click="currentView = 'legacy-mat'" :class="{ active: currentView === 'legacy-mat' }" class="nav-btn">Legacy MAT</button>
+      <button @click="currentView = 'measurements'" :class="{ active: currentView === 'measurements' }" class="nav-btn">Measurement import</button>
       <div class="nav-dropdown">
         <button
-          @click="showMoreMenu = !showMoreMenu"
-          :class="{ active: ['plecs-import', 'analytical', 'dpt', 'batch-export'].includes(currentView) }"
+          ref="moreMenuTrigger"
+          @click="toggleMoreMenu"
+          :aria-expanded="showMoreMenu" aria-controls="more-tools-popup" aria-haspopup="true"
+          :class="{ active: ['plecs-import', 'plecs-data', 'analytical', 'dpt', 'batch-export', 'waveform', 'thermal', 'analysis-grid', 'energy-map', 'assemblies', 'converter', 'digitizer', 'stress-indices'].includes(currentView) }"
           class="nav-btn"
         >
           More Tools ▾
         </button>
-        <div v-if="showMoreMenu" class="dropdown-menu" @mouseleave="showMoreMenu = false">
+        <Teleport to="body"><div v-if="showMoreMenu" ref="moreMenuPopup" id="more-tools-popup" class="dropdown-menu" :style="moreMenuStyle" aria-label="More tools">
+          <button @click="currentView = 'waveform'; showMoreMenu = false" class="dropdown-item">Waveform workbench</button>
+          <button @click="currentView = 'stress-indices'; showMoreMenu = false" class="dropdown-item">Semiconductor stress indices</button>
+          <button @click="currentView = 'analysis-grid'; showMoreMenu = false" class="dropdown-item">Analysis grid</button>
+          <button @click="currentView = 'energy-map'; showMoreMenu = false" class="dropdown-item">Energy map</button>
+          <button @click="currentView = 'digitizer'; showMoreMenu = false" class="dropdown-item">Image digitizer</button>
+          <button @click="currentView = 'thermal'; showMoreMenu = false" class="dropdown-item">Thermal workbench</button>
+          <button @click="currentView = 'assemblies'; showMoreMenu = false" class="dropdown-item">Semiconductor assemblies</button>
+          <button @click="currentView = 'converter'; showMoreMenu = false" class="dropdown-item">Converter loss workbench</button>
+          <button @click="currentView = 'plecs-data'; showMoreMenu = false" class="dropdown-item">PLECS data workbench</button>
           <button @click="showPLECSImport(); showMoreMenu = false" class="dropdown-item">
             PLECS Import
           </button>
@@ -317,7 +404,7 @@ function handleOpenDatabaseSearch() {
           <button @click="showBatchExport(); showMoreMenu = false" class="dropdown-item">
             Batch Export
           </button>
-        </div>
+        </div></Teleport>
       </div>
     </nav>
 
@@ -332,6 +419,19 @@ function handleOpenDatabaseSearch() {
     </div>
 
     <main class="app-main">
+      <CatalogFom v-if="currentView === 'catalog-fom'" :supplied-catalog="suppliedCatalog" />
+      <CatalogSourceWorkbench v-show="currentView === 'catalog-sources'" @explore-catalog="exploreCatalog" />
+      <WaveformWorkbench v-if="currentView === 'waveform'" @thermal-handoff="stageThermal" />
+      <GridWorkbench v-if="currentView === 'analysis-grid'" @thermal-handoff="stageThermal" />
+      <EnergyMapWorkbench v-if="currentView === 'energy-map'" />
+      <DigitizerWorkbench v-if="currentView === 'digitizer'" />
+      <LegacyMatWorkbench v-if="currentView === 'legacy-mat'" />
+      <MeasurementWorkbench v-if="currentView === 'measurements'" />
+      <StressIndicesWorkbench v-if="currentView === 'stress-indices'" />
+      <ThermalWorkbench v-if="currentView === 'thermal'" :staged-handoff="stagedThermal" />
+      <SemiconductorAssemblyWorkbench v-if="currentView === 'assemblies'" />
+      <ConverterWorkbench v-if="currentView === 'converter'" />
+      <PlecsWorkbench v-if="currentView === 'plecs-data'" />
       <div v-if="isLoading" class="loading">
         <div class="loading-spinner"></div>
         <p>Loading transistor database...</p>
@@ -362,6 +462,7 @@ function handleOpenDatabaseSearch() {
         :transistors="transistors"
         :selected-from-search="selectedForExport"
         @open-database-search="handleOpenDatabaseSearch"
+        @navigate-workbench="navigateWorkbench"
       />
       
       <!-- Basic Comparison -->
@@ -410,6 +511,7 @@ function handleOpenDatabaseSearch() {
         v-if="currentView === 'batch-export'"
         @close="showSearch"
         @export-complete="() => {}"
+        @navigate-workbench="navigateWorkbench"
       />
     </main>
 
@@ -597,15 +699,16 @@ body {
 }
 
 .dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
+  position: fixed;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--text-primary);
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 0 0 8px 8px;
   box-shadow: 0 4px 12px var(--shadow);
   min-width: 180px;
-  z-index: 200;
+  z-index: 500;
 }
 
 .dropdown-item {
@@ -777,3 +880,6 @@ body {
   }
 }
 </style>
+
+
+

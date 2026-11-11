@@ -200,7 +200,7 @@ class TestNetlistGeneration:
         dpt = LTspiceDPT(cfg)
         result = dpt.generate_netlist(tmp_path)
         assert result.exists()
-        assert result.suffix == ".asc"
+        assert result.suffix == ".cir"
 
     def test_generate_netlist_content(self, tmp_path: Path) -> None:
         """Netlist should contain correct voltage and component values."""
@@ -211,7 +211,7 @@ class TestNetlistGeneration:
 
         assert "600.0" in content  # V_dc
         assert "50e-06" in content or "5e-05" in content  # L_load
-        assert "DUT_NMOS" in content
+        assert "GENERIC_DPT_NMOS" in content
         assert ".tran" in content
         assert ".end" in content
 
@@ -324,17 +324,15 @@ class TestWaveformAnalysis:
         assert result.e_on < e_reference * 0.5
 
     def test_empty_waveform(self) -> None:
-        """Zero-current waveform should return default DPTResult."""
+        """Missing gate evidence must fail instead of returning zero energies."""
         cfg = DPTConfig(v_dc=400.0, i_target=20.0)
         dpt = LTspiceDPT(cfg)
         n = 1000
         time = np.linspace(0, 1e-5, n)
         v_ds = np.full(n, 400.0)
         i_d = np.zeros(n)
-        result = dpt.analyze_waveforms(time, v_ds, i_d)
-
-        assert result.e_on == 0.0
-        assert result.e_off == 0.0
+        with pytest.raises(ValueError, match="v_gs is required"):
+            dpt.analyze_waveforms(time, v_ds, i_d)
 
     def test_di_dt_positive(self) -> None:
         """Turn-on di/dt should be positive."""
@@ -353,13 +351,12 @@ class TestWaveformAnalysis:
         assert result.dv_dt_off > 0
 
     def test_analysis_without_vgs(self) -> None:
-        """Analysis should work without v_gs array."""
+        """Automatic event analysis requires a measured gate trace."""
         cfg = DPTConfig(v_dc=400.0, i_target=20.0)
         dpt = LTspiceDPT(cfg)
         time, v_ds, i_d, _ = _make_dpt_waveforms()
-        result = dpt.analyze_waveforms(time, v_ds, i_d)
-        assert result.e_on > 0
-        assert result.e_off > 0
+        with pytest.raises(ValueError, match="v_gs is required"):
+            dpt.analyze_waveforms(time, v_ds, i_d)
 
 
 class TestSwitchingDataExtraction:
@@ -436,7 +433,7 @@ class TestSwitchingDataExtraction:
         """Default junction temperature should be 25 deg C."""
         cfg = DPTConfig()
         dpt = LTspiceDPT(cfg)
-        result = DPTResult()
+        result = DPTResult(e_on=0.5e-3, e_off=0.3e-3)
         e_on_data, e_off_data = dpt.extract_switching_loss_data(result)
 
         assert e_on_data.t_j == 25.0

@@ -13,6 +13,7 @@ from typing import Any, Mapping
 
 import numpy as np
 
+from transistordatabase.condition_tables import bounded_interpolate, same_condition
 from transistordatabase.core.models import (
     ChannelCharacteristics,
     SwitchingLossData,
@@ -21,7 +22,10 @@ from transistordatabase.core.models import (
 
 
 SUPPORTED_TOPOLOGIES = ("buck", "boost", "buck-boost", "flyback")
-SUPPORTED_MODES = ("estimate", "conduction-only", "detailed", "loss-balanced")
+SUPPORTED_MODES = (
+    "estimate", "conduction-only", "detailed", "loss-balanced",
+    "switching-loss-balanced",
+)
 _SWEEP_AXES = {
     "v_in": ("v_in", "V"),
     "v_out": ("v_out", "V"),
@@ -95,9 +99,7 @@ def _valid_sweep_point_count(value: Any) -> bool:
 
 
 def _same_condition(left: float | None, right: float | None) -> bool:
-    if left is None or right is None:
-        return left is right
-    return bool(np.isclose(left, right, rtol=0.0, atol=1e-9))
+    return same_condition(left, right)
 
 
 def _curve_arrays(curve: Any, label: str) -> tuple[np.ndarray, np.ndarray]:
@@ -133,7 +135,7 @@ def _interpolate_curve(curve: Any, current: float, label: str) -> float:
             current,
             "below" if current < currents[0] else "above",
         )
-    return float(np.interp(current, currents, voltages))
+    return bounded_interpolate(currents, voltages, current, label)
 
 
 def _channel_curve(
@@ -277,11 +279,14 @@ def _energy_at_current(curve: SwitchingLossData, current: float, label: str) -> 
             f"{label} graph_i_e curve must have unique currents and non-negative energy"
         )
     if current < currents[0] or current > currents[-1]:
-        raise ValueError(
-            f"{label} switching curve supports {currents[0]:g} to {currents[-1]:g} A; "
-            f"requested {current:g} A"
+        raise _CurveRangeError(
+            label,
+            float(currents[0]),
+            float(currents[-1]),
+            current,
+            "below" if current < currents[0] else "above",
         )
-    return float(np.interp(current, currents, energies))
+    return bounded_interpolate(currents, energies, current, label)
 
 
 def _mean_conduction_power(
@@ -323,12 +328,15 @@ def _loss_balanced_ccm_operating_point(
     output_current_scale: float,
     parallel_switches: int,
     parallel_diodes: int,
+    e_on_curve: SwitchingLossData | None = None,
+    e_off_curve: SwitchingLossData | None = None,
+    frequency: float | None = None,
 ) -> dict[str, float | int]:
-    """Solve a regulated CCM point with measured channel conduction losses.
+    """Solve a regulated CCM point with measured channel and optional switching losses.
 
     Duty is root-solved against the input/output power balance. Inductor ripple
     is triangular and refined against the switch-channel drop. This is an
-    averaged channel model, not a switching or parasitic simulation.
+    averaged loss model, not a switching or parasitic simulation.
     """
     v_in = _finite_positive(parameters, "v_in")
     v_out = _finite_positive(parameters, "v_out")
@@ -416,9 +424,20 @@ def _loss_balanced_ccm_operating_point(
             output_current_scale * peak / parallel_diodes,
             "diode channel",
         )
+        p_on_per_device = (
+            _energy_at_current(e_on_curve, valley / parallel_switches, "e_on")
+            * frequency
+            if e_on_curve is not None and frequency is not None else 0.0
+        )
+        p_off_per_device = (
+            _energy_at_current(e_off_curve, peak / parallel_switches, "e_off")
+            * frequency
+            if e_off_curve is not None and frequency is not None else 0.0
+        )
         total_loss = (
             parallel_switches * p_switch_per_device
             + parallel_diodes * p_diode_per_device
+            + parallel_switches * (p_on_per_device + p_off_per_device)
         )
         residual = v_in * input_current - p_out - total_loss
         if topology == "buck":
@@ -451,6 +470,8 @@ def _loss_balanced_ccm_operating_point(
             "peak": peak,
             "switch_loss_per_device": p_switch_per_device,
             "diode_loss_per_device": p_diode_per_device,
+            "switching_on_per_device": p_on_per_device,
+            "switching_off_per_device": p_off_per_device,
             "total_loss": total_loss,
             "residual": residual,
             "volt_second_residual": volt_second_residual,
@@ -516,6 +537,33 @@ def _loss_balanced_ccm_operating_point(
             valid_duty, valid_state = duty, state
         raise no_supported_solution(boundary_error) from boundary_error
 
+    def find_supported_state_after_overshoot(
+        invalid_lower_duty: float,
+        invalid_upper_duty: float,
+        lower_error: Exception,
+        upper_error: Exception,
+    ) -> tuple[float, dict[str, float], float, Exception]:
+        """Bisect a lower-domain search that jumped across a narrow valid window."""
+        for _ in range(80):
+            duty = (invalid_lower_duty + invalid_upper_duty) / 2.0
+            if duty <= invalid_lower_duty or duty >= invalid_upper_duty:
+                break
+            try:
+                state = evaluate(duty)
+            except _CcmBoundaryError as exc:
+                invalid_lower_duty = duty
+                lower_error = exc
+            except _CurveRangeError as exc:
+                if exc.side == "below":
+                    invalid_lower_duty = duty
+                    lower_error = exc
+                else:
+                    invalid_upper_duty = duty
+                    upper_error = exc
+            else:
+                return duty, state, invalid_lower_duty, lower_error
+        raise no_supported_solution(upper_error) from lower_error
+
     low = ideal_duty
     try:
         low_state = evaluate(low)
@@ -550,7 +598,19 @@ def _loss_balanced_ccm_operating_point(
                     last_error = candidate_error
                     step *= 2.0
                     continue
-                raise no_supported_solution(candidate_error) from candidate_error
+                low, low_state, invalid_low, last_error = (
+                    find_supported_state_after_overshoot(
+                        invalid_low,
+                        candidate,
+                        last_error,
+                        candidate_error,
+                    )
+                )
+                if low_state["residual"] > 0:
+                    return refine_supported_lower_boundary(
+                        invalid_low, low, low_state
+                    )
+                break
         else:
             raise no_supported_solution(last_error) from exc
     if abs(low_state["residual"]) <= 1e-10 * max(p_out, 1.0):
@@ -1130,6 +1190,12 @@ def calculate_topology_operating_point(
     conduction_regime = parameters.get("conduction_regime", "CCM")
     if conduction_regime not in ("CCM", "DCM"):
         raise ValueError("conduction_regime must be 'CCM' or 'DCM'")
+    if mode == "switching-loss-balanced" and (
+        topology != "boost" or conduction_regime != "CCM"
+    ):
+        raise ValueError(
+            "switching-loss-balanced currently supports scalar Boost CCM only"
+        )
     if (
         mode == "loss-balanced"
         and conduction_regime == "DCM"
@@ -1219,7 +1285,10 @@ def calculate_topology_operating_point(
         i_ripple = v_l_on * duty / (l_value * f_sw)
         i_l_valley = i_l_average - i_ripple / 2.0
         i_l_peak = i_l_average + i_ripple / 2.0
-        if i_l_valley <= 0 and mode != "loss-balanced":
+        if i_l_valley <= 0 and mode not in (
+            "loss-balanced",
+            "switching-loss-balanced",
+        ):
             minimum_inductance = v_l_on * duty / (2 * f_sw * i_l_average)
             raise ValueError(
                 "Requested CCM point reaches zero inductor current; use DCM or "
@@ -1548,6 +1617,101 @@ def calculate_topology_operating_point(
                 result["calculated"]["power_balance_residual_w"] = float(
                     solved["power_balance_residual"]
                 )
+        elif mode == "switching-loss-balanced":
+            if t_j is None or v_g is None or v_g_off is None:
+                raise ValueError(
+                    "switching-loss-balanced requires exact t_j, v_g, and v_g_off"
+                )
+            if r_g_on is None or r_g_off is None:
+                raise ValueError(
+                    "switching-loss-balanced requires exact r_g_on and r_g_off"
+                )
+            e_on_curve = _switching_curve(
+                switch_transistor.switch.e_on_data,
+                label="e_on", t_j=t_j, v_supply=v_block, v_g=v_g,
+                v_g_off=v_g_off, r_g=r_g_on,
+            )
+            e_off_curve = _switching_curve(
+                switch_transistor.switch.e_off_data,
+                label="e_off", t_j=t_j, v_supply=v_block, v_g=v_g,
+                v_g_off=v_g_off, r_g=r_g_off,
+            )
+            if e_on_curve.v_g_off is None:
+                raise ValueError(
+                    "switching-loss-balanced requires Eon data with an explicit "
+                    "turn-off gate condition"
+                )
+            if e_off_curve.v_g_off is None:
+                raise ValueError(
+                    "switching-loss-balanced requires Eoff data with explicit "
+                    "turn-on and turn-off gate conditions"
+                )
+            if not _same_condition(e_on_curve.r_g, r_g_on) or not _same_condition(
+                e_off_curve.r_g, r_g_off
+            ):
+                raise ValueError(
+                    "switching-loss-balanced requires exact Eon/Eoff gate resistance"
+                )
+            solved = _loss_balanced_ccm_operating_point(
+                topology,
+                parameters,
+                switch_channel,
+                diode_channel,
+                ideal_duty=duty,
+                output_current_scale=output_current_scale,
+                parallel_switches=parallel_switches,
+                parallel_diodes=parallel_diodes,
+                e_on_curve=e_on_curve,
+                e_off_curve=e_off_curve,
+                frequency=f_sw,
+            )
+            duty = float(solved["duty"])
+            i_l_average = float(solved["average_current"])
+            i_in = float(solved["input_current"])
+            i_l_ripple = float(solved["ripple"])
+            i_l_valley = float(solved["valley"])
+            i_l_peak = float(solved["peak"])
+            diode_fraction = 1.0 - duty
+            idle_fraction = 0.0
+            i_diode_valley = i_l_valley
+            i_diode_peak = i_l_peak
+            i_diode_average = diode_fraction * i_l_average
+            i_switch_rms = np.sqrt(duty * (i_l_average**2 + i_l_ripple**2 / 12))
+            i_diode_rms = np.sqrt(
+                diode_fraction * (i_l_average**2 + i_l_ripple**2 / 12)
+            )
+            v_ripple = _ccm_output_ripple(
+                topology, duty, i_l_valley, i_l_peak, i_out, f_sw, c_out
+            )
+            switch_valley = i_l_valley / parallel_switches
+            switch_peak = i_l_peak / parallel_switches
+            diode_valley = i_diode_valley / parallel_diodes
+            diode_peak = i_diode_peak / parallel_diodes
+            p_cond_switch_per_device = float(solved["switch_loss_per_device"])
+            p_cond_diode_per_device = float(solved["diode_loss_per_device"])
+            result["calculated"].update(
+                {
+                    "duty_cycle": duty,
+                    "i_in_avg_a": i_in,
+                    "i_l_avg_a": i_l_average,
+                    "i_l_valley_a": i_l_valley,
+                    "i_l_peak_a": i_l_peak,
+                    "i_l_ripple_pp_a": i_l_ripple,
+                    "v_out_ripple_pp_v": v_ripple,
+                    "i_switch_rms_a": i_switch_rms,
+                    "i_diode_rms_a": i_diode_rms,
+                    "i_diode_avg_a": i_diode_average,
+                    "i_diode_peak_a": i_diode_peak,
+                    "diode_conduction_fraction": diode_fraction,
+                    "idle_fraction": idle_fraction,
+                    "inductor_volt_second_residual_v": float(
+                        solved["volt_second_residual"]
+                    ),
+                    "power_balance_residual_w": float(
+                        solved["power_balance_residual"]
+                    ),
+                }
+            )
         else:
             p_cond_switch_per_device = duty * _mean_conduction_power(
                 switch_channel, switch_valley, switch_peak, "switch channel"
@@ -1561,7 +1725,7 @@ def calculate_topology_operating_point(
         p_sw_off = 0.0
         e_on_curve = None
         e_off_curve = None
-        if mode == "detailed":
+        if mode in ("detailed", "switching-loss-balanced"):
             e_on_curve = _switching_curve(
                 switch_transistor.switch.e_on_data,
                 label="e_on",
@@ -1580,10 +1744,18 @@ def calculate_topology_operating_point(
                 v_g_off=v_g_off,
                 r_g=r_g_off,
             )
-            e_on = _energy_at_current(e_on_curve, switch_valley, "e_on")
-            e_off = _energy_at_current(e_off_curve, switch_peak, "e_off")
-            p_sw_on = e_on * f_sw * parallel_switches
-            p_sw_off = e_off * f_sw * parallel_switches
+            if mode == "switching-loss-balanced":
+                p_sw_on = (
+                    float(solved["switching_on_per_device"]) * parallel_switches
+                )
+                p_sw_off = (
+                    float(solved["switching_off_per_device"]) * parallel_switches
+                )
+            else:
+                e_on = _energy_at_current(e_on_curve, switch_valley, "e_on")
+                e_off = _energy_at_current(e_off_curve, switch_peak, "e_off")
+                p_sw_on = e_on * f_sw * parallel_switches
+                p_sw_off = e_off * f_sw * parallel_switches
         p_total = p_cond_switch + p_cond_diode + p_sw_on + p_sw_off
         p_in = p_out + p_total
 
@@ -1623,6 +1795,17 @@ def calculate_topology_operating_point(
                     "Parallel devices are identical and share current evenly; each branch uses the original per-device TDB curves without modifying curve data.",
                 ]
             )
+        elif mode == "switching-loss-balanced":
+            result["model"]["assumptions"].extend(
+                [
+                    "Scalar Boost CCM duty/current solve balances output power with switch and diode channel conduction plus exact-condition TDB Eon/Eoff losses.",
+                    "Eon is evaluated at switch valley current and Eoff at peak current; all curve lookups interpolate only within measured current ranges.",
+                    "Exact junction temperature, blocking voltage (Boost output), turn-on/off gate voltages, and the corresponding gate resistances are required; ambiguous curve matches are rejected.",
+                    "Reverse recovery is excluded because Eon provenance does not establish whether recovery is already included; adding it could double count the measured energy.",
+                    "Thermal output is a one-pass estimate from the solved per-device losses when positive junction-to-case and case-to-sink thermal data plus case temperature are available; temperature-dependent curve iteration is not performed.",
+                    "Parallel devices are identical and share current evenly; passive, magnetic, gate-drive, dead-time, and parasitic losses remain excluded.",
+                ]
+            )
         else:
             result["model"]["assumptions"].extend(
                 [
@@ -1652,7 +1835,7 @@ def calculate_topology_operating_point(
                 "Flyback assumes an ideal transformer with no leakage, winding "
                 "copper, core, or clamp losses."
             )
-        if mode == "detailed":
+        if mode in ("detailed", "switching-loss-balanced"):
             result["model"]["assumptions"].extend(
                 [
                     (
@@ -1708,7 +1891,7 @@ def calculate_topology_operating_point(
             "switch_channel": {"t_j": switch_channel.t_j, "v_g": switch_channel.v_g},
             "diode_channel": {"t_j": diode_channel.t_j, "v_g": diode_channel.v_g},
         }
-        if mode == "detailed":
+        if mode in ("detailed", "switching-loss-balanced"):
             assert e_on_curve is not None and e_off_curve is not None
             result["model"]["curve_conditions"].update(
                 {
@@ -1753,7 +1936,7 @@ def calculate_topology_operating_point(
                 "included channel conduction and switching losses only; "
                 "excludes reverse recovery, gate drive, passive, and magnetic "
                 "losses"
-                if mode == "detailed"
+                if mode in ("detailed", "switching-loss-balanced")
                 else (
                     "included switch and diode channel conduction only; "
                     "excludes switching, reverse recovery, gate drive, passive, "
@@ -1762,10 +1945,12 @@ def calculate_topology_operating_point(
             ),
             "loss_scope": (
                 "channel_conduction_and_switch_turn_on_turn_off"
-                if mode == "detailed"
+                if mode in ("detailed", "switching-loss-balanced")
                 else "channel_conduction_only"
             ),
-            "switching_losses_included": mode == "detailed",
+            "switching_losses_included": mode in (
+                "detailed", "switching-loss-balanced"
+            ),
             "reverse_recovery_losses_included": False,
             "gate_drive_losses_included": False,
             "per_switch_device_w": per_switch_device_loss,
@@ -1778,7 +1963,7 @@ def calculate_topology_operating_point(
             p_cond_diode_per_device,
             t_case,
         )
-        if mode == "loss-balanced":
+        if mode in ("loss-balanced", "switching-loss-balanced"):
             temperatures = result["temperatures"]
             switch_temperature = temperatures.get("switch_c")
             diode_temperature = temperatures.get("diode_c")
@@ -1810,22 +1995,28 @@ def calculate_topology_operating_point(
                 )
         result["performance"] = {
             "p_out_w": p_out,
-            "p_in_w": v_in * i_in if mode == "loss-balanced" else p_in,
+            "p_in_w": v_in * i_in if mode in (
+                "loss-balanced", "switching-loss-balanced"
+            ) else p_in,
             "efficiency_percent": 100 * p_out / p_in,
             "input_power_scope": (
+                f"{mode} Boost CCM switching-loss power balance"
+                if mode == "switching-loss-balanced" else
                 f"loss-balanced {conduction_regime} channel-conduction power balance"
                 if mode == "loss-balanced"
                 else "ideal operating point plus included partial device losses; "
                 "loss feedback is not iterated"
             ),
             "efficiency_scope": (
+                "switching-loss-balanced Boost CCM estimate"
+                if mode == "switching-loss-balanced" else
                 f"loss-balanced {conduction_regime} channel-conduction estimate"
                 if mode == "loss-balanced"
                 else "partial-loss estimate based on the ideal lossless operating point"
             ),
             "power_balance_residual_w": (
                 float(solved["power_balance_residual"])
-                if mode == "loss-balanced"
+                if mode in ("loss-balanced", "switching-loss-balanced")
                 else None
             ),
         }
@@ -1876,6 +2067,10 @@ def calculate_topology_sweep(
     diode_transistor: Transistor | None = None,
 ) -> dict[str, Any]:
     """Generate a Python-side line or contour sweep of one supported metric."""
+    if parameters.get("mode") == "switching-loss-balanced":
+        raise ValueError(
+            "switching-loss-balanced supports scalar Boost CCM only; sweeps are unsupported"
+        )
     loss_balanced = parameters.get("mode") == "loss-balanced"
     conduction_regime = parameters.get("conduction_regime", "CCM")
     x_axis = sweep.get("x_axis")

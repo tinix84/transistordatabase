@@ -84,16 +84,16 @@
           <h4>🌡️ Thermal Properties</h4>
           <div class="stat-row">
             <span>Thermal Resistance Range:</span>
-            <span>{{ Math.min(...selectedTransistors.map(t => t.thermal.r_th_cs)).toFixed(2) }} - {{ Math.max(...selectedTransistors.map(t => t.thermal.r_th_cs)).toFixed(2) }} K/W</span>
+            <span>{{ thermalRange }}</span>
           </div>
           <div class="stat-row">
-            <span>Best Thermal Performance:</span>
-            <span>{{ getBestThermalTransistor().metadata.name }}</span>
+            <span>Lowest Recorded Case-to-Sink Resistance:</span>
+            <span>{{ getLowestRecordedCaseSink()?.metadata.name || 'Unknown' }} ({{ thermalCandidates.length }}/{{ selectedTransistors.length }} known)</span>
           </div>
         </div>
 
         <div class="summary-card">
-          <h4>🏆 Recommendations</h4>
+          <h4>Recorded Rating Limits</h4>
           <div class="stat-row">
             <span>Highest Voltage:</span>
             <span>{{ getHighestVoltageTransistor().metadata.name }} ({{ getHighestVoltageTransistor().electrical.v_abs_max }}V)</span>
@@ -102,10 +102,7 @@
             <span>Highest Current:</span>
             <span>{{ getHighestCurrentTransistor().metadata.name }} ({{ getHighestCurrentTransistor().electrical.i_abs_max }}A)</span>
           </div>
-          <div class="stat-row">
-            <span>Best Power Density:</span>
-            <span>{{ getBestPowerDensityTransistor().metadata.name }}</span>
-          </div>
+          <p>Ratings do not establish efficiency, loss, power density, or application performance.</p>
         </div>
       </div>
 
@@ -181,10 +178,7 @@
             </tr>
             <tr>
               <td>Power Rating (W)</td>
-              <td v-for="transistor in selectedTransistors" :key="transistor.metadata.name"
-                  :class="{ 'best-value': calculatePowerRating(transistor) === Math.max(...selectedTransistors.map(t => calculatePowerRating(t))) }">
-                {{ calculatePowerRating(transistor).toFixed(0) }}W
-              </td>
+              <td v-for="transistor in selectedTransistors" :key="transistor.metadata.name">Unavailable · no recorded power rating</td>
             </tr>
 
             <!-- Thermal -->
@@ -194,8 +188,8 @@
             <tr>
               <td>Thermal Resistance (K/W)</td>
               <td v-for="transistor in selectedTransistors" :key="transistor.metadata.name"
-                  :class="{ 'best-value': transistor.thermal.r_th_cs === Math.min(...selectedTransistors.map(t => t.thermal.r_th_cs)) }">
-                {{ transistor.thermal.r_th_cs.toFixed(3) }}
+                  :class="{ 'best-value': knownNumber(transistor.thermal.r_th_cs) && transistor.thermal.r_th_cs === getLowestRecordedCaseSink()?.thermal.r_th_cs }">
+                {{ formatNumber(transistor.thermal.r_th_cs) }}
               </td>
             </tr>
             <tr>
@@ -222,32 +216,11 @@
             <canvas id="voltageCurrentChart" width="400" height="300"></canvas>
             <p>Voltage vs Current Rating</p>
           </div>
-          <div class="chart-container">
-            <canvas id="powerThermalChart" width="400" height="300"></canvas>
-            <p>Power Rating vs Thermal Resistance</p>
-          </div>
-          <div class="chart-container">
-            <canvas id="radarChart" width="400" height="300"></canvas>
-            <p>Performance Radar</p>
-          </div>
+          <p>Power and performance charts are unavailable. The core record has no power rating or conditioned performance estimate.</p>
         </div>
       </div>
 
-      <!-- Similar Transistors -->
-      <div class="similar-suggestions">
-        <h4>💡 Similar Transistors</h4>
-        <button @click="findSimilarTransistors" class="btn btn-secondary">
-          🔍 Find Similar Transistors
-        </button>
-        <div v-if="similarTransistors.length > 0" class="similar-list">
-          <div v-for="similar in similarTransistors" :key="similar.metadata.name" class="similar-card">
-            <h5>{{ similar.metadata.name }}</h5>
-            <p>{{ similar.metadata.manufacturer }} - {{ similar.metadata.type }}</p>
-            <p>{{ similar.electrical.v_abs_max }}V / {{ similar.electrical.i_abs_max }}A</p>
-            <p class="similarity-score">Similarity: {{ similar.similarity }}%</p>
-          </div>
-        </div>
-      </div>
+      <p>Use Advanced Compare for recorded curves and estimates at explicit operating conditions.</p>
     </div>
 
     <div v-else-if="selectedTransistors.length === 1" class="single-selection">
@@ -261,8 +234,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
-import { transistorApi } from '../services/api.js'
+import { ref, computed, watch, onBeforeUnmount, nextTick } from 'vue'
+import Chart from 'chart.js/auto'
 
 const props = defineProps({
   transistors: Array
@@ -273,13 +246,19 @@ const selectedTransistors = ref([])
 const searchQuery = ref('')
 const typeFilter = ref('')
 const manufacturerFilter = ref('')
-const similarTransistors = ref([])
 const maxComparisons = 5
 
 // Chart instances
 let voltageCurrentChart = null
-let powerThermalChart = null
-let radarChart = null
+onBeforeUnmount(() => voltageCurrentChart?.destroy())
+function knownNumber(value) { return typeof value === 'number' && Number.isFinite(value) }
+function formatNumber(value) { return knownNumber(value) ? value.toFixed(3) : 'Unknown' }
+const thermalCandidates = computed(() => selectedTransistors.value.filter(device => knownNumber(device.thermal.r_th_cs)))
+const thermalRange = computed(() => {
+  if (thermalCandidates.value.length !== selectedTransistors.value.length) return 'Unavailable · one or more recorded values are unknown'
+  const values = thermalCandidates.value.map(device => device.thermal.r_th_cs)
+  return `${Math.min(...values).toFixed(2)} - ${Math.max(...values).toFixed(2)} K/W`
+})
 
 // Computed properties
 const availableTypes = computed(() => {
@@ -329,13 +308,11 @@ function isSelected(transistor) {
 
 function clearSelection() {
   selectedTransistors.value = []
-  similarTransistors.value = []
 }
 
-function getBestThermalTransistor() {
-  return selectedTransistors.value.reduce((best, current) => 
-    current.thermal.r_th_cs < best.thermal.r_th_cs ? current : best
-  )
+function getLowestRecordedCaseSink() {
+  return thermalCandidates.value.reduce((lowest, current) =>
+    lowest === null || current.thermal.r_th_cs < lowest.thermal.r_th_cs ? current : lowest, null)
 }
 
 function getHighestVoltageTransistor() {
@@ -350,60 +327,8 @@ function getHighestCurrentTransistor() {
   )
 }
 
-function getBestPowerDensityTransistor() {
-  return selectedTransistors.value.reduce((best, current) => {
-    const currentDensity = calculatePowerRating(current) / current.thermal.housing_area
-    const bestDensity = calculatePowerRating(best) / best.thermal.housing_area
-    return currentDensity > bestDensity ? current : best
-  })
-}
-
-function calculatePowerRating(transistor) {
-  // Simplified power rating calculation
-  return transistor.electrical.v_abs_max * transistor.electrical.i_abs_max * 0.1
-}
-
-async function findSimilarTransistors() {
-  if (selectedTransistors.value.length === 0) return
-  
-  try {
-    const targetTransistor = selectedTransistors.value[0]
-    const transistorIds = selectedTransistors.value.map(t => 
-      t.metadata.name.replace(/[^a-zA-Z0-9]/g, '_')
-    )
-    
-    const result = await transistorApi.compare(transistorIds)
-    
-    // For now, simulate finding similar transistors
-    const unselected = props.transistors.filter(t => !isSelected(t))
-    const similar = unselected
-      .map(t => ({
-        ...t,
-        similarity: calculateSimilarity(targetTransistor, t)
-      }))
-      .filter(t => t.similarity > 70)
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, 5)
-    
-    similarTransistors.value = similar
-  } catch (error) {
-    console.error('Error finding similar transistors:', error)
-  }
-}
-
-function calculateSimilarity(transistor1, transistor2) {
-  // Simple similarity calculation based on specs
-  const voltageScore = 100 - Math.abs(transistor1.electrical.v_abs_max - transistor2.electrical.v_abs_max) / Math.max(transistor1.electrical.v_abs_max, transistor2.electrical.v_abs_max) * 100
-  const currentScore = 100 - Math.abs(transistor1.electrical.i_abs_max - transistor2.electrical.i_abs_max) / Math.max(transistor1.electrical.i_abs_max, transistor2.electrical.i_abs_max) * 100
-  const typeScore = transistor1.metadata.type === transistor2.metadata.type ? 100 : 0
-  
-  return Math.round((voltageScore + currentScore + typeScore) / 3)
-}
-
 function updateComparisonCharts() {
   updateVoltageCurrentChart()
-  updatePowerThermalChart()
-  updateRadarChart()
 }
 
 function updateVoltageCurrentChart() {
@@ -455,110 +380,6 @@ function updateVoltageCurrentChart() {
   })
 }
 
-function updatePowerThermalChart() {
-  const canvas = document.getElementById('powerThermalChart')
-  if (!canvas) return
-  
-  const ctx = canvas.getContext('2d')
-  if (powerThermalChart) {
-    powerThermalChart.destroy()
-  }
-  
-  const datasets = selectedTransistors.value.map((transistor, index) => ({
-    label: transistor.metadata.name,
-    data: [{
-      x: calculatePowerRating(transistor),
-      y: transistor.thermal.r_th_cs
-    }],
-    backgroundColor: getChartColor(index),
-    borderColor: getChartColor(index),
-    pointRadius: 8
-  }))
-  
-  powerThermalChart = new Chart(ctx, {
-    type: 'scatter',
-    data: { datasets },
-    options: {
-      responsive: true,
-      plugins: {
-        title: {
-          display: true,
-          text: 'Power Rating vs Thermal Resistance'
-        }
-      },
-      scales: {
-        x: {
-          title: {
-            display: true,
-            text: 'Power Rating (W)'
-          }
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'Thermal Resistance (K/W)'
-          }
-        }
-      }
-    }
-  })
-}
-
-function updateRadarChart() {
-  const canvas = document.getElementById('radarChart')
-  if (!canvas) return
-  
-  const ctx = canvas.getContext('2d')
-  if (radarChart) {
-    radarChart.destroy()
-  }
-  
-  const maxVoltage = Math.max(...selectedTransistors.value.map(t => t.electrical.v_abs_max))
-  const maxCurrent = Math.max(...selectedTransistors.value.map(t => t.electrical.i_abs_max))
-  const maxTemp = Math.max(...selectedTransistors.value.map(t => t.electrical.t_j_max))
-  const minThermal = Math.min(...selectedTransistors.value.map(t => t.thermal.r_th_cs))
-  
-  const datasets = selectedTransistors.value.map((transistor, index) => ({
-    label: transistor.metadata.name,
-    data: [
-      (transistor.electrical.v_abs_max / maxVoltage) * 100,
-      (transistor.electrical.i_abs_max / maxCurrent) * 100,
-      (transistor.electrical.t_j_max / maxTemp) * 100,
-      (minThermal / transistor.thermal.r_th_cs) * 100, // Inverted for thermal resistance
-      (calculatePowerRating(transistor) / Math.max(...selectedTransistors.value.map(t => calculatePowerRating(t)))) * 100
-    ],
-    backgroundColor: getChartColor(index, 0.2),
-    borderColor: getChartColor(index),
-    pointBackgroundColor: getChartColor(index),
-    pointBorderColor: '#fff',
-    pointHoverBackgroundColor: '#fff',
-    pointHoverBorderColor: getChartColor(index)
-  }))
-  
-  radarChart = new Chart(ctx, {
-    type: 'radar',
-    data: {
-      labels: ['Voltage', 'Current', 'Temperature', 'Thermal Performance', 'Power Rating'],
-      datasets
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        title: {
-          display: true,
-          text: 'Performance Comparison'
-        }
-      },
-      scales: {
-        r: {
-          beginAtZero: true,
-          max: 100
-        }
-      }
-    }
-  })
-}
-
 function getChartColor(index, alpha = 1) {
   const colors = [
     `rgba(255, 99, 132, ${alpha})`,
@@ -577,7 +398,11 @@ async function exportComparison() {
       summary: {
         voltageRange: `${Math.min(...selectedTransistors.value.map(t => t.electrical.v_abs_max))}V - ${Math.max(...selectedTransistors.value.map(t => t.electrical.v_abs_max))}V`,
         currentRange: `${Math.min(...selectedTransistors.value.map(t => t.electrical.i_abs_max))}A - ${Math.max(...selectedTransistors.value.map(t => t.electrical.i_abs_max))}A`,
-        bestThermal: getBestThermalTransistor().metadata.name,
+        lowestRecordedCaseToSinkResistance: getLowestRecordedCaseSink()?.metadata.name ?? null,
+        thermalCoverage: { known_count: thermalCandidates.value.length, total_count: selectedTransistors.value.length },
+        ratedPowerW: null,
+        ratedPowerReason: "The core record has no power rating",
+        applicationPerformance: null,
         highestVoltage: getHighestVoltageTransistor().metadata.name,
         highestCurrent: getHighestCurrentTransistor().metadata.name
       },
@@ -598,14 +423,6 @@ async function exportComparison() {
   }
 }
 
-// Load Chart.js if not already loaded
-onMounted(() => {
-  if (typeof Chart === 'undefined') {
-    const script = document.createElement('script')
-    script.src = 'https://cdn.jsdelivr.net/npm/chart.js'
-    document.head.appendChild(script)
-  }
-})
 </script>
 
 <style scoped>

@@ -1,426 +1,103 @@
 <template>
-  <div class="transistor-comparison-enhanced">
-    <div class="comparison-header">
-      <h2>🔍 Advanced Transistor Comparison</h2>
-      <div class="header-actions">
-        <button @click="clearAll" class="btn btn-secondary">
-          🗑️ Clear All
-        </button>
-        <button
-          @click="runComparison"
-          :disabled="selectedTransistors.length < 2"
-          class="btn btn-primary"
-        >
-          🚀 Run Comparison
-        </button>
-      </div>
+  <section class="transistor-comparison-enhanced" data-testid="advanced-comparison">
+    <header class="comparison-header"><h2>Advanced transistor comparison</h2><div class="header-actions"><button @click="clearAll">Clear selection</button><button data-testid="run-comparison" @click="runComparison" :disabled="selectedCount < 2 || busy">Run comparison</button></div></header>
+    <p>Recorded curves retain their original conditions. Estimate settings do not select nearby measurements.</p>
+    <div class="transistor-slots">
+      <article v-for="slot in 3" :key="slot" class="transistor-slot">
+        <label>Transistor {{ slot }}<select :value="selectedIds[slot - 1]" :data-testid="`comparison-device-${slot}`" @change="selectedIds[slot - 1] = $event.target.value"><option value="">Select a stored transistor</option><option v-for="device in allTransistors" :key="device.metadata.name" :value="device.metadata.name" :disabled="selectedIds.includes(device.metadata.name) && selectedIds[slot - 1] !== device.metadata.name">{{ device.metadata.name }}</option></select></label>
+        <fieldset v-if="estimateSelected && selectedIds[slot - 1]" class="config-panel"><legend>Conditions for this device</legend>
+          <label>Supply voltage (V)<input type="number" step="any" v-model="configurations[slot - 1].v_supply" :data-testid="`comparison-supply-${slot}`"></label>
+          <label>Gate on voltage (V)<input type="number" step="any" v-model="configurations[slot - 1].v_g"></label>
+          <label>Gate off voltage <select v-model="configurations[slot - 1].offKnown"><option :value="false">Explicitly unknown</option><option :value="true">Known</option></select><input v-if="configurations[slot - 1].offKnown" type="number" step="any" v-model="configurations[slot - 1].v_g_off" aria-label="Gate off voltage (V)"></label>
+          <label>Gate resistance on (Ω)<input type="number" step="any" v-model="configurations[slot - 1].r_g_on"></label>
+          <label>Gate resistance off (Ω)<input type="number" step="any" v-model="configurations[slot - 1].r_g_off"></label>
+          <label>Identical parallel device count<input type="number" min="1" step="1" v-model="configurations[slot - 1].parallel_count"></label>
+        </fieldset>
+      </article>
     </div>
-
-    <!-- Transistor Selection Section -->
-    <div class="selection-section">
-      <h3>📌 Select Transistors ({{ selectedTransistors.length }}/3)</h3>
-
-      <div class="transistor-slots">
-        <div
-          v-for="slot in 3"
-          :key="slot"
-          class="transistor-slot"
-          :class="{ filled: selectedTransistors[slot - 1] }"
-        >
-          <div class="slot-header">
-            <h4>Transistor {{ slot }}</h4>
-            <button
-              v-if="selectedTransistors[slot - 1]"
-              @click="removeTransistor(slot - 1)"
-              class="btn-icon btn-danger-small"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div v-if="selectedTransistors[slot - 1]" class="selected-transistor">
-            <div class="transistor-info">
-              <strong>{{ selectedTransistors[slot - 1].metadata.name }}</strong>
-              <p>{{ selectedTransistors[slot - 1].metadata.type }} - {{ selectedTransistors[slot - 1].metadata.manufacturer }}</p>
-              <div class="specs">
-                <span>{{ selectedTransistors[slot - 1].electrical.v_abs_max }}V</span>
-                <span>{{ selectedTransistors[slot - 1].electrical.i_abs_max }}A</span>
-              </div>
-            </div>
-
-            <!-- Configuration Panel -->
-            <div class="config-panel">
-              <div class="config-row">
-                <label>V_supply (V):</label>
-                <input
-                  v-model.number="configurations[slot - 1].v_supply"
-                  type="number"
-                  step="10"
-                  min="0"
-                  @change="onConfigChange"
-                />
-              </div>
-
-              <div class="config-row">
-                <label>R_g,on (Ω):</label>
-                <input
-                  v-model.number="configurations[slot - 1].r_g_on"
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="1"
-                  @input="onConfigChange"
-                />
-                <span class="value">{{ configurations[slot - 1].r_g_on }}Ω</span>
-              </div>
-
-              <div class="config-row">
-                <label>R_g,off (Ω):</label>
-                <input
-                  v-model.number="configurations[slot - 1].r_g_off"
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="1"
-                  @input="onConfigChange"
-                />
-                <span class="value">{{ configurations[slot - 1].r_g_off }}Ω</span>
-              </div>
-
-              <div class="config-row">
-                <label>Parallel Count:</label>
-                <select
-                  v-model.number="configurations[slot - 1].parallel_count"
-                  @change="onConfigChange"
-                >
-                  <option :value="1">x1</option>
-                  <option :value="2">x2</option>
-                  <option :value="4">x4</option>
-                  <option :value="8">x8</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div v-else class="empty-slot">
-            <button @click="openSelector(slot - 1)" class="btn-add">
-              ➕ Select Transistor
-            </button>
-          </div>
-        </div>
-      </div>
+    <label class="estimate-choice"><input type="checkbox" v-model="estimateSelected" data-testid="comparison-estimate"> I select the held-current hard-switching PWM estimate</label>
+    <div v-if="estimateSelected" class="global-config-section">
+      <p>Current is the total shared current. Each identical device carries current / count; all losses are multiplied by count. Duty applies to conduction; 0 &lt; duty &lt; 1 selects one on/off event per switching period. D = 0, D = 1 or fs = 0 has no switching events.</p>
+      <div class="global-config-grid"><label v-for="field in globalFields" :key="field[0]">{{ field[1] }}<input type="number" step="any" v-model="globalConfig[field[0]]" :data-testid="`comparison-${field[0]}`"></label></div>
+      <label>Output power (W), optional semiconductor-only efficiency estimate<input type="number" step="any" v-model="globalConfig.output_power_w" data-testid="comparison-output_power_w"></label>
     </div>
-
-    <!-- Global Configuration -->
-    <div v-if="selectedTransistors.length >= 2" class="global-config-section">
-      <h3>⚙️ Global Settings</h3>
-      <div class="global-config-grid">
-        <div class="config-item">
-          <label>Junction Temperature (T_j):</label>
-          <input
-            v-model.number="globalConfig.t_j"
-            type="number"
-            step="5"
-            @change="onConfigChange"
-          />
-          <span class="unit">°C</span>
-        </div>
-
-        <div class="config-item">
-          <label>Channel Current (I_channel):</label>
-          <input
-            v-model.number="globalConfig.i_channel"
-            type="number"
-            step="5"
-            @change="onConfigChange"
-          />
-          <span class="unit">A</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Comparison Results - 9 Plot Types -->
-    <div v-if="comparisonResults" class="results-section">
-      <h3>📊 Comparison Results</h3>
-
-      <div class="plot-tabs">
-        <button
-          v-for="(plotType, index) in plotTypes"
-          :key="index"
-          @click="activePlot = plotType.key"
-          :class="['plot-tab', { active: activePlot === plotType.key }]"
-        >
-          {{ plotType.icon }} {{ plotType.label }}
-        </button>
-      </div>
-
-      <div class="plot-container">
-        <PlotCard
-          v-if="activePlot === 'channel'"
-          title="Channel Characteristics Comparison"
-          :plot-data="comparisonResults.channel_characteristics"
-          data-requirement="channel characteristic"
-        />
-
-        <PlotCard
-          v-else-if="activePlot === 'eon'"
-          title="Turn-On Switching Losses (E_on)"
-          :plot-data="comparisonResults.switching_losses_eon"
-          data-requirement="E_on switching loss"
-        />
-
-        <PlotCard
-          v-else-if="activePlot === 'eoff'"
-          title="Turn-Off Switching Losses (E_off)"
-          :plot-data="comparisonResults.switching_losses_eoff"
-          data-requirement="E_off switching loss"
-        />
-
-        <PlotCard
-          v-else-if="activePlot === 'gate_charge'"
-          title="Gate Charge Comparison"
-          :plot-data="comparisonResults.gate_charge"
-          data-requirement="gate charge"
-        />
-
-        <PlotCard
-          v-else-if="activePlot === 'soa'"
-          title="Safe Operating Area Comparison"
-          :plot-data="comparisonResults.soa"
-          data-requirement="SOA"
-        />
-
-        <PlotCard
-          v-else-if="activePlot === 'thermal'"
-          title="Thermal Impedance Comparison"
-          :plot-data="comparisonResults.thermal_impedance"
-          data-requirement="thermal model"
-        />
-
-        <PlotCard
-          v-else-if="activePlot === 'capacitances'"
-          title="Capacitance Comparison"
-          :plot-data="comparisonResults.capacitances"
-          data-requirement="capacitance"
-        />
-
-        <PlotCard
-          v-else-if="activePlot === 'loss_breakdown'"
-          title="Loss Breakdown"
-          :plot-data="comparisonResults.loss_breakdown"
-          data-requirement="loss"
-        />
-
-        <PlotCard
-          v-else-if="activePlot === 'efficiency'"
-          title="Efficiency vs Load Current"
-          :plot-data="comparisonResults.efficiency"
-          data-requirement="efficiency"
-        />
-      </div>
-    </div>
-
-    <!-- Transistor Selector Modal -->
-    <div v-if="showSelector" class="modal-overlay" @click="closeSelector">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3>Select Transistor {{ currentSlot + 1 }}</h3>
-          <button @click="closeSelector" class="btn-close">✕</button>
-        </div>
-
-        <div class="selector-filters">
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="🔍 Search by name, type, manufacturer..."
-            class="search-input"
-          />
-          <select v-model="typeFilter">
-            <option value="">All Types</option>
-            <option v-for="type in availableTypes" :key="type" :value="type">
-              {{ type }}
-            </option>
-          </select>
-        </div>
-
-        <div class="transistor-list">
-          <div
-            v-for="(transistor, index) in filteredTransistors"
-            :key="index"
-            @click="selectTransistor(transistor)"
-            class="transistor-item"
-            :class="{ disabled: isAlreadySelected(transistor) }"
-          >
-            <div class="item-name">{{ transistor.metadata.name }}</div>
-            <div class="item-specs">
-              <span>{{ transistor.metadata.type }}</span>
-              <span>{{ transistor.electrical.v_abs_max }}V</span>
-              <span>{{ transistor.electrical.i_abs_max }}A</span>
-            </div>
-            <div v-if="isAlreadySelected(transistor)" class="already-selected">
-              ✅ Selected
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Loading Indicator -->
-    <div v-if="isLoading" class="loading-overlay">
-      <div class="loading-spinner"></div>
-      <p>Running comparison...</p>
-    </div>
-  </div>
+    <p v-if="busy" role="status">Evaluating comparison…</p><p v-if="stale" role="status">Inputs changed. Run comparison for current settings.</p><p v-if="error" role="alert">{{ error }}</p>
+    <section v-if="comparisonResults" class="results-section" data-testid="comparison-results">
+      <h3>Comparison results</h3><p>{{ comparisonResults.observation_policy }}</p><button @click="download">Download evidence JSON</button>
+      <nav class="plot-tabs"><button v-for="panel in panels" :key="panel[0]" @click="activePlot = panel[0]" :class="['plot-tab', { active: activePlot === panel[0] }]">{{ panel[1] }}</button></nav>
+      <section v-if="activePanel"><h3>{{ activePanel.title }}</h3>
+        <template v-if="activePanel.curves">
+          <p>{{ activePanel.status }}<span v-if="activePanel.reason">: {{ activePanel.reason }}</span></p>
+          <CurvePlotter v-if="activePanel.curves.length" :datasets="chartDatasets" :title="activePanel.title" :x-label="activePanel.xlabel" :y-label="activePanel.ylabel" :x-log-scale="activePanel.log_scale_x || false" />
+          <div v-if="activePanel.curves.length" class="comparison-table-scroll"><table><thead><tr><th>Device / record</th><th>Actual recorded conditions</th><th>Samples</th></tr></thead><tbody><tr v-for="(curve, index) in activePanel.curves" :key="index"><td>{{ curve.device }} / {{ curve.record_index }}</td><td>{{ conditions(curve.conditions) }}</td><td>{{ samples(curve) }}</td></tr></tbody></table></div>
+          <p v-for="(diagnostic, index) in activePanel.diagnostics || []" :key="index">{{ diagnostic.name }}: {{ diagnostic.status }} — {{ diagnostic.reason }}</p>
+        </template>
+        <template v-else-if="activePlot === 'loss_breakdown'">
+          <p>Held-current estimate; source coverage and exact conditions are required for every active component.</p>
+          <div class="comparison-table-scroll"><table><thead><tr><th>Device</th><th>Status / reason</th><th>Conduction (W)</th><th>On (W)</th><th>Off (W)</th><th>Total (W)</th></tr></thead><tbody><tr v-for="row in activePanel.rows" :key="row.name"><td>{{ row.name }}</td><td>{{ row.status }}<p v-if="row.reason">{{ row.reason }}</p></td><td>{{ number(row.conduction) }}</td><td>{{ number(row.switching_on) }}</td><td>{{ number(row.switching_off) }}</td><td>{{ number(row.total) }}</td></tr></tbody></table></div>
+          <p v-for="row in activePanel.rows.filter(row => row.calculation)" :key="row.name">{{ row.name }}: {{ conditions(row.calculation.conditions) }}. {{ row.calculation.switching_status }}. Ideal equal current sharing, count {{ row.parallel_count }}.</p>
+        </template>
+        <template v-else><p>{{ activePanel.scope }}</p><div class="comparison-table-scroll"><table><thead><tr><th>Device</th><th>Status / reason</th><th>Efficiency (%)</th></tr></thead><tbody><tr v-for="row in activePanel.rows" :key="row.name"><td>{{ row.name }}</td><td>{{ row.status }}<p v-if="row.reason">{{ row.reason }}</p></td><td>{{ number(row.efficiency_percent) }}</td></tr></tbody></table></div></template>
+      </section>
+    </section>
+  </section>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
 import { transistorApi } from '../services/api.js'
-import PlotCard from './PlotCard.vue'
-
-// State
-const allTransistors = ref([])
-const selectedTransistors = ref([])
-const configurations = ref([
-  { v_supply: 600, r_g_on: 10, r_g_off: 10, parallel_count: 1 },
-  { v_supply: 600, r_g_on: 10, r_g_off: 10, parallel_count: 1 },
-  { v_supply: 600, r_g_on: 10, r_g_off: 10, parallel_count: 1 }
-])
-const globalConfig = ref({
-  t_j: 25,
-  i_channel: 50
-})
-const comparisonResults = ref(null)
-const activePlot = ref('channel')
-const isLoading = ref(false)
-
-// Selector Modal
-const showSelector = ref(false)
-const currentSlot = ref(0)
-const searchQuery = ref('')
-const typeFilter = ref('')
-
-// Plot types
-const plotTypes = [
-  { key: 'channel', label: 'Channel', icon: '⚡' },
-  { key: 'eon', label: 'E_on', icon: '🔼' },
-  { key: 'eoff', label: 'E_off', icon: '🔽' },
-  { key: 'gate_charge', label: 'Gate Charge', icon: '🔋' },
-  { key: 'soa', label: 'SOA', icon: '🛡️' },
-  { key: 'thermal', label: 'Thermal', icon: '🌡️' },
-  { key: 'capacitances', label: 'Capacitances', icon: '🔌' },
-  { key: 'loss_breakdown', label: 'Loss Breakdown', icon: '📊' },
-  { key: 'efficiency', label: 'Efficiency', icon: '📈' }
-]
-
-// Computed
-const availableTypes = computed(() => {
-  const types = new Set(allTransistors.value.map(t => t.metadata.type))
-  return Array.from(types).sort()
-})
-
-const filteredTransistors = computed(() => {
-  let filtered = allTransistors.value
-
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(t =>
-      t.metadata.name.toLowerCase().includes(query) ||
-      t.metadata.type.toLowerCase().includes(query) ||
-      t.metadata.manufacturer.toLowerCase().includes(query)
-    )
-  }
-
-  if (typeFilter.value) {
-    filtered = filtered.filter(t => t.metadata.type === typeFilter.value)
-  }
-
-  return filtered
-})
-
-// Methods
-onMounted(async () => {
+import CurvePlotter from './CurvePlotter.vue'
+const allTransistors = ref([]), selectedIds = ref(['', '', ''])
+const configurations = ref(Array.from({ length: 3 }, () => ({ v_supply: '', v_g: '', v_g_off: '', offKnown: false, r_g_on: '', r_g_off: '', parallel_count: 1 })))
+const globalConfig = ref({ t_j: '', i_channel: '', f_sw: '', duty: '', output_power_w: '' })
+const estimateSelected = ref(false), comparisonResults = ref(null), busy = ref(false), error = ref(''), stale = ref(false)
+const activePlot = ref('channel_characteristics')
+const selectedCount = computed(() => selectedIds.value.filter(Boolean).length)
+const globalFields = [['t_j', 'Junction temperature (°C)'], ['i_channel', 'Total shared current (A)'], ['f_sw', 'Switching frequency (Hz)'], ['duty', 'Conduction duty (0–1)']]
+const panels = [['channel_characteristics', 'Channel'], ['switching_losses_eon', 'E_on'], ['switching_losses_eoff', 'E_off'], ['gate_charge', 'Gate charge'], ['soa', 'SOA'], ['thermal_impedance', 'Thermal'], ['capacitances', 'Capacitances'], ['loss_breakdown', 'Loss breakdown'], ['efficiency', 'Efficiency']]
+const activePanel = computed(() => comparisonResults.value?.[activePlot.value])
+let revision = 0, disposed = false
+watch([selectedIds, configurations, globalConfig, estimateSelected], () => { revision++; stale.value = comparisonResults.value !== null || busy.value || stale.value; comparisonResults.value = null; error.value = '' }, { deep: true, flush: 'sync' })
+onBeforeUnmount(() => { disposed = true; revision++ })
+onMounted(async () => { try { allTransistors.value = await transistorApi.getAll() } catch (e) { error.value = e.message } })
+function number(value) { return value == null ? 'Unavailable' : Number(value).toPrecision(7) }
+function conditions(value = {}) { return Object.entries(value).map(([key, item]) => `${key}: ${item == null ? 'unknown' : item}`).join('; ') || 'No condition recorded' }
+function samples(curve) { return Object.values(curve).find(value => Array.isArray(value))?.length ?? 0 }
+const chartDatasets = computed(() => (activePanel.value?.curves || []).map((curve, index) => {
+  const keys = curve.i_data && curve.e_data ? ['i_data', 'e_data'] : curve.q_data ? ['q_data', 'v_data'] : curve.c_data ? ['v_data', 'c_data'] : curve.time_data ? ['time_data', 'z_th_data'] : ['v_data', 'i_data']
+  return { label: curve.name, data: curve[keys[0]].map((x, i) => ({ x, y: curve[keys[1]][i] })), borderColor: ['#2563eb', '#dc2626', '#16a34a', '#9333ea'][index % 4], pointRadius: 2 }
+}))
+function finite(value, label) { if (value === '' || value === null || !Number.isFinite(Number(value))) throw new Error(`${label} needs a finite number`); return Number(value) }
+function clearAll() { selectedIds.value = ['', '', ''] }
+async function runComparison() {
+  const chosen = selectedIds.value.map((id, index) => ({ id, index })).filter(item => item.id)
+  if (chosen.length < 2) return
+  const version = revision; error.value = ''; comparisonResults.value = null; busy.value = true
   try {
-    allTransistors.value = await transistorApi.getAll()
-  } catch (error) {
-    console.error('Failed to load transistors:', error)
-  }
-})
-
-const openSelector = (slot) => {
-  currentSlot.value = slot
-  showSelector.value = true
-  searchQuery.value = ''
-  typeFilter.value = ''
-}
-
-const closeSelector = () => {
-  showSelector.value = false
-}
-
-const selectTransistor = (transistor) => {
-  if (isAlreadySelected(transistor)) return
-
-  selectedTransistors.value[currentSlot.value] = transistor
-  closeSelector()
-
-  // Auto-run comparison if 2+ transistors selected
-  if (selectedTransistors.value.filter(t => t).length >= 2) {
-    setTimeout(() => runComparison(), 300)
-  }
-}
-
-const removeTransistor = (slot) => {
-  selectedTransistors.value[slot] = null
-  comparisonResults.value = null
-}
-
-const isAlreadySelected = (transistor) => {
-  return selectedTransistors.value.some(
-    t => t && t.metadata.name === transistor.metadata.name
-  )
-}
-
-const clearAll = () => {
-  selectedTransistors.value = []
-  comparisonResults.value = null
-}
-
-const onConfigChange = () => {
-  // Debounced re-run of comparison
-  if (selectedTransistors.value.filter(t => t).length >= 2 && comparisonResults.value) {
-    setTimeout(() => runComparison(), 500)
-  }
-}
-
-const runComparison = async () => {
-  const selected = selectedTransistors.value.filter(t => t)
-  if (selected.length < 2) return
-
-  isLoading.value = true
-
-  try {
-    const transistorIds = selected.map(t => t.metadata.name)
-    const config = {
-      t_j: globalConfig.value.t_j,
-      i_channel: globalConfig.value.i_channel,
-      v_supply: configurations.value.slice(0, selected.length).map(c => c.v_supply),
-      r_g_on: configurations.value.slice(0, selected.length).map(c => c.r_g_on),
-      r_g_off: configurations.value.slice(0, selected.length).map(c => c.r_g_off),
-      parallel_count: configurations.value.slice(0, selected.length).map(c => c.parallel_count)
+    let config = {}
+    if (estimateSelected.value) {
+      config = Object.fromEntries(globalFields.map(([key, label]) => [key, finite(globalConfig.value[key], label)]))
+      for (const key of ['v_supply', 'v_g', 'r_g_on', 'r_g_off', 'parallel_count']) config[key] = chosen.map(({ index }) => finite(configurations.value[index][key], key))
+      config.v_g_off = chosen.map(({ index }) => configurations.value[index].offKnown ? finite(configurations.value[index].v_g_off, 'Gate off voltage') : null)
+      if (globalConfig.value.output_power_w !== '') config.output_power_w = finite(globalConfig.value.output_power_w, 'Output power')
     }
-
-    comparisonResults.value = await transistorApi.compareAdvanced(transistorIds, config)
-  } catch (error) {
-    console.error('Comparison failed:', error)
-    alert('Comparison failed: ' + error.message)
-  } finally {
-    isLoading.value = false
-  }
+    const data = await transistorApi.compareAdvanced(chosen.map(item => item.id), config)
+    if (!disposed && revision === version) { comparisonResults.value = data; stale.value = false }
+  } catch (e) { if (!disposed && revision === version) error.value = e.response?.data?.detail || e.message }
+  finally { if (!disposed) busy.value = false }
 }
+function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(comparisonResults.value, null, 2)], { type: 'application/json' })); const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'semiconductor-comparison-evidence.json'; anchor.click(); URL.revokeObjectURL(url) }
 </script>
 
 <style scoped>
+.transistor-comparison-enhanced { overflow-wrap: anywhere; }
+.transistor-comparison-enhanced label { display: grid; gap: .4rem; margin: .8rem 0; }
+.transistor-comparison-enhanced select, .transistor-comparison-enhanced input:not([type=checkbox]) { width: 100%; min-width: 0; padding: .5rem; box-sizing: border-box; }
+.transistor-comparison-enhanced .estimate-choice { display: flex; align-items: baseline; }
+.comparison-table-scroll { max-width: 100%; overflow: auto; }
+.comparison-table-scroll table { min-width: 650px; width: 100%; border-collapse: collapse; }
+.comparison-table-scroll th, .comparison-table-scroll td { min-width: 110px; text-align: left; padding: .65rem; border: 1px solid #cbd5e1; vertical-align: top; }
+@media (max-width: 650px) { .comparison-header { flex-direction: column; align-items: stretch !important; gap: 1rem; } }
 .transistor-comparison-enhanced {
   padding: 24px;
   max-width: 1400px;

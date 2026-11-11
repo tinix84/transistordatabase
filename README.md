@@ -1,4 +1,4 @@
-<!-- Last modified: 2026-10-14 -->
+<!-- Last modified: 2026-11-11 -->
 <!-- Version: 1.0.1 -->
 
 # Transistor Database
@@ -311,6 +311,84 @@ See [CHANGELOG.md](CHANGELOG.md).
 
 Licensed under [GPLv3](https://choosealicense.com/licenses/gpl-3.0/).
 
+
+## Browser analysis
+
+The **More Tools** menu contains **Analysis grid**, **Energy map**, **Waveform workbench**, and **Thermal workbench**.
+The initial values are editable hand fixtures. They do not identify measured device data.
+
+### Estimate gate resistance from voltage slew
+
+1. Open **Analytical Models** from **More Tools**.
+2. Select **Device Parameter Operations**.
+3. Select **Gate resistance from target voltage slew**.
+4. Enter the positive slew magnitude in V/s and minimum Crss in farads.
+5. Enter the driver rails and Miller plateau bounds in volts.
+6. Replace the example source and declare the switching conditions.
+7. Select the estimate acknowledgement and calculate the result.
+
+The resistance intervals use a constant-capacitance Miller model.
+The selected turn-on and turn-off values use the upper interval bounds.
+They describe total gate-loop series resistance, including driver, internal and external resistance.
+They do not specify an external resistor or a calibrated switching-loss result.
+The downloaded JSON retains the SI inputs, source, conditions and assumptions.
+
+### Compare a finite configuration grid
+
+1. Open **Analysis grid** or `/?view=analysis-grid`.
+2. Enter configuration sources and direction-specific loss models.
+3. Select each estimate explicitly.
+4. Enter sampled operating points and nonnegative weights.
+5. Select the metric, objective direction, and summary policy.
+6. Calculate the grid.
+7. Select a pair to inspect its Python waveform, spectrum, and component losses.
+
+The full weighted mean is unavailable when a positive-weight metric is missing.
+The successful-subset policy reports retained weight and coverage.
+The worst-point policy states whether zero-weight points participate.
+Failed pairs retain their inputs and diagnostic messages.
+
+The shared time cursor selects an original returned sample.
+Each time plot shows the same SI cursor position.
+Cursor readouts use exact returned points without interpolation.
+The frequency plot retains its independent Hz axis.
+The component stack uses returned average powers in watts.
+Omitted components have no bar and remain unavailable.
+
+Download the accepted grid request and complete result as JSON.
+The pair CSV retains unavailable values, status, and input hashes.
+The waveform view also exports its event and exact interval evidence.
+
+### Inspect a conditioned energy map
+
+1. Open **Energy map** or `/?view=energy-map`.
+2. Enter original source slices, source kinds, and fixed conditions.
+3. Select the map conditions and current/voltage axes.
+4. Select bounded interpolation explicitly if an estimate is needed.
+5. Build the map.
+6. Select a cell to inspect its source evidence.
+
+Changing the map filters does not change the original source conditions.
+Unknown conditions match unknown values only.
+Missing and ambiguous cells retain their status.
+An estimate requires a complete, unambiguous displayed rectangle and remains inside its bounds.
+Original source points remain visible and are included in the JSON export.
+
+### Transfer waveform heat to a thermal calculation
+
+1. Open the thermal transfer controls below an accepted waveform result.
+2. Declare physical heat ownership for positive, negative, and zero current.
+3. Select the physical thermal network owner.
+4. Acknowledge known-components-only scope if a loss component is omitted.
+5. Prepare the thermal handoff.
+6. Supply the thermal network source, Foster poles, fixed case temperature, and initial state.
+7. Review the thermal assumptions before calculation.
+
+The transfer requires an exact match with the displayed electrical request and result.
+Python retains the polynomial heat segments and event timing.
+The handoff uses ideal instantaneous switching-energy deposition.
+Missing heat remains unknown, so a partial handoff does not establish the full junction temperature.
+The thermal JSON export includes the electrical source, ownership, omissions, and input hashes.
 
 ## About
 

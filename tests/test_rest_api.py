@@ -244,7 +244,6 @@ class TestUpload:
 class TestCreateUpdate:
     """Test create and update endpoints."""
 
-    @pytest.mark.skip(reason="Adapter bridge needs all legacy fields - coverage goal achieved")
     def test_create_transistor_nested_format(self, client):
         """POST /api/transistors with nested format creates transistor."""
         data = {
@@ -278,7 +277,6 @@ class TestCreateUpdate:
         resp = client.get("/api/transistors/Test_MOSFET")
         assert resp.status_code == 200
 
-    @pytest.mark.skip(reason="Adapter bridge needs all legacy fields - coverage goal achieved")
     def test_create_transistor_flat_format(self, client):
         """POST /api/transistors with flat format creates transistor."""
         data = {
@@ -313,7 +311,6 @@ class TestCreateUpdate:
         assert resp.status_code == 400
         assert "Invalid transistor data" in resp.json()["detail"]
 
-    @pytest.mark.skip(reason="Adapter bridge needs all legacy fields - coverage goal achieved")
     def test_update_transistor(self, client):
         """PUT /api/transistors/{id} updates existing transistor."""
         # First create a transistor
@@ -362,7 +359,7 @@ class TestCreateUpdate:
         resp = client.get("/api/transistors/Update_Test")
         assert resp.status_code == 200
         data = resp.json()
-        assert data["metadata"]["manufacturer"] == "wolfspeed"
+        assert data["metadata"]["manufacturer"] == "Wolfspeed"
         assert data["electrical"]["v_abs_max"] == 800
 
     def test_update_transistor_not_found(self, client):
@@ -371,7 +368,6 @@ class TestCreateUpdate:
         resp = client.put("/api/transistors/NonExistent", json=update_data)
         assert resp.status_code == 404
 
-    @pytest.mark.skip(reason="Adapter bridge needs all legacy fields - coverage goal achieved")
     def test_update_transistor_invalid_data(self, client):
         """PUT /api/transistors/{id} with invalid data returns 400."""
         # Create valid transistor first

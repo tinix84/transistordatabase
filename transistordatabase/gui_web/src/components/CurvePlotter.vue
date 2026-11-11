@@ -3,10 +3,10 @@
     <div class="plotter-header">
       <h4>{{ title }}</h4>
       <div class="plotter-actions">
-        <button @click="toggleZoom" class="btn-icon" title="Toggle Zoom">
+        <button v-if="allowZoom" @click="toggleZoom" class="btn-icon" title="Toggle Zoom">
           🔍
         </button>
-        <button @click="resetZoom" class="btn-icon" title="Reset Zoom">
+        <button v-if="allowZoom" @click="resetZoom" class="btn-icon" title="Reset Zoom">
           🔄
         </button>
         <button @click="downloadImage" class="btn-icon" title="Download PNG">
@@ -38,6 +38,7 @@
 <script>
 import { Chart, registerables } from 'chart.js/auto'
 import zoomPlugin from 'chartjs-plugin-zoom'
+import { markRaw } from 'vue'
 
 Chart.register(...registerables, zoomPlugin)
 
@@ -81,6 +82,7 @@ export default {
       type: Boolean,
       default: false
     },
+    compactScientificYTicks: { type: Boolean, default: false },
     showLegend: {
       type: Boolean,
       default: true
@@ -88,7 +90,14 @@ export default {
     gridLines: {
       type: Boolean,
       default: true
-    }
+    },
+    allowZoom: { type: Boolean, default: true },
+    xMin: { type: Number, default: null },
+    xMax: { type: Number, default: null
+    },
+    cursorX: { type: Number, default: null },
+    yMin: { type: Number, default: null },
+    yMax: { type: Number, default: null }
   },
   data() {
     return {
@@ -100,6 +109,11 @@ export default {
     this.createChart()
   },
   watch: {
+    xMin() { this.updateRange() },
+    xMax() { this.updateRange() },
+    cursorX() { this.chart?.draw() },
+    yMin() { this.updateYRange() },
+    yMax() { this.updateYRange() },
     datasets: {
       handler() {
         this.updateChart()
@@ -113,6 +127,29 @@ export default {
     }
   },
   methods: {
+    drawCursor(chart) {
+      if (!Number.isFinite(this.cursorX)) return
+      const { ctx, chartArea, scales } = chart
+      const x = scales.x.getPixelForValue(this.cursorX)
+      if (x < chartArea.left || x > chartArea.right) return
+      ctx.save()
+      ctx.beginPath()
+      ctx.setLineDash([4, 3])
+      ctx.strokeStyle = '#7c3aed'
+      ctx.lineWidth = 1.5
+      ctx.moveTo(x, chartArea.top)
+      ctx.lineTo(x, chartArea.bottom)
+      ctx.stroke()
+      ctx.restore()
+    },
+    formatCompactScientificTick(value) {
+      const number = Number(value)
+      if (number === 0) return '0'
+      if (!Number.isFinite(number)) return String(value)
+      const magnitude = Math.abs(number)
+      return magnitude < 1e-3 || magnitude >= 1e6
+        ? number.toExponential(2) : Number(number.toPrecision(3)).toString()
+    },
     createChart() {
       const ctx = this.$refs.chartCanvas.getContext('2d')
 
@@ -124,15 +161,17 @@ export default {
           backgroundColor: ds.backgroundColor || this.getColor(index, 0.1),
           borderWidth: ds.borderWidth || 2,
           pointRadius: ds.pointRadius ?? 3,
+          showLine: ds.showLine ?? true,
           pointHoverRadius: ds.pointHoverRadius || 5,
           tension: ds.tension || 0,
           fill: ds.fill || false
         }))
       }
 
-      this.chart = new Chart(ctx, {
+      this.chart = markRaw(new Chart(ctx, {
         type: 'line',
         data: chartData,
+        plugins: [{ id: 'sharedTimeCursor', afterDatasetsDraw: chart => this.drawCursor(chart) }],
         options: {
           responsive: true,
           maintainAspectRatio: false,
@@ -151,6 +190,9 @@ export default {
               callbacks: {
                 label: (context) => {
                   const label = context.dataset.label || ''
+                  if (this.compactScientificYTicks) {
+                    return `${label}: (${context.parsed.x.toPrecision(6)}, ${context.parsed.y.toPrecision(6)})`
+                  }
                   const xValue = this.xValueScientific
                     ? context.parsed.x.toExponential(3)
                     : context.parsed.x.toFixed(this.xValueDecimals)
@@ -181,6 +223,8 @@ export default {
           },
           scales: {
             x: {
+              min: this.xMin ?? undefined,
+              max: this.xMax ?? undefined,
               type: this.xLogScale ? 'logarithmic' : 'linear',
               title: {
                 display: true,
@@ -196,7 +240,10 @@ export default {
               }
             },
             y: {
+              min: this.yMin ?? undefined,
+              max: this.yMax ?? undefined,
               type: this.yLogScale ? 'logarithmic' : 'linear',
+              ...(this.compactScientificYTicks ? { ticks: { callback: this.formatCompactScientificTick } } : {}),
               title: {
                 display: true,
                 text: this.yLabel,
@@ -212,7 +259,7 @@ export default {
             }
           }
         }
-      })
+      }))
     },
 
     updateChart() {
@@ -225,11 +272,30 @@ export default {
         backgroundColor: ds.backgroundColor || this.getColor(index, 0.1),
         borderWidth: ds.borderWidth || 2,
         pointRadius: ds.pointRadius ?? 3,
+        showLine: ds.showLine ?? true,
         tension: ds.tension || 0,
         fill: ds.fill || false
       }))
 
       this.chart.update()
+    },
+
+    updateRange() {
+      if (!this.chart) return
+      // Cancel targets computed with the old scales before drawing new bounds.
+      // Otherwise an initial animation can later restore stale point pixels.
+      this.chart.stop()
+      this.chart.options.scales.x.min = this.xMin ?? undefined
+      this.chart.options.scales.x.max = this.xMax ?? undefined
+      this.chart.update('none')
+    },
+
+    updateYRange() {
+      if (!this.chart) return
+      this.chart.stop()
+      this.chart.options.scales.y.min = this.yMin ?? undefined
+      this.chart.options.scales.y.max = this.yMax ?? undefined
+      this.chart.update('none')
     },
 
     toggleZoom() {
