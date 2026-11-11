@@ -215,4 +215,6 @@ class TestTotalLoss:
         assert result.p_total == pytest.approx(
             result.p_cond + result.p_sw_on + result.p_sw_off
         )
-        assert result.n_cycles >= 4
+        assert result.n_cycles is None  # Event counts do not establish complete periods.
+        assert result.n_on >= 4
+        assert result.n_off >= 4

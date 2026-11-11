@@ -1,0 +1,141 @@
+{
+  "record_type": "verification artifact identities",
+  "date": "2026-11-11",
+  "files": [
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/python-focused-pytest.log",
+      "bytes": 793,
+      "sha256": "8ab258b9f62d863a81a764a8929426e0ef60e0f9afa8f72d19b3528c9ec22a51"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/python-focused-selection.json",
+      "bytes": 248,
+      "sha256": "328c87029bfa3104fbc0831028ada47cae608bc0d370f36dea7c15ccde2e8dc9"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/python-junit.xml",
+      "bytes": 309734,
+      "sha256": "53aad2ec0b9073793c54130ebcebdc4fef8e02b69beff53057bca47b6b10b9d4"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/python-manifest.json",
+      "bytes": 2528,
+      "sha256": "005637781e9b2b1d35d2b192d18d3d190a01cb05cb09655ae0e90b5c754598d5"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/python-pytest.log",
+      "bytes": 3987,
+      "sha256": "588f6483217931227b96b676054bb1c053c0ff76cec0a37d34378f49f3f6de32"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/python-resource.log",
+      "bytes": 3795,
+      "sha256": "4ac2aee05bd2f4ae09c1784fbca325e108f430dabbb4fd0a90a66ade4fecf19c"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/python-selection.json",
+      "bytes": 3126,
+      "sha256": "de192b994a79cfb350ddc96e5bb4eab829400d4e436c483997d96ff8c02ddcae"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/python-source-end.json",
+      "bytes": 26491,
+      "sha256": "6e3e41a2a3d4e11f94f12e29a29a8aab2c1ef5b60d6b80c5504928d800566439"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/python-source-start.json",
+      "bytes": 26491,
+      "sha256": "6e3e41a2a3d4e11f94f12e29a29a8aab2c1ef5b60d6b80c5504928d800566439"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/screenshot-verifier-circuit-desktop.png",
+      "bytes": 119460,
+      "sha256": "0ea76d847521aac2140b4a18fcab2166e100f699cbe4bdd3f405fc678b8b4fb8"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/screenshot-verifier-dpt-generic-netlist.png",
+      "bytes": 258108,
+      "sha256": "72554198e9e5be18b620fd3e927f672e667dde860d9e596413a4b235cdafeecd"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/screenshot-verifier-waveform-linked-results.png",
+      "bytes": 327704,
+      "sha256": "b261553d44aa97c30082e03f25fd3243f19ab1cbd17b85f4636550167315f903"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/screenshot-verifier-waveform-mobile-results.png",
+      "bytes": 309194,
+      "sha256": "a2f3b71dc064977756eb8e8b009221f52e0865807643f634aa4cabf7bf65ab05"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/source-proof.json",
+      "bytes": 223058,
+      "sha256": "6ad6d150e6e109038c317e87b2c7b9eb63600360cd6595a7576163d8d67ce3e0"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-browser-adaptations.json",
+      "bytes": 5287,
+      "sha256": "27acd8438bdd238bbda255bfc5234d9dfeab24cb45302ca77f15c0ac038806cf"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-browser-config.mjs",
+      "bytes": 469,
+      "sha256": "63b2937462a99f6633de7dc6ad925ac538c060b65c3c57330becf3b55d84992a"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-compiled-browser.log",
+      "bytes": 3540,
+      "sha256": "f5242cd74a5212d13ff818e026f823a03ce4e6823d2c49c5f58429e60eee7de7"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-compiled-browser.time",
+      "bytes": 1184,
+      "sha256": "30c7c8794b08600c75b199674665f51e147230a4622d98a3833273c0ec0942a4"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-headless-current.json",
+      "bytes": 18257,
+      "sha256": "44000df63fa26e562610c42ccbb549c31bd5c25b3eb34481ea89fc6508f5dd83"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-headless-current.log",
+      "bytes": 1412,
+      "sha256": "bd210d664f7e09f51bb2ad021eb6fc360a0bfa2a591aeaaf33ee0974bd03f352"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-headless-current.time",
+      "bytes": 879,
+      "sha256": "799e2ae0a5f6c9edeafe7ceae9b2ab8d81641dd440937263b27ad905344c0f7b"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-manifest.json",
+      "bytes": 10677,
+      "sha256": "a3c220982b315c2fe373c2fcfb4c1d978a7bc1dabe9bd5c441b7a49e3b233d08"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-production-build.log",
+      "bytes": 761,
+      "sha256": "2c2ba5a08a68587f82c932e064fa43787a84c30a066689f33a78b53d665ffd05"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-production-build.time",
+      "bytes": 875,
+      "sha256": "3d033583d5982d876fb0ce93330b55bc94a24ce895c564eedd724b44a04cb0d8"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-ruff-package.log",
+      "bytes": 20,
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-vue-final.log",
+      "bytes": 15822,
+      "sha256": "2ba7e609c976d91219b76fcfc300632bb97cb6706ed7da63965e2668ba2e03ad"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-vue-final.time",
+      "bytes": 896,
+      "sha256": "25430c74a30aeb8d71b027ac3cb55855412c1f258fc454193d97089799f0b981"
+    }
+  ]
+}

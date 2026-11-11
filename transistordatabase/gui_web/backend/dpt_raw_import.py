@@ -142,7 +142,7 @@ def _ascii_line(
 
 
 def _validate_ascii_value(value: str, *, complex_value: bool) -> None:
-    """Validate one PyLTSpice-compatible scalar without retaining it."""
+    """Validate one spicelib-compatible scalar without retaining it."""
     try:
         if complex_value:
             parts = value.split(",")
@@ -160,7 +160,7 @@ def _validate_ascii_value(value: str, *, complex_value: bool) -> None:
 
 
 def _scan_raw_headers(content: bytes) -> list[dict[str, Any]]:
-    """Validate plot declarations and binary payload bounds before PyLTSpice."""
+    """Validate plot declarations and binary payload bounds before spicelib."""
     encoding = _raw_encoding(content)
     newline = "\n".encode(encoding)
     plots: list[dict[str, Any]] = []
@@ -359,7 +359,7 @@ def _scan_raw_headers(content: bytes) -> list[dict[str, Any]]:
                     if trace_index == 0 and time_values is not None:
                         try:
                             axis_value = float(value)
-                            # Match PyLTSpice's Axis.get_wave() workaround for
+                            # Match spicelib's Axis.get_wave() workaround for
                             # LTspice 2nd-order-compression negative time markers.
                             time_values[point_index] = (
                                 abs(axis_value) if trace_names[0] == "time" else axis_value
@@ -404,7 +404,7 @@ def _scan_raw_headers(content: bytes) -> list[dict[str, Any]]:
                     offset=data_start,
                     strides=(stride,),
                 )
-                # PyLTSpice exposes abs(time) for LTspice's negative markers
+                # spicelib exposes abs(time) for LTspice's negative markers
                 # used with 2nd-order compression; mirror that decoded axis.
                 summary["_time_values"] = (
                     np.abs(raw_time_values)
@@ -746,7 +746,7 @@ def parse_ltspice_raw(
             is_stepped=selected_plot["is_stepped"],
         )
         # Construct a temporary single-plot source containing only the selected
-        # step sample blocks. PyLTSpice then sees no unselected plot or step data.
+        # step sample blocks. spicelib then sees no unselected plot or step data.
         selected_content = _selected_plot_bytes(
             bytes(content), selected_plot, source_ranges
         )
@@ -775,10 +775,10 @@ def parse_ltspice_raw(
         ]
 
         try:
-            from PyLTSpice import RawRead
+            from spicelib import RawRead
         except ImportError as error:
             raise DptRawImportError(
-                "LTspice RAW import needs PyLTSpice. Install the project requirements "
+                "LTspice RAW import needs spicelib. Install the project requirements "
                 "and restart the local web server."
             ) from error
         with TemporaryDirectory(prefix="tdb-dpt-raw-selected-") as temporary_directory:
@@ -789,7 +789,7 @@ def parse_ltspice_raw(
             reader = RawRead(selected_path, traces_to_read=None, verbose=False)
             if reader.dialect != "ltspice" or reader.get_nr_plots() != 1:
                 raise DptRawImportError(
-                    "PyLTSpice could not validate the bounded selected RAW plot. "
+                    "spicelib could not validate the bounded selected RAW plot. "
                     "Re-export the transient result from LTspice."
                 )
             selected_reader_plot = reader.plots[0]

@@ -10,6 +10,7 @@ import math
 from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field, StrictInt, field_validator, model_validator
+from transistordatabase.gui_web.backend.parameter_routes import ExtractionEvidence
 
 
 class ChannelCurveCreate(BaseModel):
@@ -271,13 +272,17 @@ class TopologyCalculationRequest(BaseModel):
     """SI-unit request for one headless topology operating point and optional sweep."""
 
     topology: str = Field(..., description="buck, boost, buck-boost, or flyback; other topologies are unsupported")
-    mode: Literal["estimate", "conduction-only", "detailed", "loss-balanced"] = Field(
+    mode: Literal[
+        "estimate", "conduction-only", "detailed", "loss-balanced",
+        "switching-loss-balanced",
+    ] = Field(
         ...,
         description=(
             "Select an ideal estimate, channel conduction only, channel conduction plus "
-            "switch turn-on/turn-off losses, or channel-loss-balanced CCM/DCM "
+            "switch turn-on/turn-off losses, channel-loss-balanced CCM/DCM "
             "operating points and bounded line/contour sweeps for Buck, Boost, "
-            "Buck-Boost, and Flyback"
+            "Buck-Boost, and Flyback, or scalar Boost CCM switching-loss-balanced "
+            "feedback using exact-condition Eon/Eoff curves"
         ),
     )
     conduction_regime: Literal["CCM", "DCM"] = Field(
@@ -425,32 +430,62 @@ class UserSettings(BaseModel):
 
 
 class BielaModelRequest(BaseModel):
-    """Request schema for Biela analytical model calculations."""
+    """Explicit SI inputs to the corrected half-bridge analytical estimate."""
 
-    c_oss: float = Field(..., description="Output capacitance in F", gt=0)
-    q_g: float = Field(..., description="Total gate charge in C", gt=0)
-    v_plateau: float = Field(..., description="Gate plateau voltage in V", gt=0)
-    r_g_on: float = Field(..., description="Gate resistance turn-on in Ohm", gt=0)
-    r_g_off: float = Field(..., description="Gate resistance turn-off in Ohm", gt=0)
-    v_driver_on: float = Field(15.0, description="Gate driver voltage turn-on in V")
-    v_driver_off: float = Field(-5.0, description="Gate driver voltage turn-off in V")
+    model_config = {'extra': 'forbid', 'allow_inf_nan': False, 'strict': True}
 
-    # Operating conditions
-    v_dc: float = Field(..., description="DC bus voltage in V", gt=0)
-    i_load: float = Field(..., description="Load current in A", gt=0)
-    t_j: float = Field(25.0, description="Junction temperature in deg C")
-
-    # Optional: Calculate curve over current range
-    i_min: Optional[float] = Field(None, description="Minimum current for curve in A", ge=0)
-    i_max: Optional[float] = Field(None, description="Maximum current for curve in A", gt=0)
-    i_points: int = Field(50, description="Number of points in curve", ge=2, le=1000)
+    model_kind: Literal['christen_biela_estimate']
+    source: str = Field(..., min_length=3, max_length=2000)
+    c_gs: float = Field(..., gt=0)
+    c_ds: float = Field(..., gt=0)
+    c_gd: float = Field(..., gt=0)
+    q_oss: float = Field(..., gt=0, description='Charge of ONE switch at V0')
+    q_oss_v_ref: float = Field(..., gt=0)
+    k_1: float = Field(..., gt=0)
+    k_2: float
+    x: float = Field(..., gt=0)
+    v_th: float = Field(..., gt=0)
+    gm_i_min: float = Field(..., gt=0)
+    gm_i_max: float = Field(..., gt=0)
+    v_dc: float = Field(..., gt=0)
+    i_load: float = Field(..., gt=0)
+    v_driver_on: float
+    v_driver_off: float
+    r_g: float = Field(..., gt=0, description='Total external + internal gate resistance')
+    l_s: float = Field(..., ge=0)
+    l_d: float = Field(..., ge=0)
+    t_j: float
+    parameter_t_j: float
+    recovery_mode: Literal['omit', 'charge_control']
+    tau_rr: Optional[float] = Field(None, gt=0)
+    tau_c: Optional[float] = Field(None, gt=0)
+    t_m: Optional[float] = Field(None, gt=0)
+    q_rr_star: Optional[float] = Field(None, gt=0)
+    extraction_evidence: list[ExtractionEvidence] = Field(default_factory=list, max_length=2)
+    i_min: Optional[float] = Field(None, ge=0)
+    i_max: Optional[float] = Field(None, gt=0)
+    i_points: int = Field(25, ge=2, le=200)
 
 
 class GateChargeModelRequest(BaseModel):
     """Request schema for gate charge switching time calculations."""
 
+    model_config = {'allow_inf_nan': False}
+
+    @model_validator(mode='before')
+    @classmethod
+    def json_safe_nonfinite_errors(cls, values):
+        """Keep rejected nonfinite inputs serializable in transport diagnostics."""
+        # Python's JSON parser accepts NaN/Infinity. Preserve rejection while
+        # keeping Pydantic's echoed error input serializable by FastAPI.
+        from math import isfinite
+        if isinstance(values, dict):
+            return {key: str(value) if isinstance(value, float) and not isfinite(value)
+                    else value for key, value in values.items()}
+        return values
+
     q_gs: float = Field(..., description="Gate-source charge in C", gt=0)
-    q_gd: float = Field(..., description="Gate-drain (Miller) charge in C", gt=0)
+    q_gd: float = Field(..., description="Gate-drain (Miller) charge in C", ge=0)
     q_g: float = Field(..., description="Total gate charge in C", gt=0)
     v_th: float = Field(..., description="Threshold voltage in V", gt=0)
     v_plateau: float = Field(..., description="Plateau voltage in V", gt=0)
@@ -463,15 +498,20 @@ class GateChargeModelRequest(BaseModel):
 class DPTConfigRequest(BaseModel):
     """Request schema for LTspice DPT configuration."""
 
-    v_dc: float = Field(400.0, description="DC bus voltage in V", gt=0)
-    i_target: float = Field(20.0, description="Target current at turn-off in A", gt=0)
-    l_load: float = Field(100e-6, description="Load inductance in H", gt=0)
-    r_g_on: float = Field(10.0, description="Gate resistance turn-on in Ohm", ge=0)
-    r_g_off: float = Field(10.0, description="Gate resistance turn-off in Ohm", ge=0)
+    model_config = {"extra": "forbid"}
+
+    model_kind: Literal["generic_nmos"] = Field(
+        ..., description="Explicit choice of uncalibrated generic NMOS template"
+    )
+    v_dc: float = Field(400.0, description="DC bus voltage in V")
+    i_target: float = Field(20.0, description="Target current at turn-off in A")
+    l_load: float = Field(100e-6, description="Load inductance in H")
+    r_g_on: float = Field(10.0, description="Gate resistance turn-on in Ohm")
+    r_g_off: float = Field(10.0, description="Gate resistance turn-off in Ohm")
     v_g_on: float = Field(15.0, description="Gate drive voltage turn-on in V")
     v_g_off: float = Field(-5.0, description="Gate drive voltage turn-off in V")
-    t_dead: float = Field(5e-6, description="Dead time between pulses in s", gt=0)
-    t_pulse2: float = Field(2e-6, description="Duration of second pulse in s", gt=0)
+    t_dead: float = Field(5e-6, description="Dead time between pulses in s")
+    t_pulse2: float = Field(2e-6, description="Duration of second pulse in s")
 
 
 class DptRawEventWindow(BaseModel):

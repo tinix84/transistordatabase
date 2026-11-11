@@ -9,13 +9,11 @@ from __future__ import annotations
 import csv
 import json
 import logging
-import os
 from pathlib import Path
 from typing import Any, Dict, List
 
 import numpy as np
 
-from transistordatabase.core.adapters import core_to_legacy_dicts
 from transistordatabase.core.models import (
     FosterThermalModel,
     Transistor,
@@ -29,37 +27,6 @@ from transistordatabase.core.services import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-def _load_data_file(filename: str) -> list[str]:
-    """Load lines from a data file in the transistordatabase/data/ directory."""
-    data_dir = Path(__file__).resolve().parent.parent / "data"
-    file_path = data_dir / filename
-    items: list[str] = []
-    with open(file_path) as f:
-        for line in f.read().splitlines():
-            if line.startswith("#") or line.isspace() or not line:
-                continue
-            items.append(str(line))
-    return items
-
-
-def _build_legacy_transistor(transistor: Transistor):
-    """Convert a core Transistor to a legacy Transistor via the adapter.
-
-    :param transistor: Core Transistor object.
-    :return: Legacy ``transistordatabase.transistor.Transistor`` object.
-    """
-    from transistordatabase.transistor import Transistor as LegacyTransistor
-
-    t_args, sw_args, di_args = core_to_legacy_dicts(transistor)
-    housing_types = _load_data_file("housing_types.txt")
-    manufacturers = _load_data_file("module_manufacturers.txt")
-    return LegacyTransistor(
-        t_args, sw_args, di_args,
-        possible_housing_types=housing_types,
-        possible_module_manufacturers=manufacturers,
-    )
 
 
 # ---------------------------------------------------------------------------
@@ -296,112 +263,46 @@ class CalculationService(ICalculationService):
     def interpolate_switching_losses(
         self, loss_data: list, conditions: Dict[str, float]
     ) -> float:
-        """Interpolate switching losses for given conditions.
+        """Bounded lookup at fully specified recorded conditions; never nearest/clamped."""
+        from transistordatabase.static_losses import energy_at
 
-        Uses linear interpolation between available data points matching
-        the closest temperature and supply voltage.
-        """
-        t_j = conditions.get('t_j', 25.0)
-        i_channel = conditions.get('i_channel', 0.0)
-
-        # Find datasets matching temperature
-        matching = [d for d in loss_data if d.t_j == t_j]
-        if not matching:
-            # Find closest temperature
-            temps = [d.t_j for d in loss_data]
-            if not temps:
-                return 0.0
-            closest_t = min(temps, key=lambda x: abs(x - t_j))
-            matching = [d for d in loss_data if d.t_j == closest_t]
-
-        for data in matching:
-            if data.dataset_type == 'graph_i_e' and data.graph_i_e is not None:
-                currents = data.graph_i_e[0]
-                energies = data.graph_i_e[1]
-                return float(np.interp(i_channel, currents, energies))
-            if data.dataset_type == 'single' and data.e_x is not None:
-                return data.e_x
-
-        return 0.0
+        return energy_at(loss_data, conditions)
 
     def calculate_thermal_impedance(
         self, thermal_model: Dict[str, Any],
         time_points: np.ndarray,
     ) -> np.ndarray:
         """Calculate thermal impedance Z_th(t) using Foster model."""
-        r_th_vector = thermal_model.get('r_th_vector', [])
-        tau_vector = thermal_model.get('tau_vector', [])
+        from transistordatabase.thermal import thermal_impedance
 
-        if not r_th_vector or not tau_vector:
-            r_th_total = thermal_model.get('r_th_total', 0.0)
-            return np.full_like(time_points, r_th_total, dtype=np.float64)
-
-        z_th = np.zeros_like(time_points, dtype=np.float64)
-        for r_th, tau in zip(r_th_vector, tau_vector, strict=True):
-            z_th += r_th * (1.0 - np.exp(-time_points / tau))
-        return z_th
+        return thermal_impedance(thermal_model, time_points)
 
     def calculate_losses(
         self, transistor: Transistor, operating_point: Dict[str, float]
     ) -> Dict[str, float]:
-        """Calculate transistor losses at given operating point."""
-        t_j = operating_point.get('t_j', 25.0)
-        v_g = operating_point.get('v_g', 15.0)
-        i_channel = operating_point.get('i_channel', 0.0)
-        f_sw = operating_point.get('f_sw', 10000.0)
+        """Explicit held-current static-duty estimate; see static_losses contract."""
+        from transistordatabase.static_losses import static_duty_losses
 
-        # Conduction losses from linearized model
-        cond_loss = 0.0
-        try:
-            lm = transistor.switch.linearize_at_operating_point(
-                t_j, v_g, i_channel
-            )
-            cond_loss = (lm.v0_channel * i_channel
-                         + lm.r_channel * i_channel ** 2)
-        except ValueError:
-            pass
-
-        # Switching losses
-        e_on = self.interpolate_switching_losses(
-            transistor.switch.e_on_data,
-            {'t_j': t_j, 'i_channel': i_channel},
-        )
-        e_off = self.interpolate_switching_losses(
-            transistor.switch.e_off_data,
-            {'t_j': t_j, 'i_channel': i_channel},
-        )
-        sw_loss = (e_on + e_off) * f_sw
-
-        return {
-            'conduction_losses': cond_loss,
-            'switching_losses_on': e_on * f_sw,
-            'switching_losses_off': e_off * f_sw,
-            'total_losses': cond_loss + sw_loss,
-        }
+        return static_duty_losses(transistor, operating_point)
 
     def find_optimal_working_point(
         self, transistor: Transistor, constraints: Dict[str, Any]
     ) -> Dict[str, float]:
-        """Find optimal working point based on constraints."""
-        return {
-            't_j': constraints.get('t_j_max', 125.0),
-            'v_g': constraints.get('v_g', 15.0),
-            'i_channel': constraints.get('i_max', 100.0),
-        }
+        """Reject the former placeholder, which never evaluated an objective."""
+        raise NotImplementedError(
+            "No optimizer is implemented by this signature. Declare finite candidates "
+            "and a named physical objective; constraint maxima are not an optimum."
+        )
 
     def calculate_thermal_resistance(
         self, transistor: Transistor, power_profile: List[float]
     ) -> Dict[str, float]:
-        """Calculate thermal resistance and junction temperature."""
-        r_th = transistor.thermal_properties.r_th_cs or 0.0
-        avg_power = sum(power_profile) / len(power_profile) if power_profile else 0.0
-        t_j_rise = avg_power * r_th
-
-        return {
-            'r_th_jc': r_th,
-            't_j_rise': t_j_rise,
-            't_j_avg': 25.0 + t_j_rise,
-        }
+        """Reject the legacy signature's missing reference/path/time evidence."""
+        raise ValueError(
+            "Thermal calculation needs an explicit case/sink reference, physical "
+            "path resistances and a time-weighted heat profile. Use thermal.steady_paths "
+            "or thermal.simulate_foster; r_th_cs is not junction-to-case resistance."
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -411,23 +312,11 @@ class ExportService(IExportService):
     """Service for exporting transistor data to various formats."""
 
     def export_to_json(self, transistor: Transistor, file_path: Path) -> bool:
-        """Export transistor to JSON format."""
+        """Export complete reloadable native core data, including source provenance."""
         try:
-            data = {
-                'metadata': {
-                    'name': transistor.metadata.name,
-                    'type': transistor.metadata.type,
-                    'manufacturer': transistor.metadata.manufacturer,
-                    'housing_type': transistor.metadata.housing_type,
-                },
-                'electrical': {
-                    'v_abs_max': transistor.electrical_ratings.v_abs_max,
-                    'i_abs_max': transistor.electrical_ratings.i_abs_max,
-                    'i_cont': transistor.electrical_ratings.i_cont,
-                },
-            }
-            with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
+            from transistordatabase.core.repository import JsonTransistorLoader
+
+            JsonTransistorLoader().save_to_json(transistor, file_path)
             return True
         except Exception:
             logger.exception("Error exporting to JSON")
@@ -461,116 +350,68 @@ class ExportService(IExportService):
             return False
 
     def export_to_spice(self, transistor: Transistor, file_path: Path) -> bool:
-        """Export transistor model to SPICE format."""
-        try:
-            name = transistor.metadata.name.replace(' ', '_')
-            lines = [
-                f"* SPICE model for {transistor.metadata.name}",
-                f"* Manufacturer: {transistor.metadata.manufacturer}",
-                f"* Type: {transistor.metadata.type}",
-                f".model {name} NPN (",
-                f"+ BV={transistor.electrical_ratings.v_abs_max}",
-                "+ )",
-            ]
-            with open(file_path, 'w', encoding='utf-8') as f:
-                f.write('\n'.join(lines))
-            return True
-        except Exception:
-            logger.exception("Error exporting to SPICE")
-            return False
+        """Reject an uncalibrated device model instead of emitting an arbitrary NPN."""
+        raise NotImplementedError(
+            "Core ratings/curves do not establish a calibrated SPICE model. "
+            "Use the DPT workbench with an explicitly selected generic template "
+            "or a supplied manufacturer model."
+        )
 
     def export_to_plecs(
         self, transistor: Transistor, output_path: Path,
         template_config: dict[str, Any] | None = None,
     ) -> None:
-        """Export transistor to PLECS XML format.
+        """Write a validated source-backed PLECS model without process cwd changes.
 
-        Bridges through the adapter to use the legacy PLECS exporter which
-        relies on Jinja2 templates.
-
-        :param transistor: Core Transistor object.
-        :param output_path: Directory to write the XML files into.
-        :param template_config: Optional config with ``recheck`` (bool) and
-            ``gate_voltages`` (list of 4 floats: v_g_on, v_g_off, v_d_on,
-            v_d_off).
+        Unsupported generic core selections fail explicitly. Gate defaults and
+        nearest-condition legacy templates are not scientific export policies.
         """
-        legacy = _build_legacy_transistor(transistor)
+        from transistordatabase.plecs_document import render_core_plecs
+        from transistordatabase.plecs_core_export import render_core_selection
+        import re
+
+        if template_config and set(template_config) != {"selection"}:
+            raise ValueError("Legacy PLECS template options are unsupported; use explicit document mapping")
+        content = (render_core_selection(transistor, template_config["selection"])
+                   if template_config else render_core_plecs(transistor))
         out = Path(output_path)
         out.mkdir(parents=True, exist_ok=True)
-        cwd = os.getcwd()
-        try:
-            os.chdir(out)
-            recheck = True
-            gate_voltages = None
-            if template_config:
-                recheck = template_config.get('recheck', True)
-                gate_voltages = template_config.get('gate_voltages')
-            legacy.export_plecs(recheck=recheck, gate_voltages=gate_voltages)
-        finally:
-            os.chdir(cwd)
+        safe_name = re.sub(r'[^A-Za-z0-9._-]', '_', transistor.metadata.name).strip('.')
+        if not safe_name:
+            raise ValueError("PLECS export requires a valid device name")
+        destination = out / (safe_name + '.xml')
+        if destination.exists():
+            raise FileExistsError(f"Refusing to overwrite existing PLECS export: {destination}")
+        with destination.open('xb') as target:
+            target.write(content)
 
     def export_to_matlab(self, transistor: Transistor, output_path: Path) -> None:
-        """Export transistor data to MATLAB .mat format.
+        """Export MAT5 with the numeric legacy view and complete native core evidence."""
+        from transistordatabase.native_export import render_matlab, write_export_files
 
-        :param transistor: Core Transistor object.
-        :param output_path: Directory to write the .mat file into.
-        """
-        legacy = _build_legacy_transistor(transistor)
-        out = Path(output_path)
-        out.mkdir(parents=True, exist_ok=True)
-        cwd = os.getcwd()
-        try:
-            os.chdir(out)
-            legacy.export_matlab()
-        finally:
-            os.chdir(cwd)
+        write_export_files(output_path, render_matlab(transistor))
 
     def export_to_ltspice(self, transistor: Transistor, output_path: Path) -> None:
-        """Export transistor to LTSpice DPT netlist.
-
-        Uses the ``LTspiceDPT`` utility from ``utils/ltspice_dpt.py`` which
-        works directly with core models.
-
-        :param transistor: Core Transistor object.
-        :param output_path: Directory or file path for the netlist.
-        """
-        from transistordatabase.utils.ltspice_dpt import DPTConfig, LTspiceDPT
-
-        config = DPTConfig(
-            v_dc=transistor.electrical_ratings.v_abs_max / 2,
-            i_target=transistor.electrical_ratings.i_cont,
+        """Reject the signature's missing DPT conditions and template scope."""
+        raise NotImplementedError(
+            "Use /api/dpt/generate with explicit bus, current, gate/timing inputs "
+            "and generic-template selection. Ratings do not choose a DPT operating point."
         )
-        dpt = LTspiceDPT(config)
-        dpt.generate_netlist(output_path, transistor=transistor)
 
     def export_to_gecko_circuits(
         self, transistor: Transistor, export_params: Dict[str, Any]
     ) -> Path:
-        """Export transistor to GeckoCIRCUITS .scl format.
+        """Export one exact switch slice and its native evidence manifest.
 
-        :param transistor: Core Transistor object.
-        :param export_params: Dict with optional keys: ``recheck`` (bool),
-            ``v_supply``, ``v_g_on``, ``v_g_off``, ``r_g_on``, ``r_g_off``
-            (all float), and ``output_path`` (str or Path).
-        :return: Path to the output directory.
+        Declare component, t_j, v_supply, v_g_on, v_g_off, r_g_on and r_g_off.
+        Unknown gate conditions require None. See native_export.render_gecko.
         """
-        legacy = _build_legacy_transistor(transistor)
-        out_dir = Path(export_params.get('output_path', '.'))
-        out_dir.mkdir(parents=True, exist_ok=True)
-        cwd = os.getcwd()
-        try:
-            os.chdir(out_dir)
-            legacy.export_geckocircuits(
-                recheck=export_params.get('recheck', True),
-                v_supply=export_params.get('v_supply'),
-                v_g_on=export_params.get('v_g_on'),
-                v_g_off=export_params.get('v_g_off'),
-                r_g_on=export_params.get('r_g_on'),
-                r_g_off=export_params.get('r_g_off'),
-            )
-        finally:
-            os.chdir(cwd)
-        return out_dir
+        from transistordatabase.native_export import render_gecko, write_export_files
+
+        if not export_params.get("output_path"):
+            raise ValueError("Declare an explicit output_path for Gecko export")
+        files = render_gecko(transistor, export_params)
+        return write_export_files(export_params["output_path"], files)
 
 
 # ---------------------------------------------------------------------------
@@ -595,11 +436,11 @@ class ComparisonService(IComparisonService):
     def rank_transistors(
         self, transistors: List[Transistor], _criteria: Dict[str, float]
     ) -> list[tuple[Transistor, float]]:
-        """Rank transistors based on given criteria.
-
-        :param _criteria: Ranking criteria (reserved for future implementation)
-        """
-        return [(t, 1.0) for t in transistors]
+        """Reject the former equal-score placeholder until a physical objective is named."""
+        raise NotImplementedError(
+            "Ranking requires a named physical metric, direction and complete "
+            "comparable evaluation evidence; arbitrary equal scores are unsupported."
+        )
 
     def compare_transistors(
         self, transistors: List[Transistor]
@@ -627,476 +468,197 @@ class ComparisonService(IComparisonService):
         }
 
     def generate_advanced_comparison(
-        self,
-        transistors: List[Transistor],
-        config: Dict[str, Any]
+        self, transistors: List[Transistor], config: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """Generate advanced comparison with 9 plot types and configurations.
+        """Compare recorded observations and explicit static-duty estimates separately.
 
-        :param transistors: 2-3 transistors to compare
-        :param config: Configuration dict with keys:
-            - t_j: Junction temperature (default 25°C)
-            - v_supply: List of supply voltages per transistor
-            - r_g_on: List of gate resistances for turn-on per transistor
-            - r_g_off: List of gate resistances for turn-off per transistor
-            - parallel_count: List of parallel transistor counts per transistor
-            - i_channel: Channel current for comparison
-        :return: Dict with 9 plot types
+        Observations retain every source slice and its actual conditions. Requested
+        settings apply only to the estimate panel, never to selection by proximity.
         """
+        from transistordatabase.static_losses import finite, static_duty_losses
+
         if not 2 <= len(transistors) <= 3:
-            return {'error': 'Comparison requires 2-3 transistors'}
+            raise ValueError("Comparison requires 2-3 transistors")
+        if not isinstance(config, dict):
+            raise ValueError("Comparison config must be an object")
+        count = len(transistors)
+        per_device = ("v_supply", "v_g", "v_g_off", "r_g_on", "r_g_off", "parallel_count")
+        for key in per_device:
+            if key in config and (not isinstance(config[key], list) or len(config[key]) != count):
+                raise ValueError(f"{key} must contain one explicit value per selected transistor")
 
-        t_j = config.get('t_j', 25.0)
-        v_supply = config.get('v_supply', [600] * len(transistors))
-        r_g_on = config.get('r_g_on', [10] * len(transistors))
-        r_g_off = config.get('r_g_off', [10] * len(transistors))
-        parallel_count = config.get('parallel_count', [1] * len(transistors))
-        i_channel = config.get('i_channel', 50.0)
+        def panel(title, xlabel, ylabel):
+            return {"title": title, "xlabel": xlabel, "ylabel": ylabel,
+                    "status": "recorded-observations", "curves": [], "diagnostics": []}
 
-        return {
-            'channel_characteristics': self._plot_channel_comparison(
-                transistors, t_j
-            ),
-            'switching_losses_eon': self._plot_switching_comparison(
-                transistors, 'e_on', t_j, v_supply, r_g_on
-            ),
-            'switching_losses_eoff': self._plot_switching_comparison(
-                transistors, 'e_off', t_j, v_supply, r_g_off
-            ),
-            'gate_charge': self._plot_gate_charge_comparison(transistors, t_j),
-            'soa': self._plot_soa_comparison(transistors),
-            'thermal_impedance': self._plot_thermal_comparison(transistors),
-            'capacitances': self._plot_capacitance_comparison(transistors, t_j),
-            'loss_breakdown': self._plot_loss_breakdown(
-                transistors, t_j, v_supply, r_g_on, r_g_off, i_channel
-            ),
-            'efficiency': self._plot_efficiency_comparison(
-                transistors, t_j, v_supply, r_g_on, r_g_off, parallel_count
-            ),
-            'config': {
-                't_j': t_j,
-                'v_supply': v_supply,
-                'r_g_on': r_g_on,
-                'r_g_off': r_g_off,
-                'parallel_count': parallel_count,
-            }
+        result = {
+            "channel_characteristics": panel("Recorded channel slices", "Voltage [V]", "Current [A]"),
+            "switching_losses_eon": panel("Recorded turn-on slices", "Current [A]", "Energy [J]"),
+            "switching_losses_eoff": panel("Recorded turn-off slices", "Current [A]", "Energy [J]"),
+            "gate_charge": panel("Recorded gate-charge slices", "Gate charge [C]", "Gate voltage [V]"),
+            "soa": panel("Recorded safe operating area", "Voltage [V]", "Current [A]"),
+            "thermal_impedance": panel("Foster transient impedance", "Time [s]", "Impedance [K/W]"),
+            "capacitances": panel("Recorded capacitance slices", "Voltage [V]", "Capacitance [F]"),
         }
+        result["thermal_impedance"]["log_scale_x"] = True
 
-    def _plot_channel_comparison(
-        self, transistors: List[Transistor], t_j: float
-    ) -> Dict[str, Any]:
-        """Generate channel characteristic comparison plot data."""
-        curves = []
+        def observation(key, transistor, index, graph, x_name, y_name, conditions, suffix=""):
+            if graph is None:
+                return
+            graph = np.asarray(graph, dtype=float)
+            if (graph.ndim != 2 or graph.shape[0] != 2 or graph.shape[1] < 2
+                    or not np.isfinite(graph).all()):
+                result[key]["diagnostics"].append({"name": transistor.metadata.name,
+                    "record_index": index, "status": "invalid-data", "reason": "Need finite paired recorded samples"})
+                return
+            try:
+                for name, value in conditions.items():
+                    if value is not None:
+                        finite(value, name)
+            except ValueError as exc:
+                result[key]["diagnostics"].append({"name": transistor.metadata.name,
+                    "record_index": index, "status": "invalid-data", "reason": str(exc)})
+                return
+            label = ", ".join(f"{k}={v if v is not None else 'unknown'}" for k, v in conditions.items())
+            result[key]["curves"].append({"name": f"{transistor.metadata.name}{suffix} [{index}] ({label})",
+                "device": transistor.metadata.name, "record_index": index,
+                x_name: graph[0].tolist(), y_name: graph[1].tolist(),
+                "conditions": conditions, **conditions})
 
-        for t in transistors:
-            # Get channel data closest to target t_j
-            channel_data = t.switch.channel_data
-            if not channel_data:
-                continue
+        result["thermal_impedance"].update(self._plot_thermal_comparison(transistors))
 
-            closest = min(
-                channel_data,
-                key=lambda ch: abs(ch.t_j - t_j),
-                default=None
-            )
-
-            if closest and closest.graph_v_i is not None:
-                v_data = closest.graph_v_i[0].tolist()
-                i_data = closest.graph_v_i[1].tolist()
-                curves.append({
-                    'name': t.metadata.name,
-                    'v_data': v_data,
-                    'i_data': i_data,
-                    't_j': closest.t_j,
-                    'v_g': closest.v_g,
-                })
-
-        return {
-            'title': f'Channel Characteristics Comparison (T_j ≈ {t_j}°C)',
-            'xlabel': 'Voltage [V]',
-            'ylabel': 'Current [A]',
-            'curves': curves,
-        }
-
-    def _plot_switching_comparison(
-        self,
-        transistors: List[Transistor],
-        loss_type: str,
-        t_j: float,
-        v_supply: List[float],
-        r_g: List[float]
-    ) -> Dict[str, Any]:
-        """Generate switching loss comparison plot data."""
-        curves = []
-
-        for idx, t in enumerate(transistors):
-            if loss_type == 'e_on':
-                loss_data = t.switch.e_on_data
-            elif loss_type == 'e_off':
-                loss_data = t.switch.e_off_data
-            else:
-                continue
-
-            if not loss_data:
-                continue
-
-            # Find data matching conditions
-            target_v = v_supply[idx] if idx < len(v_supply) else 600
-            target_r_g = r_g[idx] if idx < len(r_g) else 10
-
-            for loss in loss_data:
-                if abs(loss.t_j - t_j) > 25:
-                    continue
-                if abs(loss.v_supply - target_v) > 100:
-                    continue
-                if loss.r_g and abs(loss.r_g - target_r_g) > 5:
-                    continue
-
-                if loss.graph_i_e is not None:
-                    curves.append({
-                        'name': f"{t.metadata.name} (R_g={loss.r_g}Ω)",
-                        'i_data': loss.graph_i_e[0].tolist(),
-                        'e_data': loss.graph_i_e[1].tolist(),
-                        't_j': loss.t_j,
-                        'v_supply': loss.v_supply,
-                        'r_g': loss.r_g,
-                    })
-                    break
-
-        return {
-            'title': f'{loss_type.upper()} Switching Loss Comparison',
-            'xlabel': 'Current [A]',
-            'ylabel': 'Energy [J]',
-            'curves': curves,
-        }
-
-    def _plot_gate_charge_comparison(
-        self, transistors: List[Transistor], t_j: float
-    ) -> Dict[str, Any]:
-        """Generate gate charge comparison plot data."""
-        curves = []
-
-        for t in transistors:
-            gc_curves = t.switch.gate_charge_curves
-            if not gc_curves:
-                continue
-
-            closest = min(
-                gc_curves,
-                key=lambda gc: abs(gc.t_j - t_j),
-                default=None
-            )
-
-            if closest and closest.graph_q_v is not None:
-                curves.append({
-                    'name': t.metadata.name,
-                    'q_data': closest.graph_q_v[0].tolist(),
-                    'v_data': closest.graph_q_v[1].tolist(),
-                    't_j': closest.t_j,
-                    'v_supply': closest.v_supply,
-                })
-
-        return {
-            'title': f'Gate Charge Comparison (T_j ≈ {t_j}°C)',
-            'xlabel': 'Gate Charge [C]',
-            'ylabel': 'Gate Voltage [V]',
-            'curves': curves,
-        }
-
-    def _plot_soa_comparison(
-        self, transistors: List[Transistor]
-    ) -> Dict[str, Any]:
-        """Generate SOA comparison plot data."""
-        curves = []
-
-        for t in transistors:
-            soa_curves = t.switch.soa
-            if not soa_curves:
-                continue
-
-            for soa in soa_curves:
-                if soa.graph_i_v is not None and len(soa.graph_i_v) == 2:
-                    curves.append({
-                        'name': f"{t.metadata.name} (T_c={soa.t_c}°C, t={soa.time_pulse}s)",
-                        'v_data': soa.graph_i_v[0].tolist(),
-                        'i_data': soa.graph_i_v[1].tolist(),
-                        't_c': soa.t_c,
-                        'time_pulse': soa.time_pulse,
-                    })
-
-        return {
-            'title': 'Safe Operating Area Comparison',
-            'xlabel': 'Voltage [V]',
-            'ylabel': 'Current [A]',
-            'curves': curves,
-        }
+        breakdown, efficiency = [], []
+        for index, transistor in enumerate(transistors):
+            for j, record in enumerate(transistor.switch.channel_data):
+                observation("channel_characteristics", transistor, j, record.graph_v_i,
+                            "v_data", "i_data", {"t_j": record.t_j, "v_g": record.v_g})
+            for key, records in (("switching_losses_eon", transistor.switch.e_on_data),
+                                 ("switching_losses_eoff", transistor.switch.e_off_data)):
+                for j, record in enumerate(records):
+                    if record.dataset_type != "graph_i_e":
+                        result[key]["diagnostics"].append({"name": transistor.metadata.name,
+                            "record_index": j, "status": "unsupported-plot", "reason": f"{record.dataset_type} is not a current-energy curve"})
+                        continue
+                    observation(key, transistor, j, record.graph_i_e, "i_data", "e_data",
+                        {"t_j": record.t_j, "v_supply": record.v_supply, "v_g": record.v_g,
+                         "r_g": record.r_g, "v_g_off": record.v_g_off})
+            for j, record in enumerate(transistor.switch.gate_charge_curves):
+                observation("gate_charge", transistor, j, record.graph_q_v, "q_data", "v_data",
+                            {"t_j": record.t_j, "v_supply": record.v_supply,
+                             "i_channel": record.i_channel, "i_g": record.i_g})
+            for j, record in enumerate(transistor.switch.soa):
+                observation("soa", transistor, j, record.graph_i_v, "v_data", "i_data",
+                            {"t_c": record.t_c, "time_pulse": record.time_pulse})
+            for kind in ("c_oss", "c_iss", "c_rss"):
+                for j, record in enumerate(getattr(transistor, kind, [])):
+                    observation("capacitances", transistor, j, record.graph_v_c, "v_data", "c_data",
+                                {"t_j": record.t_j}, " " + kind)
+            row = {"name": transistor.metadata.name, "status": "unsupported", "total": None,
+                   "conduction": None, "switching_on": None, "switching_off": None}
+            try:
+                required = {"t_j", "i_channel", "f_sw", "duty", *per_device}
+                missing = sorted(required - config.keys())
+                if missing:
+                    raise ValueError("Explicit static-duty estimate needs " + ", ".join(missing))
+                n = finite(config["parallel_count"][index], "parallel_count")
+                if n < 1 or n != int(n):
+                    raise ValueError("parallel_count must be a positive integer")
+                op = {key: config[key] for key in ("t_j", "f_sw", "duty")}
+                op.update({key: config[key][index] for key in per_device if key != "parallel_count"})
+                total_current = finite(config["i_channel"], "total shared current")
+                op["i_channel"] = total_current / n
+                if total_current > 0 and op["i_channel"] == 0:
+                    raise ValueError("Per-device current is below representable positive SI precision")
+                calculation = static_duty_losses(transistor, op)
+                values = {"conduction": calculation["conduction_losses"] * n,
+                          "switching_on": calculation["switching_losses_on"] * n,
+                          "switching_off": calculation["switching_losses_off"] * n,
+                          "total": calculation["total_losses"] * n}
+                for key, value in values.items():
+                    finite(value, key)
+                row.update(values, status="computed", calculation=calculation, parallel_count=int(n),
+                           assumptions=["Selected ideal equal current sharing across identical devices"])
+            except (ValueError, OverflowError) as exc:
+                row["reason"] = str(exc)
+            breakdown.append(row)
+            eta = {"name": transistor.metadata.name, "status": "unsupported", "efficiency_percent": None}
+            try:
+                if row["status"] != "computed":
+                    raise ValueError(row["reason"])
+                output = finite(config.get("output_power_w"), "output_power_w")
+                if output <= 0:
+                    raise ValueError("output_power_w must be positive")
+                denominator = finite(output + row["total"], "input power estimate")
+                eta.update(status="computed", efficiency_percent=(output / denominator) * 100,
+                           output_power_w=output, semiconductor_loss_w=row["total"])
+            except ValueError as exc:
+                eta["reason"] = str(exc)
+            efficiency.append(eta)
+        for value in result.values():
+            if not value["curves"]:
+                value["status"] = "missing-data"
+                value["reason"] = "No supported recorded curves; missing data is not zero"
+        result["loss_breakdown"] = {"title": "Explicit held-current PWM loss estimate", "rows": breakdown,
+            "status": "computed" if all(row["status"] == "computed" for row in breakdown) else "partial-or-unsupported"}
+        result["efficiency"] = {"title": "Semiconductor-only efficiency estimate", "rows": efficiency,
+            "status": "computed" if all(row["status"] == "computed" for row in efficiency) else "partial-or-unsupported",
+            "scope": "Pout / (Pout + semiconductor loss). Excludes magnetics, gate drive, auxiliaries and other converter losses."}
+        result["config"] = json.loads(json.dumps(config, allow_nan=False))
+        result["observation_policy"] = "All recorded slices shown at their actual conditions, independent of requested estimate settings"
+        return result
 
     def _plot_thermal_comparison(
         self, transistors: List[Transistor]
     ) -> Dict[str, Any]:
-        """Generate thermal impedance comparison plot data."""
-        curves = []
+        """Retain measured samples and validate each component's Foster response."""
+        from transistordatabase.thermal import thermal_impedance
 
-        # Foster curves share a fixed logarithmic display grid. Measured
-        # curves retain their recorded time and impedance samples unchanged.
-        time_points = np.logspace(-6, 1, 100)  # 1µs to 10s
-
-        for t in transistors:
+        curves, diagnostics = [], []
+        time_points = np.logspace(-6, 1, 100)
+        for transistor in transistors:
             for component_name, component in (
-                ('switch', t.switch),
-                ('diode', t.diode),
+                ("switch", transistor.switch), ("diode", transistor.diode)
             ):
                 foster = component.thermal_foster
                 if foster is None:
                     continue
-
-                measured = foster.graph_t_rthjc
-                if measured is not None:
-                    measured_points = np.asarray(measured)
-                    if (
-                        measured_points.ndim == 2
-                        and measured_points.shape[0] == 2
-                        and measured_points.shape[1] > 0
-                    ):
-                        curves.append({
-                            'name': (
-                                f'{t.metadata.name} / {component_name} '
-                                '- measured'
-                            ),
-                            'time_data': measured_points[0].tolist(),
-                            'z_th_data': measured_points[1].tolist(),
-                        })
-
-                r_th_vector = foster.r_th_vector
-                tau_vector = foster.tau_vector
-                if r_th_vector is None or tau_vector is None:
-                    continue
-
-                try:
-                    r_th = np.asarray(r_th_vector)
-                    tau = np.asarray(tau_vector)
-                except (TypeError, ValueError):
-                    continue
-
-                if (
-                    r_th.ndim != 1
-                    or tau.ndim != 1
-                    or r_th.size == 0
-                    or r_th.size != tau.size
-                    or not np.issubdtype(r_th.dtype, np.number)
-                    or not np.issubdtype(tau.dtype, np.number)
-                    or np.issubdtype(r_th.dtype, np.complexfloating)
-                    or np.issubdtype(tau.dtype, np.complexfloating)
-                ):
-                    continue
-
-                r_th = r_th.astype(np.float64, copy=False)
-                tau = tau.astype(np.float64, copy=False)
-                if (
-                    not np.isfinite(r_th).all()
-                    or not np.isfinite(tau).all()
-                    or (r_th <= 0).any()
-                    or (tau <= 0).any()
-                ):
-                    continue
-
-                z_th = [
-                    foster.get_thermal_impedance(float(time_point))
-                    for time_point in time_points
-                ]
-                curves.append({
-                    'name': (
-                        f'{t.metadata.name} / {component_name} '
-                        '- Foster model'
-                    ),
-                    'time_data': time_points.tolist(),
-                    'z_th_data': z_th,
-                })
-
-        return {
-            'title': 'Thermal Impedance Comparison',
-            'xlabel': 'Time [s]',
-            'ylabel': 'Thermal Impedance [K/W]',
-            'curves': curves,
-            'log_scale_x': True,
-        }
-
-    def _plot_capacitance_comparison(
-        self, transistors: List[Transistor], t_j: float
-    ) -> Dict[str, Any]:
-        """Generate capacitance comparison plot data."""
-        cap_types = {'c_oss': 'C_oss', 'c_iss': 'C_iss', 'c_rss': 'C_rss'}
-        all_curves = {}
-
-        for cap_type, label in cap_types.items():
-            curves = []
-            for t in transistors:
-                cap_list = getattr(t, cap_type, [])
-                if not cap_list:
-                    continue
-
-                closest = min(
-                    cap_list,
-                    key=lambda c: abs(c.t_j - t_j),
-                    default=None
-                )
-
-                if closest and closest.graph_v_c is not None:
-                    curves.append({
-                        'name': f"{t.metadata.name} - {label}",
-                        'v_data': closest.graph_v_c[0].tolist(),
-                        'c_data': closest.graph_v_c[1].tolist(),
-                        't_j': closest.t_j,
-                    })
-
-            all_curves[cap_type] = curves
-
-        return {
-            'title': f'Capacitance Comparison (T_j ≈ {t_j}°C)',
-            'xlabel': 'Voltage [V]',
-            'ylabel': 'Capacitance [F]',
-            'c_oss': all_curves.get('c_oss', []),
-            'c_iss': all_curves.get('c_iss', []),
-            'c_rss': all_curves.get('c_rss', []),
-        }
-
-    def _plot_loss_breakdown(
-        self,
-        transistors: List[Transistor],
-        t_j: float,
-        v_supply: List[float],
-        r_g_on: List[float],
-        r_g_off: List[float],
-        i_channel: float
-    ) -> Dict[str, Any]:
-        """Generate loss breakdown comparison (conduction + switching)."""
-        breakdown = []
-
-        for idx, t in enumerate(transistors):
-            target_v = v_supply[idx] if idx < len(v_supply) else 600
-
-            # Estimate conduction loss
-            p_cond = 0.0
-            if t.switch.channel_data:
-                try:
-                    closest_ch = min(
-                        t.switch.channel_data,
-                        key=lambda ch: abs(ch.t_j - t_j)
-                    )
-                    r_ds = closest_ch.get_resistance_at_current(i_channel)
-                    p_cond = r_ds * (i_channel ** 2)
-                except (ValueError, AttributeError):
-                    pass
-
-            # Estimate switching losses
-            p_sw_on = 0.0
-            p_sw_off = 0.0
-
-            if t.switch.e_on_data:
-                for loss in t.switch.e_on_data:
-                    if abs(loss.t_j - t_j) < 25 and abs(loss.v_supply - target_v) < 100:
-                        if loss.graph_i_e is not None:
-                            try:
-                                e_on = float(np.interp(
-                                    i_channel,
-                                    loss.graph_i_e[0],
-                                    loss.graph_i_e[1]
-                                ))
-                                p_sw_on = e_on * 100000  # Assume 100kHz
-                            except Exception:
-                                pass
-                        break
-
-            if t.switch.e_off_data:
-                for loss in t.switch.e_off_data:
-                    if abs(loss.t_j - t_j) < 25 and abs(loss.v_supply - target_v) < 100:
-                        if loss.graph_i_e is not None:
-                            try:
-                                e_off = float(np.interp(
-                                    i_channel,
-                                    loss.graph_i_e[0],
-                                    loss.graph_i_e[1]
-                                ))
-                                p_sw_off = e_off * 100000  # Assume 100kHz
-                            except Exception:
-                                pass
-                        break
-
-            p_total = p_cond + p_sw_on + p_sw_off
-
-            breakdown.append({
-                'name': t.metadata.name,
-                'conduction': p_cond,
-                'switching_on': p_sw_on,
-                'switching_off': p_sw_off,
-                'total': p_total,
-            })
-
-        return {
-            'title': 'Loss Breakdown Comparison',
-            'breakdown': breakdown,
-            'conditions': {
-                't_j': t_j,
-                'i_channel': i_channel,
-                'f_sw': 100000,
-            }
-        }
-
-    def _plot_efficiency_comparison(
-        self,
-        transistors: List[Transistor],
-        t_j: float,
-        v_supply: List[float],
-        r_g_on: List[float],
-        r_g_off: List[float],
-        parallel_count: List[int]
-    ) -> Dict[str, Any]:
-        """Generate efficiency vs current comparison."""
-        curves = []
-
-        current_points = np.linspace(1, 100, 50)
-
-        for idx, t in enumerate(transistors):
-            efficiencies = []
-            target_v = v_supply[idx] if idx < len(v_supply) else 600
-            n_parallel = parallel_count[idx] if idx < len(parallel_count) else 1
-
-            for i_load in current_points:
-                i_per_device = i_load / n_parallel
-
-                # Calculate losses per device
-                p_cond = 0.0
-                if t.switch.channel_data:
+                identity = {"name": transistor.metadata.name, "component": component_name}
+                if foster.graph_t_rthjc is not None:
                     try:
-                        closest_ch = min(
-                            t.switch.channel_data,
-                            key=lambda ch: abs(ch.t_j - t_j)
-                        )
-                        r_ds = closest_ch.get_resistance_at_current(i_per_device)
-                        p_cond = r_ds * (i_per_device ** 2)
-                    except Exception:
-                        p_cond = 0.01 * i_per_device  # Fallback
-
-                p_sw = 0.0001 * i_per_device  # Simplified switching loss
-
-                p_loss_total = (p_cond + p_sw) * n_parallel
-                p_out = target_v * i_load
-                p_in = p_out + p_loss_total
-
-                efficiency = (p_out / p_in * 100) if p_in > 0 else 0
-                efficiencies.append(efficiency)
-
-            curves.append({
-                'name': f"{t.metadata.name} (x{n_parallel})",
-                'current_data': current_points.tolist(),
-                'efficiency_data': efficiencies,
-            })
-
+                        measured = np.asarray(foster.graph_t_rthjc)
+                        if (measured.ndim != 2 or measured.shape[0] != 2
+                                or measured.shape[1] == 0
+                                or not np.issubdtype(measured.dtype, np.number)
+                                or np.issubdtype(measured.dtype, np.complexfloating)
+                                or not np.isfinite(measured).all()
+                                or (measured < 0).any()
+                                or (np.diff(measured[0]) <= 0).any()):
+                            raise ValueError("Measured impedance needs finite nonnegative paired samples at increasing times")
+                        curves.append({
+                            "name": f"{transistor.metadata.name} / {component_name} - measured",
+                            "time_data": measured[0].tolist(),
+                            "z_th_data": measured[1].tolist(),
+                        })
+                    except (TypeError, ValueError, OverflowError) as error:
+                        diagnostics.append({**identity, "status": "invalid-data", "reason": str(error)})
+                if foster.r_th_vector is None:
+                    continue
+                try:
+                    model = {key: getattr(foster, key) for key in (
+                        "r_th_vector", "tau_vector", "c_th_vector", "r_th_total"
+                    )}
+                    impedance = thermal_impedance(model, time_points)
+                    curves.append({
+                        "name": f"{transistor.metadata.name} / {component_name} - Foster model",
+                        "time_data": time_points.tolist(),
+                        "z_th_data": impedance.tolist(),
+                    })
+                except (TypeError, ValueError, OverflowError) as error:
+                    diagnostics.append({**identity, "status": "unsupported", "reason": str(error)})
         return {
-            'title': 'Efficiency vs Load Current',
-            'xlabel': 'Load Current [A]',
-            'ylabel': 'Efficiency [%]',
-            'curves': curves,
+            "title": "Thermal Impedance Comparison", "xlabel": "Time [s]",
+            "ylabel": "Thermal Impedance [K/W]", "curves": curves,
+            "log_scale_x": True, "diagnostics": diagnostics,
         }
 
     def find_similar_transistors(

@@ -30,3 +30,27 @@ dictionary.dic
 
 # Archived documentation
 docs/archive/
+
+# Local safe zone (not committed)
+.trash/
+
+# Virtual environments
+venv/
+
+# Built documentation
+site/
+
+# Coverage reports
+htmlcov/
+.coverage
+
+# Caches
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# Build artifacts
+*.egg-info/
+
+# Vite/frontend cache
+.vite/

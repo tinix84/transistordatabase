@@ -7,8 +7,19 @@ import numpy as np
 import pytest
 
 from transistordatabase.plecs_importer import import_plecs_xml
+from transistordatabase.plecs_document import parse_plecs_document
 
 TEST_DATA_DIR = Path(__file__).parent / "test_data"
+
+
+def _explicit_mapping(path):
+    document = parse_plecs_document(path.read_bytes())
+    return [{"package_id": "0",
+             "ratings": {"v_abs_max": 1200., "i_abs_max": 75., "i_cont": 40., "t_j_max": 175.},
+             "thermal_properties": {"housing_area": .0001, "cooling_area": .0002},
+             "block_targets": {"0": "switch"},
+             "gate_voltage_by_table": {table.source_path: 15.
+                 for table in document.packages[0].blocks[0].tables}}]
 
 
 @pytest.fixture
@@ -22,13 +33,13 @@ class TestPlecsImport:
 
     def test_import_returns_transistor_list(self, sample_switch_xml: Path) -> None:
         """Verify import returns a list of Transistor objects."""
-        result = import_plecs_xml(sample_switch_xml)
+        result = import_plecs_xml(sample_switch_xml, finalizations=_explicit_mapping(sample_switch_xml))
         assert isinstance(result, list)
         assert len(result) == 1
 
     def test_metadata_parsed(self, sample_switch_xml: Path) -> None:
         """Verify metadata is correctly extracted from XML."""
-        transistors = import_plecs_xml(sample_switch_xml)
+        transistors = import_plecs_xml(sample_switch_xml, finalizations=_explicit_mapping(sample_switch_xml))
         t = transistors[0]
         assert t.metadata.name == "TEST_MOSFET_001"
         assert t.metadata.manufacturer == "TestVendor"
@@ -36,7 +47,7 @@ class TestPlecsImport:
 
     def test_channel_data_parsed(self, sample_switch_xml: Path) -> None:
         """Verify conduction loss is mapped to channel characteristics."""
-        transistors = import_plecs_xml(sample_switch_xml)
+        transistors = import_plecs_xml(sample_switch_xml, finalizations=_explicit_mapping(sample_switch_xml))
         t = transistors[0]
         assert len(t.switch.channel_data) == 2
         ch_25 = t.switch.channel_data[0]
@@ -49,7 +60,7 @@ class TestPlecsImport:
 
     def test_switching_loss_parsed(self, sample_switch_xml: Path) -> None:
         """Verify switching loss data is correctly parsed."""
-        transistors = import_plecs_xml(sample_switch_xml)
+        transistors = import_plecs_xml(sample_switch_xml, finalizations=_explicit_mapping(sample_switch_xml))
         t = transistors[0]
         # 2 temperatures x 2 voltages = 4 e_on datasets
         assert len(t.switch.e_on_data) == 4
@@ -65,7 +76,7 @@ class TestPlecsImport:
 
     def test_thermal_model_parsed(self, sample_switch_xml: Path) -> None:
         """Verify Foster thermal model is correctly parsed."""
-        transistors = import_plecs_xml(sample_switch_xml)
+        transistors = import_plecs_xml(sample_switch_xml, finalizations=_explicit_mapping(sample_switch_xml))
         t = transistors[0]
         foster = t.switch.thermal_foster
         assert foster is not None
@@ -73,12 +84,18 @@ class TestPlecsImport:
         assert foster.tau_vector == [0.001, 0.01, 0.1, 1.0]
         assert foster.r_th_total == pytest.approx(0.50)
 
-    def test_electrical_ratings_inferred(self, sample_switch_xml: Path) -> None:
-        """Verify electrical ratings are inferred from data."""
-        transistors = import_plecs_xml(sample_switch_xml)
+    def test_electrical_ratings_declared(self, sample_switch_xml: Path) -> None:
+        """Coverage must never replace separately declared datasheet ratings."""
+        transistors = import_plecs_xml(sample_switch_xml, finalizations=_explicit_mapping(sample_switch_xml))
         t = transistors[0]
-        assert t.electrical_ratings.v_abs_max == 800.0
-        assert t.electrical_ratings.i_abs_max > 0
+        assert t.electrical_ratings.v_abs_max == 1200.0
+        assert t.electrical_ratings.i_abs_max == 75.0
+        assert parse_plecs_document(sample_switch_xml.read_bytes()).packages[0].ratings is None
+
+    def test_unknown_ratings_require_explicit_finalization(self, sample_switch_xml):
+        """Legacy import cannot construct a core object from unknown limits."""
+        with pytest.raises(ValueError, match="explicit finalizations"):
+            import_plecs_xml(sample_switch_xml)
 
     def test_file_not_found_raises(self) -> None:
         """Verify FileNotFoundError for missing files."""
@@ -87,7 +104,7 @@ class TestPlecsImport:
 
     def test_thermal_impedance_calculation(self, sample_switch_xml: Path) -> None:
         """Verify thermal impedance can be calculated from imported data."""
-        transistors = import_plecs_xml(sample_switch_xml)
+        transistors = import_plecs_xml(sample_switch_xml, finalizations=_explicit_mapping(sample_switch_xml))
         foster = transistors[0].switch.thermal_foster
         assert foster is not None
 
@@ -99,7 +116,7 @@ class TestPlecsImport:
 
     def test_energy_scale_applied(self, sample_switch_xml: Path) -> None:
         """Verify energy scale factor (0.001) is applied correctly."""
-        transistors = import_plecs_xml(sample_switch_xml)
+        transistors = import_plecs_xml(sample_switch_xml, finalizations=_explicit_mapping(sample_switch_xml))
         e_on = transistors[0].switch.e_on_data[0]
         # Original values in XML: 0.00 0.10 0.30 0.60 1.00 1.50
         # Scale is 0.001, so: 0.0 0.0001 0.0003 0.0006 0.001 0.0015

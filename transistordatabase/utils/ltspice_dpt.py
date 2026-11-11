@@ -8,14 +8,16 @@ execution requires it.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+import math
+import re
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Optional
 
 import numpy as np
 import numpy.typing as npt
 
-from transistordatabase.core.models import SwitchingLossData, Transistor
+from transistordatabase.core.models import MeasurementEvidence, SwitchingLossData, Transistor
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +54,28 @@ class DPTConfig:
     t_dead: float = 5e-6    # s
     t_pulse2: float = 2e-6  # s
 
+    model_kind: str = "generic_nmos"
+
+    def validate(self) -> None:
+        """Validate physical and representable timing domains for the template."""
+        for key in ("v_dc", "i_target", "l_load", "r_g_on", "r_g_off",
+                    "v_g_on", "v_g_off", "t_dead", "t_pulse2"):
+            if not math.isfinite(getattr(self, key)):
+                raise ValueError(f"{key} must be finite")
+        for key in ("v_dc", "i_target", "l_load", "r_g_on", "r_g_off",
+                    "t_dead", "t_pulse2"):
+            if getattr(self, key) <= 0:
+                raise ValueError(f"{key} must be positive")
+        # The uncalibrated level-1 NMOS below has VTO=3 V. Steering diodes
+        # reduce the applied rail by approximately a diode drop.
+        if not self.v_g_off + 1.0 < 3.0 < self.v_g_on - 1.0:
+            raise ValueError("Generic NMOS requires v_g_off + 1 V < 3 V < v_g_on - 1 V")
+        if self.model_kind != "generic_nmos":
+            raise ValueError("Only the explicitly selected generic_nmos template is supported")
+        pulse = self.i_target * (self.l_load / self.v_dc)
+        if not math.isfinite(pulse) or pulse <= 0:
+            raise ValueError("First pulse duration must be finite and positive")
+
     @property
     def t_pulse1(self) -> float:
         """Calculate first pulse duration to reach target current.
@@ -61,9 +85,8 @@ class DPTConfig:
         :return: Duration of first pulse in seconds.
         :raises ValueError: If DC bus voltage is not positive.
         """
-        if self.v_dc <= 0:
-            raise ValueError("DC bus voltage must be positive")
-        return self.i_target * self.l_load / self.v_dc
+        self.validate()
+        return self.i_target * (self.l_load / self.v_dc)
 
 
 @dataclass
@@ -75,19 +98,26 @@ class DPTResult:
     :param t_r: Current rise time in s.
     :param t_f: Current fall time in s.
     :param i_peak: Peak current during turn-on in A.
-    :param v_overshoot: Voltage overshoot during turn-off in V.
+    :param v_overshoot: Peak drain voltage in the bounded off-event region, V.
+        Legacy field name; this is an absolute peak, not excess above the bus.
     :param di_dt_on: di/dt during turn-on in A/s.
     :param dv_dt_off: dv/dt during turn-off in V/s.
     """
 
-    e_on: float = 0.0
-    e_off: float = 0.0
+    e_on: float | None = None
+    e_off: float | None = None
     t_r: float = 0.0
     t_f: float = 0.0
     i_peak: float = 0.0
     v_overshoot: float = 0.0
     di_dt_on: float = 0.0
     dv_dt_off: float = 0.0
+    i_on: float | None = None
+    i_off: float | None = None
+    on_window: tuple[float, float] | None = None
+    off_window: tuple[float, float] | None = None
+    energy_window_convention: str = "unspecified"
+    event_evidence: dict = field(default_factory=dict)
 
 
 class LTspiceDPT:
@@ -105,57 +135,101 @@ class LTspiceDPT:
         """
         self.config = config
 
-    def generate_netlist(
-        self,
-        output_path: Path,
-        transistor: Optional[Transistor] = None,
-    ) -> Path:
-        """Generate an LTspice netlist for double pulse test.
+    MODEL_DISCLOSURE = (
+        "Generic uncalibrated NMOS template: VTO=3 V, KP=50 A/V², RD=10 mΩ, "
+        "Cgs=2 nF, Cgd=100 pF and Cds=200 pF; idealized freewheel/steering "
+        "diodes. The selected transistor name is a label only. This is not a "
+        "vendor device model or a prediction of its switching energy. First "
+        "pulse duration uses ideal I·L/V and excludes losses and gate delay. "
+        "Pulse widths and dead time denote flat drive plateaus, with fixed "
+        "10 ns edges and a 1 µs initial delay."
+    )
 
-        Creates a basic DPT circuit netlist. If transistor is provided,
-        uses its parameters for the SPICE model.
-
-        :param output_path: Directory or file path to write the netlist.
-        :param transistor: Optional transistor for model parameters.
-        :return: Path to the generated netlist file.
-        """
+    @staticmethod
+    def netlist_filename(transistor: Optional[Transistor] = None) -> str:
+        """Return a portable filename without interpreting the label as a path."""
         name = transistor.metadata.name if transistor else "DUT"
-        if output_path.is_dir():
-            netlist_path = output_path / f"dpt_{name}.asc"
-        else:
-            netlist_path = output_path
+        label = re.sub(r"[^A-Za-z0-9_.-]", "_", name)[:100] or "DUT"
+        return f"dpt_{label}.cir"
 
+    def pulse_schedule(self) -> list[tuple[float, float]]:
+        """Two finite-edged pulses; widths/dead time refer to flat plateaus."""
         cfg = self.config
-        t1 = cfg.t_pulse1
-        t_total = t1 + cfg.t_dead + cfg.t_pulse2 + 5e-6
+        cfg.validate()
+        edge = 10e-9
+        a = 1e-6
+        b = a + edge
+        c = b + cfg.t_pulse1
+        d = c + edge
+        e = d + cfg.t_dead
+        f = e + edge
+        g = f + cfg.t_pulse2
+        h = g + edge
+        stop = h + max(cfg.t_dead, 5e-6)
+        times = [0.0, a, b, c, d, e, f, g, h, stop]
+        if not all(math.isfinite(t) for t in times) or any(
+            right <= left for left, right in zip(times, times[1:], strict=False)
+        ):
+            raise ValueError("Pulse schedule must have finite, distinct increasing times")
+        levels = [cfg.v_g_off, cfg.v_g_off, cfg.v_g_on, cfg.v_g_on,
+                  cfg.v_g_off, cfg.v_g_off, cfg.v_g_on, cfg.v_g_on,
+                  cfg.v_g_off, cfg.v_g_off]
+        return list(zip(times, levels, strict=True))
 
+    def render_netlist(self, transistor: Optional[Transistor] = None) -> str:
+        """Render a generic DPT deck without filesystem or simulator access.
+
+        No vendor parameters are inferred from the selected transistor. The
+        external capacitors and level-1 MOSFET are illustrative constants.
+        """
+        cfg = self.config
+        schedule = self.pulse_schedule()
+        name = " ".join((transistor.metadata.name if transistor else "DUT").split())
+        pwl = " ".join(f"{time:.17g} {voltage:.17g}" for time, voltage in schedule)
         lines = [
-            f"* Double Pulse Test for {name}",
-            f"* V_dc = {cfg.v_dc}V, I_target = {cfg.i_target}A",
-            f"* L_load = {cfg.l_load * 1e6:.1f}uH",
-            f"* Rg_on = {cfg.r_g_on}Ohm, Rg_off = {cfg.r_g_off}Ohm",
-            "*",
-            f"V1 vdc 0 {cfg.v_dc}",
-            f"L1 vdc vl {cfg.l_load}",
-            "M1 vl gate 0 0 DUT_NMOS",
-            "D1 0 vl DBODY",
-            f"R_g gate vgate {cfg.r_g_on}",
-            (
-                f"V_gate vgate 0 PULSE({cfg.v_g_off} {cfg.v_g_on}"
-                f" 0 10n 10n {t1} {t_total})"
-            ),
-            ".model DUT_NMOS NMOS(VTO=3 KP=50 RD=0.01)",
-            ".model DBODY D(IS=1e-12 BV=600)",
-            f".tran {t_total}",
-            ".backanno",
+            f"* Generic Double Pulse Test; selected label: {name}",
+            "* UNCALIBRATED GENERIC TEMPLATE - selected name is metadata only",
+            "* VTO=3 V KP=50 RD=0.01; Cgs=2n Cgd=100p Cds=200p",
+            "* Idealized diodes; no vendor model, recovery, package parasitics or thermal model",
+            f"* Ideal first pulse I*L/V = {cfg.t_pulse1:.17g} s; actual current differs",
+            f"Vbus bus 0 {cfg.v_dc!r}",
+            f"Lload bus sw {cfg.l_load!r}",
+            "M_dut sw gate 0 0 GENERIC_DPT_NMOS",
+            "D_freewheel sw bus GENERIC_FREEWHEEL",
+            f"R_on drive on_path {cfg.r_g_on!r}",
+            "D_on on_path gate GATE_STEERING",
+            "D_off gate off_path GATE_STEERING",
+            f"R_off off_path drive {cfg.r_g_off!r}",
+            f"Vdrive drive 0 PWL({pwl})",
+            "Cgs gate 0 2n",
+            "Cgd gate sw 100p",
+            "Cds sw 0 200p",
+            ".model GENERIC_DPT_NMOS NMOS(VTO=3 KP=50 RD=0.01)",
+            ".model GENERIC_FREEWHEEL D(IS=1e-12 RS=0.01 N=1)",
+            ".model GATE_STEERING D(IS=1e-12 RS=0.01 N=1)",
+            f".tran 0 {schedule[-1][0]:.17g} 0 1n",
+            ".options plotwinsize=0",
+            ".save V(gate) V(drive) V(sw) I(Lload) Id(M_dut) I(D_freewheel)",
             ".end",
         ]
+        return "\n".join(lines) + "\n"
 
-        netlist_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(netlist_path, "w") as f:
-            f.write("\n".join(lines))
+    def generate_netlist(
+        self, output_path: Path, transistor: Optional[Transistor] = None,
+    ) -> Path:
+        """Write the pure renderer's text; explicit file paths are preserved.
 
-        return netlist_path
+        Directory destinations use .cir because this is a textual netlist,
+        not an LTspice .asc schematic. Existing files are never overwritten.
+        """
+        text = self.render_netlist(transistor)
+        output_path = Path(output_path)
+        path = (output_path / self.netlist_filename(transistor)
+                if output_path.is_dir() else output_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("x", encoding="utf-8", newline="\n") as stream:
+            stream.write(text)
+        return path
 
     def run_simulation(self, netlist_path: Path) -> Optional[Path]:
         """Run LTspice simulation on the given netlist.
@@ -173,9 +247,10 @@ class LTspiceDPT:
             )
 
         runner = SimRunner(output_folder=str(netlist_path.parent))
-        runner.run(str(netlist_path))
-        raw_path = netlist_path.with_suffix(".raw")
-        return raw_path if raw_path.exists() else None
+        # run_now waits for the owned task and returns its actual output paths;
+        # an asynchronous run followed by exists() races simulation completion.
+        raw_path, _log_path = runner.run_now(str(netlist_path))
+        return Path(raw_path) if raw_path is not None and Path(raw_path).exists() else None
 
     def analyze_waveforms(
         self,
@@ -184,135 +259,137 @@ class LTspiceDPT:
         i_d: npt.NDArray[np.float64],
         v_gs: Optional[npt.NDArray[np.float64]] = None,
     ) -> DPTResult:
-        """Analyze DPT waveforms to extract switching parameters.
+        """Measure first turn-off and next turn-on using the measured gate.
 
-        Detects turn-off and turn-on transitions, then extracts switching
-        energies, rise/fall times, peak current, voltage overshoot, and
-        slew rates. Uses 10%/90% thresholds for rise/fall time calculation.
-
-        :param time: Time array in s.
-        :param v_ds: Drain-source voltage in V.
-        :param i_d: Drain current in A.
-        :param v_gs: Gate-source voltage in V (optional).
-        :return: DPTResult with extracted parameters.
+        A gate trace is required: missing/unresolved events raise ValueError.
+        The trace may start during the first high pulse. Gate midpoint edges
+        bound each event, drain 1/99% crossings locate the local commutation,
+        and local current levels set 10/90% times. Energies integrate measured
+        Vds*Id over the union of local 1/99% drain/current transitions (no
+        conduction subtraction). This convention is not a vendor IEC window.
+        Later second-pulse current growth cannot set first-event thresholds.
         """
-        cfg = self.config
-        i_max = np.max(i_d)
+        if (not math.isfinite(self.config.v_dc) or self.config.v_dc <= 0 or
+                not math.isfinite(self.config.v_g_on) or
+                not math.isfinite(self.config.v_g_off) or
+                self.config.v_g_on <= self.config.v_g_off):
+            raise ValueError("Declare a positive bus and finite increasing gate rails")
+        if v_gs is None:
+            raise ValueError("Measured v_gs is required to identify DPT events")
+        arrays = [np.asarray(a, dtype=float) for a in (time, v_ds, i_d, v_gs)]
+        time, v_ds, i_d, v_gs = arrays
+        if any(a.ndim != 1 or len(a) != len(time) for a in arrays) or len(time) < 8:
+            raise ValueError("Waveforms must be aligned one-dimensional arrays (at least 8 samples)")
+        if any(not np.all(np.isfinite(a)) for a in arrays):
+            raise ValueError("Waveforms must contain finite values")
+        if np.any(np.diff(time) <= 0):
+            raise ValueError("Time must be strictly increasing")
+        gate_high = v_gs >= (self.config.v_g_on + self.config.v_g_off) / 2
+        falls = np.flatnonzero(gate_high[:-1] & ~gate_high[1:]) + 1
+        rises = np.flatnonzero(~gate_high[:-1] & gate_high[1:]) + 1
+        if not len(falls):
+            raise ValueError("No first falling gate edge was resolved")
+        off_edge = falls[0]
+        next_rises = rises[rises > off_edge]
+        if not len(next_rises):
+            raise ValueError("No second rising gate edge was resolved")
+        on_edge = next_rises[0]
+        prior_rises = rises[rises < off_edge]
+        first_start = int(prior_rises[-1]) if len(prior_rises) else 0
+        later_falls = falls[falls > on_edge]
+        second_end = int(later_falls[0]) if len(later_falls) else len(time) - 1
+        def midpoint_index(first, last):
+            return int(np.searchsorted(time, (time[first] + time[last]) / 2))
 
-        if i_max <= 0:
-            return DPTResult()
+        middle = midpoint_index(off_edge, on_edge)
+        off_left = midpoint_index(first_start, off_edge)
+        on_right = midpoint_index(on_edge, second_end)
 
-        # --- Detect turn-off event ---
-        # Turn-off is the first major falling edge of current from near
-        # i_target. Find where current drops below 90% of peak for the
-        # first time after reaching peak.
-        i_threshold_high = 0.9 * i_max
-        i_threshold_low = 0.1 * i_max
+        def crossing(signal, level, start, end, rising):
+            x, y = signal[start:end], signal[start + 1:end + 1]
+            mask = ((x <= level) & (y > level) if rising
+                    else (x >= level) & (y < level))
+            indices = np.flatnonzero(mask)
+            if not len(indices):
+                raise ValueError(f"Unresolved {'rising' if rising else 'falling'} switching threshold")
+            index = start + int(indices[0])
+            return float(time[index] + (level - signal[index]) /
+                         (signal[index + 1] - signal[index]) *
+                         (time[index + 1] - time[index]))
 
-        # Find index where current first reaches near i_max
-        idx_peak_region = np.where(i_d >= i_threshold_high)[0]
-        if len(idx_peak_region) == 0:
-            return DPTResult()
+        def event(left, edge, right, turn_on):
+            if right - left < 6:
+                raise ValueError("Insufficient samples to resolve the switching event")
+            n = max(2, (right - left) // 10)
+            va = float(np.median(v_ds[left:left + n]))
+            vb = float(np.median(v_ds[right - n:right]))
+            low, high = min(va, vb), max(va, vb)
+            if high - low < .5 * self.config.v_dc or (va > vb) != turn_on:
+                raise ValueError("Gate event does not contain a resolved drain commutation")
+            vstart = crossing(v_ds, low + (high-low) * (.99 if turn_on else .01),
+                              left, right, not turn_on)
+            vend = crossing(v_ds, low + (high-low) * (.01 if turn_on else .99),
+                            left, right, not turn_on)
+            # The first off-pulse plateau or the end of the second on-transition
+            # determines the current level, never the full-record maximum.
+            if turn_on:
+                current_high = float(np.interp(vend, time, i_d))
+                current_low = float(np.median(i_d[left:left+n]))
+            else:
+                before = int(np.searchsorted(time, vstart))
+                current_high = float(np.max(i_d[left:before + 1]))
+                current_low = float(np.median(i_d[right-n:right]))
+            amplitude = current_high - current_low
+            if not math.isfinite(amplitude) or amplitude <= 0:
+                raise ValueError("Switching event must have a positive resolved current step")
+            fractions = (.01, .1, .9, .99) if turn_on else (.99, .9, .1, .01)
+            thresholds = [crossing(i_d, current_low + amplitude * fraction,
+                                   left, right, turn_on) for fraction in fractions]
+            start, stop = min(vstart, thresholds[0]), max(vend, thresholds[-1])
+            if stop <= start or thresholds[2] <= thresholds[1]:
+                raise ValueError("Switching thresholds must resolve increasing event times")
+            selected = (time > start) & (time < stop)
+            t = np.r_[start, time[selected], stop]
+            v = np.interp(t, time, v_ds)
+            current = np.interp(t, time, i_d)
+            energy = float(np.trapezoid(v * current, t))
+            result = (energy, thresholds[2] - thresholds[1],
+                      float(np.max(current)), float(np.max(v_ds[left:right + 1])),
+                      .8 * amplitude / (thresholds[2] - thresholds[1]),
+                      .8 * (high-low) / (crossing(v_ds, low+.9*(high-low), left, right,
+                                                 not turn_on) -
+                                             crossing(v_ds, low+.1*(high-low), left, right,
+                                                      not turn_on)),
+                      current_high, (start, stop))
+            if not all(math.isfinite(value) for value in result[:7]):
+                raise ValueError("Derived switching results must be finite")
+            evidence = {
+                "gate_edge_s": float(time[edge]),
+                "local_current_low_a": current_low,
+                "local_current_high_a": current_high,
+                "local_vds_low_v": low, "local_vds_high_v": high,
+                "current_threshold_times_s": thresholds,
+                "voltage_1_99_times_s": [vstart, vend],
+                "integration_window_s": [start, stop],
+            }
+            return (*result, evidence)
 
-        # Turn-off: first falling edge after the first high-current region
-        # Find the first contiguous block of high current, then the drop
-        first_high = idx_peak_region[0]
-
-        # Find where current drops below low threshold after first high
-        off_candidates = np.where(
-            (i_d[first_high:] < i_threshold_low)
-        )[0]
-        if len(off_candidates) == 0:
-            return DPTResult()
-        idx_off_end = first_high + off_candidates[0]
-
-        # Turn-off start: last index above high threshold before off_end
-        off_start_candidates = np.where(
-            i_d[:idx_off_end] >= i_threshold_high
-        )[0]
-        if len(off_start_candidates) == 0:
-            return DPTResult()
-        idx_off_start = off_start_candidates[-1]
-
-        # --- Detect turn-on event ---
-        # Turn-on is the rising edge of current after the dead time (after
-        # current has been near zero for a while).
-        # Look for current rising above low threshold after turn-off
-        post_off = np.where(i_d[idx_off_end:] >= i_threshold_low)[0]
-        if len(post_off) == 0:
-            return DPTResult()
-        idx_on_start_approx = idx_off_end + post_off[0]
-
-        # Find where current rises above high threshold for the turn-on
-        on_high_candidates = np.where(
-            i_d[idx_on_start_approx:] >= i_threshold_high
-        )[0]
-        if len(on_high_candidates) == 0:
-            # Current may not reach 90% in short pulse - use max after on
-            idx_on_end = len(i_d) - 1
-        else:
-            idx_on_end = idx_on_start_approx + on_high_candidates[0]
-
-        # Use a margin around the events to capture full switching energy
-        margin = max(
-            1,
-            int(0.1 * (idx_off_end - idx_off_start)),
-        )
-        off_slice_start = max(0, idx_off_start - margin)
-        off_slice_end = min(len(time) - 1, idx_off_end + margin)
-        on_slice_start = max(0, idx_on_start_approx - margin)
-        on_slice_end = min(len(time) - 1, idx_on_end + margin)
-
-        # --- Calculate switching energies ---
-        # P(t) = V_ds(t) * I_d(t), E = integral(P, dt)
-        p_off = v_ds[off_slice_start:off_slice_end + 1] * \
-            i_d[off_slice_start:off_slice_end + 1]
-        t_off = time[off_slice_start:off_slice_end + 1]
-        e_off = float(np.trapezoid(p_off, t_off))
-
-        p_on = v_ds[on_slice_start:on_slice_end + 1] * \
-            i_d[on_slice_start:on_slice_end + 1]
-        t_on = time[on_slice_start:on_slice_end + 1]
-        e_on = float(np.trapezoid(p_on, t_on))
-
-        # --- Rise/fall times (10%-90%) ---
-        # Fall time: time for current to go from 90% to 10% of i_max
-        t_f = float(time[idx_off_end] - time[idx_off_start])
-
-        # Rise time: time for current to go from 10% to 90% of i_max
-        t_r = float(time[idx_on_end] - time[idx_on_start_approx])
-
-        # --- Peak current during turn-on ---
-        on_region = i_d[on_slice_start:on_slice_end + 1]
-        i_peak = float(np.max(on_region)) if len(on_region) > 0 else 0.0
-
-        # --- Voltage overshoot during turn-off ---
-        off_region_v = v_ds[off_slice_start:off_slice_end + 1]
-        v_overshoot = float(np.max(off_region_v)) if len(off_region_v) > 0 else 0.0
-
-        # --- Slew rates ---
-        di_dt_on = (
-            (i_threshold_high - i_threshold_low) / t_r
-            if t_r > 0 else 0.0
-        )
-        dv_dt_off = (
-            (np.max(off_region_v) - np.min(off_region_v)) / t_f
-            if t_f > 0 else 0.0
-        )
-
-        return DPTResult(
-            e_on=e_on,
-            e_off=e_off,
-            t_r=t_r,
-            t_f=t_f,
-            i_peak=i_peak,
-            v_overshoot=v_overshoot,
-            di_dt_on=di_dt_on,
-            dv_dt_off=float(dv_dt_off),
-        )
+        off = event(off_left, off_edge, middle, False)
+        on = event(middle, on_edge, on_right, True)
+        return DPTResult(e_on=on[0], e_off=off[0], t_r=on[1], t_f=off[1],
+                         i_peak=on[2], v_overshoot=off[3], di_dt_on=on[4],
+                         dv_dt_off=off[5], i_on=on[6], i_off=off[6],
+                         on_window=on[7], off_window=off[7],
+                         energy_window_convention=(
+                             "Integral of measured Vds*Id over the union of local "
+                             "1%-99% drain/current transitions; no conduction "
+                             "subtraction; not a vendor/IEC full-energy window"
+                         ),
+                         event_evidence={"turn_on": on[8], "turn_off": off[8]})
 
     def extract_switching_loss_data(
-        self, result: DPTResult, t_j: float = 25.0
+        self, result: DPTResult, t_j: float = 25.0,
+        evidence: MeasurementEvidence | None = None,
     ) -> tuple[SwitchingLossData, SwitchingLossData]:
         """Convert DPT results to SwitchingLossData objects.
 
@@ -324,6 +401,57 @@ class LTspiceDPT:
         :return: Tuple of (e_on_data, e_off_data) SwitchingLossData.
         """
         cfg = self.config
+        def finite(value):
+            return isinstance(value, (int, float, np.number)) and not isinstance(value, (bool, np.bool_)) and math.isfinite(value)
+
+        if not finite(result.e_on) or not finite(result.e_off):
+            raise ValueError("Supply explicit finite turn-on and turn-off energies")
+        def valid_event(event, current, window):
+            data = result.event_evidence.get(event, {})
+            required = {"gate_edge_s", "local_current_low_a", "local_current_high_a",
+                        "local_vds_low_v", "local_vds_high_v", "current_threshold_times_s",
+                        "voltage_1_99_times_s", "integration_window_s"}
+            if (not finite(current) or current <= 0 or not isinstance(window, (list, tuple)) or
+                    len(window) != 2 or not all(finite(value) for value in window) or
+                    window[1] <= window[0] or not isinstance(data, dict) or
+                    not required.issubset(data)):
+                return False
+            if data["integration_window_s"] != list(window):
+                return False
+            for key in required:
+                values = data[key] if isinstance(data[key], (list, tuple)) else [data[key]]
+                if not values or not all(finite(value) for value in values):
+                    return False
+            return (len(data["current_threshold_times_s"]) == 4 and
+                    len(data["voltage_1_99_times_s"]) == 2)
+
+        resolved = (result.i_on is not None and result.i_off is not None and
+                    result.on_window is not None and result.off_window is not None and
+                    set(result.event_evidence) == {"turn_on", "turn_off"} and
+                    valid_event("turn_on", result.i_on, result.on_window) and
+                    valid_event("turn_off", result.i_off, result.off_window) and
+                    bool(result.energy_window_convention.strip()) and
+                    result.energy_window_convention != "unspecified")
+        if evidence is not None and not resolved:
+            raise ValueError("Measured extraction requires resolved DPT event evidence")
+        source = evidence or MeasurementEvidence(
+            source_kind="unknown" if resolved else "manual",
+            method="waveform-local-edge" if resolved else "manual-point",
+            manual_override=None if resolved else (
+                "Manually supplied energies. Missing currents use the requested target, not a measured current."
+            ))
+        def event_evidence(event, current, window):
+            if not resolved:
+                return replace(source, event=event, local_current_a=current,
+                               bus_voltage_v=cfg.v_dc, t_j=t_j,
+                               v_g_on=cfg.v_g_on, v_g_off=cfg.v_g_off,
+                               r_g_on=cfg.r_g_on, r_g_off=cfg.r_g_off)
+            return replace(source, event=event, local_current_a=current, window_s=window,
+                           method="waveform-local-edge", bus_voltage_v=cfg.v_dc, t_j=t_j,
+                           v_g_on=cfg.v_g_on, v_g_off=cfg.v_g_off,
+                           r_g_on=cfg.r_g_on, r_g_off=cfg.r_g_off,
+                           convention=result.energy_window_convention,
+                           thresholds=result.event_evidence[event])
 
         e_on_data = SwitchingLossData(
             dataset_type="single",
@@ -332,8 +460,9 @@ class LTspiceDPT:
             v_g=cfg.v_g_on,
             v_g_off=cfg.v_g_off,
             e_x=result.e_on,
-            i_x=cfg.i_target,
+            i_x=result.i_on if result.i_on is not None else cfg.i_target,
             r_g=cfg.r_g_on,
+            evidence=event_evidence("turn_on", result.i_on, result.on_window),
         )
 
         e_off_data = SwitchingLossData(
@@ -343,8 +472,9 @@ class LTspiceDPT:
             v_g=cfg.v_g_on,
             v_g_off=cfg.v_g_off,
             e_x=result.e_off,
-            i_x=cfg.i_target,
+            i_x=result.i_off if result.i_off is not None else cfg.i_target,
             r_g=cfg.r_g_off,
+            evidence=event_evidence("turn_off", result.i_off, result.off_window),
         )
 
         return e_on_data, e_off_data

@@ -221,7 +221,7 @@ class TopologyCalculatorMixin:
             slider_topology_r_g_on_transistor.setValue(int(r_g_on_max * 100))
             label_topology_slider_r_g_on_value_transistor.setText(str(round(r_g_on_max, 1)))
 
-        except:
+        except Exception:
             try:
                 r_g_on_max = max([i for i in [e_on.r_g for e_on in transistor.switch.e_on] if i is not None])
                 slider_topology_r_g_on_transistor.setMinimum(int(r_g_on_max * 100))
@@ -229,7 +229,7 @@ class TopologyCalculatorMixin:
                 if not self.start:
                     self.show_popup_message(
                         f"No energy data for different turn on gate resistor for <b>{transistor.name}</b> available!")
-            except:
+            except Exception:
                 if not self.start:
                     self.show_popup_message(f"No turn-on energy data for <b>{transistor.name}</b> available!")
                 slider_topology_r_g_on_transistor.setMinimum(0)
@@ -261,7 +261,7 @@ class TopologyCalculatorMixin:
                 slider_topology_r_g_off_transistor.setMaximum(int(r_g_off_max * 100))
                 slider_topology_r_g_off_transistor.setValue(int(r_g_off_max * 100))
                 label_topology_slider_r_g_off_value_transistor.setText(str(round(r_g_off_max, 1)))
-        except:
+        except Exception:
             try:
                 r_g_off_max = max([i for i in [e_off.r_g for e_off in transistor.switch.e_off] if i is not None])
                 slider_topology_r_g_off_transistor.setMinimum(int(r_g_off_max * 100))
@@ -269,7 +269,7 @@ class TopologyCalculatorMixin:
                 if not self.start:
                     self.show_popup_message(
                         f"No energy data for different turn off gate resistor for <b>{transistor.name}</b> available!")
-            except:
+            except Exception:
                 slider_topology_r_g_off_transistor.setMinimum(0)
                 slider_topology_r_g_off_transistor.setMaximum(0)
                 if not self.start:
@@ -364,7 +364,7 @@ class TopologyCalculatorMixin:
         matplotlibwidget.axis.clear()
         try:
             matplotlibwidget.axis_cm.remove()
-        except:
+        except Exception:
             pass
 
         transistor1 = self.tdb.load_transistor(self.comboBox_topology_transistor1.currentText())
@@ -376,7 +376,7 @@ class TopologyCalculatorMixin:
         try:
             t_heatsink = float(self.lineEdit_topology_temperature_heatsink.text())
             r_th_heatsink = float(self.lineEdit_topology_thermal_resistance_heatsink.text())
-        except:
+        except Exception:
             pass
 
         try:
@@ -636,7 +636,7 @@ class TopologyCalculatorMixin:
                                                  linewidth=1)
                 matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
 
-        except:
+        except Exception:
             matplotlibwidget.axis.clear()
             matplotlibwidget.figure.canvas.draw_idle()
             self.show_popup_message(
@@ -863,7 +863,7 @@ class TopologyCalculatorMixin:
                                                  color="Green", linewidth=1)
                 matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
 
-        except:
+        except Exception:
             matplotlibwidget.axis.clear()
             matplotlibwidget.figure.canvas.draw_idle()
             self.show_popup_message(

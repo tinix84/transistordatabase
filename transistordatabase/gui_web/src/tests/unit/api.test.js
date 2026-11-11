@@ -74,7 +74,7 @@ describe('API Service', () => {
         expect.stringContaining('[transistorApi.getAll] Fetching')
       )
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('[transistorApi.getAll] Success!')
+        expect.stringContaining('[transistorApi.getAll] Success!'), mockTransistors.length, 'transistors'
       )
     })
 
@@ -265,6 +265,21 @@ describe('API Service', () => {
   })
 
   describe('export()', () => {
+    it('sends explicit conditions and decodes JSON errors received as Blob bytes', async () => {
+      const selection = { component: 'switch', t_j: 25, v_supply: 600, v_g_on: 15, v_g_off: null, r_g_on: 2, r_g_off: 3 }
+      mock.onPost('/api/transistors/part/export/gecko', selection).reply(422,
+        new Blob([JSON.stringify({ detail: 'No exact recorded switch slice' })], { type: 'application/json' }))
+      await expect(transistorApi.export('part', 'gecko', selection)).rejects.toThrow('No exact recorded switch slice')
+      expect(JSON.parse(mock.history.post[0].data)).toEqual(selection)
+    })
+
+    it('returns complete native JSON bytes without parsing large integers', async () => {
+      const bytes = new Blob(['{"source_id":1152921504606846977}'], { type: 'application/json' })
+      mock.onPost('/api/transistors/part/export/json').reply(200, bytes)
+      const result = await transistorApi.export('part', 'json')
+      expect(result).toBe(bytes)
+      expect(await result.text()).toContain('1152921504606846977')
+    })
     it('should export transistor in specified format', async () => {
       const name = 'CREE_C3M0060065J'
       const format = 'json'

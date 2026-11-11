@@ -302,12 +302,12 @@ def _measurement_context(
     )
     verified_raw_import = (
         isinstance(provenance, dict)
-        and provenance.get("parser") == "PyLTSpice.RawRead"
+        and provenance.get("parser") in ("spicelib.RawRead", "PyLTSpice.RawRead")
     )
     if has_inductance and not verified_raw_import:
         raise DptEnergyDerivationError(
             f"Point {point_number} has load or commutation inductance without "
-            "verified PyLTSpice.RawRead importer provenance. Its stored unit cannot "
+            "verified PyLTSpice.RawRead importer provenance or spicelib.RawRead importer provenance. Its stored unit cannot "
             "be established, so energy derivation stops rather than guessing."
         )
     # The imported raw-measurement contract stores these fields in µH, while

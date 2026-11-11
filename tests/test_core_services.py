@@ -219,15 +219,16 @@ class TestCalculationService:
         """Interpolation returns reasonable value."""
         result = self.svc.interpolate_switching_losses(
             transistor.switch.e_on_data,
-            {"t_j": 25.0, "i_channel": 100.0},
+            {"t_j": 25.0, "i_channel": 100.0, "v_supply": 600,
+             "v_g": 15, "r_g": 10, "v_g_off": None},
         )
         assert result > 0
         assert result == pytest.approx(0.012, abs=0.001)
 
     def test_interpolate_no_data(self):
-        """Interpolation with no data returns 0."""
-        result = self.svc.interpolate_switching_losses([], {"t_j": 25.0})
-        assert result == 0.0
+        """Missing switching evidence is unavailable, never zero."""
+        with pytest.raises(ValueError):
+            self.svc.interpolate_switching_losses([], {"t_j": 25.0})
 
     def test_calculate_thermal_impedance(self, transistor):
         """Thermal impedance calculation returns array."""
@@ -248,7 +249,9 @@ class TestCalculationService:
         """Loss calculation returns all expected keys."""
         result = self.svc.calculate_losses(
             transistor,
-            {"t_j": 25.0, "v_g": 15.0, "i_channel": 100.0, "f_sw": 10000.0},
+            {"t_j": 25.0, "v_g": 15.0, "i_channel": 100.0, "f_sw": 10000.0,
+             "duty": .5, "v_supply": 600, "r_g_on": 10, "r_g_off": 10,
+             "v_g_off": None},
         )
         assert "switching_losses_on" in result
         assert "switching_losses_off" in result
@@ -256,13 +259,9 @@ class TestCalculationService:
         assert result["total_losses"] >= 0
 
     def test_calculate_thermal_resistance(self, transistor):
-        """Thermal resistance calculation returns reasonable values."""
-        result = self.svc.calculate_thermal_resistance(
-            transistor, [10.0, 20.0, 15.0],
-        )
-        assert "r_th_jc" in result
-        assert "t_j_rise" in result
-        assert "t_j_avg" in result
+        """Require the explicit physical path/reference introduced in phase6."""
+        with pytest.raises(ValueError, match="explicit case/sink reference"):
+            self.svc.calculate_thermal_resistance(transistor, [10.0, 20.0, 15.0])
 
 
 # ---------------------------------------------------------------------------
@@ -483,7 +482,11 @@ class TestExportService:
         assert result is True
         assert out.exists()
         data = json.loads(out.read_text())
-        assert data["metadata"]["name"] == "TEST_SVC"
+        from transistordatabase.core.serialization import core_from_json_document
+        restored = core_from_json_document(data)
+        assert restored.metadata.name == "TEST_SVC"
+        np.testing.assert_array_equal(restored.switch.channel_data[0].graph_v_i,
+                                      transistor.switch.channel_data[0].graph_v_i)
 
     def test_export_csv(self, transistor, tmp_path):
         """CSV export creates a file."""
@@ -495,11 +498,11 @@ class TestExportService:
         assert "TEST_SVC" in content
 
     def test_export_spice(self, transistor, tmp_path):
-        """SPICE export creates a file."""
+        """Ratings alone cannot establish a calibrated SPICE model."""
         out = tmp_path / "test.spice"
-        result = self.svc.export_to_spice(transistor, out)
-        assert result is True
-        assert out.exists()
+        with pytest.raises(NotImplementedError, match="calibrated SPICE"):
+            self.svc.export_to_spice(transistor, out)
+        assert not out.exists()
 
 
 # ---------------------------------------------------------------------------

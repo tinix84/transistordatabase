@@ -37,6 +37,7 @@
               <option value="conduction-only">TDB channel conduction only</option>
               <option value="detailed">TDB curve based losses</option>
               <option value="loss-balanced">Loss-balanced channel model</option>
+              <option value="switching-loss-balanced" :disabled="!switchingLossBalancedSupported">Boost CCM switching-loss-balanced</option>
             </select>
           </label>
           <label class="param-item">Conduction regime
@@ -92,6 +93,8 @@
             </label>
           </div>
           <p class="hint">Estimate mode does not use device curves. Conduction-only mode requires exact-condition switch and diode channel curves. Detailed mode also requires exact-condition turn-on and turn-off curves. Loss-balanced mode requires exact-condition switch and diode channel curves. Scalar DCM feedback is available for Buck, Boost, inverting Buck-Boost, and Flyback. All curve extrapolation is rejected.</p>
+          <p v-if="switchingLossBalanced" class="hint">This mode supports scalar Boost CCM only. It requires exact TDB Eon/Eoff graph_i_e curves at the Boost blocking voltage, selected temperature, both gate voltages, and each gate resistance. Eon/Eoff current extrapolation, sweeps, and topology comparison are rejected. Reverse recovery is excluded because Eon provenance does not establish whether it is already included.</p>
+          <p v-if="switchingLossBalanced && !switchingLossBalancedSupported" class="hint" role="alert">Switching-loss-balanced requires Boost with CCM selected. Choose Boost/CCM or select another calculation mode before calculating.</p>
         </div>
 
         <div v-if="form.mode !== 'estimate'" class="param-section">
@@ -109,13 +112,13 @@
             <label class="param-item">Diode channel gate voltage (optional; required for gate-conditioned curves)
               <input v-model.number="form.diode_v_g" type="number" step="any"><span class="unit">V</span>
             </label>
-            <label class="param-item">Turn-off gate voltage (optional)
+            <label class="param-item">Turn-off gate voltage{{ switchingLossBalanced ? ' (required)' : ' (optional)' }}
               <input v-model.number="form.v_g_off" type="number" step="any"><span class="unit">V</span>
             </label>
-            <label class="param-item">Turn-on gate resistance (optional)
+            <label class="param-item">Turn-on gate resistance{{ switchingLossBalanced ? ' (required)' : ' (optional)' }}
               <input v-model.number="form.r_g_on" type="number" min="0" step="any"><span class="unit">Ω</span>
             </label>
-            <label class="param-item">Turn-off gate resistance (optional)
+            <label class="param-item">Turn-off gate resistance{{ switchingLossBalanced ? ' (required)' : ' (optional)' }}
               <input v-model.number="form.r_g_off" type="number" min="0" step="any"><span class="unit">Ω</span>
             </label>
           </div>
@@ -123,10 +126,11 @@
 
         <div class="param-section">
           <h4>Python generated sweep</h4>
-          <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox"> Include line or contour sweep</label>
+          <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox" :disabled="switchingLossBalanced"> Include line or contour sweep</label>
           <p v-if="form.mode === 'loss-balanced'" class="hint">Loss-balanced sweeps solve each CCM or DCM point from exact-condition channel curves. DCM uses the scalar ramp and charge solve; every point must be supported and below the CCM boundary. No curve extrapolation is used.</p>
           <p v-if="lossBalancedDcm" class="hint">DCM sweeps expose the independently checked power-balance and averaged inductor volt-second residuals. Temperature values are one-pass estimates at the selected curve temperature; electrothermal iteration is not implemented.</p>
-          <div v-if="form.sweep_enabled" class="param-grid">
+          <p v-if="switchingLossBalanced && form.sweep_enabled" class="hint">Saved sweep settings are hidden and will not be submitted while switching-loss-balanced is selected.</p>
+          <div v-if="form.sweep_enabled && !switchingLossBalanced" class="param-grid">
             <label class="param-item">Sweep type
               <select v-model="form.sweep_kind"><option value="line">Line</option><option value="contour">Contour</option></select>
             </label>
@@ -164,8 +168,8 @@
         </div>
 
         <div class="calculation-actions">
-          <button class="btn btn-primary" type="button" :disabled="loading" @click="calculate">{{ loading ? 'Calculating…' : 'Calculate' }}</button>
-        <button class="btn btn-secondary" type="button" :disabled="loading" @click="compare">Compare topologies</button>
+          <button class="btn btn-primary" type="button" :disabled="loading || (switchingLossBalanced && !switchingLossBalancedSupported)" @click="calculate">{{ loading ? 'Calculating…' : 'Calculate' }}</button>
+        <button class="btn btn-secondary" type="button" :disabled="loading || switchingLossBalanced" @click="compare">Compare topologies</button>
         </div>
         <div v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</div>
         <p v-if="lossBalancedDcm" class="hint">Topology comparison evaluates all four converters at this DCM boundary. Unsupported voltage or curve domains appear as per-topology errors; any ranking includes channel-conduction losses only.</p>
@@ -179,7 +183,7 @@
 
         <div class="results-grid">
           <div class="result-item"><label>Duty cycle</label><span class="value">{{ format(results.calculated.duty_cycle, 4) }}</span></div>
-          <div class="result-item"><label>{{ results.model.mode === 'estimate' ? 'Average input current' : results.model.mode === 'loss-balanced' ? 'Average input current (loss-balanced)' : 'Average input current (ideal lossless point)' }}</label><span class="value">{{ format(results.calculated.i_in_avg_a, 3) }} A</span></div>
+          <div class="result-item"><label>{{ results.model.mode === 'estimate' ? 'Average input current' : ['loss-balanced', 'switching-loss-balanced'].includes(results.model.mode) ? 'Average input current (loss-balanced)' : 'Average input current (ideal lossless point)' }}</label><span class="value">{{ format(results.calculated.i_in_avg_a, 3) }} A</span></div>
           <div class="result-item"><label>Average output current</label><span class="value">{{ format(results.calculated.i_out_avg_a, 3) }} A</span></div>
           <div class="result-item"><label>{{ results.topology === 'flyback' ? 'Average primary magnetizing current' : 'Average inductor current' }}</label><span class="value">{{ format(results.calculated.i_l_avg_a, 3) }} A</span></div>
           <div class="result-item"><label>{{ results.topology === 'flyback' ? 'Peak primary magnetizing current' : 'Peak inductor current' }}</label><span class="value">{{ format(results.calculated.i_l_peak_a, 3) }} A</span></div>
@@ -192,15 +196,15 @@
         </div>
 
         <div v-if="results.losses" class="results-section">
-          <h4>{{ results.model.mode === 'loss-balanced' ? 'Included device losses' : 'Partial device losses' }}</h4>
+          <h4>{{ ['loss-balanced', 'switching-loss-balanced'].includes(results.model.mode) ? 'Included device losses' : 'Partial device losses' }}</h4>
           <div class="loss-grid">
             <div class="loss-item"><label>Switch conduction</label><span class="value">{{ format(results.losses.conduction_switch_w, 3) }} W</span></div>
             <div class="loss-item"><label>Diode conduction</label><span class="value">{{ format(results.losses.conduction_diode_w, 3) }} W</span></div>
-            <div v-if="results.model.mode === 'detailed'" class="loss-item"><label>Switching on</label><span class="value">{{ format(results.losses.switching_on_w, 3) }} W</span></div>
-            <div v-if="results.model.mode === 'detailed'" class="loss-item"><label>Switching off</label><span class="value">{{ format(results.losses.switching_off_w, 3) }} W</span></div>
+            <div v-if="['detailed', 'switching-loss-balanced'].includes(results.model.mode)" class="loss-item"><label>Switching on</label><span class="value">{{ format(results.losses.switching_on_w, 3) }} W</span></div>
+            <div v-if="['detailed', 'switching-loss-balanced'].includes(results.model.mode)" class="loss-item"><label>Switching off</label><span class="value">{{ format(results.losses.switching_off_w, 3) }} W</span></div>
             <div class="loss-item total"><label>Included partial loss</label><span class="value">{{ format(results.losses.total_w, 3) }} W</span></div>
-            <div class="loss-item"><label>{{ results.model.mode === 'loss-balanced' ? 'Loss-balanced input power' : 'Partial input power estimate' }}</label><span class="value">{{ format(results.performance.p_in_w, 3) }} W</span></div>
-            <div class="loss-item"><label>{{ results.model.mode === 'loss-balanced' ? 'Loss-balanced efficiency' : 'Partial efficiency estimate' }}</label><span class="value">{{ format(results.performance.efficiency_percent, 3) }}%</span></div>
+            <div class="loss-item"><label>{{ ['loss-balanced', 'switching-loss-balanced'].includes(results.model.mode) ? 'Loss-balanced input power' : 'Partial input power estimate' }}</label><span class="value">{{ format(results.performance.p_in_w, 3) }} W</span></div>
+            <div class="loss-item"><label>{{ ['loss-balanced', 'switching-loss-balanced'].includes(results.model.mode) ? 'Loss-balanced efficiency' : 'Partial efficiency estimate' }}</label><span class="value">{{ format(results.performance.efficiency_percent, 3) }}%</span></div>
           </div>
           <p v-if="results.performance.power_balance_residual_w != null" class="hint">Power-balance residual: {{ format(results.performance.power_balance_residual_w, 8) }} W.</p>
           <p v-if="results.calculated.inductor_volt_second_residual_v != null" class="hint">Averaged inductor volt-second residual: {{ format(results.calculated.inductor_volt_second_residual_v, 8) }} V.</p>
@@ -378,6 +382,10 @@ const hasExportableResults = computed(() => hasResults.value || comparison.value
 const lossBalancedDcm = computed(() => (
   form.mode === 'loss-balanced' && form.conduction_regime === 'DCM'
 ))
+const switchingLossBalanced = computed(() => form.mode === 'switching-loss-balanced')
+const switchingLossBalancedSupported = computed(() => (
+  selectedTopology.value === 'boost' && form.conduction_regime === 'CCM'
+))
 const showDcmSweepData = computed(() => (
   results.value?.model?.mode === 'loss-balanced'
   && results.value?.model?.conduction_regime === 'DCM'
@@ -393,6 +401,7 @@ const modelLabel = computed(() => {
       : regime
     return `${topology} TDB channel loss-balanced averaged model`
   }
+  if (mode === 'switching-loss-balanced') return 'Boost CCM TDB switching-loss-balanced model'
   if (mode === 'detailed') return 'TDB curve based partial device model'
   if (mode === 'conduction-only') return 'TDB channel conduction-only partial model'
   return `Ideal ${results.value?.model?.conduction_regime || 'CCM'} operating-point estimate`
@@ -511,10 +520,10 @@ function buildPayload(includeSweep = true, includeFlybackComparison = false) {
     t_case: form.mode !== 'estimate' ? optionalNumber(form.t_case) : undefined,
     v_g: form.mode !== 'estimate' ? Number(form.v_g) : undefined,
     diode_v_g: form.mode !== 'estimate' ? optionalNumber(form.diode_v_g) : undefined,
-    v_g_off: form.mode === 'detailed' ? optionalNumber(form.v_g_off) : undefined,
-    r_g_on: form.mode === 'detailed' ? optionalNumber(form.r_g_on) : undefined,
-    r_g_off: form.mode === 'detailed' ? optionalNumber(form.r_g_off) : undefined,
-    ...(includeSweep && buildSweep()
+    v_g_off: ['detailed', 'switching-loss-balanced'].includes(form.mode) ? optionalNumber(form.v_g_off) : undefined,
+    r_g_on: ['detailed', 'switching-loss-balanced'].includes(form.mode) ? optionalNumber(form.r_g_on) : undefined,
+    r_g_off: ['detailed', 'switching-loss-balanced'].includes(form.mode) ? optionalNumber(form.r_g_off) : undefined,
+    ...(includeSweep && !switchingLossBalanced.value && buildSweep()
       ? { sweep: buildSweep() }
       : {})
   }

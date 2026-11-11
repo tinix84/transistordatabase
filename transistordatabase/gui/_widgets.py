@@ -120,7 +120,7 @@ class ViewCurveWindow(QMainWindow):
             self.update_curve()
 
             self.show()
-        except:
+        except Exception:
             pass
 
 

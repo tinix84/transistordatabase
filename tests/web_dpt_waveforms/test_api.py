@@ -103,8 +103,11 @@ def test_dpt_data_includes_multiple_raw_records_and_acquisitions(
     assert response.status_code == 200
     payload = response.json()
     assert "waveform_preview" not in payload
-    assert payload["has_e_on"] is True
-    assert payload["has_e_off"] is True
+    assert payload["has_e_on"] is False
+    assert payload["has_e_off"] is False
+    assert payload["has_recorded_e_on"] is True
+    assert payload["has_recorded_e_off"] is True
+    assert payload["legacy_source_status"] == "unknown-without-structured-evidence"
     assert "has_e_rr" in payload
     assert "metadata" in payload
     raw_records = payload["raw_measurement_data"]
@@ -218,8 +221,11 @@ def test_dpt_data_returns_empty_raw_list_without_changing_summary_fields(
     assert response.status_code == 200
     payload = response.json()
     assert payload["raw_measurement_data"] == []
-    assert payload["has_e_on"] is True
-    assert payload["has_e_off"] is True
+    assert payload["has_e_on"] is False
+    assert payload["has_e_off"] is False
+    assert payload["has_recorded_e_on"] is True
+    assert payload["has_recorded_e_off"] is True
+    assert payload["legacy_source_status"] == "unknown-without-structured-evidence"
     assert "has_e_rr" in payload
     assert "metadata" in payload
 

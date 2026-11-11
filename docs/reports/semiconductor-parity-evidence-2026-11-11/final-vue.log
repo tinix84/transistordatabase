@@ -1,0 +1,343 @@
+
+> transistor-database-web@1.0.0 test:run
+> vitest run --maxWorkers=1 --minWorkers=1
+
+
+ RUN  v2.1.9 /home/tinix/claude_wsl/transistordatabase/transistordatabase/gui_web
+
+ ✓ src/tests/unit/LegacyMatWorkbench.test.js (9 tests) 1819ms
+   ✓ legacy MAT browser workflow > sends independent declarations, original indices and citation evidence then downloads native JSON verbatim 602ms
+   ✓ legacy MAT browser workflow > uses Python bounded values, reports coverage and rejects stale lookup exports after edits 498ms
+ ✓ src/tests/unit/GridEnergyWorkbench.test.js (9 tests) 983ms
+   ✓ finite grid and conditioned energy evidence > bounds the prepared matrix and lazy source evidence before mounting a large accepted response 346ms
+ ✓ src/tests/unit/RgEnergyPanel.test.js (13 tests) 991ms
+ ✓ src/tests/unit/App.test.js (31 tests) 972ms
+ ✓ src/tests/unit/ExtractionAdapters.test.js (10 tests) 311ms
+ ✓ src/tests/unit/TransistorComparison.test.js (39 tests) 628ms
+ ✓ src/tests/unit/SearchDatabase.test.js (42 tests) 425ms
+ ✓ src/tests/unit/CatalogSourceWorkbench.test.js (9 tests) 239ms
+ ✓ src/tests/unit/XyzEnergyImportPanel.test.js (20 tests) 1070ms
+   ✓ XYZ energy observation import > pages large duplicate evidence and writes common CSV metadata once 348ms
+ ✓ src/tests/unit/DeviceModelFitting.test.js (20 tests) 433ms
+ ✓ src/tests/unit/DigitizerWorkbench.test.js (7 tests) 328ms
+stdout | src/tests/unit/api.test.js > API Service > getAll() > should fetch all transistors successfully
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > getAll() > should handle empty array response
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > getAll() > should throw error on failed request
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > getAll() > should throw error on network failure
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > getAll() > should log successful requests
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > getAll() > should log failed requests
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > getById() > should fetch specific transistor by ID
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > getById() > should handle 404 for non-existent transistor
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > create() > should create new transistor
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > create() > should handle validation errors
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > update() > should update existing transistor
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > update() > should handle 404 for non-existent transistor
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > delete() > should delete transistor
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > delete() > should handle 404 for non-existent transistor
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > validate() > should validate transistor successfully
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > validate() > should return validation errors
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > compare() > should compare multiple transistors
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > export() > sends explicit conditions and decodes JSON errors received as Blob bytes
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > export() > returns complete native JSON bytes without parsing large integers
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > export() > should export transistor in specified format
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > export() > should handle unsupported format
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > upload() > should upload transistor file
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > upload() > should handle invalid file format
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > Error Handling > should handle timeout errors
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > Error Handling > should handle CORS errors
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/api.test.js > API Service > Error Handling > should handle malformed JSON response
+[API] Initialized with BASE_URL: 
+
+ ✓ src/tests/unit/api.test.js (26 tests) 137ms
+stdout | src/tests/unit/TopologyCalculator.test.js
+[API] Initialized with BASE_URL: 
+
+ ✓ src/tests/unit/TopologyCalculator.test.js (44 tests) 445ms
+ ✓ src/tests/unit/MeasurementWorkbench.test.js (7 tests) 422ms
+ ✓ src/tests/unit/MeritAnalysis.test.js (7 tests) 249ms
+ ✓ src/tests/unit/TopologyWorkflow.test.js (9 tests) 204ms
+ ✓ src/tests/unit/EnergyScene3D.test.js (14 tests) 176ms
+ ✓ src/tests/unit/StressIndicesWorkbench.test.js (8 tests) 390ms
+ ✓ src/tests/unit/GroupedHarmonics.test.js (4 tests) 311ms
+ ✓ src/tests/unit/ConverterWorkbench.test.js (10 tests) 629ms
+ ✓ src/tests/unit/CatalogFom.test.js (7 tests) 425ms
+ ✓ src/tests/unit/ReverseSharingPanel.test.js (8 tests) 259ms
+ ✓ src/tests/unit/PlecsWorkbench.test.js (7 tests) 136ms
+ ✓ src/tests/unit/SemiconductorAssemblyWorkbench.test.js (10 tests) 479ms
+ ✓ src/tests/unit/TransistorForm.test.js (21 tests) 581ms
+ ✓ src/tests/unit/WaveformWorkbench.test.js (7 tests) 340ms
+ ✓ src/tests/unit/ExportingTools.test.js (7 tests) 141ms
+ ✓ src/tests/unit/PlecsCoreExport.test.js (6 tests) 209ms
+ ✓ src/tests/unit/DeviceParameterCalculator.test.js (7 tests) 193ms
+ ✓ src/tests/unit/CircuitPhysicalSummary.test.js (6 tests) 215ms
+ ✓ src/tests/unit/GateAllocationPanel.test.js (6 tests) 118ms
+ ✓ src/tests/unit/CatalogScatter.test.js (5 tests) 75ms
+ ✓ src/tests/unit/LegacyComparisonClosure.test.js (5 tests) 123ms
+ ✓ src/tests/unit/BielaCalculator.test.js (6 tests) 184ms
+ ✓ src/tests/unit/ThermalWorkbench.test.js (7 tests) 155ms
+ ✓ src/tests/unit/CurvePlotterTicks.test.js (4 tests) 81ms
+ ✓ src/tests/unit/PlecsCoreMapping.test.js (4 tests) 122ms
+ ✓ src/tests/unit/GateChargeCalculator.test.js (6 tests) 199ms
+ ✓ src/tests/unit/EnergySceneGeometryIndependent.test.js (7 tests) 8ms
+ ✓ src/tests/unit/GateResistanceCalculator.test.js (1 test) 125ms
+stdout | src/tests/unit/DeviceModelApi.test.js
+[API] Initialized with BASE_URL: 
+
+stderr | src/tests/unit/DeviceModelApi.test.js > preserves exact model train review text and structured validation errors
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: '{"detail":"Unsupported model"}',
+  url: '/api/models/train'
+}
+stdout | src/tests/unit/DeviceModelApi.test.js > preserves exact model train review text and structured validation errors
+[API Request] POST /api/models/train
+[API Response] POST /api/models/train: 200 undefined
+[API Response] Data type: string
+[API Request] POST /api/models/train
+
+
+stdout | src/tests/unit/DeviceModelApi.test.js > preserves exact model evaluate review text and structured validation errors
+[API Request] POST /api/models/evaluate
+[API Response] POST /api/models/evaluate: 200 undefined
+[API Response] Data type: string
+[API Request] POST /api/models/evaluate
+
+stderr | src/tests/unit/DeviceModelApi.test.js > preserves exact model evaluate review text and structured validation errors
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: '{"detail":"Unsupported model"}',
+  url: '/api/models/evaluate'
+}
+
+stdout | src/tests/unit/DeviceModelApi.test.js > sends imported model number tokens without browser normalization
+[API Request] POST /api/models/evaluate
+
+stderr | src/tests/unit/DeviceModelApi.test.js > sends imported model number tokens without browser normalization
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: '{"detail":"Underflow is invalid"}',
+  url: '/api/models/evaluate'
+}
+
+ ✓ src/tests/unit/DeviceModelApi.test.js (3 tests) 30ms
+ ✓ src/tests/unit/returnedPlotBounds.test.js (8 tests) 6ms
+stdout | src/tests/unit/RgEnergyApi.test.js
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/RgEnergyApi.test.js > loads a repository inventory through the encoded device locator
+[API Request] GET /api/transistors/device%20one/rg-energy
+[API Response] GET /api/transistors/device%20one/rg-energy: 200 undefined
+[API Response] Data type: object
+
+stdout | src/tests/unit/RgEnergyApi.test.js > retains exact HTTP response text and zero without reserialization
+[API Request] POST /api/transistors/sample/rg-energy
+[API Response] POST /api/transistors/sample/rg-energy: 200 undefined
+[API Response] Data type: string
+
+stdout | src/tests/unit/RgEnergyApi.test.js > retains core validation diagnostics in rejected raw HTTP responses
+[API Request] POST /api/transistors/sample/rg-energy
+
+stderr | src/tests/unit/RgEnergyApi.test.js > retains core validation diagnostics in rejected raw HTTP responses
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: '{"detail":"Multiple inverse crossings"}',
+  url: '/api/transistors/sample/rg-energy'
+}
+
+ ✓ src/tests/unit/RgEnergyApi.test.js (3 tests) 40ms
+stdout | src/tests/unit/MeritAnalysisApi.test.js
+[API] Initialized with BASE_URL: 
+
+stderr | src/tests/unit/MeritAnalysisApi.test.js > posts advanced grid JSON text unchanged with its numeric literal and JSON content type
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: { detail: 'Numeric value is outside representable precision' },
+  url: '/api/analysis/grid'
+}
+stdout | src/tests/unit/MeritAnalysisApi.test.js > posts advanced grid JSON text unchanged with its numeric literal and JSON content type
+[API Request] POST /api/analysis/grid
+
+
+stdout | src/tests/unit/MeritAnalysisApi.test.js > keeps guided grid objects on the existing JSON request path
+[API Request] POST /api/analysis/grid
+[API Response] POST /api/analysis/grid: 200 undefined
+[API Response] Data type: object
+
+ ✓ src/tests/unit/MeritAnalysisApi.test.js (2 tests) 24ms
+stdout | src/tests/unit/StressApi.test.js
+[API] Initialized with BASE_URL: 
+
+stderr | src/tests/unit/StressApi.test.js > stress review response transport > retains structured API validation errors when successful responses use raw text
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: '{"detail":"Time must increase strictly"}',
+  url: '/api/stress/calculate'
+}
+
+stdout | src/tests/unit/StressApi.test.js > stress review response transport > preserves exact JSON number text and negative zero for evidence downloads
+[API Request] POST /api/stress/calculate
+[API Response] POST /api/stress/calculate: 200 undefined
+[API Response] Data type: string
+
+stdout | src/tests/unit/StressApi.test.js > stress review response transport > retains structured API validation errors when successful responses use raw text
+[API Request] POST /api/stress/calculate
+
+ ✓ src/tests/unit/StressApi.test.js (2 tests) 23ms
+stdout | src/tests/unit/ReverseSharingApi.test.js
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/ReverseSharingApi.test.js > retains exact reverse-sharing response bytes and null unsupported values
+[API Request] POST /api/assemblies/reverse-sharing
+[API Response] POST /api/assemblies/reverse-sharing: 200 undefined
+[API Response] Data type: string
+
+stdout | src/tests/unit/ReverseSharingApi.test.js > retains structured reverse-sharing validation errors
+[API Request] POST /api/assemblies/reverse-sharing
+
+stderr | src/tests/unit/ReverseSharingApi.test.js > retains structured reverse-sharing validation errors
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: '{"detail":[{"msg":"Gate bias is incompatible"}]}',
+  url: '/api/assemblies/reverse-sharing'
+}
+
+ ✓ src/tests/unit/ReverseSharingApi.test.js (2 tests) 34ms
+stdout | src/tests/unit/GateAllocationApi.test.js
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/GateAllocationApi.test.js > keeps raw allocation evidence text and negative zero
+[API Request] POST /api/waveform/gate-allocation
+[API Response] POST /api/waveform/gate-allocation: 200 undefined
+[API Response] Data type: string
+
+stdout | src/tests/unit/GateAllocationApi.test.js > retains structured allocation validation errors
+[API Request] POST /api/waveform/gate-allocation
+
+stderr | src/tests/unit/GateAllocationApi.test.js > retains structured allocation validation errors
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: '{"detail":"Binary gate state is invalid"}',
+  url: '/api/waveform/gate-allocation'
+}
+
+ ✓ src/tests/unit/GateAllocationApi.test.js (2 tests) 30ms
+stdout | src/tests/unit/AnalyticalNavigation.test.js
+[API] Initialized with BASE_URL: 
+
+ ✓ src/tests/unit/AnalyticalNavigation.test.js (5 tests) 40ms
+stdout | src/tests/unit/XyzEnergyApi.test.js
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/XyzEnergyApi.test.js > preserves exact XYZ HTTP response text and structured parser diagnostics
+[API Request] POST /api/analysis/energy-map/xyz
+[API Response] POST /api/analysis/energy-map/xyz: 200 undefined
+[API Response] Data type: string
+[API Request] POST /api/analysis/energy-map/xyz
+
+stderr | src/tests/unit/XyzEnergyApi.test.js > preserves exact XYZ HTTP response text and structured parser diagnostics
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: '{"detail":"Line 1: invalid energy"}',
+  url: '/api/analysis/energy-map/xyz'
+}
+
+ ✓ src/tests/unit/XyzEnergyApi.test.js (1 test) 25ms
+ ✓ src/tests/unit/CircuitSummaryApi.test.js (1 test) 4ms
+
+ Test Files  50 passed (50)
+      Tests  504 passed (504)
+   Start at  14:34:08
+   Duration  57.10s (transform 4.80s, setup 185ms, collect 13.71s, tests 15.58s, environment 14.15s, prepare 4.16s)
+
+	Command being timed: "/usr/bin/npm --prefix /home/tinix/claude_wsl/transistordatabase/transistordatabase/gui_web run test:run -- --maxWorkers=1 --minWorkers=1"
+	User time (seconds): 79.32
+	System time (seconds): 14.53
+	Percent of CPU this job got: 153%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:00.98
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 362148
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 6
+	Minor (reclaiming a frame) page faults: 1806933
+	Voluntary context switches: 63348
+	Involuntary context switches: 1157
+	Swaps: 0
+	File system inputs: 256
+	File system outputs: 12968
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+

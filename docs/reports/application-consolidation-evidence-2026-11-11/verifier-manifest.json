@@ -1,0 +1,222 @@
+{
+  "created_utc": "2026-11-11T16:05:57.079535+00:00",
+  "clone": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111",
+  "all_copied_artifact_sha256_match": true,
+  "ruff": {
+    "exit_code": 0,
+    "diagnostics": 0,
+    "runtime_and_rss": "not measured"
+  },
+  "vue": {
+    "files_passed": 55,
+    "tests_passed": 598,
+    "skipped": 0,
+    "test_seconds": 44.46,
+    "process_wall_seconds": 45.28,
+    "max_rss_kib": 515428
+  },
+  "headless": {
+    "science_modules": 32,
+    "module_paths_all_inside_clone": true,
+    "qt_loaded": [],
+    "blocked_qt_attempts": [],
+    "api_method_paths": 104,
+    "route_objects": 109,
+    "process_wall_seconds": 3.19,
+    "max_rss_kib": 245456
+  },
+  "production_build": {
+    "exit_code": 0,
+    "modules_transformed": 204,
+    "build_seconds": 4.32,
+    "process_wall_seconds": 4.91,
+    "max_rss_kib": 568540,
+    "output_proved_absent_before_build": true,
+    "emptyOutDir": false,
+    "warning": "Minified JavaScript chunk exceeds 500 kB."
+  },
+  "compiled_browser": {
+    "exit_code": 0,
+    "tests_passed": 13,
+    "skipped": 0,
+    "test_seconds": 36.9,
+    "process_wall_seconds": 38.64,
+    "max_rss_kib": 349528,
+    "workers": 1,
+    "base_url": "http://127.0.0.1:8003",
+    "fully_mocked_ui_cases": [
+      "scalar Boost CCM switching-loss-balanced request/result/export",
+      "notebook Boost Pareto screen request/result/export"
+    ],
+    "other_cases": "Use actual API calculations or generation. Some additionally hold responses to test stale-result suppression.",
+    "adaptations": "Port 8002 to 8003 and compiled UI entry / to /index.html only. Assertions and selectors remain unchanged.",
+    "previous_attempt": "Interrupted after two GET / API-metadata navigation timeouts. Its logs and screenshots remain in the external audit directory."
+  },
+  "database_integrity": {
+    "copied_original_files_checked": 24,
+    "bytes": 28903083,
+    "all_original_and_clone_bytes_unchanged": true,
+    "private_per_file_receipt": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/database-postacceptance-4845c848-03e5-4ae6-bbbf-651b7c768955.json",
+    "private_per_file_receipt_sha256": "19f8028b2a38fac9eba01c3facd81b858cf442da6b4d4722775fd0486af96b21",
+    "database_files_copied_into_this_evidence_directory": 0
+  },
+  "headless_module_source_hashes_still_match": true,
+  "browser_source_and_copy_hashes_still_match": true,
+  "critical_source_files": [
+    {
+      "path": "transistordatabase/backend/concrete_services.py",
+      "bytes": 37687,
+      "sha256": "3b9b187ac9c03c4197e6d09e7cdef0764bac8f187d5679891cb59113680d57e8"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/main.py",
+      "bytes": 181834,
+      "sha256": "3710ebd535dd60c2ac0c84738c64af90846c7ec63386ec17a605ba97e21b2671"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/native_record_view.py",
+      "bytes": 10131,
+      "sha256": "ad7793225c1cac4b3e334b472ec1dc03b1ed2f2fdca81d7be24b697056bb7ae5"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/App.vue",
+      "bytes": 29089,
+      "sha256": "efcecd0f8f22716b1934d220134ee4de7ca6dea105efc471800db36c39a8d1e8"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/components/DPTManager.vue",
+      "bytes": 114387,
+      "sha256": "5b69f95edd7c1155a1bdf4e87e578c9afc1f3a411e4c5a5dda7f328da86342c2"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/components/CurvePlotter.vue",
+      "bytes": 10720,
+      "sha256": "06f644220167b78306e17e552452194921f621a446b5dd0b1ac73063b07dd7e8"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/components/TopologyCalculator.vue",
+      "bytes": 49026,
+      "sha256": "9eaf96232a56a67ac72f1a4c0f0fcabcc15225c011ecee37fc3af69cd9eb8841"
+    }
+  ],
+  "built_dist_files": [
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-BxNnU9yB.js",
+      "bytes": 1081023,
+      "sha256": "88ae3470defd19afe7260fdf12d7ab89847376f8cbc82c2324d1797ceed8cb77"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-C0FW12Zz.css",
+      "bytes": 142070,
+      "sha256": "796bd9b2679a0cbfe081bfc61826a2fdd068c2b7080c800c6aaca027d8618daf"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/index.html",
+      "bytes": 481,
+      "sha256": "3bec747f622ede3bd8b8114abafdf8b2450b501fab04f355db973b137da51a07"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/vite.svg",
+      "bytes": 1497,
+      "sha256": "4a748afd443918bb16591c834c401dae33e87861ab5dbad0811c3a3b4a9214fb"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-vue-final.log",
+      "source": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/vue-final-5addcb7bf57f42fb9dcc029e12e1ef55.log",
+      "bytes": 15822,
+      "sha256": "2ba7e609c976d91219b76fcfc300632bb97cb6706ed7da63965e2668ba2e03ad"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-vue-final.time",
+      "source": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/vue-final-5addcb7bf57f42fb9dcc029e12e1ef55.time",
+      "bytes": 896,
+      "sha256": "25430c74a30aeb8d71b027ac3cb55855412c1f258fc454193d97089799f0b981"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-ruff-package.log",
+      "source": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/ruff-package-fixed-df93c009ca984e6095ac87c9efc2acb6.log",
+      "bytes": 20,
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-headless-current.json",
+      "source": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/headless-current-39721794-1f12-4c6d-b224-7900a85a5ef3.json",
+      "bytes": 18257,
+      "sha256": "44000df63fa26e562610c42ccbb549c31bd5c25b3eb34481ea89fc6508f5dd83"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-headless-current.log",
+      "source": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/headless-current-ef29414f7b894ded86456b3af4329ca4.log",
+      "bytes": 1412,
+      "sha256": "bd210d664f7e09f51bb2ad021eb6fc360a0bfa2a591aeaaf33ee0974bd03f352"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-headless-current.time",
+      "source": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/headless-current-ef29414f7b894ded86456b3af4329ca4.time",
+      "bytes": 879,
+      "sha256": "799e2ae0a5f6c9edeafe7ceae9b2ab8d81641dd440937263b27ad905344c0f7b"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-production-build.log",
+      "source": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/production-build-e3c6457290b840d280b4335a5fc1eb15.log",
+      "bytes": 761,
+      "sha256": "2c2ba5a08a68587f82c932e064fa43787a84c30a066689f33a78b53d665ffd05"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-production-build.time",
+      "source": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/production-build-e3c6457290b840d280b4335a5fc1eb15.time",
+      "bytes": 875,
+      "sha256": "3d033583d5982d876fb0ce93330b55bc94a24ce895c564eedd724b44a04cb0d8"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-compiled-browser.log",
+      "source": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/compiled-browser-entrypoint-294655623636476ea04b800491e13d92.log",
+      "bytes": 3540,
+      "sha256": "f5242cd74a5212d13ff818e026f823a03ce4e6823d2c49c5f58429e60eee7de7"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-compiled-browser.time",
+      "source": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/compiled-browser-entrypoint-294655623636476ea04b800491e13d92.time",
+      "bytes": 1184,
+      "sha256": "30c7c8794b08600c75b199674665f51e147230a4622d98a3833273c0ec0942a4"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-browser-config.mjs",
+      "source": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/playwright.config.mjs",
+      "bytes": 469,
+      "sha256": "63b2937462a99f6633de7dc6ad925ac538c060b65c3c57330becf3b55d84992a"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/verifier-browser-adaptations.json",
+      "source": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/copy-receipt.json",
+      "bytes": 5287,
+      "sha256": "27acd8438bdd238bbda255bfc5234d9dfeab24cb45302ca77f15c0ac038806cf"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/screenshot-verifier-waveform-linked-results.png",
+      "source": "/tmp/tdb-consolidation-browser-57876578-f75f-4604-8bbb-b94717415892/waveform-workbench-real-pr-6837e--and-reproducible-downloads-chromium/waveform-linked-results.png",
+      "bytes": 327704,
+      "sha256": "b261553d44aa97c30082e03f25fd3243f19ab1cbd17b85f4636550167315f903"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/screenshot-verifier-waveform-mobile-results.png",
+      "source": "/tmp/tdb-consolidation-browser-57876578-f75f-4604-8bbb-b94717415892/waveform-workbench-compile-790ec-mates-and-fits-the-viewport-chromium/waveform-mobile-results.png",
+      "bytes": 309194,
+      "sha256": "a2f3b71dc064977756eb8e8b009221f52e0865807643f634aa4cabf7bf65ab05"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/screenshot-verifier-dpt-generic-netlist.png",
+      "source": "/tmp/tdb-consolidation-browser-57876578-f75f-4604-8bbb-b94717415892/dpt-contract-real-DPT-endp-6062c-disclosed-two-pulse-circuit-chromium/dpt-generic-netlist.png",
+      "bytes": 258108,
+      "sha256": "72554198e9e5be18b620fd3e927f672e667dde860d9e596413a4b235cdafeecd"
+    },
+    {
+      "path": "docs/reports/application-consolidation-evidence-2026-11-11/screenshot-verifier-circuit-desktop.png",
+      "source": "/tmp/tdb-consolidation-browser-57876578-f75f-4604-8bbb-b94717415892/circuit-physical-summary-c-640e9-e-and-exact-audit-downloads-chromium/circuit-desktop.png",
+      "bytes": 119460,
+      "sha256": "0ea76d847521aac2140b4a18fcab2166e100f699cbe4bdd3f405fc678b8b4fb8"
+    }
+  ]
+}

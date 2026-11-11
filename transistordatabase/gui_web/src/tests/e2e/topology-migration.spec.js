@@ -65,6 +65,50 @@ async function mockTopologyCalculation(page, response) {
 }
 
 test.describe('topology migration browser workflow', () => {
+  test('submits and exports scalar Boost CCM switching-loss-balanced result', async ({ page }) => {
+    const response = topologyResult(null, 'switching-loss-balanced')
+    response.topology = 'boost'
+    response.model.assumptions = [
+      'Reverse recovery is excluded because Eon provenance does not establish whether it is included.'
+    ]
+    response.losses = {
+      conduction_switch_w: 5, conduction_diode_w: 3,
+      switching_on_w: 2, switching_off_w: 4, total_w: 14,
+      loss_scope: 'channel_conduction_and_switch_turn_on_turn_off',
+      scope: 'included channel conduction and switching losses; reverse recovery excluded'
+    }
+    response.performance = {
+      p_out_w: 1000, p_in_w: 1014, efficiency_percent: 98.62,
+      power_balance_residual_w: 0, input_power_scope: 'switching-loss feedback'
+    }
+    const capturedRequest = await mockTopologyCalculation(page, response)
+
+    await openTopology(page, 'Boost')
+    await page.locator('label.param-item').filter({ hasText: 'Calculation mode' }).locator('select').selectOption('switching-loss-balanced')
+    await page.locator('label.param-item').filter({ hasText: 'Input voltage' }).locator('input').fill('100')
+    await page.locator('label.param-item').filter({ hasText: 'Output voltage magnitude' }).locator('input').fill('200')
+    await page.locator('label.param-item').filter({ hasText: 'Output power' }).locator('input').fill('1000')
+    await expect(page.locator('label.sweep-toggle input')).toBeDisabled()
+    await expect(page.getByRole('button', { name: 'Compare topologies' })).toBeDisabled()
+    await page.getByRole('button', { name: 'Calculate', exact: true }).click()
+
+    await expect(page.locator('.model-label')).toHaveText('Boost CCM TDB switching-loss-balanced model')
+    await expect(page.locator('.results-panel')).toContainText('Switching on')
+    await expect(page.locator('.results-panel')).toContainText('Switching off')
+    await expect(page.locator('.results-panel')).toContainText('Reverse recovery is excluded')
+    expect(capturedRequest()).toMatchObject({
+      topology: 'boost', mode: 'switching-loss-balanced', conduction_regime: 'CCM',
+      v_g_off: -5, r_g_on: 10, r_g_off: 10
+    })
+    expect(capturedRequest().sweep).toBeUndefined()
+
+    const downloadPromise = page.waitForEvent('download')
+    await page.locator('.calc-header').getByRole('button', { name: 'Download JSON' }).click()
+    const exported = JSON.parse(await readFile(await (await downloadPromise).path(), 'utf8'))
+    expect(exported.request.mode).toBe('switching-loss-balanced')
+    expect(exported.result.losses.switching_off_w).toBe(4)
+  })
+
   test('calculates a boost point through FastAPI and invalidates changed results', async ({ page }) => {
     await openTopology(page)
     await setParameter(page, 'Input voltage', 100)

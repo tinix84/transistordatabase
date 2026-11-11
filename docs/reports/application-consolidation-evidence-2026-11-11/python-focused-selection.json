@@ -1,0 +1,8 @@
+[
+  "tests/test_native_editor_union.py",
+  "tests/web_dpt_waveforms/test_api.py",
+  "tests/test_native_json_api_import.py",
+  "tests/web_dpt_raw_import/test_api.py",
+  "tests/web_dpt_energy/test_api.py",
+  "tests/web_database_backup/test_api.py"
+]

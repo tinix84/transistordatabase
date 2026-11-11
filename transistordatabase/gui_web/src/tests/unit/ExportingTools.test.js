@@ -1,333 +1,106 @@
-/**
- * Unit tests for ExportingTools.vue component
- */
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
+import { mount, flushPromises } from '@vue/test-utils'
 import ExportingTools from '../../components/ExportingTools.vue'
-import { transistorApi } from '../../services/api'
-import { mockTransistors } from '../fixtures/transistors'
-
-// Mock the transistorApi
-vi.mock('../../services/api', () => ({
-  transistorApi: {
-    export: vi.fn()
+import BatchExportPanel from '../../components/BatchExportPanel.vue'
+import { transistorApi } from '../../services/api.js'
+vi.mock('../../services/api.js', () => ({ transistorApi: { export: vi.fn(), batchExport: vi.fn(), getAll: vi.fn() } }))
+const devices = [{ metadata: { name: 'part-one', manufacturer: 'Source lab' } }, { metadata: { name: 'part-two', manufacturer: 'Second lab' } }]
+let wrapper, downloadNames
+beforeEach(() => {
+  vi.clearAllMocks()
+  vi.stubGlobal('URL', { createObjectURL: vi.fn(() => 'blob:original-bytes'), revokeObjectURL: vi.fn() })
+  downloadNames = []
+  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function () { downloadNames.push(this.download) })
+  transistorApi.getAll.mockResolvedValue(devices)
+  transistorApi.export.mockResolvedValue(new Blob(['{"source_id":1152921504606846977}']))
+  transistorApi.batchExport.mockResolvedValue(new Blob(['ZIP bytes']))
+  wrapper = mount(ExportingTools, { props: { transistors: devices, selectedFromSearch: [devices[0]] } })
+})
+afterEach(() => { wrapper.unmount(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
+const button = text => wrapper.findAll('button').find(item => item.text() === text)
+const download = () => wrapper.get('[data-testid=download-export]')
+const format = value => wrapper.get('[data-testid=export-format]').setValue(value)
+async function conditions(values = {}) {
+  for (const [key, value] of Object.entries({ t_j: 37, v_supply: 430, v_g_on: 11, v_g_off: -3, r_g_on: 4, r_g_off: 7, ...values })) {
+    await wrapper.get(`[data-testid=gecko-${key}]`).setValue(String(value))
   }
-}))
-
-describe('ExportingTools.vue', () => {
-  let wrapper
-
-  beforeEach(() => {
-    vi.clearAllMocks()
-    vi.spyOn(console, 'log').mockImplementation(() => {})
-    vi.spyOn(console, 'error').mockImplementation(() => {})
-
-    transistorApi.export.mockResolvedValue(new Blob(['test data']))
-
-    wrapper = mount(ExportingTools, {
-      props: {
-        transistors: mockTransistors,
-        selectedFromSearch: []
-      }
+}
+describe('Python-backed device exports', () => {
+  it('sends native JSON download bytes directly to the browser without number conversion', async () => {
+    await download().trigger('click'); await flushPromises()
+    expect(transistorApi.export).toHaveBeenCalledWith('part-one', 'json', {})
+    const blob = await transistorApi.export.mock.results[0].value
+    expect(URL.createObjectURL).toHaveBeenCalledWith(blob)
+    expect(await blob.text()).toContain('1152921504606846977')
+    expect(wrapper.text()).toContain('Download prepared for 1 device')
+  })
+  it('requires all Gecko conditions and sends explicit recorded unknown values', async () => {
+    await format('gecko')
+    expect(download().attributes('disabled')).toBeDefined()
+    await conditions({ v_g_off: 'null', r_g_off: 'null' })
+    expect(download().attributes('disabled')).toBeUndefined()
+    await download().trigger('click'); await flushPromises()
+    expect(transistorApi.export).toHaveBeenCalledWith('part-one', 'gecko', {
+      component: 'switch', t_j: 37, v_supply: 430, v_g_on: 11, v_g_off: null, r_g_on: 4, r_g_off: null,
     })
   })
-
-  describe('Component Rendering', () => {
-    it('should render the component', () => {
-      expect(wrapper.exists()).toBe(true)
-    })
-
-    it('should display exporting tools title', () => {
-      expect(wrapper.text()).toMatch(/export|exporting/i)
-    })
-
-    it('should have transistor selection', () => {
-      const selects = wrapper.findAll('select')
-      expect(selects.length).toBeGreaterThan(0)
-    })
+  it('keeps request identity and filename when the form changes during a held download', async () => {
+    let release
+    const bytes = new Blob(['MAT5 bytes'])
+    transistorApi.export.mockImplementationOnce(() => new Promise(resolve => { release = resolve }))
+    await format('matlab')
+    await download().trigger('click')
+    await format('gecko')
+    await button('Clear selection').trigger('click')
+    release(bytes); await flushPromises()
+    expect(transistorApi.export).toHaveBeenCalledWith('part-one', 'matlab', {})
+    expect(URL.createObjectURL).toHaveBeenCalledWith(bytes)
+    expect(downloadNames).toEqual(['part-one_matlab.mat'])
+    expect(wrapper.text()).toContain('Download prepared for 1 device.')
+    expect(wrapper.findComponent({ name: 'ExportDownloadPanel' }).emitted('export-complete')).toEqual([[{ count: 1, format: 'matlab' }]])
   })
-
-  describe('Transistor Selection', () => {
-    it('should list available transistors', () => {
-      // Should show list of transistors to export
-      expect(wrapper.props('transistors')).toEqual(mockTransistors)
-    })
-
-    it('should allow selecting transistor', async () => {
-      const selects = wrapper.findAll('select')
-      if (selects.length > 0) {
-        await selects[0].setValue(mockTransistors[0].metadata.name)
-        expect(wrapper.vm).toBeDefined()
-      }
-    })
-
-    it('should support pre-selected transistors', () => {
-      wrapper = mount(ExportingTools, {
-        props: {
-          transistors: mockTransistors,
-          selectedFromSearch: [mockTransistors[0]]
-        }
-      })
-
-      expect(wrapper.props('selectedFromSearch')).toHaveLength(1)
-    })
-
-    it('should emit open-database-search event', async () => {
-      await wrapper.vm.$emit('open-database-search')
-
-      expect(wrapper.emitted('open-database-search')).toBeTruthy()
-    })
+  it('rejects invalid Gecko input and shows API source failures without a download', async () => {
+    await format('gecko'); await conditions({ r_g_on: -1 })
+    expect(download().attributes('disabled')).toBeDefined()
+    expect(transistorApi.export).not.toHaveBeenCalled()
+    await conditions()
+    transistorApi.export.mockRejectedValueOnce(new Error('No exact recorded channel slice'))
+    await download().trigger('click'); await flushPromises()
+    expect(wrapper.get('[role=alert]').text()).toContain('No exact recorded channel slice')
+    expect(URL.createObjectURL).not.toHaveBeenCalled()
   })
-
-  describe('Export Formats', () => {
-    it('should support JSON export', () => {
-      const text = wrapper.text()
-      expect(text).toMatch(/json|JSON/i)
+  it('preserves checkbox and search selection and uses one explicit common batch slice', async () => {
+    await button('Select visible devices').trigger('click')
+    await format('gecko'); await conditions()
+    await download().trigger('click'); await flushPromises()
+    expect(transistorApi.batchExport).toHaveBeenCalledWith(['part-one', 'part-two'], 'gecko', {
+      selection: { component: 'switch', t_j: 37, v_supply: 430, v_g_on: 11, v_g_off: -3, r_g_on: 4, r_g_off: 7 },
     })
-
-    it('should support MATLAB export', () => {
-      const text = wrapper.text()
-      expect(text).toMatch(/matlab|MATLAB/i)
-    })
-
-    it('should support PLECS export', () => {
-      const text = wrapper.text()
-      expect(text).toMatch(/plecs|PLECS/i)
-    })
-
-    it('should support Simulink export', () => {
-      const text = wrapper.text()
-      expect(text).toMatch(/simulink|Simulink/i)
-    })
-
-    it('should support GeckoCIRCUITS export', () => {
-      const text = wrapper.text()
-      expect(text).toMatch(/gecko|GeckoCIRCUITS/i)
-    })
-
-    it('should support datasheet export', () => {
-      const text = wrapper.text()
-      expect(text).toMatch(/datasheet|pdf/i)
-    })
-
-    it('should have export format selection', () => {
-      const selects = wrapper.findAll('select')
-      const buttons = wrapper.findAll('button')
-
-      // Should have some way to select export format
-      expect(selects.length + buttons.length).toBeGreaterThan(0)
-    })
+    await button('Clear selection').trigger('click')
+    expect(download().attributes('disabled')).toBeDefined()
+    await wrapper.setProps({ selectedFromSearch: [devices[1]] })
+    expect(wrapper.get('legend').text()).toContain('1 selected')
   })
-
-  describe('Export Actions', () => {
-    it('should have export button', () => {
-      const exportButton = wrapper.find('button:contains("Export")')
-      const hasExport = exportButton.exists() || wrapper.text().includes('Export')
-
-      expect(hasExport).toBe(true)
-    })
-
-    it('should call export API when exporting', async () => {
-      // Simulate export action
-      if (wrapper.vm.handleExport) {
-        await wrapper.vm.handleExport()
-        // API should be called
-      }
-    })
-
-    it('should handle successful export', async () => {
-      const blob = new Blob(['test data'], { type: 'application/json' })
-      transistorApi.export.mockResolvedValue(blob)
-
-      // Should handle successful export
-      expect(wrapper.exists()).toBe(true)
-    })
-
-    it('should handle export errors', async () => {
-      transistorApi.export.mockRejectedValue(new Error('Export failed'))
-
-      // Should handle export errors gracefully
-      expect(wrapper.exists()).toBe(true)
-    })
-
-    it('should download exported file', () => {
-      // Should trigger file download
-      expect(wrapper.vm).toBeDefined()
-    })
+  it('provides real MAT5 and ratings summary formats with workbench navigation', async () => {
+    await format('matlab'); await download().trigger('click'); await flushPromises()
+    expect(transistorApi.export).toHaveBeenCalledWith('part-one', 'matlab', {})
+    expect(wrapper.text()).toContain('not SC scData or a Simulink model')
+    await format('csv')
+    expect(wrapper.text()).toContain('CSV contains ratings only')
+    await button('Open PLECS data workbench').trigger('click')
+    await button('Open DPT workbench').trigger('click')
+    expect(wrapper.emitted('navigate-workbench')).toEqual([['plecs-data'], ['dpt']])
+    expect(wrapper.findAll('option').map(item => item.attributes('value'))).not.toContain('spice')
+    expect(wrapper.findAll('option').map(item => item.attributes('value'))).not.toContain('simulink')
+    await button('Search database').trigger('click')
+    expect(wrapper.emitted('open-database-search')).toHaveLength(1)
   })
-
-  describe('Export Options', () => {
-    it('should allow selecting multiple transistors', () => {
-      // Should support bulk export
-      expect(wrapper.props('transistors')).toHaveLength(3)
-    })
-
-    it('should show export preview', () => {
-      // Should preview export data
-      const text = wrapper.text()
-      expect(text).toBeTruthy()
-    })
-
-    it('should validate selection before export', () => {
-      // Should check that transistor is selected
-      expect(wrapper.vm).toBeDefined()
-    })
-  })
-
-  describe('Format-Specific Options', () => {
-    it('should show JSON export options', () => {
-      // JSON export might have options like indentation
-      const text = wrapper.text()
-      expect(text).toBeTruthy()
-    })
-
-    it('should show MATLAB export options', () => {
-      // MATLAB export might have version selection
-      const text = wrapper.text()
-      expect(text).toBeTruthy()
-    })
-
-    it('should show simulation tool options', () => {
-      // Simulation tools might have model options
-      const text = wrapper.text()
-      expect(text).toBeTruthy()
-    })
-  })
-
-  describe('Props Handling', () => {
-    it('should accept transistors prop', () => {
-      expect(wrapper.props('transistors')).toEqual(mockTransistors)
-    })
-
-    it('should accept selectedFromSearch prop', () => {
-      expect(wrapper.props('selectedFromSearch')).toEqual([])
-    })
-
-    it('should handle empty transistor list', async () => {
-      await wrapper.setProps({ transistors: [] })
-
-      expect(wrapper.props('transistors')).toEqual([])
-      expect(wrapper.text()).toMatch(/no transistors|empty/i)
-    })
-
-    it('should update when selectedFromSearch changes', async () => {
-      await wrapper.setProps({
-        selectedFromSearch: [mockTransistors[0]]
-      })
-
-      expect(wrapper.props('selectedFromSearch')).toHaveLength(1)
-    })
-  })
-
-  describe('File Download', () => {
-    it('should generate correct filename', () => {
-      // Should create filename based on transistor name and format
-      expect(wrapper.vm).toBeDefined()
-    })
-
-    it('should set correct MIME type', () => {
-      // Should use appropriate MIME type for each format
-      expect(wrapper.vm).toBeDefined()
-    })
-
-    it('should trigger browser download', () => {
-      // Should create download link and click it
-      expect(wrapper.vm).toBeDefined()
-    })
-  })
-
-  describe('Error States', () => {
-    it('should show error for no selection', () => {
-      // Should warn user to select transistor
-      expect(wrapper.exists()).toBe(true)
-    })
-
-    it('should show error for unsupported format', () => {
-      // Should handle unsupported format gracefully
-      expect(wrapper.exists()).toBe(true)
-    })
-
-    it('should show error for export failure', async () => {
-      transistorApi.export.mockRejectedValue(new Error('Network error'))
-
-      // Should display error message
-      expect(wrapper.exists()).toBe(true)
-    })
-  })
-
-  describe('UI Features', () => {
-    it('should show export progress', () => {
-      // Should show loading state during export
-      expect(wrapper.html()).toBeTruthy()
-    })
-
-    it('should show success message', () => {
-      // Should confirm successful export
-      expect(wrapper.html()).toBeTruthy()
-    })
-
-    it('should allow canceling export', () => {
-      // Should support canceling in-progress export
-      expect(wrapper.html()).toBeTruthy()
-    })
-  })
-
-  describe('Bulk Export', () => {
-    it('should support exporting multiple transistors', () => {
-      wrapper = mount(ExportingTools, {
-        props: {
-          transistors: mockTransistors,
-          selectedFromSearch: mockTransistors
-        }
-      })
-
-      expect(wrapper.props('selectedFromSearch')).toHaveLength(3)
-    })
-
-    it('should create zip for bulk export', () => {
-      // Bulk export might create ZIP archive
-      expect(wrapper.vm).toBeDefined()
-    })
-
-    it('should show bulk export progress', () => {
-      // Should show progress for multiple exports
-      expect(wrapper.vm).toBeDefined()
-    })
-  })
-
-  describe('Integration with Search', () => {
-    it('should open database search on button click', async () => {
-      const searchButton = wrapper.find('button:contains("Search")')
-
-      if (searchButton.exists()) {
-        await searchButton.trigger('click')
-      } else {
-        await wrapper.vm.$emit('open-database-search')
-      }
-
-      expect(wrapper.emitted('open-database-search')).toBeTruthy()
-    })
-
-    it('should accept transistors from search', () => {
-      wrapper = mount(ExportingTools, {
-        props: {
-          transistors: mockTransistors,
-          selectedFromSearch: [mockTransistors[0]]
-        }
-      })
-
-      expect(wrapper.props('selectedFromSearch')).toHaveLength(1)
-    })
-  })
-
-  describe('Responsive Design', () => {
-    it('should render on mobile devices', () => {
-      expect(wrapper.exists()).toBe(true)
-    })
-
-    it('should adapt layout for smaller screens', () => {
-      // Should be usable on mobile
-      expect(wrapper.html()).toBeTruthy()
-    })
+  it('uses the same honest format controls for the batch dialog without simulated progress', async () => {
+    wrapper.unmount(); wrapper = mount(BatchExportPanel); await flushPromises()
+    await button('Select visible devices').trigger('click')
+    await download().trigger('click'); await flushPromises()
+    expect(transistorApi.batchExport).toHaveBeenCalledWith(['part-one', 'part-two'], 'json', {})
+    expect(wrapper.text()).not.toContain('Estimated')
+    expect(wrapper.emitted('export-complete')[0][0]).toEqual({ count: 2, format: 'json' })
   })
 })

@@ -1,0 +1,406 @@
+{
+  "version": "1.1",
+  "date": "2026-11-10",
+  "scope": "Selected substantive semiconductor contracts at the released verification snapshot, before follow-on implementation. Order is an engineering recommendation. Check current code and issues for later closure.",
+  "reference_roots": {
+    "sc": "\\\\wsl.localhost\\Ubuntu\\home\\tinix\\claude_wsl\\archive_ntbees2\\sc",
+    "enco": "D:\\OneDrive\\claude\\bhy\\enco",
+    "current": "\\\\wsl.localhost\\Ubuntu\\home\\tinix\\claude_wsl\\transistordatabase\\transistordatabase"
+  },
+  "baseline": "docs/sprints/semiconductor-function-gap-ledger.json",
+  "released_record": "docs/reports/semiconductor-parity-verification-2026-11-10.json",
+  "released_record_sha256": "2968a2fb9097ed965d6a052033828ee92cadd0954c371b16cc85c157fd1701fb",
+  "queue": [
+    {
+      "order": 1,
+      "id": "stress-indices",
+      "title": "Electrical stress indices",
+      "kind": "capability",
+      "sources": [
+        {
+          "id": "enco-e5bb43a4c901c9c4",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py",
+          "symbol": "MOSFET.get_volume_index",
+          "line": 709,
+          "frozen_disposition": "reference-only-specific"
+        },
+        {
+          "id": "enco-f9693f97fd609cb8",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py",
+          "symbol": "MOSFET.get_cost_index",
+          "line": 755,
+          "frozen_disposition": "reference-only-specific"
+        },
+        {
+          "id": "enco-1708782b7484876c",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py",
+          "symbol": "MOSFET.get_conduction_loss_index",
+          "line": 719,
+          "frozen_disposition": "reference-only-specific"
+        },
+        {
+          "id": "enco-827a8a60d4655502",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py",
+          "symbol": "MOSFET.get_switching_loss_index",
+          "line": 724,
+          "frozen_disposition": "reference-only-specific"
+        }
+      ],
+      "inputs": "Waveform currents, voltages, transitions and declared on-resistance as required by each index.",
+      "outputs": "Named electrical screening indices with formula, units and denominator checks.",
+      "observed_gap": "The reviewed waveform and workbook measures do not expose this complete ENCO index set. Cost and volume indices are electrical proxies.",
+      "local_evidence": [
+        "transistordatabase/waveform_losses.py"
+      ]
+    },
+    {
+      "order": 2,
+      "id": "gate-mask",
+      "title": "Gate-state current allocation",
+      "kind": "capability",
+      "sources": [
+        {
+          "id": "enco-396842419c21b91e",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py",
+          "symbol": "MOSFET.get_diode_current",
+          "line": 764,
+          "frozen_disposition": "reference-only-specific"
+        },
+        {
+          "id": "enco-d4607f37d0a79c85",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py",
+          "symbol": "MOSFET.get_mosfet_current",
+          "line": 769,
+          "frozen_disposition": "reference-only-specific"
+        }
+      ],
+      "inputs": "Aligned signed drain current and binary gate state.",
+      "outputs": "Signed on-state and off-state traces whose samplewise sum equals device current.",
+      "observed_gap": "Existing gate thresholds locate switching events. Conduction integrates separately declared signed current. Gate state alone cannot determine simultaneous physical current sharing.",
+      "local_evidence": [
+        "transistordatabase/waveform_losses.py"
+      ]
+    },
+    {
+      "order": 3,
+      "id": "reverse-sharing",
+      "title": "Reverse channel and diode current sharing",
+      "kind": "capability",
+      "sources": [
+        {
+          "id": "enco-e11ddebd7e4b83f8",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py",
+          "symbol": "MOSFET.get_channel_diode_currents",
+          "line": 145,
+          "frozen_disposition": "reference-only-specific"
+        },
+        {
+          "id": "sc-690e0248306e4f30",
+          "root": "sc",
+          "path": "matlab_func/reverseTurnedOnMOSFET.m",
+          "symbol": "reverseTurnedOnMOSFET",
+          "line": 1,
+          "frozen_disposition": "capability-correspondence"
+        }
+      ],
+      "inputs": "Reverse device current, temperature, gate condition, and conditioned channel and diode characteristics.",
+      "outputs": "Channel and diode currents with conserved total, validity domain and method.",
+      "observed_gap": "The current envelope selects the lower drop. ENCO estimates diode current using voltage inferred from full current times on-resistance. A common-voltage solution needs separate numerical verification.",
+      "local_evidence": [
+        "transistordatabase/semiconductor_assemblies.py"
+      ]
+    },
+    {
+      "order": 4,
+      "id": "rg-energy",
+      "title": "Gate-resistance energy queries in the browser",
+      "kind": "interface",
+      "sources": [
+        {
+          "id": "current-59e9f089825867c8",
+          "root": "current",
+          "path": "rg_formula.py",
+          "symbol": "interpolate_energy_at_rg",
+          "line": 16,
+          "frozen_disposition": "capability-correspondence"
+        },
+        {
+          "id": "current-0e55819a38865760",
+          "root": "current",
+          "path": "rg_formula.py",
+          "symbol": "find_rg_for_target_energy",
+          "line": 97,
+          "frozen_disposition": "capability-correspondence"
+        }
+      ],
+      "inputs": "Stored device, event branch, fixed conditions, fixed current, gate resistance or target energy.",
+      "outputs": "Bounded energy or one unique gate-resistance crossing with source evidence.",
+      "observed_gap": "Two public Python helpers exist. The frozen rg-energy capability records no browser operation. SC Miller slew sizing is a different inverse problem.",
+      "local_evidence": [
+        "transistordatabase/rg_formula.py"
+      ]
+    },
+    {
+      "order": 5,
+      "id": "fit",
+      "title": "Conditioned MOSFET training and fit inspection",
+      "kind": "capability",
+      "sources": [
+        {
+          "id": "enco-b1ff841464ea2d09",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py",
+          "symbol": "MOSFET.train",
+          "line": 64,
+          "frozen_disposition": "context-only"
+        },
+        {
+          "id": "enco-130c2a2161139100",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/regressor_ron.py",
+          "symbol": "get_trained_model",
+          "line": 40,
+          "frozen_disposition": "input-or-format-specific"
+        },
+        {
+          "id": "enco-efa374abcdd83d03",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/regressor_diode_vf.py",
+          "symbol": "get_trained_model",
+          "line": 85,
+          "frozen_disposition": "input-or-format-specific"
+        },
+        {
+          "id": "enco-b340fe16ac4ea5d2",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/regressor_diode_if.py",
+          "symbol": "get_trained_model",
+          "line": 83,
+          "frozen_disposition": "input-or-format-specific"
+        },
+        {
+          "id": "enco-f1716ce1915dc7fd",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/regressor_energy.py",
+          "symbol": "EnergyRegressor.fit",
+          "line": 42,
+          "frozen_disposition": "input-or-format-specific"
+        },
+        {
+          "id": "enco-cfddec9c175640d4",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/regressor_energy.py",
+          "symbol": "EnergyRegressor.rmse",
+          "line": 83,
+          "frozen_disposition": "input-or-format-specific"
+        },
+        {
+          "id": "enco-785acc0270427985",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/regressor_energy.py",
+          "symbol": "EnergyRegressor.r2_score",
+          "line": 88,
+          "frozen_disposition": "input-or-format-specific"
+        },
+        {
+          "id": "enco-b7d91944a862d149",
+          "root": "enco",
+          "path": "enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py",
+          "symbol": "MOSFET.plot_regressors",
+          "line": 515,
+          "frozen_disposition": "context-only"
+        }
+      ],
+      "inputs": "Device observations for on-resistance, forward/inverse diode curves or on/off event energies, with recorded conditions.",
+      "outputs": "Fitted state, bounded predictions, source sample identities and fit diagnostics.",
+      "observed_gap": "Prepared tables and selected separable estimates exist. A train-and-inspect workflow from observations was absent at review. Report fit errors separately from independent validation.",
+      "local_evidence": [
+        "transistordatabase/condition_tables.py"
+      ]
+    },
+    {
+      "order": 6,
+      "id": "xyz-import",
+      "title": "Three-column energy-map import",
+      "kind": "file-adapter",
+      "sources": [
+        {
+          "id": "sc-7496258f50c32467",
+          "root": "sc",
+          "path": "matlab_func/double_pulse/xyzread.m",
+          "symbol": "xyzread",
+          "line": 1,
+          "frozen_disposition": "input-or-format-specific"
+        },
+        {
+          "id": "sc-4d62fb1625d590c7",
+          "root": "sc",
+          "path": "matlab_func/double_pulse/xyz2grid.m",
+          "symbol": "xyz2grid",
+          "line": 1,
+          "frozen_disposition": "input-or-format-specific"
+        }
+      ],
+      "inputs": "Three-column coordinate/value file plus column units, energy kind, operating conditions and source.",
+      "outputs": "Regular-grid axes, original cells, explicit holes and duplicate-coordinate diagnostics.",
+      "observed_gap": "The map accepts prepared slices. SC accepts three-column files. Restrict the new adapter to declared regular-grid semiconductor data.",
+      "local_evidence": [
+        "transistordatabase/energy_maps.py"
+      ]
+    },
+    {
+      "order": 7,
+      "id": "surface",
+      "title": "Three-axis switching-energy view",
+      "kind": "interface",
+      "sources": [
+        {
+          "id": "sc-0c9501bd111cf4da",
+          "root": "sc",
+          "path": "semiconductors/helpers_plot.py",
+          "symbol": "DoublePulseViewerPlotly_old.add_surface",
+          "line": 67,
+          "frozen_disposition": "capability-correspondence"
+        },
+        {
+          "id": "sc-217d191b91bf2329",
+          "root": "sc",
+          "path": "utils/dpt/helpers_plot.py",
+          "symbol": "plot_switching_energy_map_scatter",
+          "line": 173,
+          "frozen_disposition": "capability-correspondence"
+        }
+      ],
+      "inputs": "Source current, voltage and energy points with fixed conditions.",
+      "outputs": "Inspectable three-axis point or surface view with source labels and missing cells.",
+      "observed_gap": "The current map uses selectable heatmap cells and tables. Interactive surface/scatter rendering for these results is a distinct display operation.",
+      "local_evidence": [
+        "transistordatabase/gui_web/src/components/EnergyMapWorkbench.vue"
+      ]
+    },
+    {
+      "order": 8,
+      "id": "series-output",
+      "title": "Thresholded spectrum and grouped series export",
+      "kind": "capability-and-export",
+      "sources": [
+        {
+          "id": "enco-6918ddd45dbe2531",
+          "root": "enco",
+          "path": "enco/packages/enco-core/src/enco_core/series/series_container.py",
+          "symbol": "SeriesContainer.harmonics",
+          "line": 603,
+          "frozen_disposition": "context-only"
+        },
+        {
+          "id": "enco-1c6b96e97d0a62f2",
+          "root": "enco",
+          "path": "enco/packages/enco-analysis/src/enco_analysis/circuit/circuit_group/dataframe.py",
+          "symbol": "get_time_dataframe",
+          "line": 214,
+          "frozen_disposition": "context-only"
+        },
+        {
+          "id": "enco-4b36c6af1581b780",
+          "root": "enco",
+          "path": "enco/packages/enco-analysis/src/enco_analysis/circuit/circuit_group/dataframe.py",
+          "symbol": "get_frequency_dataframe",
+          "line": 302,
+          "frozen_disposition": "context-only"
+        }
+      ],
+      "inputs": "Uniform time samples, series identity, threshold, configuration and operating-point identities.",
+      "outputs": "The grouped time export returns one row per series with its minimum, maximum, arithmetic sample mean, sample standard deviation and discrete RMS. The frequency export takes the first ten qualifying bins in frequency order and returns frequency, magnitude, phase, real and imaginary components. Rows retain series, configuration and operating-point identities.",
+      "observed_gap": "The current waveform mean and RMS integrate piecewise-linear samples over time. The existing grid CSV reports loss summaries. ENCO selects bins whose magnitude strictly exceeds the maximum magnitude times a fraction (default 0.1). Its harmonics label does not test integer multiples. Retain correct one-sided Nyquist scaling and quadrant-aware phase in an independent implementation.",
+      "local_evidence": [
+        "transistordatabase/waveform_losses.py",
+        "transistordatabase/gui_web/src/components/GridWorkbench.vue"
+      ]
+    },
+    {
+      "order": 9,
+      "id": "merit",
+      "title": "Multi-indicator merit across operating points",
+      "kind": "capability",
+      "sources": [
+        {
+          "id": "enco-35deec4ca946d64d",
+          "root": "enco",
+          "path": "enco/packages/enco-analysis/src/enco_analysis/circuit/circuit_group/dataframe.py",
+          "symbol": "get_indicator_dataframe",
+          "line": 89,
+          "frozen_disposition": "context-only"
+        },
+        {
+          "id": "enco-ff0e2cb8fd29ffd5",
+          "root": "enco",
+          "path": "enco/packages/enco-analysis/src/enco_analysis/circuit/circuit_group/dataframe.py",
+          "symbol": "get_indicator_merit_dataframe",
+          "line": 188,
+          "frozen_disposition": "context-only"
+        },
+        {
+          "id": "enco-1345987de071cc7d",
+          "root": "enco",
+          "path": "library-design/dcdc/cllc/src/project/optimizer.py",
+          "symbol": "compute_merit",
+          "line": 310,
+          "frozen_disposition": "context-only"
+        }
+      ],
+      "inputs": "Finite configurations, operating-point weights, indicator objectives and declared normalization.",
+      "outputs": "Dimensionless weighted merit, per-indicator contributions, data coverage and deterministic rank.",
+      "observed_gap": "Existing grid ranks a selected power metric. Catalog Pareto screening handles different data. The general optimizer also handles arbitrary circuits and caching outside this scope.",
+      "local_evidence": [
+        "transistordatabase/grid_analysis.py"
+      ]
+    },
+    {
+      "order": 10,
+      "id": "device-thermal-rollup",
+      "title": "Per-device circuit loss and thermal summary",
+      "kind": "integration",
+      "sources": [
+        {
+          "id": "enco-6201203722e7f211",
+          "root": "enco",
+          "path": "enco/packages/enco-analysis/src/enco_analysis/circuit/circuit/mosfet.py",
+          "symbol": "attach_physical_indicators",
+          "line": 271,
+          "frozen_disposition": "context-only"
+        },
+        {
+          "id": "sc-ae25213abbd6b0bf",
+          "root": "sc",
+          "path": "matlab_func/SemiconductorTemperature.m",
+          "symbol": "SemiconductorTemperature",
+          "line": 1,
+          "frozen_disposition": "capability-correspondence"
+        }
+      ],
+      "inputs": "Identified devices, aligned current/gate/voltage, device models, scenario and thermal inputs.",
+      "outputs": "One per-device channel/diode/switching loss table, circuit totals and hottest identified junction with convergence evidence.",
+      "observed_gap": "Branch loss aggregation, waveform thermal handoff and bounded thermal iteration exist. The reviewed converter response does not bind each physical position to independent electrical and thermal results.",
+      "local_evidence": [
+        "transistordatabase/converter_losses.py",
+        "transistordatabase/thermal.py"
+      ]
+    }
+  ],
+  "qualifications": [
+    "Simulator/vendor acceptance of generated PLECS and Gecko files needs an independent consuming tool and stated version. Numeric table round trips and file serialization already exist.",
+    "The 12 converter mappings consume supplied signals. Separate buck, boost and buck-boost operating-point calculations exist. Full converter waveform solvers and external simulator orchestration require their own scope."
+  ],
+  "non_features": [
+    "Exact duplicate implementations and data schema accessors.",
+    "ENCO enco_to_xml fixed-example export, two defective scalar adapters and the ParetoPlot schema without a corresponding renderer.",
+    "SC manual digitizer already supports calibration, ordered point editing and data export. Automatic trace recognition has no demonstrated source contract in the inspected DataPicker."
+  ]
+}

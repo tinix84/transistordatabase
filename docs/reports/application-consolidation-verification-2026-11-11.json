@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "record_type": "point-in-time application consolidation verification",
+  "date": "2026-11-11",
+  "scope": "application content only",
+  "report": {
+    "path": "docs/reports/application-consolidation-verification-2026-11-11.md",
+    "sha256": "98cec3cc5e3b0d130abfcffeb58b2e78b076502f78d0569b4867d8647a375181"
+  },
+  "source_proof": {
+    "path": "docs/reports/application-consolidation-evidence-2026-11-11/source-proof.json",
+    "sha256": "6ad6d150e6e109038c317e87b2c7b9eb63600360cd6595a7576163d8d67ce3e0"
+  },
+  "artifact_manifest": {
+    "path": "docs/reports/application-consolidation-evidence-2026-11-11/evidence-artifact-manifest.json",
+    "sha256": "00a8d118cc8a42da6fba8850b31dcb54a9404b2e4edd685417f61370438cbfc7"
+  },
+  "application_candidates": 390,
+  "root_original_files_unchanged": 374,
+  "root_exact_copies": 356,
+  "root_reviewed_changed_copies": 18,
+  "three_way_overlaps": 17,
+  "python": {
+    "files": 76,
+    "passed": 2219,
+    "skipped": 1,
+    "failed": 0,
+    "errors": 0,
+    "pytest_seconds": 141.19,
+    "wall_seconds": 144.58,
+    "peak_rss_kib": 566804,
+    "skip": "TDB_GENERIC_DPT_RAW was not configured for the 2026-11-11 consolidation run."
+  },
+  "vue": {
+    "files_passed": 55,
+    "tests_passed": 598,
+    "skipped": 0,
+    "test_seconds": 44.46,
+    "process_wall_seconds": 45.28,
+    "max_rss_kib": 515428
+  },
+  "ruff": {
+    "exit_code": 0,
+    "diagnostics": 0,
+    "runtime_and_rss": "not measured"
+  },
+  "headless": {
+    "science_modules": 32,
+    "module_paths_all_inside_clone": true,
+    "qt_loaded": [],
+    "blocked_qt_attempts": [],
+    "api_method_paths": 104,
+    "route_objects": 109,
+    "process_wall_seconds": 3.19,
+    "max_rss_kib": 245456
+  },
+  "production_build": {
+    "exit_code": 0,
+    "modules_transformed": 204,
+    "build_seconds": 4.32,
+    "process_wall_seconds": 4.91,
+    "max_rss_kib": 568540,
+    "output_proved_absent_before_build": true,
+    "emptyOutDir": false,
+    "warning": "Minified JavaScript chunk exceeds 500 kB."
+  },
+  "compiled_browser": {
+    "exit_code": 0,
+    "tests_passed": 13,
+    "skipped": 0,
+    "test_seconds": 36.9,
+    "process_wall_seconds": 38.64,
+    "max_rss_kib": 349528,
+    "workers": 1,
+    "base_url": "http://127.0.0.1:8003",
+    "fully_mocked_ui_cases": [
+      "scalar Boost CCM switching-loss-balanced request/result/export",
+      "notebook Boost Pareto screen request/result/export"
+    ],
+    "other_cases": "Use actual API calculations or generation. Some additionally hold responses to test stale-result suppression.",
+    "adaptations": "Port 8002 to 8003 and compiled UI entry / to /index.html only. Assertions and selectors remain unchanged.",
+    "previous_attempt": "Interrupted after two GET / API-metadata navigation timeouts. Its logs and screenshots remain in the external audit directory."
+  },
+  "database_integrity": {
+    "files": 24,
+    "bytes": 28903083,
+    "source_and_copy_unchanged": true,
+    "published_database_files": 0
+  },
+  "preservation": {
+    "directory": "/home/tinix/claude_wsl/merge-preservation-20261111-6a3d7bf0-d340-4d39-8937-8abbc428038e",
+    "seal_sha256": "97c2f019164e0466d342707a8b3d5a38ecd0753fb2a47bc172860f2856c1a463",
+    "bundle_sha256": "cda5ff5b80e7598b4f6d45cdf38027403bf5b88bf403f2ab1e69447a7d6fa978"
+  },
+  "ci_limit": "Earlier main run38482209038 failed133preexistingstylefindings. Local verification does not assert remote CI is green.",
+  "history_limit": "Private historical commits are excluded from publication. No all-branch-ancestry claim."
+}

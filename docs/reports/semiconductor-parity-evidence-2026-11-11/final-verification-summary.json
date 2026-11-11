@@ -1,0 +1,124 @@
+{
+  "date": "2026-11-11",
+  "branch": "codex/semiconductor-parity-20261110",
+  "status": "verified",
+  "python": {
+    "passed": 1869,
+    "skipped": 1,
+    "failed": 0,
+    "errors": 0,
+    "files": 64,
+    "duration_seconds": 112.31,
+    "measured_seconds": 117.99,
+    "peak_rss_kib": 566244,
+    "swaps": 0,
+    "junit_tests": 1870,
+    "junit_time_seconds": 112.176,
+    "log": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776.log",
+    "junit": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776.xml",
+    "selection": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776-selection.json",
+    "skip_name": "tests.test_measurement_import_independent::test_fresh_ltspice_binary_complete_waveform_and_native_archive",
+    "skip_reason": "TDB_GENERIC_DPT_RAW is not configured; original November 10 RAW fixture is unavailable for this run. Previous pass remains historical evidence only."
+  },
+  "vue": {
+    "passed": 504,
+    "failed": 0,
+    "files": 50,
+    "duration_seconds": 57.1,
+    "measured_seconds": 60.98,
+    "peak_rss_kib": 362148,
+    "swaps": 0,
+    "log": "/tmp/tdb-vue-final-20261111-143408-circuit.log"
+  },
+  "build": {
+    "passed": true,
+    "duration_seconds": 17.07,
+    "measured_seconds": 18.45,
+    "peak_rss_kib": 534324,
+    "assets": {
+      "index.html": "ab6606e3fd9d486a99d94af29b77890565ee00c46d30edc638e3f985a0c59059",
+      "assets/index-CcpTzzUv.css": "253325253c0dd9d59bb752dcce3c3080d6cf77f580e6bce27c45601535980663",
+      "assets/index-C38dULHp.js": "e626230ff4add851354693df94f4692663eeda371bf518230f6214e27fa97f7b"
+    },
+    "warning": "Existing Vite chunk-size warning above 500 kB"
+  },
+  "phase10_browser": {
+    "passed": 8,
+    "duration_seconds": 43.6,
+    "measured_seconds": 52.69,
+    "peak_rss_kib": 354376,
+    "artifact_root": "/tmp/tdb-parity-browser-1ca4d127-0a8d-44f4-9ad4-41b94006821f"
+  },
+  "final_post_guard_browser": {
+    "passed": 3,
+    "duration_seconds": 14.4,
+    "measured_seconds": 16.9,
+    "peak_rss_kib": 316148,
+    "swaps": 0,
+    "log": "/tmp/tdb-browser-final-20261111-f3fa0e35-15e1-4f92-a958-b03636001441.log",
+    "scope": "Compiled desktop/mobile physical summary and DAB distinct-signal charts/exports after final backend restart"
+  },
+  "headless": {
+    "pass": true,
+    "core": "transistordatabase.core.models.Transistor",
+    "science_modules": [
+      "catalog_fom",
+      "catalog_sources",
+      "grid_analysis",
+      "energy_maps",
+      "biela",
+      "channel_models",
+      "semiconductor_assemblies",
+      "converter_losses",
+      "plecs_document",
+      "measurement_import",
+      "static_losses",
+      "device_parameters",
+      "thermal",
+      "condition_tables",
+      "digitization",
+      "plecs_core_export",
+      "native_export",
+      "legacy_mat",
+      "waveform_losses",
+      "analytical_models",
+      "gate_resistance",
+      "workbook_fom",
+      "rg_formula",
+      "semiconductor_stress",
+      "current_allocation",
+      "reverse_current_sharing",
+      "rg_energy_access",
+      "device_model_fitting",
+      "xyz_energy_import",
+      "grouped_series",
+      "grid_merit",
+      "circuit_summary"
+    ],
+    "science_module_count": 32,
+    "routes": 94,
+    "qt_loaded": []
+  },
+  "headless_artifact": "/tmp/tdb-headless-final-20261111-e6c30199-e643-4bf0-83a7-36293132e340.json",
+  "ruff": {
+    "passed": true,
+    "findings": 0,
+    "scope": "All transistordatabase production Python plus final converter/circuit test files"
+  },
+  "whitespace": {
+    "scoped_passed": true,
+    "crlf_aware": true,
+    "whole_tree_clean": false,
+    "limitation": "Whole-tree check includes mixed-EOL working state. Broader GUI scope flags an existing extra EOF blank line in App.vue. App.vue was not changed during this continuation after the WSL restart. Narrowed final tracked implementation paths pass."
+  },
+  "runtime": {
+    "url": "http://localhost:8002/index.html",
+    "pid": 474359,
+    "autoreload": false,
+    "session": 68430
+  },
+  "excluded_runs": [
+    "Interrupted 9b9b9f11 aggregate run is not final proof",
+    "Browser CLI pipe-quoting attempt 15850c1b is not application/test evidence"
+  ]
+}

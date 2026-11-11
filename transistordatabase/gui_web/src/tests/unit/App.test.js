@@ -41,6 +41,19 @@ vi.mock('../../components/TopologyCalculator.vue', () => ({
 vi.mock('../../components/DatabaseBackupManager.vue', () => ({
   default: { name: 'DatabaseBackupManager', template: '<div>DatabaseBackupManager</div>' }
 }))
+vi.mock('../../components/GridWorkbench.vue', () => ({
+  default: { name: 'GridWorkbench', template: '<div>GridWorkbench</div>' }
+}))
+vi.mock('../../components/EnergyMapWorkbench.vue', () => ({
+  default: { name: 'EnergyMapWorkbench', template: '<div>EnergyMapWorkbench</div>' }
+}))
+vi.mock('../../components/ThermalWorkbench.vue', () => ({
+  default: { name: 'ThermalWorkbench', props: ['stagedHandoff'], template: '<div>ThermalWorkbench</div>' }
+}))
+
+function navButton(wrapper, label) {
+  return wrapper.findAll('nav button').find(button => button.text() === label)
+}
 
 describe('App.vue', () => {
   beforeEach(() => {
@@ -132,7 +145,7 @@ describe('App.vue', () => {
       const wrapper = mount(App)
       await flushPromises()
 
-      const createButton = wrapper.find('button:nth-of-type(2)')
+      const createButton = navButton(wrapper, 'Create/Edit')
       await createButton.trigger('click')
 
       expect(wrapper.vm.currentView).toBe('create')
@@ -142,7 +155,7 @@ describe('App.vue', () => {
       const wrapper = mount(App)
       await flushPromises()
 
-      const exportButton = wrapper.find('button:nth-of-type(3)')
+      const exportButton = navButton(wrapper, 'Export')
       await exportButton.trigger('click')
 
       expect(wrapper.vm.currentView).toBe('export')
@@ -152,7 +165,7 @@ describe('App.vue', () => {
       const wrapper = mount(App)
       await flushPromises()
 
-      const compareButton = wrapper.find('button:nth-of-type(4)')
+      const compareButton = navButton(wrapper, 'Compare')
       await compareButton.trigger('click')
 
       expect(wrapper.vm.currentView).toBe('compare')
@@ -162,7 +175,7 @@ describe('App.vue', () => {
       const wrapper = mount(App)
       await flushPromises()
 
-      const topologyButton = wrapper.find('button:nth-of-type(5)')
+      const topologyButton = navButton(wrapper, 'Topology')
       await topologyButton.trigger('click')
 
       expect(wrapper.vm.currentView).toBe('topology')
@@ -182,8 +195,33 @@ describe('App.vue', () => {
       const wrapper = mount(App)
       await flushPromises()
 
-      const searchButton = wrapper.find('button:nth-of-type(1)')
+      const searchButton = navButton(wrapper, 'Search Database')
       expect(searchButton.classes()).toContain('active')
+    })
+
+    it('opens the finite grid and energy map through the existing tools menu', async () => {
+      const wrapper = mount(App)
+      await flushPromises()
+      for (const [label, view, component] of [['Analysis grid', 'analysis-grid', 'GridWorkbench'], ['Energy map', 'energy-map', 'EnergyMapWorkbench']]) {
+        await navButton(wrapper, 'More Tools ▾').trigger('click')
+        const button = document.querySelector('#more-tools-popup')
+        const item = [...button.querySelectorAll('button')].find(value => value.textContent === label)
+        item.click(); await flushPromises()
+        expect(wrapper.vm.currentView).toBe(view)
+        expect(wrapper.findComponent({ name: component }).exists()).toBe(true)
+      }
+      wrapper.unmount()
+    })
+
+    it('stages an independent frozen copy of a Python thermal handoff', async () => {
+      const wrapper = mount(App)
+      await flushPromises()
+      const value = { input_sha256: 'accepted', thermal_input: { segments: [{ power_coefficients_w: [1, 2, 3, 4] }] } }
+      wrapper.vm.stageThermal(value); await flushPromises()
+      value.thermal_input.segments[0].power_coefficients_w[0] = 999
+      expect(wrapper.vm.currentView).toBe('thermal')
+      expect(wrapper.findComponent({ name: 'ThermalWorkbench' }).props('stagedHandoff').thermal_input.segments[0].power_coefficients_w).toEqual([1, 2, 3, 4])
+      wrapper.unmount()
     })
   })
 

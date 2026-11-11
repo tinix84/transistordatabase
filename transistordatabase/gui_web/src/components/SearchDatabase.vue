@@ -310,7 +310,7 @@
                 </td>
                 <td>{{ transistor.electrical.v_abs_max }}V</td>
                 <td>{{ transistor.electrical.i_abs_max }}A</td>
-                <td>{{ transistor.thermal.r_th_cs.toFixed(3) }} K/W</td>
+                <td>{{ formatNumber(transistor.thermal.r_th_cs) }} K/W</td>
                 <td class="actions">
                   <button @click="loadToExportingTools(transistor)" class="btn btn-sm btn-primary">
                     📤 Export
@@ -374,7 +374,7 @@
                   <p><strong>Housing:</strong> {{ transistor.metadata.housing_type }}</p>
                   <p><strong>Max Voltage:</strong> {{ transistor.electrical.v_abs_max }}V</p>
                   <p><strong>Max Current:</strong> {{ transistor.electrical.i_abs_max }}A</p>
-                  <p><strong>Thermal Resistance:</strong> {{ transistor.thermal.r_th_cs.toFixed(3) }} K/W</p>
+                  <p><strong>Thermal Resistance:</strong> {{ formatNumber(transistor.thermal.r_th_cs) }} K/W</p>
                 </div>
                 <div class="card-actions">
                   <button @click="loadToExportingTools(transistor)" class="btn btn-sm btn-primary">
@@ -528,6 +528,7 @@ const filteredTransistors = computed(() => {
           value = transistor.electrical[field]
         }
 
+        if (typeof value !== 'number' || !Number.isFinite(value)) return false
         if (filter.min !== null && value < filter.min) return false
         if (filter.max !== null && value > filter.max) return false
       }
@@ -576,6 +577,10 @@ const paginatedTransistors = computed(() => {
 })
 
 // Methods
+function formatNumber(value, digits = 3) {
+  return typeof value === 'number' && Number.isFinite(value) ? value.toFixed(digits) : 'Unknown'
+}
+
 function resetFilters() {
   filters.value = {
     name: { enabled: false, value: '' },

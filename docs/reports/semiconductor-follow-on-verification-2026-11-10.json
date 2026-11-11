@@ -1,0 +1,1529 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-10",
+  "scope": "Point-in-time receipts for individual follow-on workflows. The dated queue records the pre-implementation findings.",
+  "queue_path": "docs/reports/semiconductor-remaining-gaps-2026-11-10.json",
+  "released_record_sha256": "2968a2fb9097ed965d6a052033828ee92cadd0954c371b16cc85c157fd1701fb",
+  "receipts": [
+    {
+      "queue_id": "stress-indices",
+      "accepted_date": "2026-11-10",
+      "scope": "Four electrical screening indices from one declared waveform. This receipt covers the gap 1 acceptance run.",
+      "source_ids": [
+        "enco-e5bb43a4c901c9c4",
+        "enco-f9693f97fd609cb8",
+        "enco-1708782b7484876c",
+        "enco-827a8a60d4655502"
+      ],
+      "entry_points": {
+        "python": "transistordatabase.semiconductor_stress.calculate_stress_indices",
+        "api": "POST /api/stress/calculate",
+        "browser_view": "stress-indices"
+      },
+      "method": "semiconductor-stress-v1",
+      "conventions": [
+        "Exact integral of squared piecewise-linear current over elapsed time. ENCO computes discrete sample RMS.",
+        "Maximum signed voltage retains polarity. Each explicit transition supplies its time, kind and frequency in Hz. The declared transition list determines the sum.",
+        "Unknown transition evidence retains an unavailable switching result. An explicitly empty set gives a computed zero. Unknown resistance leaves the cost proxy unavailable.",
+        "The indices are electrical screening proxies. Physical loss, component volume and price require additional models or source data."
+      ],
+      "review_export": {
+        "download": "Original successful HTTP response JSON text, preserving float representations and signed zero.",
+        "reproduce": "Parse the response, canonicalize inputs or result with the Python JSON settings below and SHA-256 hash its UTF-8 bytes.",
+        "json_dumps": {
+          "sort_keys": true,
+          "ensure_ascii": false,
+          "separators": [
+            ",",
+            ":"
+          ],
+          "allow_nan": false
+        },
+        "hashes": {
+          "inputs": "input_sha256",
+          "result": "result_sha256"
+        }
+      },
+      "verification": {
+        "python": {
+          "passed": 112,
+          "suites": {
+            "owner": 36,
+            "independent": 9,
+            "adjacent": 67
+          },
+          "basis": "Acceptance-owner report from implementation and independent verification."
+        },
+        "vue": {
+          "passed": 378,
+          "files_passed": 32,
+          "log": "/tmp/tdb-stress-vue-rawreview-20261110-2138.log"
+        },
+        "compiled_chromium": {
+          "passed": 5,
+          "seconds": 15.3,
+          "screenshots_width_px": [
+            1440,
+            390
+          ],
+          "visual_inspection": "Acceptance owner inspected both screenshots.",
+          "log": "/tmp/tdb-stress-owner-browser-20261110-2141.log"
+        },
+        "build": {
+          "modules": 176,
+          "basis": "Acceptance-owner build report. The named retained assets appear below."
+        },
+        "runtime_at_acceptance": {
+          "port": 8002,
+          "pid": 1164805,
+          "session_id": 4339,
+          "basis": "Acceptance-owner report for this historical run."
+        }
+      },
+      "retained_evidence": [
+        {
+          "path": "/tmp/tdb-stress-owner-browser-20261110-2141.log",
+          "sha256": "7e94200e7193071fdb195d666c137546d4d4e44839489ae5d6fcaea62cc541e4",
+          "bytes": 1035
+        },
+        {
+          "path": "/tmp/tdb-stress-vue-rawreview-20261110-2138.log",
+          "sha256": "ab293b2fee2b7dc478b2c3a7e53618a369b857a9de1b26e7a7683280d780114d",
+          "bytes": 57586
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-51ff3192-6644-4b9f-acf0-7645053519b1/stress-indices-workbench-s-2cbc4-ance-and-downloads-at-390px-chromium/stress-results-390.png",
+          "sha256": "27dd82194a115c9795861490381009b75ade2d70200c4a74e3280ea0ef510cd4",
+          "bytes": 298019
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-51ff3192-6644-4b9f-acf0-7645053519b1/stress-indices-workbench-s-f597e-nce-and-downloads-at-1440px-chromium/stress-results-1440.png",
+          "sha256": "8b966bc0056b96ad82c69843d83e5569f67fb6a5a91ed4e192932e3bb011a9ba",
+          "bytes": 329512
+        },
+        {
+          "path": "transistordatabase/gui_web/dist/assets/index-zCPTodLY.js",
+          "sha256": "1a7e5149410580eb945b2998a8bc231b13fc4cfba9f8ac3d0aee401c4173c2df",
+          "bytes": 849184
+        },
+        {
+          "path": "transistordatabase/gui_web/dist/assets/index-BFr6vyw7.css",
+          "sha256": "46c84eedc808ca60e12d0f7c05c4af8f47c5f46a9c98d6c225bb6645d5766cd8",
+          "bytes": 111999
+        }
+      ],
+      "source_and_test_files_observed_at_receipt": [
+        {
+          "path": "transistordatabase/semiconductor_stress.py",
+          "sha256": "3c02b02af9111ba18e0f12b5007ae79d532c7d0d0d2b6f9b592fcfe1c816b641",
+          "bytes": 10473
+        },
+        {
+          "path": "tests/test_semiconductor_stress.py",
+          "sha256": "7ba0818f07f007bc37941ecf74faba1e184b15bb669401a1a0e4fa7d66e50748",
+          "bytes": 8024
+        },
+        {
+          "path": "tests/test_stress_independent_review.py",
+          "sha256": "3cd05ab5cb62fc61b99b9d5b8c8a1693318a51d917b24b9352eeb2b586354761",
+          "bytes": 5549
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/unit/StressApi.test.js",
+          "sha256": "7df80e72fdd020fad07ae61377eda363e44ef0b00250c2a6307944b54985502d",
+          "bytes": 1104
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/unit/StressIndicesWorkbench.test.js",
+          "sha256": "eaf85fe4685ee0a5a5af0d5a57fc43033a63a43fc2f132fb45cef5afb23464b7",
+          "bytes": 9522
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/e2e/stress-indices-workbench.spec.js",
+          "sha256": "b545ec63814c962a66356ce93d51f47798cd238070af84a121819cbd40b276f2",
+          "bytes": 8210
+        }
+      ],
+      "hash_scope": "Hashes identify the retained files read during receipt preparation. Run-time source hashes and a pre-run source manifest were unavailable. Shared integration paths were subject to subsequent edits.",
+      "shared_integration_paths_without_run_hash": [
+        "transistordatabase/gui_web/backend/stress_routes.py",
+        "transistordatabase/gui_web/backend/main.py",
+        "transistordatabase/gui_web/src/services/api.js",
+        "transistordatabase/gui_web/src/App.vue",
+        "transistordatabase/gui_web/src/components/StressIndicesWorkbench.vue"
+      ]
+    },
+    {
+      "queue_id": "gate-mask",
+      "accepted_date": "2026-11-10",
+      "scope": "Sample-only signed current allocation by binary gate command or declared voltage threshold.",
+      "source_ids": [
+        "enco-396842419c21b91e",
+        "enco-d4607f37d0a79c85"
+      ],
+      "entry_points": {
+        "python": "transistordatabase.current_allocation.allocate_gate_current",
+        "api": "POST /api/waveform/gate-allocation",
+        "browser_view": "waveform",
+        "panel": "Gate-state current allocation"
+      },
+      "method": "gate-state-allocation-v1",
+      "conventions": [
+        "Each original signed current sample contributes to exactly one returned trace. Their sum equals the supplied current at that time.",
+        "Binary mode accepts actual booleans and numeric 0 or 1. Threshold mode assigns gate_v > threshold_v to the on state. Equality gives the off state.",
+        "User selection, source and conditions accompany the result. Null conditions retain unknown values. Sample markers represent command-state allocations. Physical sharing and interval energy require separate models."
+      ],
+      "review_export": {
+        "json": "The downloaded evidence retains the original successful HTTP JSON response text.",
+        "csv": "One row per original sample with source, conditions, provenance and evidence hashes."
+      },
+      "verification": {
+        "basis": "Acceptance-owner report for the successive checks. Artifact hashes identify the files retained at receipt preparation.",
+        "python": {
+          "passed": 141,
+          "suites": {
+            "owner": 46,
+            "independent": 13,
+            "adjacent_waveform_and_stress": 82
+          }
+        },
+        "vue": {
+          "full_suite_passed": 386,
+          "affected_after_visual_change_passed": 13
+        },
+        "compiled_chromium": {
+          "combined_runs": [
+            {
+              "passed": 9,
+              "gate_owner": 3,
+              "gate_independent": 1,
+              "stress": 5
+            },
+            {
+              "passed": 9,
+              "gate_owner": 3,
+              "gate_independent": 1,
+              "stress": 5
+            }
+          ],
+          "after_final_y_axis_padding": {
+            "passed": 4,
+            "gate_owner": 3,
+            "gate_independent": 1
+          },
+          "screenshot_widths_px": [
+            1440,
+            390
+          ],
+          "visual_inspection": "Acceptance owner inspected the initial desktop and mobile images and the final mobile image. Positive and negative markers fit inside the final chart."
+        },
+        "live_api": {
+          "boundary_probes_passed": 6
+        },
+        "ruff": "passed",
+        "build": {
+          "status": "passed",
+          "modules": 176
+        },
+        "runtime_at_acceptance": {
+          "port": 8002,
+          "pid": 1249742,
+          "session_id": 30977
+        }
+      },
+      "retained_evidence": [
+        {
+          "path": "transistordatabase/gui_web/dist/assets/index-D0nrk4yG.js",
+          "sha256": "f9f0b5e0b33b91f732893a6258be6cd4bc7017d3ab0912d5df1e8b357cedbb5e",
+          "bytes": 857305
+        },
+        {
+          "path": "transistordatabase/gui_web/dist/assets/index-4DsHr3JX.css",
+          "sha256": "b32eb006d28c2f6f4db040c3235e7772511be3914070cb2c0149b771ec337485",
+          "bytes": 113335
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-a19ef267-a785-4264-a0e8-dc6677476a22/gate-allocation-real-signe-38f4c--portable-evidence-at-390px-chromium/gate-allocation-390.png",
+          "sha256": "871bb93bc41bd1949f6431dc2fa32d9097cf9d0193c1a23ab7a8f76ea5d4645f",
+          "bytes": 96685
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-a19ef267-a785-4264-a0e8-dc6677476a22/gate-allocation-real-signe-e6475-portable-evidence-at-1440px-chromium/gate-allocation-1440.png",
+          "sha256": "c839fc0ea1a873fc966be9127674744ba9f5d167de9e7eef6f256546fb218faa",
+          "bytes": 111550
+        }
+      ],
+      "source_and_test_files_observed_at_receipt": [
+        {
+          "path": "transistordatabase/current_allocation.py",
+          "sha256": "9148d94bab751532e447658396c71a1af7a8ebe4dad9dd9857401b665e54951b",
+          "bytes": 6204
+        },
+        {
+          "path": "transistordatabase/gui_web/backend/current_allocation_routes.py",
+          "sha256": "854755f445d3f13e6d42c5c9dd79f96b82888fc3df0d641fe3ecb36b01f7a488",
+          "bytes": 3120
+        },
+        {
+          "path": "transistordatabase/gui_web/backend/finite_json_route.py",
+          "sha256": "82ea9019d83dd0870adf6e1454f1b1ca722847d611404a5d2598bfdc2812eb15",
+          "bytes": 3047
+        },
+        {
+          "path": "transistordatabase/gui_web/src/components/GateAllocationPanel.vue",
+          "sha256": "e74334164b389c24448511a141d2493ca0eb65ecd71f2b69105705efe43d653d",
+          "bytes": 9584
+        },
+        {
+          "path": "transistordatabase/gui_web/src/components/WaveformWorkbench.vue",
+          "sha256": "59da7b017c8966413f758f02d6fff7f01e3e96e603883fd0e4d5a633c854101b",
+          "bytes": 15420
+        },
+        {
+          "path": "tests/test_current_allocation.py",
+          "sha256": "5197cb8bcf7893608c8281a6782ba8e875e4d7fcd2284fc67245c05be28529eb",
+          "bytes": 6109
+        },
+        {
+          "path": "tests/test_gate_allocation_independent_review.py",
+          "sha256": "29dcaed7c439d4c35af805fdeb51216172f776f4de3d6ed269630ed865c9e1a3",
+          "bytes": 5500
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/unit/GateAllocationApi.test.js",
+          "sha256": "de1169cb37bb62460ce8cd91731757d44e683fd73393a2fd83b45ddf22872bfb",
+          "bytes": 906
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/unit/GateAllocationPanel.test.js",
+          "sha256": "031dec17592e59bf8559ab6bed7db8915b581dd9c2250e1fddadf12ce3cc4333",
+          "bytes": 5743
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/e2e/gate-allocation.spec.js",
+          "sha256": "99135aa75deef61b41a2274e72e3929616188879abcbcf5008df678849116501",
+          "bytes": 5965
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/e2e/gate-allocation-independent-review.spec.js",
+          "sha256": "bfbfcbe7de3b3caa126607d1ea8d11cf40d6420db16b36b27932a507760dc139",
+          "bytes": 2539
+        }
+      ],
+      "hash_scope": "File hashes identify bytes inspected when preparing this receipt. A pre-run source manifest was unavailable. Shared web and API entry points can change in subsequent work.",
+      "shared_integration_paths_without_run_hash": [
+        "transistordatabase/gui_web/backend/main.py",
+        "transistordatabase/gui_web/backend/stress_routes.py",
+        "transistordatabase/gui_web/src/App.vue",
+        "transistordatabase/gui_web/src/services/api.js",
+        "transistordatabase/gui_web/src/components/analysisFiles.js"
+      ]
+    },
+    {
+      "queue_id": "reverse-sharing",
+      "accepted_date": "2026-11-10",
+      "scope": "Static equal-voltage and current-conserving solution from separately identified, bounded reverse channel and diode curves.",
+      "source_ids": [
+        "enco-e11ddebd7e4b83f8"
+      ],
+      "source_relation": "MOSFET.get_channel_diode_currents motivates splitting total current. ENCO estimates voltage from total current and on-resistance, predicts diode current, then subtracts it. This implementation independently solves the branch equations at common voltage. The source association concerns intent.",
+      "entry_points": {
+        "python": "transistordatabase.reverse_current_sharing.solve_reverse_current_sharing",
+        "api": "POST /api/assemblies/reverse-sharing",
+        "browser_view": "assemblies",
+        "panel": "Reverse current sharing"
+      },
+      "method": "bounded-reverse-sharing-v1",
+      "conventions": [
+        "The caller supplies branch isolation evidence and acknowledges compatible operating states at one junction temperature. Each recorded condition must match its request. An explicitly unknown gate bias remains null.",
+        "Strict recorded support requires one isolated solution. An unsupported or ambiguous result retains null solution quantities and displays no solved-point marker.",
+        "Ideal-diode-blocking is an explicitly selected estimate. It permits zero diode current under its declared condition.",
+        "Branch powers apply to a static operating point. The response retains signed branch currents, common voltage, current residual and voltage residual."
+      ],
+      "review_export": {
+        "json": "Original successful HTTP JSON text retains portable evidence.",
+        "csv": "Result quantities and evidence are available for review."
+      },
+      "verification": {
+        "basis": "Implementation, independent review and acceptance-owner reports. Suites overlap where shown.",
+        "python": {
+          "implementation_run": {
+            "owner": 64,
+            "adjacent": 121,
+            "passed": 185
+          },
+          "review_run": {
+            "owner_repeated": 64,
+            "independent": 8,
+            "passed": 72
+          },
+          "coverage": [
+            "25 independent inverse-voltage-law oracle points",
+            "disjoint current axes",
+            "plateau cases",
+            "adjacent representable floats",
+            "UTF-8 input",
+            "10000-point limit"
+          ]
+        },
+        "vue": {
+          "full_suite_passed": 397,
+          "files_passed": 36,
+          "affected_after_plot_anchor_change_passed": 20
+        },
+        "compiled_chromium": {
+          "earlier_runs_passed": [
+            3,
+            3
+          ],
+          "final_passed": 3,
+          "final_seconds": 14.5,
+          "screenshot_widths_px": [
+            1440,
+            390
+          ],
+          "visual_inspection": "Acceptance owner inspected the final desktop and mobile plots. The plotted solved points and source curves were fully visible.",
+          "additional_checks": [
+            "Raw input validation",
+            "Stale response handling",
+            "Zero observed console errors"
+          ]
+        },
+        "ruff": "passed",
+        "build": {
+          "status": "passed",
+          "modules": 180
+        },
+        "runtime_at_acceptance": {
+          "port": 8002,
+          "pid": 1316046,
+          "session_id": 23734
+        },
+        "documentation_example": {
+          "endpoint": "POST /api/assemblies/reverse-sharing",
+          "locally_probed_cases": 3,
+          "checks": [
+            "Analytic -10 A strict solution (channel -20/3 A, diode -10/3 A and common voltage -2/3 V)",
+            "Strict -4 A query returns unsupported with null diode current",
+            "Selected blocking mode gives an estimated zero diode current at -4 A",
+            "Null diode gate preserved across all three probes"
+          ]
+        }
+      },
+      "implementation_core_sha256_at_acceptance": "bdfa533809ac7fa7c90e88a2f1a6189756428ec27a673b8533963ce7f65d8cc8",
+      "retained_evidence": [
+        {
+          "path": "transistordatabase/gui_web/dist/assets/index-CgPJiQEJ.js",
+          "sha256": "8f69885653b72e4490e746786a8b30f8a65ed85a34c4220c2803e73b295f8bb9",
+          "bytes": 869133
+        },
+        {
+          "path": "transistordatabase/gui_web/dist/assets/index-JA6EQ04h.css",
+          "sha256": "baf8c341f013d16147a76571cf4f96f48cb34990ebef4418685009004da6de9d",
+          "bytes": 114577
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-cfaa2a2e-c694-4cc4-a8d3-313dca3e04b7/reverse-current-sharing-st-57e80--portable-evidence-at-390px-chromium/reverse-sharing-390.png",
+          "sha256": "0329b7130dc4849ec4d509638f0c61668d7cead95cf77c4a18da8951d8af3d3b",
+          "bytes": 168776
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-cfaa2a2e-c694-4cc4-a8d3-313dca3e04b7/reverse-current-sharing-st-57e80--portable-evidence-at-390px-chromium/reverse-sharing-plot-390.png",
+          "sha256": "24dcdc16dc2463dec8f70bf1d511194cbc2f926cba917d33cdafd8a7d064caea",
+          "bytes": 28647
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-cfaa2a2e-c694-4cc4-a8d3-313dca3e04b7/reverse-current-sharing-st-84cab-portable-evidence-at-1440px-chromium/reverse-sharing-1440.png",
+          "sha256": "48e0d6ea6461f66bbda217fe946d7ac75af04b4cbfac50645f903b04162052e3",
+          "bytes": 189450
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-cfaa2a2e-c694-4cc4-a8d3-313dca3e04b7/reverse-current-sharing-st-84cab-portable-evidence-at-1440px-chromium/reverse-sharing-plot-1440.png",
+          "sha256": "972027d4b363755c0687bf60a585b547f467bc2d6163cd909c2006d979c9b187",
+          "bytes": 37969
+        }
+      ],
+      "source_and_test_files_observed_at_receipt": [
+        {
+          "path": "transistordatabase/reverse_current_sharing.py",
+          "sha256": "bdfa533809ac7fa7c90e88a2f1a6189756428ec27a673b8533963ce7f65d8cc8",
+          "bytes": 11016
+        },
+        {
+          "path": "transistordatabase/gui_web/backend/current_sharing_routes.py",
+          "sha256": "87229360e100a24560f5824a090202d15df579034c5c57206ac2d184bc767206",
+          "bytes": 3228
+        },
+        {
+          "path": "transistordatabase/gui_web/src/components/ReverseSharingPanel.vue",
+          "sha256": "d74a2cb56e6b70c8be2084a6ece07be45ce8ac0a4188cf86a3047d6dcb0a3a95",
+          "bytes": 13942
+        },
+        {
+          "path": "tests/test_reverse_current_sharing.py",
+          "sha256": "69d4dfb19360d5fa974567c9df71b07d076360f3ad3deef64141fa1ab3af3667",
+          "bytes": 16953
+        },
+        {
+          "path": "tests/test_reverse_sharing_independent_review.py",
+          "sha256": "f9e2adbaa2b7a473906e973eac368714e8a5b98baa8a6b302379856d359f3dba",
+          "bytes": 4925
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/unit/ReverseSharingApi.test.js",
+          "sha256": "73132b019c6bd048efbb55556c903bae13f57f30b3cea1fdaf469299434a9a4b",
+          "bytes": 1046
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/unit/ReverseSharingPanel.test.js",
+          "sha256": "657bd678a9c433e889d5ccdba3502eafec5d9e6859849f48f3797aca9abbb1d1",
+          "bytes": 8383
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/e2e/reverse-current-sharing.spec.js",
+          "sha256": "4b16b97ea7f209b0d348b1f4fc83623fab5de9c324680e78ba100917eef6f71b",
+          "bytes": 7720
+        }
+      ],
+      "hash_scope": "The core digest matches the acceptance-owner digest. Other hashes identify bytes observed during receipt preparation. Shared entry points could change in subsequent work.",
+      "shared_integration_paths_without_run_hash": [
+        "transistordatabase/gui_web/backend/main.py",
+        "transistordatabase/gui_web/src/services/api.js",
+        "transistordatabase/gui_web/src/components/SemiconductorAssemblyWorkbench.vue"
+      ]
+    },
+    {
+      "queue_id": "rg-energy",
+      "accepted_date": "2026-11-10",
+      "scope": "Read-only repository inventory and web access to the existing bounded switching-energy and gate-resistance calculations.",
+      "source_ids": [
+        "current-59e9f089825867c8",
+        "current-0e55819a38865760"
+      ],
+      "entry_points": {
+        "python_forward": "transistordatabase.rg_formula.interpolate_energy_at_rg",
+        "python_inverse": "transistordatabase.rg_formula.find_rg_for_target_energy",
+        "api": "GET and POST /api/transistors/{transistor_id}/rg-energy",
+        "browser_url": "http://localhost:8002/index.html?view=analytical&model=parameters#rg-energy"
+      },
+      "conventions": [
+        "Use one recorded representation, branch, query temperature, current and declared context. The existing helper retains its numerical and error behavior for queried curves.",
+        "POST evidence describes considered branch and representation rows at their actual conditions. The source set can include rows the helper did not use for the numeric result.",
+        "Unavailable source metadata can coexist with a supported query against a different curve. An unavailable source retains its diagnostic and nullable evidence.",
+        "Dependency snapshots contain normalized calculation data. Source-file and dependency hashes identify different data. The export omits original_base64."
+      ],
+      "review_export": {
+        "json": "Original successful HTTP JSON text.",
+        "csv": "Query and considered-source evidence. The tests exercised file downloads."
+      },
+      "verification": {
+        "basis": "Acceptance-owner and independent-review reports. Local guide and inventory probes repeated during receipt preparation. The retained Vue log confirms the full Vue count.",
+        "python": {
+          "passed": 211,
+          "suites": {
+            "owner": 60,
+            "independent": 7,
+            "existing_helpers": 144
+          }
+        },
+        "ruff": {
+          "status": "passed",
+          "new_files": 5
+        },
+        "vue": {
+          "passed": 417,
+          "files_passed": 39
+        },
+        "compiled_chromium": {
+          "final_passed": 5,
+          "seconds": 15.7,
+          "independent_get_post_evidence_regression_passed": 1,
+          "independent_scope": "Changed repository evidence between inventory and query, including condition comparison tolerance.",
+          "widths_px": [
+            1440,
+            390
+          ],
+          "visual_inspection": "Acceptance owner inspected the final desktop and mobile plots.",
+          "regressions": [
+            "Unavailable 100 degree Celsius row retained with null evidence alongside a valid 75 degree Celsius query",
+            "Strict boolean and finite inputs, explicit null and zero, literal method names, duplicate crossings and inverse coverage holes",
+            "Stale context and result handling, marker bounds and zero observed browser errors"
+          ]
+        },
+        "build": {
+          "status": "passed",
+          "modules": 182
+        },
+        "runtime_at_acceptance": {
+          "main_port": 8002,
+          "pid": 1374331,
+          "session_id": 79553,
+          "fixture_port": 8003,
+          "fixture_pid": 1374506,
+          "fixture_session_id": 74776,
+          "fixture_run": "Four in-memory fixture devices. Acceptance owner closed the fixture process after verification. No repository device writes."
+        },
+        "local_inventory_probe": {
+          "devices_read": 24,
+          "nonempty_devices": 21,
+          "total_source_rows": 255,
+          "guide_device": "Fuji_2MBI600XEE065-50",
+          "guide_device_inventory_rows": 24,
+          "guide_query": "Turn-on, graph_i_e, 600 A, 25 degrees Celsius, 3.3 ohm, 300 V supply, 15 V gate, other conditions unknown.",
+          "guide_result_j": 0.015417335173179664,
+          "guide_query_considered_rows": 8
+        }
+      },
+      "accepted_file_sha256": {
+        "transistordatabase/rg_formula.py": "6f08bb1a4f2c084f3f55000b6f55c93d58114c0983d114388fb2c0fd65d242e1",
+        "transistordatabase/rg_energy_access.py": "1d0db9b6f3e035eac0a78a33ebd8c4858e83d07cb8e5df39b66d6c4002b8ae8f",
+        "transistordatabase/gui_web/backend/rg_energy_routes.py": "12fc31db6394c01fb74dea389df8b9a99c42b049e7075df2d4fdf94f9d2ea635"
+      },
+      "retained_evidence": [
+        {
+          "path": "transistordatabase/gui_web/dist/assets/index-FIv-7SxQ.js",
+          "sha256": "99388c9bfd6f643868618e2ee0fba431dcc9703aa07c4a9fe1912a872f294c37",
+          "bytes": 884176
+        },
+        {
+          "path": "transistordatabase/gui_web/dist/assets/index-pzI-OEVU.css",
+          "sha256": "e4e54867eff172943d36159bfce4ae16080810d3e135152afbd6ba5aaceb7f71",
+          "bytes": 115941
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-1ef7d1b4-7f30-4dc1-abfa-26eb3a575fba/rg-energy-an-unavailable-r-8bec1-repository-and-result-proof-chromium/rg-energy-unavailable-record.png",
+          "sha256": "b4c49316ed35178fd46ffdde4383b052c7f3d25e8a0de2cd4aafadaefc0db441",
+          "bytes": 22846
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-1ef7d1b4-7f30-4dc1-abfa-26eb3a575fba/rg-energy-compiled-reposit-41963-and-portable-proof-at-390px-chromium/rg-energy-plot-390.png",
+          "sha256": "96b7fb921222d858bd52986e2763ff41d4dcaaa453c3d8b019acba55f84387f3",
+          "bytes": 26175
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-1ef7d1b4-7f30-4dc1-abfa-26eb3a575fba/rg-energy-compiled-reposit-41963-and-portable-proof-at-390px-chromium/rg-energy-result-390.png",
+          "sha256": "16c47e566464b74947234dd6512cd83b27492f0c9161429a28db91b9f6172864",
+          "bytes": 43292
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-1ef7d1b4-7f30-4dc1-abfa-26eb3a575fba/rg-energy-compiled-reposit-b1d73-nd-portable-proof-at-1440px-chromium/rg-energy-plot-1440.png",
+          "sha256": "f4f58c946e0a9c21002a28d1c7a550366ac52335c65f3631eb0fdb9157660737",
+          "bytes": 38399
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-1ef7d1b4-7f30-4dc1-abfa-26eb3a575fba/rg-energy-compiled-reposit-b1d73-nd-portable-proof-at-1440px-chromium/rg-energy-result-1440.png",
+          "sha256": "8ad572c900323c2bbf87668b13cf92d0ee607ca08b9cb4308c6ab6db419ea6dd",
+          "bytes": 44736
+        },
+        {
+          "path": "/tmp/rg-energy-vue-complete.log",
+          "sha256": "d594c20ede98e39266057564a4162808b51f6e0417e60a8aec3a84efadbe010c",
+          "bytes": 14615
+        }
+      ],
+      "source_and_test_files_observed_at_receipt": [
+        {
+          "path": "transistordatabase/rg_formula.py",
+          "sha256": "6f08bb1a4f2c084f3f55000b6f55c93d58114c0983d114388fb2c0fd65d242e1",
+          "bytes": 12471
+        },
+        {
+          "path": "transistordatabase/rg_energy_access.py",
+          "sha256": "1d0db9b6f3e035eac0a78a33ebd8c4858e83d07cb8e5df39b66d6c4002b8ae8f",
+          "bytes": 13688
+        },
+        {
+          "path": "transistordatabase/gui_web/backend/rg_energy_routes.py",
+          "sha256": "12fc31db6394c01fb74dea389df8b9a99c42b049e7075df2d4fdf94f9d2ea635",
+          "bytes": 4756
+        },
+        {
+          "path": "transistordatabase/gui_web/src/components/RgEnergyPanel.vue",
+          "sha256": "7d91dceda788c977583d0781017a68b39c7534710640cf7e8ab271788ba90d24",
+          "bytes": 17988
+        },
+        {
+          "path": "tests/test_rg_energy_access.py",
+          "sha256": "f8e75700f47be71c854c1900e6186131363c25919252caa0d5d4c5eca3845461",
+          "bytes": 18333
+        },
+        {
+          "path": "tests/test_rg_energy_access_independent_review.py",
+          "sha256": "d52f4c4c9b297303cf6979166cef6fb7628523a38cdfd2be0f69e1862ce7b299",
+          "bytes": 7587
+        },
+        {
+          "path": "tests/test_rg_energy_independent.py",
+          "sha256": "8fc2a7d4f770615767f737fb58dd4de5e3d9d5925f9902562cb152e1bf499053",
+          "bytes": 4609
+        },
+        {
+          "path": "tests/test_rg_formula.py",
+          "sha256": "8acd935bee65e9aaa56ed16afa916694cf3752b4d2f1c8bf78d33efd96abd5a4",
+          "bytes": 23840
+        },
+        {
+          "path": "tests/rg_energy_browser_server.py",
+          "sha256": "033b3205c4ed452469d4d37f3d9efbcceb8a079797d32a054071afa6f35bd575",
+          "bytes": 1161
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/unit/RgEnergyApi.test.js",
+          "sha256": "1f25dcf070b7a2eb2ce016c62cc28d5168687b9a33a16f46076b2ff45f3d1644",
+          "bytes": 1338
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/unit/RgEnergyPanel.test.js",
+          "sha256": "d05f14c8940bbb21dffaf498f69356a62f60b02e0e82f5dd58ddbabcec17dbe9",
+          "bytes": 13221
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/e2e/rg-energy.spec.js",
+          "sha256": "f45a0c8b6692051f5f664398dfa56757c0ff0cb906ab91a7ebef848eb7f5396a",
+          "bytes": 13009
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/e2e/rg-energy-independent-review.spec.js",
+          "sha256": "5936ea4f3a1b5da97d7824ba9423c8e42520cd079316ce3b16395f3ea74a5d5c",
+          "bytes": 2321
+        }
+      ],
+      "hash_scope": "The three listed accepted file digests match the acceptance-owner digests. Other hashes identify bytes read during receipt preparation. The two original scientific helpers share the unchanged rg_formula.py file.",
+      "shared_integration_paths_without_run_hash": [
+        "transistordatabase/gui_web/backend/main.py",
+        "transistordatabase/gui_web/src/services/api.js",
+        "transistordatabase/gui_web/src/components/AnalyticalCalculator.vue"
+      ]
+    },
+    {
+      "queue_id": "fit",
+      "accepted_date": "2026-11-10",
+      "scope": "Conditioned resistance, forward and inverse diode and separate turn-on or turn-off switching energy fitting. The user supplies train and holdout assignments, source and conditions.",
+      "source_ids": [
+        "enco-b1ff841464ea2d09",
+        "enco-130c2a2161139100",
+        "enco-efa374abcdd83d03",
+        "enco-b340fe16ac4ea5d2",
+        "enco-f1716ce1915dc7fd",
+        "enco-cfddec9c175640d4",
+        "enco-785acc0270427985",
+        "enco-b7d91944a862d149"
+      ],
+      "entry_points": {
+        "python": [
+          "transistordatabase.device_model_fitting.train_device_model",
+          "transistordatabase.device_model_fitting.evaluate_device_model"
+        ],
+        "api": [
+          "POST /api/models/train",
+          "POST /api/models/evaluate"
+        ],
+        "browser_url": "http://localhost:8002/index.html?view=analytical&model=device-fitting"
+      },
+      "method": "scaled-polynomial-device-fit-v1",
+      "conventions": [
+        "Bounded degree 1 through 3 polynomial fits. Report training and independent holdout errors separately, with null R2 when undefined. Residual is observed minus predicted.",
+        "Diode temperature can be explicitly unknown for a fixed slice. Zero Celsius remains a distinct condition. On-resistance and energy temperature coordinates require finite values.",
+        "Each energy event uses its own fitted current baseline multiplied by normalized voltage, temperature and gate-resistance factors. Multi-coordinate holdouts test separability at their supplied coordinates.",
+        "Hand fixtures establish calculation behavior. Device-specific accuracy needs separate evidence. Imported files support replay with the application method. General model interchange and cross-LAPACK equivalence remain unverified."
+      ],
+      "review_export": {
+        "model": "Exact application model_json with UTF-8 SHA-256. The import preserves numeric token text until the backend checks the model.",
+        "review": "Raw HTTP training and evaluation evidence JSON and CSV downloads. No automatic repository writes."
+      },
+      "fixture_results": {
+        "resistance": {
+          "holdout_temperature_c": 50,
+          "observed_ohm": 0.0115,
+          "predicted_ohm": 0.01125,
+          "residual_ohm": 0.00025,
+          "single_holdout_r2": null
+        },
+        "diode": {
+          "forward_2a_v": 0.6,
+          "inverse_0_70v_a": 4
+        },
+        "browser_energy": {
+          "anchor": {
+            "current_a": 20,
+            "voltage_v": 400,
+            "t_j_c": 25,
+            "r_g_ohm": 4
+          },
+          "query": {
+            "current_a": 15,
+            "voltage_v": 500,
+            "t_j_c": 75,
+            "r_g_ohm": 6
+          },
+          "observed_j": 0.002678125,
+          "predicted_j": 0.002578125,
+          "residual_j": 0.0001,
+          "basis": "Checked browser fixture, query initialization and compiled-browser assertion."
+        }
+      },
+      "verification": {
+        "basis": "Acceptance-owner and independent-review reports. Artifact digests and the guide example were checked during receipt preparation.",
+        "python_final": {
+          "passed": 186,
+          "seconds": 6.88,
+          "owner": 48,
+          "fixed_unknown_temperature": 3,
+          "fresh_independent": 9,
+          "adjacent": 126
+        },
+        "python_focused": {
+          "passed": 60,
+          "scope": "Overlaps final run. Includes extrema, holdouts, quadratic fits, separability, adjacent floating-point inputs and model tampering."
+        },
+        "ruff": {
+          "status": "passed",
+          "files": 5
+        },
+        "vue": {
+          "targeted_passed": 28,
+          "full_passed": 441,
+          "files_passed": 41,
+          "full_seconds": 25.28
+        },
+        "compiled_chromium": {
+          "final_passed": 7,
+          "final_minutes_approx": 1.1,
+          "earlier_passed": 7,
+          "earlier_seconds": 38.4,
+          "earlier_scope": "Preceded final route reload. Final run used the accepted route.",
+          "widths_px": [
+            1440,
+            390
+          ],
+          "visual_inspection": "Acceptance owner viewed the final centered figures at both widths. Source markers and axes were readable.",
+          "test_report_attachments": [
+            "model-fitting-timings.json",
+            "model-fit-rendered-markers.json"
+          ],
+          "attachment_scope": "Attachment names verified in the browser test. The retained run directory contained seven separate PNG artifacts."
+        },
+        "model_import": {
+          "rejected_422": [
+            "25.0000000000000001 replacing 25",
+            "2^53+1 replacing 2^53"
+          ],
+          "accepted_equivalent": [
+            "25",
+            "2.5e1"
+          ]
+        },
+        "build": {
+          "passed": true,
+          "modules": 187
+        },
+        "runtime_at_acceptance": {
+          "main_port": 8002,
+          "pid": 1517707,
+          "session_id": 6133,
+          "auto_reload": false,
+          "private_fixture_server": false
+        },
+        "guide_probe": "Read-only POST train and evaluate of the guide resistance fixture returned the expected holdout residual and 50 degree prediction. Recomputed SHA-256 from returned model_json matched the server digest."
+      },
+      "accepted_file_sha256": {
+        "transistordatabase/device_model_fitting.py": "9fc0925b3ab3ef07119b09d18bf83ddb3b027ea5c15918795cbc38d9c0b25a68",
+        "transistordatabase/gui_web/backend/model_fit_routes.py": "275a4345df7a8914ac8bc64770f4c68875fccc5f49dc5f6875e99b84b204cfff"
+      },
+      "retained_evidence": [
+        {
+          "path": "transistordatabase/gui_web/dist/assets/index-CfHqPMBQ.js",
+          "sha256": "9e8d399becdb7b670bf5bde5b9c3b21d11f50ad2d28f3e42d73fd7f76fabd685",
+          "bytes": 906433
+        },
+        {
+          "path": "transistordatabase/gui_web/dist/assets/index-HgQllRMQ.css",
+          "sha256": "4a3516b67440fc984d7e256c5e1f51bd71a07bd085cca130a4797405bdcfe2a5",
+          "bytes": 118180
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-61575f95-6472-45d5-aba5-daf1509287f9/device-model-fitting-compi-6afeb-and-exact-exports-at-1440px-chromium/model-fit-figure-1440.png",
+          "sha256": "b7209c60140b6a606b1ac9e6afff2cfcecc3a32eae0dd729b8395f2f996f6e1e",
+          "bytes": 32034
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-61575f95-6472-45d5-aba5-daf1509287f9/device-model-fitting-compi-6afeb-and-exact-exports-at-1440px-chromium/model-fit-plot-1440.png",
+          "sha256": "cd8b032de2e9d37ce133796bc8b26b6235ff29347d2456e54ef73e35097b15f7",
+          "bytes": 16434
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-61575f95-6472-45d5-aba5-daf1509287f9/device-model-fitting-compi-6afeb-and-exact-exports-at-1440px-chromium/model-fitting-1440.png",
+          "sha256": "0420d13dae75084f26886813fea959eee509e872f2dad11d0aff5a4449da7577",
+          "bytes": 453696
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-61575f95-6472-45d5-aba5-daf1509287f9/device-model-fitting-compi-fcde6--and-exact-exports-at-390px-chromium/model-fit-figure-390.png",
+          "sha256": "b0a9731053e2dbc5cb5fff87dd2788bfa230d40cb46463b61b972a97760d7c4d",
+          "bytes": 25043
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-61575f95-6472-45d5-aba5-daf1509287f9/device-model-fitting-compi-fcde6--and-exact-exports-at-390px-chromium/model-fit-plot-390.png",
+          "sha256": "9a5787b4d91581461267b485cf20ffe5d2a132b05d8dbd1aa9a78044c15a7f79",
+          "bytes": 10731
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-61575f95-6472-45d5-aba5-daf1509287f9/device-model-fitting-compi-fcde6--and-exact-exports-at-390px-chromium/model-fitting-390.png",
+          "sha256": "492c0676cfa846eb977d55544740830994d235fc087e6e9813621237649c2a97",
+          "bytes": 387283
+        },
+        {
+          "path": "/tmp/tdb-parity-browser-61575f95-6472-45d5-aba5-daf1509287f9/device-model-fitting-separ-2ac1f-al-mixed-coordinate-holdout-chromium/energy-fit-support.png",
+          "sha256": "24729383d7f74cc175a92c241cc730d8575bb74ddd6d2cb71900a2c5e7df08f7",
+          "bytes": 643111
+        }
+      ],
+      "source_and_test_files_observed_at_receipt": [
+        {
+          "path": "transistordatabase/device_model_fitting.py",
+          "sha256": "9fc0925b3ab3ef07119b09d18bf83ddb3b027ea5c15918795cbc38d9c0b25a68",
+          "bytes": 27569
+        },
+        {
+          "path": "transistordatabase/gui_web/backend/model_fit_routes.py",
+          "sha256": "275a4345df7a8914ac8bc64770f4c68875fccc5f49dc5f6875e99b84b204cfff",
+          "bytes": 6995
+        },
+        {
+          "path": "transistordatabase/gui_web/src/components/DeviceModelFitting.vue",
+          "sha256": "31a1e4095c888e6bd73b70c5dbea9cc1de06fe6b8542bc944914c76c3a64cc39",
+          "bytes": 19226
+        },
+        {
+          "path": "transistordatabase/gui_web/src/components/DeviceModelFitPlot.vue",
+          "sha256": "06d12e68fad2dcbb7a5f26d5e41f0a1d68b91f5f1539afdced9360774c80b28d",
+          "bytes": 4482
+        },
+        {
+          "path": "transistordatabase/gui_web/src/components/deviceModelInput.js",
+          "sha256": "5962543b8a4bf681a185bffa918a89587c9e48047bdb19f72b33b54497615592",
+          "bytes": 4222
+        },
+        {
+          "path": "tests/test_device_model_fitting.py",
+          "sha256": "567928f54a5875b18930737f6f36f2c8ca329bdbeeeef2c8217801a6b2575e83",
+          "bytes": 18840
+        },
+        {
+          "path": "tests/test_device_model_unknown_temperature_review.py",
+          "sha256": "d773bdaa3ea4081b2f724da892b865555e7f379d8ceb8a6ec62150f3c79d74db",
+          "bytes": 3909
+        },
+        {
+          "path": "tests/test_device_model_execution_review.py",
+          "sha256": "0424a6cf3b7b591c66ace2f68733f1b1b62f1d07946aca548f75a184b6bc36fe",
+          "bytes": 7783
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/unit/DeviceModelFitting.test.js",
+          "sha256": "96e76b9de132cd22fbd0d09e58e3a31e9bd2f4ee8cca4fa932c69aea5a6996a1",
+          "bytes": 11475
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/unit/DeviceModelApi.test.js",
+          "sha256": "101e5dd9496d9b8730b1bffd580e1b09acf5028e11366b4ed73eebb620b3d34d",
+          "bytes": 1358
+        },
+        {
+          "path": "transistordatabase/gui_web/src/tests/e2e/device-model-fitting.spec.js",
+          "sha256": "28f782b457d43448f5531c44f770d95cd7545af3e22a299685bfa8b3821213a3",
+          "bytes": 12766
+        }
+      ],
+      "hash_scope": "The two accepted digests match the acceptance-owner digests. Other hashes identify bytes read during receipt preparation. Shared entry points can change during subsequent work.",
+      "shared_integration_paths_without_run_hash": [
+        "transistordatabase/gui_web/backend/main.py",
+        "transistordatabase/gui_web/src/services/api.js",
+        "transistordatabase/gui_web/src/components/AnalyticalCalculator.vue"
+      ]
+    },
+    {
+      "queue_id": "xyz-import",
+      "accepted_date": "2026-11-11",
+      "scope": "Dated verification snapshot for workflow 6. Import declared three-column energy observations without filling holes or reducing duplicate coordinates.",
+      "source_ids": [
+        "sc-7496258f50c32467",
+        "sc-4d62fb1625d590c7"
+      ],
+      "entry_points": {
+        "python": "transistordatabase.xyz_energy_import.import_xyz_energy_map",
+        "api": "POST /api/analysis/energy-map/xyz",
+        "browser_url": "http://localhost:8002/index.html?view=energy-map",
+        "browser_input": "XYZ",
+        "usage_guide": "docs/api/xyz-energy-import.md"
+      },
+      "method": "xyz-energy-map-v1",
+      "conventions": [
+        "Declare the delimiter, header, three distinct column positions, source units, energy event and one common condition set.",
+        "Current, voltage and known energy use finite nonnegative magnitudes. Recorded zero remains zero. Unknown numeric conditions remain null.",
+        "Ascending returned axes use voltage rows and current columns. The browser matrix displays higher voltage above lower voltage.",
+        "A coordinate without a source row is missing. Blank or declared missing energy is unknown. Every duplicate coordinate is ambiguous, including identical duplicates.",
+        "Only a single known source row supplies an available cell energy. No averaging, summation, interpolation or synthetic zero observation applies.",
+        "Original rows retain line numbers, raw records, lexemes and decimal coordinate identities. Declared units convert to A, V and J."
+      ],
+      "review_export": {
+        "source": "The original-source download preserves supplied file bytes, including a UTF-8 byte order mark and CRLF line endings. Paste mode preserves UTF-8 paste bytes.",
+        "source_sha256": "SHA-256 of the supplied original file bytes or UTF-8 paste bytes, as stated by hash_scope.",
+        "request_sha256": "SHA-256 of UTF-8 canonical JSON containing source_sha256 and validated metadata. Settings: sort_keys=true, ensure_ascii=true, allow_nan=false, separators=[comma,colon].",
+        "response": "The JSON download preserves the successful HTTP response text. Source-row and cell CSV downloads distinguish NULL from zero and protect text cells against spreadsheet formulas.",
+        "invalidation": "Changing the source or declarations invalidates the displayed result and downloads. An earlier in-flight response cannot replace the changed request."
+      },
+      "fixture_results": {
+        "basis": "Calculated fixture values asserted by the recorded compiled-browser run, not measured device data.",
+        "source_units": {"current": "A", "voltage": "V", "energy": "µJ"},
+        "currents_a": [0, 3, 9],
+        "voltages_v": [200, 600],
+        "cells_energy_j": [[0, 0.00003, 0.00006], [0.000012, null, 0.00009]],
+        "source_rows": 5,
+        "available_cells": 5,
+        "missing_cells": 1,
+        "duplicate_probe": "Two rows at 3 A and 600 V retain both observations and return an ambiguous null-energy cell.",
+        "unknown_probe": "One NA energy row at 3 A and 600 V returns an unknown null-energy cell when NA is declared missing."
+      },
+      "verification": {
+        "basis": "Historical acceptance-owner reports recovered before the tool-host reset. Documentation preparation rechecked the three accepted source digests.",
+        "python": {
+          "passed": 208,
+          "scope": "Reported acceptance run. The raw log is unavailable after reset."
+        },
+        "python_focused": {
+          "passed": 63,
+          "scope": "Reported focused verification. Counts can overlap the acceptance run and must not be added."
+        },
+        "vue": {
+          "passed": 461,
+          "files_passed": 43,
+          "scope": "Reported pre-reset run. This is not a claim about subsequent workflow 7 interface edits."
+        },
+        "build": {
+          "passed": true,
+          "modules": 189,
+          "reported_asset_identifiers": ["DM-nKQI0", "C3uOMKmx"],
+          "scope": "Historical build report. Artifact bytes and hashes are unavailable after reset."
+        },
+        "compiled_chromium": {
+          "date": "2026-11-11",
+          "passed": 5,
+          "seconds": 22.5,
+          "widths_px": [1440, 390],
+          "visual_inspection": "The acceptance owner inspected the desktop and mobile matrix screenshots before the tool-host reset.",
+          "checks": [
+            "Rendered cells, axis order, energy values, recorded zero and an explicit hole match the returned matrix.",
+            "Duplicate observations remain visible. Declared NA remains distinct from a missing coordinate and recorded zero.",
+            "Original BOM/CRLF file downloads and SHA-256 match. Reordered TSV columns and declared mA, kV and µJ units convert correctly.",
+            "Successful JSON downloads match HTTP response text. CSV retains source hashes and protects formula-like text.",
+            "Singleton zero, blank energy, identical duplicates and invalid numeric or parser inputs retain their specified distinctions.",
+            "Condition underflow is rejected. Zero and unknown conditions remain distinct.",
+            "Source-byte and axis limits reject excess input. Changed files invalidate results. Stale responses are discarded."
+          ],
+          "artifact_availability": "The recorded run directory is absent after reset. No current screenshot bytes or artifact digests are claimed."
+        },
+        "context_recovery": "The memory worker was unreachable. Earlier bounded Ubuntu transcript recovery found no matching main-project or worktree conversation. Memory claims were not used as scientific evidence."
+      },
+      "accepted_file_sha256": {
+        "transistordatabase/xyz_energy_import.py": "2bb062cab74a102ba98c5d875c9c5279e993cbfe5d1cfd5161991fdb379a3704",
+        "transistordatabase/gui_web/backend/xyz_energy_routes.py": "c89d99a46c3714f397f533ba92bdae1f80dca797a8bb4c28d29368b231d4a731",
+        "transistordatabase/gui_web/backend/finite_json_route.py": "62452692d3fb93ab05299b96ae1e7db670d855aa9daf16643d47a4089f828218"
+      },
+      "source_files_observed_at_receipt": [
+        {"path": "transistordatabase/xyz_energy_import.py", "bytes": 13656},
+        {"path": "transistordatabase/gui_web/backend/xyz_energy_routes.py", "bytes": 5546},
+        {"path": "transistordatabase/gui_web/backend/finite_json_route.py", "bytes": 3113}
+      ],
+      "historical_visual_evidence_without_current_bytes": [
+        "/tmp/tdb-parity-browser-972b66e6-3ef4-479d-8332-11517adeda02/xyz-energy-import-compiled-ea980-d-exact-downloads-at-1440px-chromium/xyz-matrix-1440.png",
+        "/tmp/tdb-parity-browser-972b66e6-3ef4-479d-8332-11517adeda02/xyz-energy-import-compiled-ad3e7-nd-exact-downloads-at-390px-chromium/xyz-matrix-390.png"
+      ],
+      "limits_at_snapshot": {
+        "raw_bytes": 4000000,
+        "http_request_bytes": 6000000,
+        "source_rows": 100000,
+        "current_axis": 256,
+        "voltage_axis": 128,
+        "cells": 16384,
+        "response_bytes": 24000000
+      },
+      "limitations": [
+        "This receipt records software fixtures and source inspection. It does not validate physical device measurements or general scattered-data interpolation.",
+        "Workflow 7 interface edits began after this verification snapshot. Their rendered behavior requires its own compiled-browser and visual verification.",
+        "The version 1.1 remaining-gap appendix and released parity record remain frozen historical baselines. Reconcile live status with current code and the issue tracker."
+      ],
+      "hash_scope": "The importer, route and shared finite-JSON guard matched the accepted digests on 2026-11-11. Mutable interface files have no acceptance-run hash in this receipt."
+    },
+    {
+      "queue_id": "surface",
+      "accepted_date": "2026-11-11",
+      "scope": "Workflow 7 adds a three-axis switching-energy view for prepared source slices and imported XYZ observations. The Python calculation and API did not change.",
+      "source_ids": ["sc-0c9501bd111cf4da", "sc-217d191b91bf2329"],
+      "entry_points": {
+        "browser_url": "http://localhost:8002/index.html?view=energy-map",
+        "usage_guide": "docs/api/grid-analysis.md",
+        "geometry": "transistordatabase/gui_web/src/components/energyScene.js",
+        "scene": "transistordatabase/gui_web/src/components/EnergyScene3D.vue",
+        "slice_evidence": "transistordatabase/gui_web/src/components/EnergySourceSliceEvidence.vue",
+        "prepared_parent": "transistordatabase/gui_web/src/components/EnergyMapWorkbench.vue",
+        "xyz_parent": "transistordatabase/gui_web/src/components/XyzEnergyImportPanel.vue"
+      },
+      "conventions": [
+        "Each finite original observation retains its source identity. Repeated coordinates retain all original values. Unknown energy remains null.",
+        "The axes use current in A, voltage in V and energy in J. Surface connections use four unique available adjacent corners. Prepared corners must also share valid source-slice edges.",
+        "The scene suppresses point drawing above 12000 finite observations and face construction above 65536 current-by-voltage coordinates. Tables expose source identities in pages of 50."
+      ],
+      "verification": {
+        "vue": {"passed": 51, "files_passed": 5, "independent_oracle_cases_included": 7, "peak_kib": 309576, "scene_tests": ["transistordatabase/gui_web/src/tests/unit/EnergyScene3D.test.js", "transistordatabase/gui_web/src/tests/unit/EnergySceneGeometryIndependent.test.js"]},
+        "native_oracle": {"passed": 11},
+        "build": {"passed": true, "modules": 194, "peak_kib": 538032},
+        "compiled_chromium": {"passed": 12, "seconds": 35.9, "peak_kib": 410768, "widths_px": [1440, 390], "scene_tests": "transistordatabase/gui_web/src/tests/e2e/energy-scene-3d.spec.js", "visual_inspection": "The acceptance owner inspected the complete desktop and mobile views and the explicit-cap view."},
+        "node_benchmark": {"source_rows": 100000, "peak_kib": 198400, "scope": "Node geometry benchmark. Browser evidence covers the drawing limit separately."},
+        "context_recovery": "The memory worker was unreachable. The receipt uses the acceptance records and artifact bytes."
+      },
+      "accepted_build_sha256": {
+        "index.html": "de6f134a5e8b9f033fcaba24a98b3b921a6dbe324aff0207bcc98dc462a554ac",
+        "assets/index-BltfurBe.css": "25f3aa07ea10e62b1c379dd2d3d401efb1c6fe6e9c621670bbeb6223315624fa",
+        "assets/index-D-3srB53.js": "4254ef9024e12901b4007a62adf56a4290b955ee70e56f7afb3d7b1fa3557714"
+      },
+      "visual_evidence": [
+        {"path": "/tmp/tdb-parity-browser-97415a89-f2d5-433d-a1f5-094f641f8e21/energy-scene-3d-compiled-o-6d15a-ation-and-surface-at-1440px-chromium/energy-3d-complete-1440.png", "bytes": 143002, "sha256": "8dce24e505dff37df690a6a847945ce3a38b0dccfd4c1d22a1ae7098dd569e09"},
+        {"path": "/tmp/tdb-parity-browser-97415a89-f2d5-433d-a1f5-094f641f8e21/energy-scene-3d-compiled-o-de026-tation-and-surface-at-390px-chromium/energy-3d-complete-390.png", "bytes": 138280, "sha256": "e9311f007e4d135db64f440b7f7d8bb87f4cda092b5869d718d0a5451076d0f9"},
+        {"path": "/tmp/tdb-parity-browser-97415a89-f2d5-433d-a1f5-094f641f8e21/energy-scene-3d-compiled-o-067b7-pages-and-exact-source-hash-chromium/energy-3d-explicit-cap-and-identities.png", "bytes": 533215, "sha256": "1650a49d65cf0c5b9a120a39a17b26f9d86ef2ff09d82e622b11637ccd3a7429"}
+      ]
+    },
+    {
+      "queue_id": "series-output",
+      "accepted_date": "2026-11-11",
+      "scope": "Workflow 8 adds complex current spectra and grouped time and frequency exports from accepted configuration and operating-point pairs.",
+      "source_ids": ["enco-6918ddd45dbe2531", "enco-1c6b96e97d0a62f2", "enco-4b36c6af1581b780"],
+      "entry_points": {
+        "waveform": "transistordatabase.waveform_losses.waveform_spectrum",
+        "grid": "transistordatabase.grid_analysis.evaluate_grid",
+        "grouped_projection": "transistordatabase.grouped_series.project_grouped_series",
+        "api": ["POST /api/waveform/analyze", "POST /api/analysis/grid"],
+        "usage_guides": ["docs/api/waveform-workbench.md", "docs/api/grid-analysis.md"]
+      },
+      "method": "grouped-physical-series-v1",
+      "conventions": [
+        "The spectrum uses uniform samples and coherent-gain-corrected one-sided peak amplitudes. DC and even-length Nyquist retain unit multiplicity. The odd-length final bin keeps multiplicity two.",
+        "Phase in radians uses atan2 and the first sample as its reference. An exactly zero phasor has null phase. The full spectrum and Parseval evidence remain available.",
+        "The first ten bins in ascending frequency with magnitude strictly greater than peak times relative_threshold qualify. The default fraction is 0.1. A threshold of 1 or an all-zero signal yields no selected bins.",
+        "The time export distinguishes arithmetic sample mean, sample standard deviation with N minus one denominator, and discrete RMS from piecewise-linear time mean and RMS.",
+        "The grouped export covers each supplied current, gate voltage, device voltage and bus voltage. It retains source, configuration, operating point, weight, SI unit, statuses, error and input hashes.",
+        "Unrequested spectra, unsupported operations and computed spectra with no retained bins have distinct manifest evidence. The grid preserves failed pairs and applies no phase averaging."
+      ],
+      "review_export": {
+        "opt_in": "Set grouped_series_exports to true on the original grid calculation. Absent or false preserves legacy grid input hashes.",
+        "downloads": "Two bare JSON arrays and two CSV tables come from accepted server rows. The browser downloads their original text. Values retain server numeric representations in JSON. CSV writes NULL and protects formula-like source text.",
+        "limits": {"pairs": 256, "expanded_samples": 200000, "time_rows": 1024, "frequency_rows": 10240, "complete_response_bytes": 24000000}
+      },
+      "verification": {
+        "python_final_focused": {"passed": 23, "independent_cases_included": 8, "seconds": 2.33, "peak_kib": 252300, "files": ["tests/test_harmonics_grouped_series.py", "tests/test_grouped_harmonic_independent.py"]},
+        "python_adjacent": {"passed": 98, "seconds": 5.75, "peak_kib": 329708, "scope": "Earlier adjacent run. Its population overlaps the final focused run. The final focused run also covered the strict product comparison."},
+        "ruff": {"files_passed": 7},
+        "vue": {"passed": 20, "seconds": 3.30, "peak_kib": 238304, "feature_tests": "transistordatabase/gui_web/src/tests/unit/GroupedHarmonics.test.js"},
+        "build": {"passed": true, "modules": 196, "seconds": 3.4, "peak_kib": 545144},
+        "compiled_chromium": {"existing_cases_passed": 6, "final_feature_cases_passed": 2, "final_feature_seconds": 12.6, "final_feature_peak_kib": 316972, "widths_px": [1440, 390], "feature_tests": "transistordatabase/gui_web/src/tests/e2e/grouped-harmonics.spec.js", "visual_inspection": "The acceptance owner inspected the settled 2 A peak at 0.25 Hz on desktop and mobile. The grouped table distinguishes discrete and piecewise-linear RMS."},
+        "independent_checks": [
+          "An alternating sequence plus an impulse yields 17 nonzero bins. The largest is Nyquist. The first ten selected bins are indices 0 through 9.",
+          "A three-sample shifted-time impulse yields final-bin real minus one third, imaginary minus square root of three over three and phase minus two pi over three.",
+          "Samples [18,5] with fraction 0.5652173913043478 retain both bins under the strict peak-product comparison.",
+          "The 4-sample [2,2,2,-2] case retains only 0.25 Hz at threshold 0.5. Its phasor is minus 2j and its phase is minus pi over two.",
+          "Samples [0,2] yield sample standard deviation and discrete RMS of square root of two, and piecewise-linear RMS of two over square root of three.",
+          "Signed source values, scalar bus expansion, empty and failed manifests, canonical input hashes, independent per-series failures and repeated escaped metadata each have an oracle."
+        ]
+      },
+      "accepted_file_sha256": {
+        "transistordatabase/waveform_losses.py": "3d51d76cd0dafc4aa426ce9320b99acf80d310d6712af010f3752e2ba206800e",
+        "transistordatabase/grid_analysis.py": "015d8afc19093593e0e76aa893c32bfcb0ea8ec7acb0c3470164543ba27e2748",
+        "transistordatabase/grouped_series.py": "8eaaef49ac14bd6ccfaba510df8a5d7f6cf6585c8914dec96dd2ae376b6d5fea",
+        "transistordatabase/gui_web/backend/analysis_routes.py": "305851d11888790cb79bd78feeb2ebcbea691d90a28222574dadc7f82e181b2b",
+        "transistordatabase/gui_web/backend/waveform_routes.py": "5b5abbfb2cd5c495ef6ba806fbf10e17cdc2b2b93c523101f032e3375fe53e85",
+        "transistordatabase/gui_web/src/components/GroupedSeriesEvidence.vue": "dacb79bb68d306ed301b2e5e530fe051d47c1ce300266696aec315a75f98370c",
+        "transistordatabase/gui_web/src/components/GridWorkbench.vue": "23dc82b5c8da63597383a2a69af092cc450048c9cc2bc1696cb765981ced8d9b",
+        "transistordatabase/gui_web/src/components/WaveformAnalysisView.vue": "fe63a31e602a97a8a24f2fcc2d2e1194f9c94c8661c21e12feec0ad89aae0375",
+        "transistordatabase/gui_web/src/components/WaveformWorkbench.vue": "84bd2f6c4ec0c31e042f65efa7ed8a7d5f6e6f2b85b9bf48c0b7f365ea57a6a6",
+        "tests/test_grouped_harmonic_independent.py": "4560942bf34e921878789ef275b359a3fd6b915f948296118c7b389bbecd954d",
+        "tests/test_harmonics_grouped_series.py": "f9c6c36a8585b2a35cf4e7e1312be738956cedf9648d4de1a501e94f790f975d"
+      },
+      "accepted_build_sha256": {
+        "index.html": "ef0aca5a598c33eb8327f629f1cd1127aff767c8ce9c289da9d5c232404bd0a2",
+        "assets/index-DrLUS6gu.js": "98ee1dc35e596a763d20c84f029200aa3a5e257a62a948f0de735d68f3dee7f3",
+        "assets/index-BDY7H0Ad.css": "d131bd03770486e143ee9c24cba442a8647d3a55ef137e7ca42416394f6ccd6b"
+      },
+      "visual_evidence_root": "/tmp/tdb-parity-browser-c6f42af5-cf20-47be-9569-00cc3b718aba",
+      "visual_evidence": [
+        {"path": "grouped-harmonics-compiled-b4a2b-and-raw-downloads-at-1440px-chromium/current-spectrum-1440.png", "bytes": 119482, "sha256": "f76f2dc3a714bd904fc00a95c12bd90d889baf19dd1a93264d8ff9b7d1bc953d"},
+        {"path": "grouped-harmonics-compiled-b4a2b-and-raw-downloads-at-1440px-chromium/current-harmonics-1440.png", "bytes": 119482, "sha256": "f76f2dc3a714bd904fc00a95c12bd90d889baf19dd1a93264d8ff9b7d1bc953d"},
+        {"path": "grouped-harmonics-compiled-b4a2b-and-raw-downloads-at-1440px-chromium/grouped-harmonics-1440.png", "bytes": 138404, "sha256": "55e371a640d0105982afed03e835b65c419cccacc572a5de9fb3f360d96ab83a"},
+        {"path": "grouped-harmonics-compiled-b4a2b-and-raw-downloads-at-1440px-chromium/grouped-statistics-values-1440.png", "bytes": 116096, "sha256": "b752b71575a207a042a37f986a1d954e0256709609023286d1a79d5ecdb2046c"},
+        {"path": "grouped-harmonics-compiled-fb269--and-raw-downloads-at-390px-chromium/current-spectrum-390.png", "bytes": 55805, "sha256": "b5bae8e9656088c9bd2e97068e60286678905ae268106a4100381253866365ad"},
+        {"path": "grouped-harmonics-compiled-fb269--and-raw-downloads-at-390px-chromium/current-harmonics-390.png", "bytes": 53658, "sha256": "063842a087128f4c3501be6f2288060515bf6f6c0584e6293510844f9d9c7898"},
+        {"path": "grouped-harmonics-compiled-fb269--and-raw-downloads-at-390px-chromium/grouped-harmonics-390.png", "bytes": 81990, "sha256": "7fc31d402a87c36999b9bc59de8ef707c44b94758180516b4d76ccbd2d2d8fb4"},
+        {"path": "grouped-harmonics-compiled-fb269--and-raw-downloads-at-390px-chromium/grouped-statistics-values-390.png", "bytes": 33025, "sha256": "9bec84ece4086f197ec312d618693e73151876bdac19003b9db81bcf7e84e628"}
+      ],
+      "limitations": ["The fixtures verify software behavior on supplied samples. Device measurement accuracy requires independent physical evidence.", "The memory worker was unavailable. This receipt uses source inspection, tests and captured artifacts."]
+    },
+    {
+      "queue_id": "merit",
+      "accepted_date": "2026-11-11",
+      "scope": "Workflow 9 compares complete waveform-grid configurations using one to four declared power objectives.",
+      "source_ids": [
+        "enco-35deec4ca946d64d",
+        "enco-ff0e2cb8fd29ffd5",
+        "enco-1345987de071cc7d"
+      ],
+      "entry_points": {
+        "grid": "transistordatabase.grid_analysis.evaluate_grid",
+        "merit": "transistordatabase.grid_merit.build_merit",
+        "api": "POST /api/analysis/grid",
+        "view": "Analysis grid",
+        "usage_guide": "docs/api/grid-analysis.md"
+      },
+      "method": "waveform-grid-merit-v1",
+      "conventions": [
+        "Operating-point weights determine each raw full mean in W. Every active objective uses the same complete configuration population.",
+        "Positive objective weights determine relative contributions to the dimensionless score. A zero objective weight contributes zero and leaves the configuration eligible.",
+        "Minimization penalizes the distance above the population minimum. Maximization penalizes the distance below the maximum. Both divide by the full range. A constant range gives zero penalty.",
+        "Lower scores rank first. Equal computed scores share a competition rank. Configuration IDs order each tie. Each extreme lists every tied configuration.",
+        "Excluded active objectives retain null penalties and contributions. Missing positive-weight points remain identifiable even when the reported coverage rounds to one.",
+        "The server rejects a positive normalized weight, penalty or contribution that would round to zero. It constrains the score to the observed range of active penalties."
+      ],
+      "review_export": {
+        "opt_in": "Add objectives to the grid request. An absent or null objectives field preserves the original request hash and response.",
+        "downloads": "The browser downloads the complete JSON array or CSV table returned by the server. Every row retains both hashes, population IDs, direction, weights, raw mean, extrema, coverage and contribution.",
+        "limits": {
+          "configurations": 32,
+          "operating_points": 64,
+          "pairs": 256,
+          "objectives": 4,
+          "merit_rows": 128,
+          "complete_response_bytes": 24000000
+        }
+      },
+      "verification": {
+        "python_final": {
+          "passed": 96,
+          "seconds": 6.16,
+          "peak_kib": 295236,
+          "merit_cases": 19,
+          "independent_merit_cases": 5,
+          "adjacent_grid_cases": 28,
+          "adjacent_harmonics_cases": 15,
+          "adjacent_energy_cases": 22,
+          "adjacent_independent_grid_cases": 7
+        },
+        "ruff": {
+          "files_passed": 5
+        },
+        "independent_checks": [
+          "The A and B power fixtures give conduction means of 25 W and 20 W and turn-on means of 4 W and 8 W. Minimize weights of 1 and 3 give scores of 0.25 and 0.75.",
+          "For minimize ranges from 0 to 2 W, a middle mean of 5e-324 W would yield a false zero penalty. A separate positive contribution can also underflow. Both cases fail explicitly.",
+          "Three unit penalties with objective weights 0.01, 0.01 and 4 give exactly 1. The complete fixture gives ranks 1, 1 and 3.",
+          "A missing point with weight 1e-30 leaves rounded coverage at 1. The incomplete configuration remains excluded and retains null contributions in JSON and CSV.",
+          "A 32-configuration fixture with four constant objectives preserves all 128 audit rows and all tied Unicode identifiers in JSON and CSV."
+        ],
+        "vue": {
+          "passed": 29,
+          "seconds": 6.15,
+          "peak_kib": 246864
+        },
+        "build": {
+          "passed": true,
+          "modules": 198,
+          "seconds": 10.97,
+          "peak_kib": 526992
+        },
+        "compiled_chromium": {
+          "passed": 7,
+          "seconds": 47,
+          "peak_kib": 420552,
+          "widths_px": [
+            1440,
+            390
+          ],
+          "feature_tests": "transistordatabase/gui_web/src/tests/e2e/grid-merit.spec.js",
+          "visual_inspection": "The acceptance owner inspected the desktop and mobile ranking captures. The bars show A at 0.25 and B at 0.75. The raw means are 25 W and 4 W for A and 20 W and 8 W for B. The excluded configuration shows unavailable evidence."
+        }
+      },
+      "accepted_file_sha256": {
+        "transistordatabase/grid_merit.py": "5a734f327b4f0c29123c1eec0216480d9ae87c851a274655de5a882d92c0a238",
+        "transistordatabase/grid_analysis.py": "4dd4fcefdc3914c4e951bc649b746cb034642c95575408517cbe12c5038dd485",
+        "transistordatabase/grouped_series.py": "8eaaef49ac14bd6ccfaba510df8a5d7f6cf6585c8914dec96dd2ae376b6d5fea",
+        "transistordatabase/gui_web/backend/analysis_routes.py": "d19e581613d2706388825715d069aa3898ea931f7ee496bcfb17e096f0de9dc9",
+        "transistordatabase/gui_web/backend/finite_json_route.py": "62452692d3fb93ab05299b96ae1e7db670d855aa9daf16643d47a4089f828218",
+        "tests/test_grid_merit.py": "685805f4cb868834df134d31e95cc59d1c39f914f1c405946f9d19d89fb9f351",
+        "tests/test_grid_merit_boundaries.py": "baeea83f319af744b3974d03866d7bb7cdacc496162e654052273e5b95c68f06",
+        "transistordatabase/gui_web/src/components/GridWorkbench.vue": "ef6116a9161bbeaef64c29fd2a7e04c622c6e1a9103113c3ed4f177bb8b30ebe",
+        "transistordatabase/gui_web/src/components/MeritAnalysisEvidence.vue": "21709c48895881395b77942d251908fd800c07b9866815ae1e49898e14fc7355",
+        "transistordatabase/gui_web/src/services/api.js": "3c4754a2dcb547f8255f2bcf8da4680e5b20d22a34ac0954e5de7613b1c41899",
+        "transistordatabase/gui_web/src/tests/unit/MeritAnalysis.test.js": "e5031ced22de4cdbf5f4047ec6cd0b08ba16b654c6ce0aa785aa4c9c127e9fde",
+        "transistordatabase/gui_web/src/tests/unit/MeritAnalysisApi.test.js": "a434eec2f4596c0bcf8d538b27bc6a0b13af0822cd6c3d0500a2ecbe752e7013",
+        "transistordatabase/gui_web/src/tests/e2e/grid-merit.spec.js": "bf01d1128c673b6db123443ee5b78328aecef97e951bae35dc8144ae6b6bb3c3"
+      },
+      "limitations": [
+        "These calculated fixtures verify the declared comparison policy. Device measurement accuracy needs independent physical evidence.",
+        "Rounding can cause a last-digit difference between a score and the sum of exported contributions. A conservative metadata estimate can reject long identities before export.",
+        "The project memory bridge was unavailable. Source inspection, test results and compiled browser artifacts provide the acceptance evidence."
+      ],
+      "visual_evidence_root": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e",
+      "visual_evidence": [
+        {
+          "path": "grid-merit-compiled-weight-982c4-omplete-population-at-390px-chromium/merit-definition-390.png",
+          "bytes": 77513,
+          "sha256": "f66d5733217ba540d7c1e03258fd0fdc1573f28b1d8ec687aef206ac46bae696"
+        },
+        {
+          "path": "grid-merit-compiled-weight-982c4-omplete-population-at-390px-chromium/merit-ranking-390.png",
+          "bytes": 49066,
+          "sha256": "aa6d16861e05ec679ccb8c11ffe922aca980cb55cb8acca85c792abdfaa9e26f"
+        },
+        {
+          "path": "grid-merit-compiled-weight-982c4-omplete-population-at-390px-chromium/merit-values-390.png",
+          "bytes": 64024,
+          "sha256": "86193d7cddcccf6a2bd9c2ce92380210a27b1b20f869c9e0a80d89f3c4f16eff"
+        },
+        {
+          "path": "grid-merit-compiled-weight-a2f38-mplete-population-at-1440px-chromium/merit-definition-1440.png",
+          "bytes": 172021,
+          "sha256": "f8d54f270ff64fed5cb0ca7b8d50b644b85e708d5e3de7feeed3c2866f5fdf58"
+        },
+        {
+          "path": "grid-merit-compiled-weight-a2f38-mplete-population-at-1440px-chromium/merit-ranking-1440.png",
+          "bytes": 136068,
+          "sha256": "5291e6ec89ef004846c2d362c4debe503652c0e3e6d09fa106af8849e4389bb7"
+        },
+        {
+          "path": "grid-merit-compiled-weight-a2f38-mplete-population-at-1440px-chromium/merit-values-1440.png",
+          "bytes": 133755,
+          "sha256": "235623b6553a2684d32cb52af4d95e9d89e7235d399f16a9246c648cd5001a53"
+        }
+      ],
+      "accepted_build_sha256": {
+        "index.html": "efe06cd9864ca8a349774436094e2a4bb6d117941a3a5165ceba2d89743a011c",
+        "assets/index--DRVIGjY.js": "42403f960b8bd65f154e8797a748c2bff5a6ed63f8cc47ac4d560397157affd9",
+        "assets/index-DUhDaYVX.css": "48f8f9ea66275793b0366e8af8d760f00ceb5ccab6b55db2e96f3f78c0480e40"
+      }
+    },
+    {
+      "queue_id": "device-thermal-rollup",
+      "accepted_date": "2026-11-11",
+      "scope": "Workflow 10 binds one converter calculation to explicit physical members, die owners, junction owners and independent ideal-fixed-sink paths.",
+      "source_ids": [
+        "enco-6201203722e7f211",
+        "sc-ae25213abbd6b0bf"
+      ],
+      "entry_points": {
+        "python": "transistordatabase.circuit_summary.analyze_circuit_summary",
+        "api": "POST /api/converters/circuit-summary",
+        "browser_url": "http://localhost:8002/index.html?view=converter",
+        "usage_guide": "docs/api/semiconductor-circuit-summary.md"
+      },
+      "method": "explicit-physical-ownership-fixed-sink-v1",
+      "conventions": [
+        "The wrapper evaluates the converter once. Per-member values are not multiplied by role multiplicity again.",
+        "Conduction and switching currents remain independent. Positive, negative and finite zero-current events use explicit owners.",
+        "Die and junction ownership are independent. Negative current can belong to a channel. A shared junction requires the same explicit ID.",
+        "Physical-owner energies are aggregated before division by duration. Unknown or omitted loss remains null. Empty known subtotals do not become fabricated zero.",
+        "Known heat remains available without a thermal path. Full temperature requires sourced paths, heat coverage and complete physical inventory.",
+        "The full maximum retains all tied hottest junctions. Acknowledged known-heat-only temperature remains separate from full temperature.",
+        "The boundary is an ideal fixed sink with constant heat. Iteration is not-required-constant-heat. No shared-sink rise, electrothermal feedback or Foster transient is claimed.",
+        "Canonical request and converter SHA-256 identify normalized inputs. The nullable upstream digest is caller-declared and not verified against source bytes."
+      ],
+      "review_export": {
+        "json": "Original server core-result JSON text.",
+        "csv": "Original server junction rows with NULL and formula-safe text, linked to JSON by canonical input SHA-256.",
+        "limits": {
+          "input_bytes": 4000000,
+          "response_bytes": 24000000,
+          "members": 128,
+          "junctions_per_member": 128
+        },
+        "preflight": "Input, evidence metadata and event/segment and omission/member/junction expansion are bounded before electrical evaluation. Shared converter checks also protect standalone analyze."
+      },
+      "verification": {
+        "python_final_selected": {
+          "passed": 1869,
+          "skipped": 1,
+          "failed": 0,
+          "errors": 0,
+          "files": 64,
+          "duration_seconds": 112.31,
+          "measured_seconds": 117.99,
+          "peak_rss_kib": 566244,
+          "swaps": 0,
+          "junit_tests": 1870,
+          "junit_time_seconds": 112.176,
+          "log": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776.log",
+          "junit": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776.xml",
+          "selection": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776-selection.json",
+          "skip_name": "tests.test_measurement_import_independent::test_fresh_ltspice_binary_complete_waveform_and_native_archive",
+          "skip_reason": "TDB_GENERIC_DPT_RAW is not configured; original November 10 RAW fixture is unavailable for this run. Previous pass remains historical evidence only."
+        },
+        "circuit_cases_in_final_selected": {
+          "counts_by_file": {
+            "tests/test_circuit_summary.py": 27,
+            "tests/test_circuit_summary_independent_review.py": 7
+          },
+          "total": 34,
+          "scope": "Included in the aggregate count. Do not add again."
+        },
+        "vue_final": {
+          "passed": 504,
+          "failed": 0,
+          "files": 50,
+          "duration_seconds": 57.1,
+          "measured_seconds": 60.98,
+          "peak_rss_kib": 362148,
+          "swaps": 0,
+          "log": "/tmp/tdb-vue-final-20261111-143408-circuit.log"
+        },
+        "build": {
+          "passed": true,
+          "duration_seconds": 17.07,
+          "measured_seconds": 18.45,
+          "peak_rss_kib": 534324,
+          "assets": {
+            "index.html": "ab6606e3fd9d486a99d94af29b77890565ee00c46d30edc638e3f985a0c59059",
+            "assets/index-CcpTzzUv.css": "253325253c0dd9d59bb752dcce3c3080d6cf77f580e6bce27c45601535980663",
+            "assets/index-C38dULHp.js": "e626230ff4add851354693df94f4692663eeda371bf518230f6214e27fa97f7b"
+          },
+          "warning": "Existing Vite chunk-size warning above 500 kB"
+        },
+        "compiled_chromium": {
+          "passed": 8,
+          "duration_seconds": 43.6,
+          "measured_seconds": 52.69,
+          "peak_rss_kib": 354376,
+          "artifact_root": "/tmp/tdb-parity-browser-1ca4d127-0a8d-44f4-9ad4-41b94006821f",
+          "widths_px": [
+            1440,
+            390
+          ],
+          "basis": "Acceptance-owner verified result. Raw eight-case log was not retained.",
+          "visual_inspection": "The acceptance owner inspected the ba2243 desktop, mobile and partial-known-heat captures. Their byte-identical retained copies appear below."
+        },
+        "final_post_guard_compiled": {
+          "passed": 3,
+          "duration_seconds": 14.4,
+          "measured_seconds": 16.9,
+          "peak_rss_kib": 316148,
+          "swaps": 0,
+          "log": "/tmp/tdb-browser-final-20261111-f3fa0e35-15e1-4f92-a958-b03636001441.log",
+          "scope": "Compiled desktop/mobile physical summary and DAB distinct-signal charts/exports after final backend restart"
+        },
+        "headless": {
+          "pass": true,
+          "core": "transistordatabase.core.models.Transistor",
+          "science_modules": [
+            "catalog_fom",
+            "catalog_sources",
+            "grid_analysis",
+            "energy_maps",
+            "biela",
+            "channel_models",
+            "semiconductor_assemblies",
+            "converter_losses",
+            "plecs_document",
+            "measurement_import",
+            "static_losses",
+            "device_parameters",
+            "thermal",
+            "condition_tables",
+            "digitization",
+            "plecs_core_export",
+            "native_export",
+            "legacy_mat",
+            "waveform_losses",
+            "analytical_models",
+            "gate_resistance",
+            "workbook_fom",
+            "rg_formula",
+            "semiconductor_stress",
+            "current_allocation",
+            "reverse_current_sharing",
+            "rg_energy_access",
+            "device_model_fitting",
+            "xyz_energy_import",
+            "grouped_series",
+            "grid_merit",
+            "circuit_summary"
+          ],
+          "science_module_count": 32,
+          "routes": 94,
+          "qt_loaded": []
+        },
+        "ruff": {
+          "passed": true,
+          "findings": 0,
+          "scope": "All transistordatabase production Python plus final converter/circuit test files"
+        },
+        "independent_checks": [
+          "Two positions each dissipate 1 J and 1 W over 1 s. Circuit total is 2 J and 2 W. Independent 10 K/W paths from 25 degrees Celsius give tied 35 degree junctions.",
+          "Omitted diode loss leaves full power and full temperature null. Acknowledgement exposes separate known-heat-only 35 degree estimates.",
+          "Cold boundaries, sourced zero resistance, missing resistance, negative channel ownership and finite E(0) retain distinct meanings.",
+          "Unknown die ownership can retain valid junction temperature. Unknown junction ownership retains unallocated heat and incomplete maximum coverage.",
+          "Owner energy aggregation preserves representable small values. Oversized repeated event/source and omission metadata rejects before engine evaluation."
+        ]
+      },
+      "accepted_file_sha256": {
+        "transistordatabase/converter_losses.py": "5a30a7f06f3cd33e0c38a048c0647566cc36df953ddc4c57d2031e82dac2357d",
+        "transistordatabase/circuit_summary.py": "79e0f5a72cc67cc213b540532d57cfc427d7a9881776b7ec040532277c917165",
+        "transistordatabase/thermal.py": "3feae846500afd05bbf4b2a5e27a92ffa2ebd55f2f342d04511da5e55d10c4ad",
+        "transistordatabase/gui_web/backend/converter_routes.py": "9c1e40fff7eb63ef2d100173f25231a69ff0121dc9b367facd6b099479c12498",
+        "transistordatabase/gui_web/backend/finite_json_route.py": "62452692d3fb93ab05299b96ae1e7db670d855aa9daf16643d47a4089f828218",
+        "transistordatabase/gui_web/src/components/CircuitPhysicalSummary.vue": "71ba4c29c34c3d3639dc3077ac1a2f606d08c4d85fafc684e26f5e2a27e5f136",
+        "transistordatabase/gui_web/src/components/circuitSummaryForm.js": "7e34d5e30d841b02074d172fe098d00e19a993ce2985307abe5fa3c5232aeb0c",
+        "transistordatabase/gui_web/src/components/ConverterWorkbench.vue": "31e8a4b61cb23d830025d41b601f555020744871429876d41b1ab4cc105580e1",
+        "transistordatabase/gui_web/src/components/converterForm.js": "60f0030aa0062183ad52d6d1f826720dc46418235e9d34bfba6661f140325047",
+        "transistordatabase/gui_web/src/services/circuitSummaryApi.js": "f85843f02370316da9f40bc964fc9241165adfffc64dec106dc932ce657e159b",
+        "transistordatabase/gui_web/src/tests/unit/CircuitPhysicalSummary.test.js": "8b3917b90308de69955ee5b7738e77fd0410391e0afea4c766058738aade85e0",
+        "transistordatabase/gui_web/src/tests/unit/CircuitSummaryApi.test.js": "83c40f78a63fe88785b786d8c8f7aa9f8a84fc5960b2bbca397dfc3b62c9a6af",
+        "transistordatabase/gui_web/src/tests/unit/ConverterWorkbench.test.js": "1b4c55a63cbfe607cc3083a1e4613bd912dbc5645bf31b2ea30a222fc0ec9b21",
+        "transistordatabase/gui_web/src/tests/e2e/circuit-physical-summary.spec.js": "cb69643e31a7f316e5325dd30b3cb8ced7558a8f60594dea5c762c3cf4ef667c",
+        "transistordatabase/gui_web/src/tests/e2e/converter-workbench.spec.js": "c045b414219afa9833a62db0fb933e4fc58e4b587390db009b626e3d9842a468",
+        "tests/test_circuit_summary.py": "79307096675cf80caffccf97616e0e7b21b6c092c8249908a9b6608373e6af2b",
+        "tests/test_circuit_summary_independent_review.py": "413860e7f5d98763f603f2366917507175daaa4c8f3bc09725f93e5068e8b5bf",
+        "tests/test_converter_losses.py": "d3e6e878846568170a7dd99ad69489ef9f85b9c841a16f187ebf96e409313448",
+        "docs/api/semiconductor-circuit-summary.md": "c5d5abbc6aff97bee955ba92eeb4cccadc1ca155bbc3421097a0f42af81afd92"
+      },
+      "accepted_build_sha256": {
+        "index.html": "ab6606e3fd9d486a99d94af29b77890565ee00c46d30edc638e3f985a0c59059",
+        "assets/index-CcpTzzUv.css": "253325253c0dd9d59bb752dcce3c3080d6cf77f580e6bce27c45601535980663",
+        "assets/index-C38dULHp.js": "e626230ff4add851354693df94f4692663eeda371bf518230f6214e27fa97f7b"
+      },
+      "visual_evidence": [
+        {
+          "source_path": "/tmp/tdb-parity-browser-ba2243cc-58aa-4d68-adfd-d9f90c267220/circuit-physical-summary-c-640e9-e-and-exact-audit-downloads-chromium/circuit-desktop.png",
+          "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/circuit-desktop.png",
+          "bytes": 119540,
+          "sha256": "0fd2d50d2380a19726e6198522c13ff15bc8528452c292de0d3555df949b5274"
+        },
+        {
+          "source_path": "/tmp/tdb-parity-browser-ba2243cc-58aa-4d68-adfd-d9f90c267220/circuit-physical-summary-c-14ede-e-and-exact-audit-downloads-chromium/circuit-mobile.png",
+          "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/circuit-mobile.png",
+          "bytes": 90223,
+          "sha256": "2f86f2967da7f611a6e584e4b686985fb9c5aea3ed9c0190cf392a38422e1ea7"
+        },
+        {
+          "source_path": "/tmp/tdb-parity-browser-ba2243cc-58aa-4d68-adfd-d9f90c267220/circuit-physical-summary-c-8af5a--and-negative-channel-owner-chromium/circuit-partial-known-heat-ack.png",
+          "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/circuit-partial-known-heat-ack.png",
+          "bytes": 143866,
+          "sha256": "675fc6ead25c9743aa611307ee49ac4acd51faca6edf1277c75d2269ff811241"
+        }
+      ],
+      "retained_verification_summary": {
+        "source_path": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776-summary.json",
+        "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-verification-summary.json",
+        "bytes": 4306,
+        "sha256": "6b9054c6f81cd283326f931729292cabcb7de3235fffbfcbf5f1464d62e7570b"
+      },
+      "limitations": [
+        "Calculated fixtures verify software behavior. Physical device accuracy requires measurements and declared operating conditions.",
+        "TDB_GENERIC_DPT_RAW is not configured; original November 10 RAW fixture is unavailable for this run. Previous pass remains historical evidence only.",
+        "The earlier memory bridge was unavailable. No automatic capture health is claimed."
+      ]
+    }
+  ]
+}

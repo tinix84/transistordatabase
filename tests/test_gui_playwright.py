@@ -187,9 +187,22 @@ class TestPlotEndpoints:
         assert "curves" in content or "error" in content or "not found" in content.lower()
 
 
+def _vue_server_available() -> bool:
+    """Check if Vue dev server is running on port 5173."""
+    import socket
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        result = sock.connect_ex(('localhost', 5173))
+        sock.close()
+        return result == 0
+    except OSError:
+        return False
+
+
 # Integration test example (requires full setup)
 @pytest.mark.e2e
 @pytest.mark.slow
+@pytest.mark.skipif(not _vue_server_available(), reason="Vue dev server not running on port 5173")
 class TestFullWebInterface:
     """Tests for the full web interface (requires Vue frontend on port 5173)."""
 

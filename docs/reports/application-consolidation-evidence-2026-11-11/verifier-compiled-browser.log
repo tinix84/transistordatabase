@@ -1,0 +1,17 @@
+
+Running 13 tests using 1 worker
+
+[1A[2K[1/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/circuit-physical-summary.spec.js:24:37 › compiled desktop physical fixture and exact audit downloads
+[1A[2K[2/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/circuit-physical-summary.spec.js:24:37 › compiled mobile physical fixture and exact audit downloads
+[1A[2K[3/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/circuit-physical-summary.spec.js:51:1 › compiled explicit unknowns, omissions, cold sink, zero resistance, shared junction and negative channel owner
+[1A[2K[4/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/circuit-physical-summary.spec.js:83:1 › compiled suppresses late responses and rejects raw thermal underflow before inventing zero
+[1A[2K[5/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/dpt-contract.spec.js:17:1 › real DPT endpoint renders and downloads the disclosed two-pulse circuit
+[1A[2K[6/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/dpt-contract.spec.js:48:1 › DPT rejects invalid resistance and discards an in-flight result after input changes
+[1A[2K[7/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/dpt-contract.spec.js:74:1 › compiled DPT template remains usable on a narrow screen
+[1A[2K[8/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/topology-migration.spec.js:68:3 › topology migration browser workflow › submits and exports scalar Boost CCM switching-loss-balanced result
+[1A[2K[9/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/topology-pareto-workflows.spec.js:67:1 › screens the notebook Boost boundary in the browser and exports provenance
+[1A[2K[10/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/topology-pareto-workflows.spec.js:124:1 › sends the browser Pareto request to the running FastAPI endpoint
+[1A[2K[11/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/waveform-workbench.spec.js:14:1 › real pre-edge waveform losses, linked views and reproducible downloads
+[1A[2K[12/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/waveform-workbench.spec.js:53:1 › real explicit masks preserve two final blanks and FFT uses a separate frequency view
+[1A[2K[13/13] [chromium] › ../../../transistordatabase-integration-audit-20261111/browser-8003-entrypoint-57876578-f75f-4604-8bbb-b94717415892/e2e/waveform-workbench.spec.js:69:1 › compiled mobile waveform view rejects unselected estimates and fits the viewport
+[1A[2K  13 passed (36.9s)

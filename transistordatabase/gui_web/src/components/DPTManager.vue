@@ -2,14 +2,13 @@
   <div class="dpt-manager">
     <h2>Double Pulse Test (DPT) Manager</h2>
     <p class="description">
-      Generate LTspice netlists for double pulse testing and validate measurement data
-      against datasheet specifications.
+      Inspect stored switching data and generate a two-pulse LTspice circuit template.
     </p>
 
     <!-- Transistor Selector -->
     <div class="transistor-selector">
       <label>Select Transistor:</label>
-      <select
+      <select aria-label="DPT transistor label"
         v-model="selectedTransistorId"
         :disabled="rawImportSaving || dptEnergySaving"
         @change="loadDPTData"
@@ -53,30 +52,34 @@
 
         <div v-if="dptData" class="data-overview">
           <div class="status-grid">
-            <div class="status-card" :class="{ available: dptData.has_e_on }">
-              <div class="status-icon">{{ dptData.has_e_on ? '✅' : '❌' }}</div>
+            <div class="status-card" :class="{ available: dptData.has_recorded_e_on ?? dptData.has_e_on }">
+              <div class="status-icon">{{ (dptData.has_recorded_e_on ?? dptData.has_e_on) ? '✅' : '❌' }}</div>
               <div class="status-label">Turn-On Energy (E_on)</div>
               <div class="status-text">
-                {{ dptData.has_e_on ? 'Available' : 'Not available' }}
+                {{ dptData.has_e_on ? 'Available (DPT evidence)' : dptData.has_recorded_e_on ? 'Available (source unknown)' : 'Not available' }}
               </div>
             </div>
 
-            <div class="status-card" :class="{ available: dptData.has_e_off }">
-              <div class="status-icon">{{ dptData.has_e_off ? '✅' : '❌' }}</div>
+            <div class="status-card" :class="{ available: dptData.has_recorded_e_off ?? dptData.has_e_off }">
+              <div class="status-icon">{{ (dptData.has_recorded_e_off ?? dptData.has_e_off) ? '✅' : '❌' }}</div>
               <div class="status-label">Turn-Off Energy (E_off)</div>
               <div class="status-text">
-                {{ dptData.has_e_off ? 'Available' : 'Not available' }}
+                {{ dptData.has_e_off ? 'Available (DPT evidence)' : dptData.has_recorded_e_off ? 'Available (source unknown)' : 'Not available' }}
               </div>
             </div>
 
-            <div class="status-card" :class="{ available: dptData.has_e_rr }">
-              <div class="status-icon">{{ dptData.has_e_rr ? '✅' : '❌' }}</div>
+            <div class="status-card" :class="{ available: dptData.has_recorded_e_rr ?? dptData.has_e_rr }">
+              <div class="status-icon">{{ (dptData.has_recorded_e_rr ?? dptData.has_e_rr) ? '✅' : '❌' }}</div>
               <div class="status-label">Reverse Recovery (E_rr)</div>
               <div class="status-text">
-                {{ dptData.has_e_rr ? 'Available' : 'Not available' }}
+                {{ dptData.has_e_rr ? 'Available (DPT evidence)' : dptData.has_recorded_e_rr ? 'Available (source unknown)' : 'Not available' }}
               </div>
             </div>
           </div>
+
+          <p v-if="(dptData.has_recorded_e_on && !dptData.has_e_on) || (dptData.has_recorded_e_off && !dptData.has_e_off) || (dptData.has_recorded_e_rr && !dptData.has_e_rr)" data-testid="dpt-curve-source-status">
+            Recorded switching curves remain available. Their DPT source is unknown without structured event evidence.
+          </p>
 
           <!-- Metadata -->
           <div v-if="dptData.metadata" class="metadata-section">
@@ -941,22 +944,33 @@
         <h3>LTspice DPT Netlist Generator</h3>
 
         <div class="config-form">
+          <p class="model-disclosure">
+            This template uses an uncalibrated generic NMOS with illustrative fixed
+            capacitances and idealized diodes. The selected transistor name is a label
+            only; it does not supply a vendor model or predict that device's losses.
+            Gate steering diodes introduce a voltage drop. Pulse 1 uses ideal I·L/V;
+            actual current differs because of gate delays and circuit losses.
+          </p>
+          <label class="model-choice">
+            <input v-model="genericSelected" type="checkbox" />
+            Use the uncalibrated generic NMOS template
+          </label>
           <div class="form-grid">
             <div class="form-section">
               <h4>Circuit Parameters</h4>
               <div class="form-row">
-                <label>DC Bus Voltage:</label>
-                <input v-model.number="dptConfig.v_dc" type="number" step="10" />
+                <label for="dpt-v_dc">DC Bus Voltage:</label>
+                <input id="dpt-v_dc" v-model.number="dptConfig.v_dc" type="number" step="10" />
                 <span class="unit">V</span>
               </div>
               <div class="form-row">
-                <label>Target Current:</label>
-                <input v-model.number="dptConfig.i_target" type="number" step="1" />
+                <label for="dpt-i_target">Target Current:</label>
+                <input id="dpt-i_target" v-model.number="dptConfig.i_target" type="number" step="1" />
                 <span class="unit">A</span>
               </div>
               <div class="form-row">
-                <label>Load Inductance:</label>
-                <input v-model.number="dptConfig.l_load" type="number" step="10e-6" />
+                <label for="dpt-l_load">Load Inductance:</label>
+                <input id="dpt-l_load" v-model.number="dptConfig.l_load" type="number" step="10e-6" />
                 <span class="unit">H</span>
               </div>
             </div>
@@ -964,23 +978,23 @@
             <div class="form-section">
               <h4>Gate Drive</h4>
               <div class="form-row">
-                <label>R_g Turn-On:</label>
-                <input v-model.number="dptConfig.r_g_on" type="number" step="0.5" />
+                <label for="dpt-r_g_on">R_g Turn-On:</label>
+                <input id="dpt-r_g_on" v-model.number="dptConfig.r_g_on" type="number" step="0.5" />
                 <span class="unit">Ω</span>
               </div>
               <div class="form-row">
-                <label>R_g Turn-Off:</label>
-                <input v-model.number="dptConfig.r_g_off" type="number" step="0.5" />
+                <label for="dpt-r_g_off">R_g Turn-Off:</label>
+                <input id="dpt-r_g_off" v-model.number="dptConfig.r_g_off" type="number" step="0.5" />
                 <span class="unit">Ω</span>
               </div>
               <div class="form-row">
-                <label>V_gate On:</label>
-                <input v-model.number="dptConfig.v_g_on" type="number" step="1" />
+                <label for="dpt-v_g_on">V_gate On:</label>
+                <input id="dpt-v_g_on" v-model.number="dptConfig.v_g_on" type="number" step="1" />
                 <span class="unit">V</span>
               </div>
               <div class="form-row">
-                <label>V_gate Off:</label>
-                <input v-model.number="dptConfig.v_g_off" type="number" step="1" />
+                <label for="dpt-v_g_off">V_gate Off:</label>
+                <input id="dpt-v_g_off" v-model.number="dptConfig.v_g_off" type="number" step="1" />
                 <span class="unit">V</span>
               </div>
             </div>
@@ -988,19 +1002,19 @@
             <div class="form-section">
               <h4>Timing</h4>
               <div class="form-row">
-                <label>Dead Time:</label>
-                <input v-model.number="dptConfig.t_dead" type="number" step="1e-6" />
+                <label for="dpt-t_dead">Dead Time:</label>
+                <input id="dpt-t_dead" v-model.number="dptConfig.t_dead" type="number" step="1e-6" />
                 <span class="unit">s</span>
               </div>
               <div class="form-row">
-                <label>Pulse 2 Duration:</label>
-                <input v-model.number="dptConfig.t_pulse2" type="number" step="1e-6" />
+                <label for="dpt-t_pulse2">Pulse 2 Duration:</label>
+                <input id="dpt-t_pulse2" v-model.number="dptConfig.t_pulse2" type="number" step="1e-6" />
                 <span class="unit">s</span>
               </div>
             </div>
           </div>
 
-          <button @click="generateNetlist" :disabled="generating" class="btn-generate">
+          <button @click="generateNetlist" :disabled="generating || !genericSelected" class="btn-generate">
             {{ generating ? 'Generating...' : 'Generate LTspice Netlist' }}
           </button>
         </div>
@@ -1014,11 +1028,14 @@
                 📋 Copy to Clipboard
               </button>
               <button @click="downloadNetlist" class="btn-download">
-                💾 Download .asc file
+                💾 Download .cir file
               </button>
             </div>
           </div>
-          <pre class="netlist-content">{{ generatedNetlist.netlist }}</pre>
+          <p class="model-disclosure">{{ generatedNetlist.model_disclosure }}</p>
+          <p>Ideal first-pulse plateau: {{ (generatedNetlist.ideal_first_pulse_s * 1e6).toFixed(6) }} µs.
+            Integration and simulation are separate operations; this download runs no simulator.</p>
+          <pre aria-label="Generated DPT netlist" class="netlist-content">{{ generatedNetlist.netlist }}</pre>
         </div>
       </div>
 
@@ -1093,7 +1110,7 @@
     </div>
 
     <!-- Error Display -->
-    <div v-if="error" class="error-message">
+    <div v-if="error" role="alert" class="error-message">
       <strong>Error:</strong> {{ error }}
     </div>
   </div>
@@ -1122,6 +1139,8 @@ export default {
     const comparisonColors = ['#2563eb', '#dc2626', '#7c3aed', '#ea580c', '#059669', '#9333ea']
     const generating = ref(false)
     const validating = ref(false)
+    const genericSelected = ref(false)
+    let revision = 0
     const error = ref(null)
     const rawImportFileInput = ref(null)
     const rawImportFile = ref(null)
@@ -2213,6 +2232,17 @@ export default {
       return comparisonColors[index % comparisonColors.length]
     }
 
+    watch([dptConfig, selectedTransistorId, genericSelected], () => {
+      revision += 1
+      generatedNetlist.value = null
+      error.value = null
+    }, { deep: true, flush: 'sync' })
+
+    function errorMessage(err) {
+      const detail = err.response?.data?.detail
+      return typeof detail === 'string' ? detail : err.message
+    }
+
     onMounted(async () => {
       try {
         const transistors = await transistorApi.getAll()
@@ -2230,6 +2260,7 @@ export default {
       if (!requestedTransistorId) return
       const requestVersion = ++dptDataRequestVersion.value
 
+      validationResults.value = null
       try {
         error.value = null
         const response = await transistorApi.getDPTData(
@@ -2259,18 +2290,21 @@ export default {
     }
 
     async function generateNetlist() {
-      if (!selectedTransistorId.value) return
+      if (!selectedTransistorId.value || !genericSelected.value) return
 
+      const token = revision
+      generatedNetlist.value = null
       generating.value = true
       error.value = null
 
       try {
-        generatedNetlist.value = await transistorApi.generateDPTNetlist(
+        const result = await transistorApi.generateDPTNetlist(
           selectedTransistorId.value,
-          dptConfig.value
+          { ...dptConfig.value, model_kind: 'generic_nmos' }
         )
+        if (token === revision) generatedNetlist.value = result
       } catch (err) {
-        error.value = 'Failed to generate netlist: ' + err.message
+        if (token === revision) error.value = 'Failed to generate netlist: ' + errorMessage(err)
       } finally {
         generating.value = false
       }
@@ -2279,13 +2313,15 @@ export default {
     async function validateData() {
       if (!selectedTransistorId.value) return
 
+      const selected = selectedTransistorId.value
       validating.value = true
       error.value = null
 
       try {
-        validationResults.value = await transistorApi.validateDPTData(selectedTransistorId.value)
+        const result = await transistorApi.validateDPTData(selected)
+        if (selected === selectedTransistorId.value) validationResults.value = result
       } catch (err) {
-        error.value = 'Failed to validate data: ' + err.message
+        if (selected === selectedTransistorId.value) error.value = 'Failed to validate data: ' + errorMessage(err)
       } finally {
         validating.value = false
       }
@@ -2306,7 +2342,7 @@ export default {
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `${generatedNetlist.value.transistor_name}_DPT.asc`
+      link.download = generatedNetlist.value.filename
       link.click()
       URL.revokeObjectURL(url)
     }
@@ -2382,6 +2418,7 @@ export default {
       importRawDptMeasurement,
       dptConfig,
       generating,
+      genericSelected,
       validating,
       error,
       generatedNetlist,
@@ -2436,6 +2473,7 @@ h2 {
 /* Tabs */
 .tab-nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 20px;
   border-bottom: 2px solid #e0e0e0;
@@ -2908,7 +2946,7 @@ h2 {
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 30px;
   margin-bottom: 30px;
 }
@@ -2980,6 +3018,8 @@ h2 {
 
 .netlist-header {
   display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
@@ -3011,6 +3051,25 @@ h2 {
 .btn-copy:hover,
 .btn-download:hover {
   background: #1976D2;
+}
+
+.model-disclosure {
+  padding: 12px;
+  background: #fff5df;
+  line-height: 1.55;
+}
+
+.model-choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 24px;
+}
+
+@media (max-width: 600px) {
+  .dpt-manager, .tab-panel { padding: 12px; }
+  .form-row { grid-template-columns: minmax(0, 1fr) 85px 24px; }
+  .netlist-actions { flex-wrap: wrap; }
 }
 
 .netlist-content {

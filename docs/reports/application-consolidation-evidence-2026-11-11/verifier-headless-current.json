@@ -1,0 +1,663 @@
+{
+  "pass": true,
+  "created_utc": "2026-11-11T15:53:36.407329+00:00",
+  "clone": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111",
+  "git_head": "546faaeb6840d3b188d7f09e8c88be67e06075d1",
+  "working_tree_has_tracked_changes": true,
+  "core": "transistordatabase.core.models.Transistor",
+  "science_modules": [
+    "catalog_fom",
+    "catalog_sources",
+    "grid_analysis",
+    "energy_maps",
+    "biela",
+    "channel_models",
+    "semiconductor_assemblies",
+    "converter_losses",
+    "plecs_document",
+    "measurement_import",
+    "static_losses",
+    "device_parameters",
+    "thermal",
+    "condition_tables",
+    "digitization",
+    "plecs_core_export",
+    "native_export",
+    "legacy_mat",
+    "waveform_losses",
+    "analytical_models",
+    "gate_resistance",
+    "workbook_fom",
+    "rg_formula",
+    "semiconductor_stress",
+    "current_allocation",
+    "reverse_current_sharing",
+    "rg_energy_access",
+    "device_model_fitting",
+    "xyz_energy_import",
+    "grouped_series",
+    "grid_merit",
+    "circuit_summary"
+  ],
+  "science_module_count": 32,
+  "module_paths_all_inside_clone": true,
+  "module_sources": [
+    {
+      "module": "transistordatabase",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/__init__.py",
+      "sha256": "f99eead47afffed80f585b2d240413f3047f4277748fcc10397cb6bd820cfef1"
+    },
+    {
+      "module": "transistordatabase.core",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/core/__init__.py",
+      "sha256": "b2112fb9d9600bebfe74be09c1a496171621dec2f4a5364194123e52f1989cfd"
+    },
+    {
+      "module": "transistordatabase.catalog_fom",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/catalog_fom.py",
+      "sha256": "4065cb46138f382428daf50300ef5f12c7eddf006af3200843f1496c313b6a83"
+    },
+    {
+      "module": "transistordatabase.catalog_sources",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/catalog_sources.py",
+      "sha256": "445312c6f99951db871f20a8f48d9d39515fc933f97c633ff3660aa213ae010c"
+    },
+    {
+      "module": "transistordatabase.grid_analysis",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/grid_analysis.py",
+      "sha256": "4dd4fcefdc3914c4e951bc649b746cb034642c95575408517cbe12c5038dd485"
+    },
+    {
+      "module": "transistordatabase.energy_maps",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/energy_maps.py",
+      "sha256": "047d8a226fb6d6b9f5698874534c64fe0c6a66f6834c2ad75659eae7f94168b1"
+    },
+    {
+      "module": "transistordatabase.biela",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/biela.py",
+      "sha256": "9b90701f2f41c49a5c1b3ac19a80a35bcfa65e7fed2601cd8568dffce845e979"
+    },
+    {
+      "module": "transistordatabase.channel_models",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/channel_models.py",
+      "sha256": "9c8334715dfda4809e24e28badffc8fdf76ff8cabc900dceda57553bc0ce2b39"
+    },
+    {
+      "module": "transistordatabase.semiconductor_assemblies",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/semiconductor_assemblies.py",
+      "sha256": "408d16d5ccc73f37af0d8d4d0c3593666e8988e81bd95e5fd97d7f7d3e704d30"
+    },
+    {
+      "module": "transistordatabase.converter_losses",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/converter_losses.py",
+      "sha256": "5a30a7f06f3cd33e0c38a048c0647566cc36df953ddc4c57d2031e82dac2357d"
+    },
+    {
+      "module": "transistordatabase.plecs_document",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/plecs_document.py",
+      "sha256": "42657785fbe214e00c752f402b2a92c323bda3d04d401bf9c73160535970ce79"
+    },
+    {
+      "module": "transistordatabase.measurement_import",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/measurement_import.py",
+      "sha256": "d4420ab07ba424934d1ccb8ffc4d9532d797f92ff47e020f0a8fd08748939aaf"
+    },
+    {
+      "module": "transistordatabase.static_losses",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/static_losses.py",
+      "sha256": "fe85b008252b2bc1788c86abc0b4ea0312f9875e41eac2248c0722e1f2c3573c"
+    },
+    {
+      "module": "transistordatabase.device_parameters",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/device_parameters.py",
+      "sha256": "432df1a5524ce528a1ee2d0af467d576896bad90d6d596921ab2490dc8bf4982"
+    },
+    {
+      "module": "transistordatabase.thermal",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/thermal.py",
+      "sha256": "3feae846500afd05bbf4b2a5e27a92ffa2ebd55f2f342d04511da5e55d10c4ad"
+    },
+    {
+      "module": "transistordatabase.condition_tables",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/condition_tables.py",
+      "sha256": "5c08322fa87d0d08fa4ebfa6d143228c07e4a8a53bfa50ac9bf9db9400fb5d40"
+    },
+    {
+      "module": "transistordatabase.digitization",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/digitization.py",
+      "sha256": "a0a24741352000af593bc2c2520ed0c9f4d0cb997e47dbf0677a5a8d28c86158"
+    },
+    {
+      "module": "transistordatabase.plecs_core_export",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/plecs_core_export.py",
+      "sha256": "d7fff7dfb07983123f5176fb8cb0d25c68e0cf35bd2e15f3305c30f971d4a5e8"
+    },
+    {
+      "module": "transistordatabase.native_export",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/native_export.py",
+      "sha256": "73eab272d9048d6af2ddd0dc13b0c5aef7228496d1698a97591db755bb63b169"
+    },
+    {
+      "module": "transistordatabase.legacy_mat",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/legacy_mat.py",
+      "sha256": "c6056c0eb687e5642bf4f58138b21819092d3d6a893197a5fc2e162d3dab9e49"
+    },
+    {
+      "module": "transistordatabase.waveform_losses",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/waveform_losses.py",
+      "sha256": "3d51d76cd0dafc4aa426ce9320b99acf80d310d6712af010f3752e2ba206800e"
+    },
+    {
+      "module": "transistordatabase.analytical_models",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/analytical_models.py",
+      "sha256": "dd3c159cb2e92c5edd316f9e7c42d807e2e1035a100a2167d5a56d1899996600"
+    },
+    {
+      "module": "transistordatabase.gate_resistance",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/gate_resistance.py",
+      "sha256": "e1fbb3d3441ebe6a8a9374edbf165b4cb29a808c36f53921767f56ffac3d295f"
+    },
+    {
+      "module": "transistordatabase.workbook_fom",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/workbook_fom.py",
+      "sha256": "cd788403b06892848ad5eb0bdf99669ca2fe90030fa500abf7bb3d755155ec27"
+    },
+    {
+      "module": "transistordatabase.rg_formula",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/rg_formula.py",
+      "sha256": "6f08bb1a4f2c084f3f55000b6f55c93d58114c0983d114388fb2c0fd65d242e1"
+    },
+    {
+      "module": "transistordatabase.semiconductor_stress",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/semiconductor_stress.py",
+      "sha256": "3c02b02af9111ba18e0f12b5007ae79d532c7d0d0d2b6f9b592fcfe1c816b641"
+    },
+    {
+      "module": "transistordatabase.current_allocation",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/current_allocation.py",
+      "sha256": "9148d94bab751532e447658396c71a1af7a8ebe4dad9dd9857401b665e54951b"
+    },
+    {
+      "module": "transistordatabase.reverse_current_sharing",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/reverse_current_sharing.py",
+      "sha256": "bdfa533809ac7fa7c90e88a2f1a6189756428ec27a673b8533963ce7f65d8cc8"
+    },
+    {
+      "module": "transistordatabase.rg_energy_access",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/rg_energy_access.py",
+      "sha256": "1d0db9b6f3e035eac0a78a33ebd8c4858e83d07cb8e5df39b66d6c4002b8ae8f"
+    },
+    {
+      "module": "transistordatabase.device_model_fitting",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/device_model_fitting.py",
+      "sha256": "9fc0925b3ab3ef07119b09d18bf83ddb3b027ea5c15918795cbc38d9c0b25a68"
+    },
+    {
+      "module": "transistordatabase.xyz_energy_import",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/xyz_energy_import.py",
+      "sha256": "2bb062cab74a102ba98c5d875c9c5279e993cbfe5d1cfd5161991fdb379a3704"
+    },
+    {
+      "module": "transistordatabase.grouped_series",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/grouped_series.py",
+      "sha256": "8eaaef49ac14bd6ccfaba510df8a5d7f6cf6585c8914dec96dd2ae376b6d5fea"
+    },
+    {
+      "module": "transistordatabase.grid_merit",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/grid_merit.py",
+      "sha256": "5a734f327b4f0c29123c1eec0216480d9ae87c851a274655de5a882d92c0a238"
+    },
+    {
+      "module": "transistordatabase.circuit_summary",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/circuit_summary.py",
+      "sha256": "79e0f5a72cc67cc213b540532d57cfc427d7a9881776b7ec040532277c917165"
+    },
+    {
+      "module": "transistordatabase.gui_web.backend.main",
+      "path": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/transistordatabase/gui_web/backend/main.py",
+      "sha256": "3710ebd535dd60c2ac0c84738c64af90846c7ec63386ec17a605ba97e21b2671"
+    }
+  ],
+  "qt_import_blocker": [
+    "PyQt5",
+    "PyQt6",
+    "PySide2",
+    "PySide6",
+    "qtpy"
+  ],
+  "blocked_qt_attempts": [],
+  "qt_loaded": [],
+  "route_objects": 109,
+  "api_method_path_count": 104,
+  "api_method_paths": [
+    [
+      "DELETE",
+      "/api/transistor-record"
+    ],
+    [
+      "DELETE",
+      "/api/transistors/{transistor_id}"
+    ],
+    [
+      "DELETE",
+      "/api/transistors/{transistor_id}/curves/thermal/{component}"
+    ],
+    [
+      "DELETE",
+      "/api/transistors/{transistor_id}/curves/{component}/{curve_type}/{index}"
+    ],
+    [
+      "GET",
+      "/api/catalog/sources"
+    ],
+    [
+      "GET",
+      "/api/converters/presets"
+    ],
+    [
+      "GET",
+      "/api/database/backup"
+    ],
+    [
+      "GET",
+      "/api/devices/"
+    ],
+    [
+      "GET",
+      "/api/devices/{device_id}/pairs"
+    ],
+    [
+      "GET",
+      "/api/favorites/list"
+    ],
+    [
+      "GET",
+      "/api/measurement/capabilities"
+    ],
+    [
+      "GET",
+      "/api/pairs/"
+    ],
+    [
+      "GET",
+      "/api/pairs/export/csv"
+    ],
+    [
+      "GET",
+      "/api/pairs/{pair_id}"
+    ],
+    [
+      "GET",
+      "/api/pairs/{pair_id}/validate"
+    ],
+    [
+      "GET",
+      "/api/plecs/core/{transistor_id}/contexts"
+    ],
+    [
+      "GET",
+      "/api/plots/channel/{transistor_id}"
+    ],
+    [
+      "GET",
+      "/api/plots/gate_charge/{transistor_id}"
+    ],
+    [
+      "GET",
+      "/api/plots/soa/{transistor_id}"
+    ],
+    [
+      "GET",
+      "/api/plots/switching/{transistor_id}"
+    ],
+    [
+      "GET",
+      "/api/plots/thermal/{transistor_id}"
+    ],
+    [
+      "GET",
+      "/api/settings/user"
+    ],
+    [
+      "GET",
+      "/api/topology/recommendations"
+    ],
+    [
+      "GET",
+      "/api/transistor-record"
+    ],
+    [
+      "GET",
+      "/api/transistors"
+    ],
+    [
+      "GET",
+      "/api/transistors/{transistor_id}"
+    ],
+    [
+      "GET",
+      "/api/transistors/{transistor_id}/curves"
+    ],
+    [
+      "GET",
+      "/api/transistors/{transistor_id}/dpt_data"
+    ],
+    [
+      "GET",
+      "/api/transistors/{transistor_id}/export/{format}/preview"
+    ],
+    [
+      "GET",
+      "/api/transistors/{transistor_id}/rg-energy"
+    ],
+    [
+      "POST",
+      "/api/analysis/energy-map"
+    ],
+    [
+      "POST",
+      "/api/analysis/energy-map/xyz"
+    ],
+    [
+      "POST",
+      "/api/analysis/grid"
+    ],
+    [
+      "POST",
+      "/api/analysis/thermal-handoff"
+    ],
+    [
+      "POST",
+      "/api/analytical/biela"
+    ],
+    [
+      "POST",
+      "/api/analytical/gate_charge"
+    ],
+    [
+      "POST",
+      "/api/assemblies/analyze"
+    ],
+    [
+      "POST",
+      "/api/assemblies/reverse-sharing"
+    ],
+    [
+      "POST",
+      "/api/catalog-sources/coefficients"
+    ],
+    [
+      "POST",
+      "/api/catalog-sources/diff"
+    ],
+    [
+      "POST",
+      "/api/catalog-sources/links"
+    ],
+    [
+      "POST",
+      "/api/catalog-sources/preview"
+    ],
+    [
+      "POST",
+      "/api/catalog-sources/snapshot"
+    ],
+    [
+      "POST",
+      "/api/catalog/screen"
+    ],
+    [
+      "POST",
+      "/api/comparison/advanced"
+    ],
+    [
+      "POST",
+      "/api/converters/analyze"
+    ],
+    [
+      "POST",
+      "/api/converters/circuit-summary"
+    ],
+    [
+      "POST",
+      "/api/database/backup/restore"
+    ],
+    [
+      "POST",
+      "/api/database/backup/validate"
+    ],
+    [
+      "POST",
+      "/api/digitizer/image"
+    ],
+    [
+      "POST",
+      "/api/digitizer/transform"
+    ],
+    [
+      "POST",
+      "/api/dpt/generate_netlist"
+    ],
+    [
+      "POST",
+      "/api/favorites/add"
+    ],
+    [
+      "POST",
+      "/api/favorites/remove"
+    ],
+    [
+      "POST",
+      "/api/import/plecs"
+    ],
+    [
+      "POST",
+      "/api/mat/array"
+    ],
+    [
+      "POST",
+      "/api/mat/calculate"
+    ],
+    [
+      "POST",
+      "/api/mat/export"
+    ],
+    [
+      "POST",
+      "/api/mat/finalize"
+    ],
+    [
+      "POST",
+      "/api/mat/preview"
+    ],
+    [
+      "POST",
+      "/api/measurement/extract"
+    ],
+    [
+      "POST",
+      "/api/measurement/preview"
+    ],
+    [
+      "POST",
+      "/api/models/evaluate"
+    ],
+    [
+      "POST",
+      "/api/models/train"
+    ],
+    [
+      "POST",
+      "/api/parameters/calculate"
+    ],
+    [
+      "POST",
+      "/api/plecs/core/{transistor_id}/export"
+    ],
+    [
+      "POST",
+      "/api/plecs/core/{transistor_id}/preview"
+    ],
+    [
+      "POST",
+      "/api/plecs/export"
+    ],
+    [
+      "POST",
+      "/api/plecs/finalize"
+    ],
+    [
+      "POST",
+      "/api/plecs/preview"
+    ],
+    [
+      "POST",
+      "/api/settings/user/reset"
+    ],
+    [
+      "POST",
+      "/api/stress/calculate"
+    ],
+    [
+      "POST",
+      "/api/thermal/analyze"
+    ],
+    [
+      "POST",
+      "/api/topology/calculate"
+    ],
+    [
+      "POST",
+      "/api/topology/compare"
+    ],
+    [
+      "POST",
+      "/api/topology/pareto"
+    ],
+    [
+      "POST",
+      "/api/transistors"
+    ],
+    [
+      "POST",
+      "/api/transistors/batch_export"
+    ],
+    [
+      "POST",
+      "/api/transistors/compare"
+    ],
+    [
+      "POST",
+      "/api/transistors/search/advanced"
+    ],
+    [
+      "POST",
+      "/api/transistors/upload"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/curves/capacitance/{cap_type}"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/curves/channel"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/curves/gate_charge"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/curves/soa"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/curves/switching/{loss_type}"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/curves/thermal/{component}"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/curves/validate"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/dpt_energy/preview"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/dpt_energy/save"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/dpt_raw_import"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/dpt_raw_import/preview"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/dpt_raw_import/trace_preview"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/dpt_validate"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/export/{format}"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/rg-energy"
+    ],
+    [
+      "POST",
+      "/api/transistors/{transistor_id}/validate"
+    ],
+    [
+      "POST",
+      "/api/waveform/analyze"
+    ],
+    [
+      "POST",
+      "/api/waveform/gate-allocation"
+    ],
+    [
+      "PUT",
+      "/api/settings/user"
+    ],
+    [
+      "PUT",
+      "/api/transistor-record"
+    ],
+    [
+      "PUT",
+      "/api/transistors/{transistor_id}"
+    ],
+    [
+      "PUT",
+      "/api/transistors/{transistor_id}/curves/thermal/{component}"
+    ],
+    [
+      "PUT",
+      "/api/transistors/{transistor_id}/curves/{component}/{curve_type}/{index}"
+    ]
+  ],
+  "python_executable": "/home/tinix/miniconda3/envs/ntbees2/bin/python",
+  "python_version": "3.13.12",
+  "runtime_versions": {
+    "numpy": "2.4.4",
+    "scipy": "1.17.1",
+    "fastapi": "0.136.3",
+    "pydantic": "2.12.5",
+    "matplotlib": "3.10.8",
+    "uvicorn": "0.49.0",
+    "spicelib": "1.6.4"
+  },
+  "historical_proof": "/home/tinix/claude_wsl/transistordatabase-consolidation-20261111/docs/reports/semiconductor-parity-evidence-2026-11-11/final-headless.json",
+  "historical_proof_sha256": "e5c16445785e6bf5d032e260ad2d8ba41c4857da71e8cbfa3563eab697a9a124"
+}

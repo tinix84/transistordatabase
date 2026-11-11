@@ -234,7 +234,7 @@ describe('TransistorForm.vue', () => {
     })
 
     it('should show create transistor title', () => {
-      expect(wrapper.text()).toContain('Create New Transistor')
+      expect(wrapper.get('h2').text()).toBe('Create New Transistor')
     })
 
     it('should have empty form fields', () => {
@@ -316,12 +316,15 @@ describe('TransistorForm.vue', () => {
   })
 
   describe('Data Structure', () => {
-    it('should handle metadata section', () => {
+    it('should handle metadata section', async () => {
       wrapper = mount(TransistorForm, {
         props: { transistor: mockTransistor1 }
       })
+      await flushPromises()
 
-      expect(wrapper.html()).toMatch(/Metadata|Name|Manufacturer/)
+      expect(wrapper.get('label[for="name"]').text()).toBe('Name *')
+      expect(wrapper.get('#name').element.value).toBe(mockTransistor1.metadata.name)
+      expect(wrapper.get('#manufacturer').element.value).toBe(mockTransistor1.metadata.manufacturer)
     })
 
     it('should handle electrical ratings section', () => {

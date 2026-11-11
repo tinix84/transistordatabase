@@ -118,10 +118,9 @@ nav:
       - Transient Thermal Comparison Sprint: sprints/sprint-web-transient-thermal-comparison.md
       - Transient Thermal Curve Workflow Sprint: sprints/sprint-web-transient-thermal-curve-workflow.md
   - Architecture:
-      - Overview: architecture/overview.md
-      - Core Design: architecture/core-design.md
-      - Service Layer: architecture/services.md
-      - GUI Architecture: architecture/gui.md
+      - Generated Reference: ARCHITECTURE.md
+      - Project Design Notes: reference/project-architecture-notes.md
+      - Project Requirements Notes: reference/project-requirements-notes.md
   - Development:
       - Contributing: development/contributing.md
       - Testing: development/testing.md

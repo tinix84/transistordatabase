@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-11",
+  "scope": "Byte-identical retained copies of explicit final verification logs and reviewed workflow 7 through 10 captures. Historical receipts remain unchanged.",
+  "artifacts": [
+    {
+      "source_path": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776.log",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-python.log",
+      "bytes": 6870,
+      "sha256": "667fc3834fa96060dc203037f66d486fab8ad2ffefcc51fa981579ed00bd5965"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776.xml",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-python.xml",
+      "bytes": 256057,
+      "sha256": "158d698ce152a86efe4b8b457c068dabe34e1a702b90f3f7bb790c75ebcf491b"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776-selection.json",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-python-selection.json",
+      "bytes": 2703,
+      "sha256": "a7752d531c86c73dd2ae0a676716ecbf1d7cc203a0a0f32abeb85daa289baccf"
+    },
+    {
+      "source_path": "/tmp/tdb-vue-final-20261111-143408-circuit.log",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-vue.log",
+      "bytes": 15523,
+      "sha256": "4bb4827c1314c42166a0196afc6d9b7a1c38bea091a8dc11f14d7eebc0f30002"
+    },
+    {
+      "source_path": "/tmp/tdb-headless-final-20261111-e6c30199-e643-4bf0-83a7-36293132e340.json",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-headless.json",
+      "bytes": 889,
+      "sha256": "e5c16445785e6bf5d032e260ad2d8ba41c4857da71e8cbfa3563eab697a9a124"
+    },
+    {
+      "source_path": "/tmp/tdb-browser-final-20261111-f3fa0e35-15e1-4f92-a958-b03636001441.log",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-post-guard-browser.log",
+      "bytes": 1574,
+      "sha256": "ad078b631e6208b3d4ed69dca629e4f1b504630e8cf1246bb621b92130957159"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-97415a89-f2d5-433d-a1f5-094f641f8e21/energy-scene-3d-compiled-o-6d15a-ation-and-surface-at-1440px-chromium/energy-3d-complete-1440.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/surface-energy-3d-complete-1440.png",
+      "bytes": 143002,
+      "sha256": "8dce24e505dff37df690a6a847945ce3a38b0dccfd4c1d22a1ae7098dd569e09"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-97415a89-f2d5-433d-a1f5-094f641f8e21/energy-scene-3d-compiled-o-de026-tation-and-surface-at-390px-chromium/energy-3d-complete-390.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/surface-energy-3d-complete-390.png",
+      "bytes": 138280,
+      "sha256": "e9311f007e4d135db64f440b7f7d8bb87f4cda092b5869d718d0a5451076d0f9"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-97415a89-f2d5-433d-a1f5-094f641f8e21/energy-scene-3d-compiled-o-067b7-pages-and-exact-source-hash-chromium/energy-3d-explicit-cap-and-identities.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/surface-energy-3d-explicit-cap-and-identities.png",
+      "bytes": 533215,
+      "sha256": "1650a49d65cf0c5b9a120a39a17b26f9d86ef2ff09d82e622b11637ccd3a7429"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-c6f42af5-cf20-47be-9569-00cc3b718aba/grouped-harmonics-compiled-b4a2b-and-raw-downloads-at-1440px-chromium/current-spectrum-1440.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/series-output-current-spectrum-1440.png",
+      "bytes": 119482,
+      "sha256": "f76f2dc3a714bd904fc00a95c12bd90d889baf19dd1a93264d8ff9b7d1bc953d"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-c6f42af5-cf20-47be-9569-00cc3b718aba/grouped-harmonics-compiled-fb269--and-raw-downloads-at-390px-chromium/current-spectrum-390.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/series-output-current-spectrum-390.png",
+      "bytes": 55805,
+      "sha256": "b5bae8e9656088c9bd2e97068e60286678905ae268106a4100381253866365ad"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e/grid-merit-compiled-weight-982c4-omplete-population-at-390px-chromium/merit-definition-390.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/merit-merit-definition-390.png",
+      "bytes": 77513,
+      "sha256": "f66d5733217ba540d7c1e03258fd0fdc1573f28b1d8ec687aef206ac46bae696"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e/grid-merit-compiled-weight-982c4-omplete-population-at-390px-chromium/merit-ranking-390.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/merit-merit-ranking-390.png",
+      "bytes": 49066,
+      "sha256": "aa6d16861e05ec679ccb8c11ffe922aca980cb55cb8acca85c792abdfaa9e26f"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e/grid-merit-compiled-weight-982c4-omplete-population-at-390px-chromium/merit-values-390.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/merit-merit-values-390.png",
+      "bytes": 64024,
+      "sha256": "86193d7cddcccf6a2bd9c2ce92380210a27b1b20f869c9e0a80d89f3c4f16eff"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e/grid-merit-compiled-weight-a2f38-mplete-population-at-1440px-chromium/merit-definition-1440.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/merit-merit-definition-1440.png",
+      "bytes": 172021,
+      "sha256": "f8d54f270ff64fed5cb0ca7b8d50b644b85e708d5e3de7feeed3c2866f5fdf58"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e/grid-merit-compiled-weight-a2f38-mplete-population-at-1440px-chromium/merit-ranking-1440.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/merit-merit-ranking-1440.png",
+      "bytes": 136068,
+      "sha256": "5291e6ec89ef004846c2d362c4debe503652c0e3e6d09fa106af8849e4389bb7"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-57934b20-9574-474a-b04e-05cbbbf96f3e/grid-merit-compiled-weight-a2f38-mplete-population-at-1440px-chromium/merit-values-1440.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/merit-merit-values-1440.png",
+      "bytes": 133755,
+      "sha256": "235623b6553a2684d32cb52af4d95e9d89e7235d399f16a9246c648cd5001a53"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-ba2243cc-58aa-4d68-adfd-d9f90c267220/circuit-physical-summary-c-640e9-e-and-exact-audit-downloads-chromium/circuit-desktop.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/circuit-desktop.png",
+      "bytes": 119540,
+      "sha256": "0fd2d50d2380a19726e6198522c13ff15bc8528452c292de0d3555df949b5274"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-ba2243cc-58aa-4d68-adfd-d9f90c267220/circuit-physical-summary-c-14ede-e-and-exact-audit-downloads-chromium/circuit-mobile.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/circuit-mobile.png",
+      "bytes": 90223,
+      "sha256": "2f86f2967da7f611a6e584e4b686985fb9c5aea3ed9c0190cf392a38422e1ea7"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-browser-ba2243cc-58aa-4d68-adfd-d9f90c267220/circuit-physical-summary-c-8af5a--and-negative-channel-owner-chromium/circuit-partial-known-heat-ack.png",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/circuit-partial-known-heat-ack.png",
+      "bytes": 143866,
+      "sha256": "675fc6ead25c9743aa611307ee49ac4acd51faca6edf1277c75d2269ff811241"
+    },
+    {
+      "source_path": "/tmp/tdb-parity-final-20261111-d61f36db-7506-4ec9-a48d-d82ba40e8776-summary.json",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/final-verification-summary.json",
+      "bytes": 4306,
+      "sha256": "6b9054c6f81cd283326f931729292cabcb7de3235fffbfcbf5f1464d62e7570b"
+    },
+    {
+      "source_path": "C:\\Users\\tinix\\.codex\\visualizations\\2026\\10\\15\\01a14167-12e0-7b50-8854-30a2da5da2fe\\wsl-diagnosis-20261111\\ubuntu-memory-incident.md",
+      "retained_path": "docs/reports/semiconductor-parity-evidence-2026-11-11/ubuntu-memory-incident.md",
+      "bytes": 4360,
+      "sha256": "05df3d72970e49ea10d1df3c6ae4a639442eb4b6d8552482121ee2dfef160cea"
+    }
+  ]
+}

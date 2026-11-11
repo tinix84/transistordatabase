@@ -119,16 +119,35 @@ def _json_dict_to_legacy_transistor(transistor_dict: dict):
     )
 
 
+class RepositoryPathError(ValueError):
+    """A preserved device identity cannot safely name a repository storage file."""
+
+
 class JsonTransistorRepository(TransistorRepository):
     """File-based repository using JSON storage."""
     
     def __init__(self, data_directory: Path):
         self.data_directory = Path(data_directory)
         self.data_directory.mkdir(parents=True, exist_ok=True)
+
+    def _storage_path(self, name: str) -> Path:
+        """Reject unsafe names and resolved links without rewriting device identity."""
+        if (not isinstance(name, str) or not name.strip() or name in (".", "..")
+                or any(character in name for character in ("/", "\\", ":"))
+                or any(ord(character) < 32 for character in name)):
+            raise RepositoryPathError("Device identity must be a single relative storage name without path separators or traversal")
+        try:
+            root = self.data_directory.resolve()
+            candidate = (self.data_directory / f"{name}.json").resolve()
+        except (OSError, RuntimeError) as exc:
+            raise RepositoryPathError("Device storage path cannot be resolved safely") from exc
+        if candidate.parent != root:
+            raise RepositoryPathError("Resolved device storage path must stay within the exact repository directory")
+        return candidate
     
     def get_by_name(self, name: str) -> Optional[Transistor]:
         """Get transistor by name from JSON file."""
-        file_path = self.data_directory / f"{name}.json"
+        file_path = self._storage_path(name)
         if not file_path.exists():
             return None
         
@@ -137,7 +156,7 @@ class JsonTransistorRepository(TransistorRepository):
     
     def save(self, transistor: Transistor) -> None:
         """Save transistor to JSON file."""
-        file_path = self.data_directory / f"{transistor.metadata.name}.json"
+        file_path = self._storage_path(transistor.metadata.name)
         loader = JsonTransistorLoader()
         loader.save_to_json(transistor, file_path)
     
@@ -158,46 +177,38 @@ class JsonTransistorRepository(TransistorRepository):
 class JsonTransistorLoader(ITransistorLoader):
     """JSON-based transistor loader.
 
-    Uses the adapter bridge to load JSON files through the legacy Transistor
-    constructor (which handles full numpy array conversion and validation),
-    then converts the result to a core Transistor via ``legacy_to_core()``.
+    Save complete versioned core data without legacy manufacturer/housing lists.
+    Existing flat legacy JSON remains readable through the compatibility bridge.
     """
 
     def load_from_json(self, file_path: Path) -> Transistor:
-        """Load transistor from JSON file via adapter bridge.
-
-        Pipeline: JSON dict -> numpy conversion -> legacy Transistor
-        -> ``legacy_to_core()`` -> core Transistor.
-        """
-        from .adapters import legacy_to_core
-
+        """Load native core JSON, or the established flat legacy representation."""
         with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
+        return self.load_from_dict(data)
 
-        legacy = _json_dict_to_legacy_transistor(data)
+    def load_from_dict(self, data: dict) -> Transistor:
+        """Load decoded JSON in memory, rejecting unknown or malformed native schemas."""
+        from copy import deepcopy
+        from .adapters import legacy_to_core
+        from .serialization import core_from_json_document
+
+        if not isinstance(data, dict):
+            raise ValueError("Transistor JSON must be an object")
+        if "schema" in data or ("version" in data and "transistor" in data):
+            return core_from_json_document(data)
+
+        legacy = _json_dict_to_legacy_transistor(deepcopy(data))
         return legacy_to_core(legacy)
 
     def save_to_json(self, transistor: Transistor, file_path: Path) -> None:
-        """Save core transistor to JSON file via adapter bridge.
+        """Save all core values and source provenance without legacy coercion."""
+        from .serialization import core_to_json_document
 
-        Pipeline: core Transistor -> ``core_to_legacy_dicts()`` -> legacy
-        Transistor -> ``convert_to_dict()`` -> JSON.
-        """
-        from .adapters import core_to_legacy_dicts
-        from transistordatabase.transistor import Transistor as LegacyTransistor
-
-        t_args, sw_args, di_args = core_to_legacy_dicts(transistor)
-        housing_types = _load_data_file("housing_types.txt")
-        manufacturers = _load_data_file("module_manufacturers.txt")
-        legacy = LegacyTransistor(
-            t_args, sw_args, di_args, housing_types, manufacturers,
-        )
-        legacy_dict = legacy.convert_to_dict()
-        if "_id" in legacy_dict:
-            del legacy_dict["_id"]
+        document = core_to_json_document(transistor)
 
         with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(legacy_dict, f, indent=2)
+            json.dump(document, f, indent=2, allow_nan=False)
 
     @staticmethod
     def _json_serializer(obj: Any) -> Any:
