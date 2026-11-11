@@ -29,6 +29,52 @@ retain direction, original sample interval, source and cumulative energy bounds;
 thermal adapters should consume these polynomials unchanged. Plot samples are
 illustrations generated from those same polynomials.
 
+## Hysteretic gate states
+
+Select `events.mode: "hysteresis"` to derive sampled states with a deadband.
+The allocation panel accepts the same `digitizer` settings under `gate.mode: "hysteresis"`.
+Existing binary and single-threshold policies retain their behavior.
+
+```json
+{
+  "mode": "hysteresis",
+  "digitizer": {
+    "thresholds": {"scale": "absolute", "low_v": 2.5, "high_v": 7.5},
+    "initial_state": false
+  }
+}
+```
+
+A gate voltage strictly above `high_v` sets the state on.
+A voltage strictly below `low_v` sets the state off.
+Equality and the deadband retain the previous sampled state.
+Without `initial_state`, sample zero must be strictly outside the band.
+Otherwise, declare its state explicitly.
+A declared state that contradicts an outside-band first sample is rejected.
+There is no event before sample zero.
+
+Relative thresholds require `scale: "relative"`, `low_fraction`, `high_fraction`,
+`minimum_v`, and `maximum_v` instead of absolute threshold fields.
+The fractions satisfy `0 <= low_fraction < high_fraction <= 1`.
+The finite calibrated voltage bounds satisfy `minimum_v < maximum_v`.
+The selected reference is explicit. The tool does not infer calibration from observed extrema.
+Constant traces remain valid with a valid declared calibration or absolute thresholds.
+A first sample on or inside the band still requires an initial state.
+Resolved thresholds must remain distinct in the supported numeric range.
+
+For `[0,8,4,6,4,2,10]` V with bounds 2.5 V and 7.5 V,
+states are `[0,1,1,1,1,0,1]`.
+Turn-on brackets start at indices 0 and 5. The turn-off bracket starts at index 4.
+Switching uses the existing pre-edge sample and time bracket.
+It does not interpolate a switching instant.
+Gate states do not mask the conduction calculation or establish physical branch sharing.
+
+`gate_digitization` records the resolved thresholds, initial-state source,
+original-sample states, and transition brackets with the method and units.
+The browser displays this evidence and retains it in JSON and gate-state CSV downloads.
+Threshold, calibration, initial-state, and sample edits invalidate prior results and exports.
+CSV rows include scalar method metadata without repeating complete state vectors.
+
 `events.mode` is `gate` with a finite `threshold_v` (strict `gate > threshold`,
 equality is low), `masks` with mutually exclusive boolean N−1 `turn_on`/`turn_off`
 arrays, or `omitted` with a nonblank string reason. Gate and mask policies cannot

@@ -6,6 +6,8 @@ import json
 import math
 from numbers import Real
 
+from transistordatabase.gate_states import hysteretic_gate_states
+
 
 def _utf8(value):
     try:
@@ -61,6 +63,7 @@ def allocate_gate_current(*, time_s, current_a, gate, source, conditions, select
         raise ValueError("Time samples must increase strictly")
     if not isinstance(gate, dict):
         raise ValueError("Supply an explicit gate policy")
+    digitization = None
     if gate.get("mode") == "binary":
         if set(gate) != {"mode", "state"}:
             raise ValueError("Binary gate policy requires only mode and state")
@@ -82,8 +85,17 @@ def allocate_gate_current(*, time_s, current_a, gate, source, conditions, select
             raise ValueError("Gate voltage needs one value per current sample")
         states = [value > threshold for value in values]
         policy = {"mode": "threshold", "gate_v": values, "threshold_v": threshold}
+    elif gate.get("mode") == "hysteresis":
+        if set(gate) != {"mode", "gate_v", "digitizer"}:
+            raise ValueError("Hysteresis gate policy requires only mode, gate_v and digitizer")
+        values = _vector(gate["gate_v"], "gate_v")
+        if len(values) != len(time):
+            raise ValueError("Gate voltage needs one value per current sample")
+        digitization = hysteretic_gate_states(values, gate["digitizer"])
+        states = digitization["evidence"]["states"]
+        policy = {"mode": "hysteresis", "gate_v": values, "digitizer": digitization["policy"]}
     else:
-        raise ValueError("Select binary or threshold gate policy")
+        raise ValueError("Select binary, threshold or hysteresis gate policy")
     if provenance is not None:
         if (not isinstance(provenance, dict)
                 or set(provenance) - {"source", "calibration_notes", "imported_filename", "edited_after_import"}
@@ -109,6 +121,9 @@ def allocate_gate_current(*, time_s, current_a, gate, source, conditions, select
               "scope": "Gate-on channel allocation and gate-off diode allocation are command-state assumptions. They do not identify physical current paths, simultaneous sharing, losses or energy.",
               "units": {"time_s": "s", "current_a": "A", "gate_on_current_a": "A",
                         "gate_off_current_a": "A", "gate_on": "boolean"}}
+    if digitization is not None:
+        result["gate_digitization"] = digitization["evidence"]
+        result["semantics"] = "Sample-only hysteretic mask. Strict crossings change state. Equality and deadband hold the preceding sampled state. No switching time is inferred between samples."
     def digest(value):
         return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"),
                                          allow_nan=False).encode()).hexdigest()

@@ -1,0 +1,10 @@
+{
+  "tests/test_gate_hysteresis_independent.py": "4748e73a3f9a7abcfb32cb641599f65dcfe85b846fe87d6069bba53e2683d9e4",
+  "transistordatabase/gate_states.py": "9fcf91737e41acee502c625a5fd8d16bb36ce1654f266e04acb6bb32c85b3ed4",
+  "transistordatabase/current_allocation.py": "4fd8a154e251a46e69556d39bf32debdb8d619c3f11ceb6625aaef019f1132bc",
+  "transistordatabase/waveform_losses.py": "8a78bf1b6f8515b82ca85c4b1f0cbbaf4c52553deb22393ab74f79500f078e2f",
+  "transistordatabase/gui_web/backend/gate_policy.py": "daf0e903578b64b99a17052e7d5d605cbc33a8f80174c03cd722854bf6bc3020",
+  "transistordatabase/gui_web/backend/current_allocation_routes.py": "d164929c47712f2fa454c83704b4bbaba0422466b5b8e47744af910fc0355968",
+  "transistordatabase/gui_web/backend/waveform_routes.py": "b091d8621838d8b18bc4720261755c365f937003416967b1180cb9c014ee3550",
+  "transistordatabase/gui_web/backend/finite_json_route.py": "62452692d3fb93ab05299b96ae1e7db670d855aa9daf16643d47a4089f828218"
+}

@@ -6,8 +6,10 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, HTTPException
 from pydantic import Field, model_serializer
 
-from transistordatabase.gui_web.backend.parameter_routes import ParameterRoute, Strict
+from transistordatabase.gui_web.backend.parameter_routes import Strict
+from transistordatabase.gui_web.backend.finite_json_route import FiniteJsonRoute
 from transistordatabase.waveform_losses import WaveformResourceLimitError, analyze_waveform
+from transistordatabase.gui_web.backend.gate_policy import HysteresisPolicy
 
 Vector = Annotated[list[float], Field(min_length=2, max_length=10000)]
 Conditions = dict[str, float | None]
@@ -87,11 +89,20 @@ class Conduction(Strict):
 class EventPolicy(Strict):
     """Gate > threshold, explicit N-1 masks, or a reasoned omission."""
 
-    mode: Literal["gate", "masks", "omitted"]
+    mode: Literal["gate", "hysteresis", "masks", "omitted"]
     threshold_v: float | None = None
     turn_on: list[bool] | None = None
     turn_off: list[bool] | None = None
     omission_reason: str = ""
+    digitizer: HysteresisPolicy | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_existing_policy(self, handler):
+        """Omit new optional settings when an existing request does not supply them."""
+        data = handler(self)
+        if "digitizer" not in self.model_fields_set:
+            data.pop("digitizer", None)
+        return data
 
 
 class SwitchingComponent(Strict):
@@ -146,7 +157,7 @@ class WaveformRequest(Strict):
     provenance: Provenance | None = None
 
 
-router = APIRouter(prefix="/api/waveform", tags=["Signed waveforms"], route_class=ParameterRoute)
+router = APIRouter(prefix="/api/waveform", tags=["Signed waveforms"], route_class=FiniteJsonRoute)
 
 
 @router.post("/analyze")

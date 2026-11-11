@@ -1,0 +1,11 @@
+{
+  "src/components/GateAllocationPanel.vue": "8da7d30030d3e1954553fda63ef46b44d617cf882bb5bfd9b34cef128e261d4f",
+  "src/components/WaveformWorkbench.vue": "36ea4d6456dfe30ce0254a8e4d51a245f041e6ec9e1b276bee0b73f4915f9229",
+  "src/components/WaveformAnalysisView.vue": "f99dcbfc5bf829ec7a82e2f6c401452ac6cf30f1941fbba5a66fe2fd5837bdc7",
+  "src/components/HysteresisGateControls.vue": "1f6bf5cebe736b3140ace295762accce2e5a8fe67d83c94bc640b541775abd6d",
+  "src/components/gateHysteresis.js": "491cc3cae11f7c227194fd2738209aed97482c76b99313bcc321c5788e5988dd",
+  "src/tests/unit/GateAllocationPanel.test.js": "5cb3958c5f13cccc09396e217b6be859f4a9eaddd0c5a548bbf0e8dd2b759de8",
+  "src/tests/unit/WaveformWorkbench.test.js": "95f7723cc9d0c44c1dd89399a748091e4c6c1dafa50ddb3350aa4befdab9fb59",
+  "src/tests/unit/gateHysteresis.test.js": "c70e410199e379579c3f73b200cb5f49a949b7e7baa60200c1d2fee50ca7d763",
+  "src/tests/unit/GateAllocationApi.test.js": "de1169cb37bb62460ce8cd91731757d44e683fd73393a2fd83b45ddf22872bfb"
+}

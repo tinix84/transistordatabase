@@ -1,0 +1,41 @@
+
+> transistor-database-web@1.0.0 build
+> vite build --emptyOutDir false
+
+vite v7.0.6 building for production...
+transforming...
+✓ 207 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     0.48 kB │ gzip:   0.31 kB
+dist/assets/index-BiqYnh0l.css    142.59 kB │ gzip:  23.68 kB
+dist/assets/index-B-uDa43d.js   1,088.04 kB │ gzip: 333.55 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 5.02s
+	Command being timed: "/usr/bin/npm --prefix /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web run build -- --emptyOutDir false"
+	User time (seconds): 7.83
+	System time (seconds): 0.71
+	Percent of CPU this job got: 154%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:05.53
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 573644
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 62
+	Minor (reclaiming a frame) page faults: 146967
+	Voluntary context switches: 6697
+	Involuntary context switches: 38
+	Swaps: 0
+	File system inputs: 17680
+	File system outputs: 7272
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

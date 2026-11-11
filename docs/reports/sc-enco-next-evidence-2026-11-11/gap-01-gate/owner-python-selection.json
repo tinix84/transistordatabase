@@ -1,0 +1,8 @@
+[
+  "tests/test_current_allocation.py",
+  "tests/test_gate_allocation_independent_review.py",
+  "tests/test_waveform_workbench.py",
+  "tests/test_waveform_losses.py",
+  "tests/test_public_calculation_exports.py",
+  "tests/test_public_export_independent_review.py"
+]

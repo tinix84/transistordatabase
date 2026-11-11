@@ -48,6 +48,38 @@ describe('signed waveform workflow', () => {
     }
     expect(wrapper.get('[data-testid=waveform-results]').text()).toContain('0.00000400000 s interval')
   })
+  it('selects hysteretic events without changing gate samples and exposes returned state evidence', async () => {
+    const eventSelect = wrapper.get('[aria-label="Event policy"]')
+    await eventSelect.setValue('hysteresis')
+    await wrapper.get('[data-testid=hysteresis-low]').setValue('-.5')
+    await wrapper.get('[data-testid=hysteresis-high]').setValue('.5')
+    const evidence = { method: 'strict-hysteresis-v1', threshold_scale: 'absolute', low_v: -.5, high_v: .5,
+      initial_state: false, initial_state_source: 'declared', states: [false, true], turn_on_brackets: [0], turn_off_brackets: [],
+      semantics: 'Strict crossings. Equality and deadband hold.' }
+    analyze.mockResolvedValueOnce({ ...response, gate_digitization: evidence })
+    await wrapper.get('[data-testid=hysteresis-initial]').setValue('off')
+    await submit()
+    expect(analyze.mock.calls.at(-1)[0].events).toEqual({ mode: 'hysteresis', digitizer: {
+      thresholds: { scale: 'absolute', low_v: -.5, high_v: .5 }, initial_state: false } })
+    expect(analyze.mock.calls.at(-1)[0].waveform.gate_v).toEqual([0, 0, 1, 1, 0])
+    expect(wrapper.get('[data-testid=waveform-hysteresis-evidence]').text()).toContain('declared')
+    expect(wrapper.get('[data-testid=waveform-gate-csv]').exists()).toBe(true)
+    await wrapper.get('[data-testid=hysteresis-low]').setValue('-.25')
+    expect(wrapper.find('[data-testid=waveform-results]').exists()).toBe(false)
+  })
+  it('holds a pending hysteresis result stale when calibrated bounds change', async () => {
+    await wrapper.get('[aria-label="Event policy"]').setValue('hysteresis')
+    await wrapper.get('[data-testid=hysteresis-scale]').setValue('relative')
+    await wrapper.get('[data-testid=hysteresis-minimum]').setValue('0')
+    await wrapper.get('[data-testid=hysteresis-maximum]').setValue('10')
+    let resolve
+    analyze.mockImplementationOnce(() => new Promise(done => { resolve = done }))
+    await wrapper.get('form').trigger('submit')
+    expect(analyze.mock.calls.at(-1)[0].events.digitizer.thresholds.minimum_v).toBe(0)
+    await wrapper.get('[data-testid=hysteresis-maximum]').setValue('12')
+    resolve(response); await flushPromises()
+    expect(wrapper.find('[data-testid=waveform-results]').exists()).toBe(false)
+  })
   it('invalidates completed and in-flight results on input edits', async () => {
     await submit()
     await wrapper.get('[data-testid=waveform-csv]').setValue('time_s,current_a\n0,1\n1,1')

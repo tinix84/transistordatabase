@@ -1,0 +1,35 @@
+
+Running 8 tests using 1 worker
+
+[1A[2K[1/8] [desktop] › src/tests/e2e/gate-hysteresis-acceptance.spec.js:56:1 › actual noisy waveform has two on one off brackets and independent seven millijoule oracle
+[1A[2K[2/8] [desktop] › src/tests/e2e/gate-hysteresis-acceptance.spec.js:92:1 › actual allocation preserves signed sample states export metadata hashes and stale clearing
+[1A[2K[3/8] [desktop] › src/tests/e2e/gate-hysteresis-acceptance.spec.js:117:1 › calibrated flat traces equality initial ambiguity and contradictory states use actual controls
+[1A[2K[4/8] [desktop] › src/tests/e2e/gate-hysteresis-acceptance.spec.js:148:1 › precision guards reject rounded upper fractions and negative tiny wire literals
+[1A[2K[5/8] [mobile-390] › src/tests/e2e/gate-hysteresis-acceptance.spec.js:56:1 › actual noisy waveform has two on one off brackets and independent seven millijoule oracle
+[1A[2K[6/8] [mobile-390] › src/tests/e2e/gate-hysteresis-acceptance.spec.js:92:1 › actual allocation preserves signed sample states export metadata hashes and stale clearing
+[1A[2K[7/8] [mobile-390] › src/tests/e2e/gate-hysteresis-acceptance.spec.js:117:1 › calibrated flat traces equality initial ambiguity and contradictory states use actual controls
+[1A[2K[8/8] [mobile-390] › src/tests/e2e/gate-hysteresis-acceptance.spec.js:148:1 › precision guards reject rounded upper fractions and negative tiny wire literals
+[1A[2K  8 passed (30.4s)
+	Command being timed: "/usr/bin/node /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/node_modules/@playwright/test/cli.js test --config /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/playwright.gate-hysteresis.acceptance.config.js"
+	User time (seconds): 15.18
+	System time (seconds): 4.14
+	Percent of CPU this job got: 58%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:33.18
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 331632
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 1257
+	Minor (reclaiming a frame) page faults: 268331
+	Voluntary context switches: 31026
+	Involuntary context switches: 161
+	Swaps: 0
+	File system inputs: 194928
+	File system outputs: 42896
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

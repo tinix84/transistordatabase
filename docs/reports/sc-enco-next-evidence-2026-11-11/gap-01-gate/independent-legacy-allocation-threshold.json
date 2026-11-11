@@ -1,0 +1,101 @@
+{
+  "case": "threshold",
+  "baseline_commit": "e41cc8a56e3caa254a124672a16eef4a7b4c5863",
+  "recaptured_at_utc": "2026-11-11T17:12:31.378041+00:00",
+  "method": "POST",
+  "path": "/api/waveform/gate-allocation",
+  "expected_status": 200,
+  "request": {
+    "time_s": [
+      0,
+      1,
+      2
+    ],
+    "current_a": [
+      -2,
+      0,
+      3
+    ],
+    "selected": true,
+    "source": "compatibility fixture",
+    "conditions": {},
+    "gate": {
+      "mode": "threshold",
+      "gate_v": [
+        0,
+        5,
+        6
+      ],
+      "threshold_v": 5
+    }
+  },
+  "response": {
+    "inputs": {
+      "time_s": [
+        0.0,
+        1.0,
+        2.0
+      ],
+      "current_a": [
+        -2.0,
+        0.0,
+        3.0
+      ],
+      "gate": {
+        "mode": "threshold",
+        "gate_v": [
+          0.0,
+          5.0,
+          6.0
+        ],
+        "threshold_v": 5.0
+      },
+      "selected": true,
+      "source": "compatibility fixture",
+      "conditions": {},
+      "provenance": null
+    },
+    "result": {
+      "samples": [
+        {
+          "time_s": 0.0,
+          "current_a": -2.0,
+          "gate_on": false,
+          "gate_on_current_a": 0.0,
+          "gate_off_current_a": -2.0
+        },
+        {
+          "time_s": 1.0,
+          "current_a": 0.0,
+          "gate_on": false,
+          "gate_on_current_a": 0.0,
+          "gate_off_current_a": 0.0
+        },
+        {
+          "time_s": 2.0,
+          "current_a": 3.0,
+          "gate_on": true,
+          "gate_on_current_a": 3.0,
+          "gate_off_current_a": 0.0
+        }
+      ],
+      "sample_count": 3,
+      "semantics": "Sample-only mask. No state or interpolation is defined between samples. Threshold equality is low.",
+      "scope": "Gate-on channel allocation and gate-off diode allocation are command-state assumptions. They do not identify physical current paths, simultaneous sharing, losses or energy.",
+      "units": {
+        "time_s": "s",
+        "current_a": "A",
+        "gate_on_current_a": "A",
+        "gate_off_current_a": "A",
+        "gate_on": "boolean"
+      }
+    },
+    "evidence": {
+      "method": "gate-state-allocation-v1",
+      "input_sha256": "f13ef98c242c048e06ed56f109699d12b3a2d3acfa188cb6649888a23baa3a57",
+      "result_sha256": "f8a9d0fe2da36d6ec6f23e60f1c2e7b493c45779d7c2f8ecab3aa97f50c3c5ed"
+    }
+  },
+  "response_bytes_sha256": "696d75e47415e26f50ab48116f0a048645541b62173c20c30c1c96d065fad0c2",
+  "response_canonical_json_sha256": "25bd7234f8a2b8b53598d0b1f4d948eea48948892bf88470dccffaebc8a1ac99"
+}

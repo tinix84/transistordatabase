@@ -2,6 +2,8 @@
 import { onBeforeUnmount, reactive, ref, watch } from 'vue'
 import WaveformAnalysisView from './WaveformAnalysisView.vue'
 import GateAllocationPanel from './GateAllocationPanel.vue'
+import HysteresisGateControls from './HysteresisGateControls.vue'
+import { defaultHysteresis, hysteresisRequest } from './gateHysteresis.js'
 import { binaryDecimal, finiteDecimal } from './analysisFiles.js'
 import WaveformModelEditor from './WaveformModelEditor.vue'
 import { model, finite, branch } from './waveformModels.js'
@@ -10,7 +12,7 @@ import { waveformApi } from '../services/api.js'
 const input = reactive({
   csv: 'time_s,current_a,gate_v,device_voltage_v\n0,0,0,400\n0.000001,2,0,400\n0.000002,9,1,2\n0.000003,3,1,2\n0.000004,0,0,400',
   conductionOmit: false, conductionReason: '', positive: model(), negative: model(false, false), duty: 1,
-  eventMode: 'gate', threshold: .5, eventReason: '', bus: '',
+  eventMode: 'gate', threshold: .5, hysteresis: defaultHysteresis(), eventReason: '', bus: '',
   onOmit: true, offOmit: true, onReason: 'Explicit conduction-only evaluation', offReason: 'Explicit conduction-only evaluation',
   onPositive: model(true), onNegative: model(true, false), offPositive: model(true), offNegative: model(true, false),
   fft: false, window: 'rectangular', detrend: 'none', harmonicThreshold: .1, advanced: false, json: '',
@@ -55,6 +57,7 @@ function request() {
   if (input.bus !== '' && !waveform.bus_voltage_v) waveform.bus_voltage_v = finite(input.bus, 'Bus voltage')
   const omitted = reason => ({ omit: true, omission_reason: reason })
   const eventPolicy = input.eventMode === 'gate' ? { mode: 'gate', threshold_v: finite(input.threshold, 'Gate threshold') }
+    : input.eventMode === 'hysteresis' ? { mode: 'hysteresis', digitizer: hysteresisRequest(input.hysteresis) }
     : input.eventMode === 'masks' ? { mode: 'masks', turn_on, turn_off }
     : { mode: 'omitted', omission_reason: input.eventReason }
   return { waveform,
@@ -138,8 +141,9 @@ function showRequest() {
       </section>
       <section class="panel">
         <h3>3. Switching evidence and independent energy models</h3>
-        <label>Event policy<select v-model="input.eventMode" aria-label="Event policy"><option value="gate">Gate &gt; threshold (equality is low)</option><option value="masks">Explicit interval masks from CSV</option><option value="omitted">Explicitly omit event detection</option></select></label>
+        <label>Event policy<select v-model="input.eventMode" aria-label="Event policy"><option value="gate">Gate &gt; threshold (equality is low)</option><option value="hysteresis">Hysteresis: strict crossings and deadband hold</option><option value="masks">Explicit interval masks from CSV</option><option value="omitted">Explicitly omit event detection</option></select></label>
         <label v-if="input.eventMode === 'gate'">Gate threshold (V)<input v-model.number="input.threshold" type="number" step="any"></label>
+        <HysteresisGateControls v-if="input.eventMode === 'hysteresis'" v-model="input.hysteresis" label="Switching event"/>
         <label v-if="input.eventMode === 'omitted'">Reason for omitting event detection<input v-model="input.eventReason"></label>
         <p>Every event uses sample i before the transition bracket [i, i+1]. No initial or wrapped event is invented. E(0) remains finite when recorded. No nearest-temperature lookup, clamping or automatic ZVS energy reduction is applied.</p>
         <template v-for="side in ['on', 'off']" :key="side">

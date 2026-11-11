@@ -4,6 +4,7 @@ import CurvePlotter from './CurvePlotter.vue'
 import WaveformThermalTransfer from './WaveformThermalTransfer.vue'
 import { analysisCsv } from './analysisFiles.js'
 import { returnedPlotBounds } from './returnedPlotBounds.js'
+import { gateDigitizationColumns } from './gateHysteresis.js'
 const props = defineProps({ result: { type: Object, required: true }, acceptedRequest: { type: Object, default: null }, identity: { type: String, default: '' } })
 const emit = defineEmits(['thermal-handoff'])
 const result = computed(() => props.result)
@@ -31,6 +32,18 @@ function signal(name, label) {
 function series(rows, x, y, label, extras = {}) { return rows.length ? [{ label, pointRadius: 0, data: rows.map(row => ({ x: row[x], y: row[y] })), ...extras }] : [] }
 const current = computed(() => signal('current_a', 'Signed current'))
 const gate = computed(() => signal('gate_v', 'Gate evidence'))
+const gateStates = computed(() => result.value.gate_digitization ? [{ label: 'Sampled hysteretic state', showLine: false, pointRadius: 4,
+  data: result.value.signals.time_s.map((time, index) => ({ x: time, y: Number(result.value.gate_digitization.states[index]) })) }] : [])
+const gateRows = computed(() => {
+  const evidence = result.value.gate_digitization
+  if (!evidence) return []
+  const on = new Set(evidence.turn_on_brackets), off = new Set(evidence.turn_off_brackets)
+  const context = gateDigitizationColumns(evidence)
+  return result.value.signals.time_s.map((time, index, times) => ({ sample_index: index, time_s: time,
+    gate_v: result.value.signals.gate_v[index], gate_on: evidence.states[index],
+    turn_on_bracket: index < times.length - 1 ? on.has(index) : null,
+    turn_off_bracket: index < times.length - 1 ? off.has(index) : null, ...context }))
+})
 const voltage = computed(() => signal('device_voltage_v', 'Measured device voltage'))
 const power = computed(() => series(result.value?.conduction_plot ?? [], 'time_s', 'power_w', 'Exact conduction power'))
 const cumulative = computed(() => [
@@ -69,6 +82,12 @@ function csvExport(rows, filename) {
     <section v-if="result" class="results" data-testid="waveform-results">
       <p v-if="identity" class="identity">Selected source: {{ identity }}</p>
       <p>Waveform source: {{ result.waveform_provenance?.source ?? 'Unknown' }}<template v-if="result.waveform_provenance?.imported_filename"> · {{ result.waveform_provenance.imported_filename }}</template></p>
+      <section v-if="result.gate_digitization" data-testid="waveform-hysteresis-evidence">
+        <h3>Hysteretic gate-state evidence</h3>
+        <p>Low {{ result.gate_digitization.low_v }} V, high {{ result.gate_digitization.high_v }} V. Initial state {{ result.gate_digitization.initial_state ? 'on' : 'off' }} ({{ result.gate_digitization.initial_state_source }}). {{ result.gate_digitization.semantics }}</p>
+        <CurvePlotter title="Sampled hysteretic gate state" :datasets="gateStates" x-label="Time (s)" y-label="Gate state (0/1)" :y-min="-.1" :y-max="1.1" :allow-zoom="false"/>
+        <button type="button" data-testid="waveform-gate-csv" @click="csvExport(gateRows, 'gate-digitization.csv')">Download gate-state evidence CSV</button>
+      </section>
       <h3>Losses over the complete {{ number(result.duration_s) }} s interval</h3>
       <p>Known component sum: <strong>{{ number(result.known_component_power_w) }} W</strong>. Full total: <strong>{{ number(result.total_power_w) }} W</strong> ({{ result.total_status }}). An omitted component remains unknown, never zero.</p>
       <figure class="component-stack" data-testid="loss-component-stack">

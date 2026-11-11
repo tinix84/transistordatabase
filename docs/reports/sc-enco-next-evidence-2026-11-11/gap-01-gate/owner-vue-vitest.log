@@ -1,0 +1,37 @@
+
+> transistor-database-web@1.0.0 test:run
+> vitest run src/tests/unit/GateAllocationPanel.test.js src/tests/unit/WaveformWorkbench.test.js src/tests/unit/gateHysteresis.test.js src/tests/unit/GateAllocationApi.test.js --maxWorkers=1 --no-file-parallelism
+
+
+ RUN  v2.1.9 /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web
+
+ ✓ src/tests/unit/WaveformWorkbench.test.js (9 tests) 807ms
+ ✓ src/tests/unit/GateAllocationPanel.test.js (8 tests) 315ms
+ ✓ src/tests/unit/gateHysteresis.test.js (5 tests) 14ms
+stdout | src/tests/unit/GateAllocationApi.test.js
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/GateAllocationApi.test.js > keeps raw allocation evidence text and negative zero
+[API Request] POST /api/waveform/gate-allocation
+[API Response] POST /api/waveform/gate-allocation: 200 undefined
+[API Response] Data type: string
+
+stdout | src/tests/unit/GateAllocationApi.test.js > retains structured allocation validation errors
+[API Request] POST /api/waveform/gate-allocation
+
+stderr | src/tests/unit/GateAllocationApi.test.js > retains structured allocation validation errors
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: '{"detail":"Binary gate state is invalid"}',
+  url: '/api/waveform/gate-allocation'
+}
+
+ ✓ src/tests/unit/GateAllocationApi.test.js (2 tests) 39ms
+
+ Test Files  4 passed (4)
+      Tests  24 passed (24)
+   Start at  18:01:47
+   Duration  7.22s (transform 874ms, setup 36ms, collect 2.15s, tests 1.18s, environment 2.36s, prepare 487ms)
+

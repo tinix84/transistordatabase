@@ -1,0 +1,85 @@
+{
+  "artifacts": [
+    {
+      "file": "verifier-ruff.log",
+      "bytes": 879,
+      "sha256": "c42642e609363d64be7feabfc4f964987e5c0f539ab1ec7a416fd4aca34b40cf",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-headless-qt-blocked.json",
+      "bytes": 1505,
+      "sha256": "1f4734e4f8456fa1de83e8fcad94c5848ed214c4bb6f3efdacffe9ea78e7e3e1",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-build.log",
+      "bytes": 1619,
+      "sha256": "b899ae02f33b8012f21041cc5b4b98aae2adf6cc8f06f81e5d6e3620e7713c54",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-build-receipt.json",
+      "bytes": 389,
+      "sha256": "780a2b44f96b3d71d0bb73501148f8f2c81bd267f1f2d746bf204bc098c6e392",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-browser.log",
+      "bytes": 2507,
+      "sha256": "ca9882a8654abf70274181c9c18aeaf798b410765e783ebccd319a1d9d1ab03d",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-browser-receipt.json",
+      "bytes": 787,
+      "sha256": "894079c6d6b2e7d0874d857446607fd1513449e9933ddaa86127f1e0d5715306",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-browser-results.json",
+      "bytes": 87639,
+      "sha256": "abe445f8e940763ea07e0ad15573fdf19d3f4bf63e7216ad0f1b76bab37f3286",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-noisy-waveform-desktop.png",
+      "bytes": 825322,
+      "sha256": "3bc0fe507c8e0c83549829e689af3513a46accbe3febf7dffda1c4ceee6e5361",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-noisy-waveform-mobile-390.png",
+      "bytes": 691183,
+      "sha256": "4ce899f6df3e9233b6dce8ed81a6aad18ebd3f56cc6c58a76df9235e30e75479",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-noisy-allocation-mobile-390.png",
+      "bytes": 491283,
+      "sha256": "cb3a7974ba519bd245c9bc79f950a7dc83d7dd24b8608e764b7b9f3e7cd5cad7",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-calibrated-flat-mobile-390.png",
+      "bytes": 492004,
+      "sha256": "796e4ac2d6fde06b9b28921d9bf173422da9a79e0d32a487658c96a2b8d4ae36",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-source-and-oracle-proof.json",
+      "bytes": 2267,
+      "sha256": "96bc6ba635bf352fdaa97b46d1d4f68a2e984a437d248a76d39ee140599a9402",
+      "new_receipt": true
+    },
+    {
+      "file": "verifier-browser-configuration.json",
+      "bytes": 883,
+      "sha256": "6753f04049fc1765fcb6ee0d6eff7caad0a56d235583da60d774c2daf4ca809f",
+      "new_receipt": true
+    }
+  ],
+  "count": 13,
+  "bytes": 2598267,
+  "private_database_contents_copied_to_report": false
+}

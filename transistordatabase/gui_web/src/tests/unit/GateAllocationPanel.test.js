@@ -44,6 +44,45 @@ describe('gate-state allocation child', () => {
     await field('mode').setValue('threshold'); await field('threshold').setValue('.5'); await submit()
     expect(allocate.mock.calls[0][0].gate).toEqual({ mode: 'threshold', threshold_v: .5, gate_v: [-5, .5] })
   })
+  it('sends explicit hysteresis settings and invalidates returned evidence after threshold or initial edits', async () => {
+    await ready()
+    parseSamples.mockReturnValue({ time_s: [0, 1], current_a: [-3, 4], gate_v: [-5, 5] })
+    await field('mode').setValue('hysteresis')
+    await wrapper.get('[data-testid=hysteresis-low]').setValue('-2')
+    await wrapper.get('[data-testid=hysteresis-high]').setValue('2')
+    const evidence = { method: 'strict-hysteresis-v1', threshold_scale: 'absolute', low_v: -2, high_v: 2,
+      calibration_min_v: null, calibration_max_v: null, initial_state: false,
+      initial_state_source: 'first-sample-below-low', states: [false, true], turn_on_brackets: [0], turn_off_brackets: [],
+      semantics: 'Strict crossings. Equality and deadband hold the preceding sampled state.' }
+    const returned = { ...response, result: { ...response.result, gate_digitization: evidence } }
+    allocate.mockResolvedValue({ data: returned, rawJson: JSON.stringify(returned) })
+    await submit()
+    expect(parseSamples).toHaveBeenLastCalledWith(true, false)
+    expect(allocate.mock.calls.at(-1)[0].gate).toEqual({ mode: 'hysteresis', gate_v: [-5, 5],
+      digitizer: { thresholds: { scale: 'absolute', low_v: -2, high_v: 2 } } })
+    expect(wrapper.get('[data-testid=allocation-hysteresis-evidence]').text()).toContain('first-sample-below-low')
+    await wrapper.get('[data-testid=hysteresis-initial]').setValue('off')
+    expect(wrapper.find('[data-testid=allocation-json]').exists()).toBe(false)
+    await submit()
+    expect(allocate.mock.calls.at(-1)[0].gate.digitizer.initial_state).toBe(false)
+    await wrapper.get('[data-testid=hysteresis-high]').setValue('3')
+    expect(wrapper.find('[data-testid=allocation-results]').exists()).toBe(false)
+  })
+  it('requires relative calibration and discards a stale hysteresis response after reference changes', async () => {
+    await ready(); await field('mode').setValue('hysteresis')
+    await wrapper.get('[data-testid=hysteresis-scale]').setValue('relative')
+    await submit(); expect(allocate).not.toHaveBeenCalled()
+    await wrapper.get('[data-testid=hysteresis-minimum]').setValue('-5')
+    await wrapper.get('[data-testid=hysteresis-maximum]').setValue('15')
+    let resolve
+    allocate.mockImplementationOnce(() => new Promise(done => { resolve = done }))
+    await wrapper.get('form').trigger('submit')
+    expect(allocate.mock.calls.at(-1)[0].gate.digitizer.thresholds).toEqual({
+      scale: 'relative', low_fraction: .25, high_fraction: .75, minimum_v: -5, maximum_v: 15 })
+    await wrapper.get('[data-testid=hysteresis-minimum]').setValue('-4')
+    resolve({ data: response, rawJson: JSON.stringify(response) }); await flushPromises()
+    expect(wrapper.find('[data-testid=allocation-results]').exists()).toBe(false)
+  })
   it('invalidates results and exports after source, CSV, provenance or policy changes', async () => {
     await ready(); await submit(); expect(field('results').exists()).toBe(true)
     await field('source').setValue('changed'); expect(wrapper.find('[data-testid=allocation-results]').exists()).toBe(false)
