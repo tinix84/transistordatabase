@@ -1,0 +1,66 @@
+{
+  "docs/api/thermal-workbench.md": {
+    "bytes": 12593,
+    "sha256": "07f6a6b8eb05f73ab4a234b1fbbbf3de6e5e17de6e74d18e2bbe0b84a845b249"
+  },
+  "transistordatabase/gui_web/backend/finite_json_route.py": {
+    "bytes": 3758,
+    "sha256": "527b7d959357f680e75d5f479b5b6b157915e1045d5922c96bacb9f49eafbfc7"
+  },
+  "transistordatabase/gui_web/backend/main.py": {
+    "bytes": 182420,
+    "sha256": "c723df8538e996f79f1b4f0296b6f8ac7611558febf30b63927c013073532227"
+  },
+  "transistordatabase/gui_web/src/components/ThermalWorkbench.vue": {
+    "bytes": 29054,
+    "sha256": "4f0614d18f939fefccccff1a237a1e03a40becd08c319f55edfac9c3773313ad"
+  },
+  "transistordatabase/gui_web/src/components/analysisFiles.js": {
+    "bytes": 3109,
+    "sha256": "7cf4630d385b7df7602b05d1c8b7d1b8423c42354cc58306f3305a099bb05af7"
+  },
+  "transistordatabase/gui_web/src/components/spectrumAnalysis.js": {
+    "bytes": 2970,
+    "sha256": "8c03217c1dcafd959b559cf2d9df8a0f445b5b5fbc930550ec8843d45ce68fcb"
+  },
+  "transistordatabase/gui_web/src/services/api.js": {
+    "bytes": 18564,
+    "sha256": "bcf9f6faac68135d5ede8e1366ca9cd60832ef49cc90e7ad371fd8c4af4c9603"
+  },
+  "docs/api/device-electrothermal.md": {
+    "bytes": 6600,
+    "sha256": "04d3f89eb2a13757584cb5234d7c03b5b3fe699c8a7cd1e2bf74a0aa0781131c"
+  },
+  "transistordatabase/device_electrothermal.py": {
+    "bytes": 21396,
+    "sha256": "1f7d76556d2f386c376298d885898806d1f714a10569c9e0cacaea6fecd05794"
+  },
+  "transistordatabase/gui_web/backend/device_electrothermal_routes.py": {
+    "bytes": 11184,
+    "sha256": "cdc85e3bcdf9481b7301b6e320ccb3e1f59758431a3694f7eac65afaa0615b9b"
+  },
+  "transistordatabase/gui_web/src/components/NativeDeviceElectrothermal.vue": {
+    "bytes": 14918,
+    "sha256": "9b7e1eda16951becad2b3f03695c6289afaf8ae3e2d7d04201207934abdde57c"
+  },
+  "tests/test_device_electrothermal.py": {
+    "bytes": 8713,
+    "sha256": "c4838b3747c147d6b675088b42fdac3291b900bb2fe6f52b026621a24672741a"
+  },
+  "tests/test_device_electrothermal_independent.py": {
+    "bytes": 20288,
+    "sha256": "5a3bd1a8de41babf44931f274dcf206eb2bc3262f2a245086500a1622af23b53"
+  },
+  "transistordatabase/gui_web/src/tests/unit/NativeDeviceElectrothermal.test.js": {
+    "bytes": 8454,
+    "sha256": "d7e4a46685aaf08d86e8fbe184681b7750ffa84b00896d13ddb08b6e8f04582e"
+  },
+  "transistordatabase/gui_web/playwright.device-electrothermal.acceptance.config.js": {
+    "bytes": 939,
+    "sha256": "99427ed6b3b695daca5f11b67fca99cbbf43afa662ea7e6a98d5041b8d426f7c"
+  },
+  "transistordatabase/gui_web/src/tests/e2e/device-electrothermal-acceptance.spec.js": {
+    "bytes": 12025,
+    "sha256": "4279b789ec6e587a3d34784163049da9f0b4f8aa5180584c7a02b475941b1512"
+  }
+}

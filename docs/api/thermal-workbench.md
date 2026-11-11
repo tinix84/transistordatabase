@@ -205,3 +205,11 @@ stable screening roots, unknown metadata, strict finite validation and 413.
 The convolution moments are also compared to independent adaptive quadrature.
 Browser and independent review results are recorded separately in the parity
 sprint; fixtures establish equations and interfaces, not measured-device accuracy.
+
+## Native-device curve feedback
+
+The optional native-device source uses explicit indexed channel and switching
+families to derive a bounded temperature/loss table.
+It passes that table to the existing one-junction fixed-sink iteration.
+See [native-device electrothermal feedback](device-electrothermal.md) for source
+identity, fixed conditions, inactive terms, bounds, and replay details.

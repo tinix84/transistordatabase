@@ -1,0 +1,30 @@
+{
+  "source_files": 388,
+  "source_unchanged": true,
+  "database": {
+    "files": 24,
+    "bytes": 28903083,
+    "originals_and_copies_unchanged": true
+  },
+  "old_dist_assets_retained": {
+    "vite.svg": true,
+    "assets/index-Cd-9xTOa.js": true,
+    "assets/index-g-r-JQ0i.js": true,
+    "assets/index-Dh9GZBYy.js": true,
+    "assets/index-DERh4duk.css": true,
+    "assets/index-SnRinjk2.css": true,
+    "assets/index-DwhnJuQe.css": true,
+    "assets/index-CfzCuJjG.js": true,
+    "assets/index-B-uDa43d.js": true,
+    "assets/index-Djcupi58.css": true,
+    "assets/index-BiqYnh0l.css": true,
+    "assets/index-BsmDSL5R.css": true,
+    "assets/index-11is31Q7.js": true
+  },
+  "compiled_and_served_index_sha256": "b837010ad59c73da8e4c24ace3c0a711108d68963b06e012070337e92194989a",
+  "e2e": {
+    "transistordatabase/gui_web/src/tests/e2e/device-electrothermal-acceptance.spec.js": "4279b789ec6e587a3d34784163049da9f0b4f8aa5180584c7a02b475941b1512",
+    "transistordatabase/gui_web/playwright.device-electrothermal.acceptance.config.js": "99427ed6b3b695daca5f11b67fca99cbbf43afa662ea7e6a98d5041b8d426f7c"
+  },
+  "synthetic_provider_sha256": "fb6cebb54d936e3f647790e7411fab24aabd3da9349660b09dea3118f1d53769"
+}

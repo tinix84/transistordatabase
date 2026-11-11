@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-11",
+  "gap": 5,
+  "scope": "Native switch-junction electrothermal feedback at a fixed sink; no inferred diode or package coupling.",
+  "status": "accepted",
+  "verification": {
+    "owner_python": 124,
+    "owner_vue": 67,
+    "independent_sourceparse": 35,
+    "compiled_browser": 10,
+    "browser_retries": 0,
+    "browser_skips": 0,
+    "ruff_errors": 0,
+    "headless_imports": 11,
+    "qt_modules": 0,
+    "mobile_document_max_px": 391
+  },
+  "numerical_basis": "Current interpolation at each recorded temperature, then independent per-family temperature interpolation at common union knots; existing thermal.electrothermal solver.",
+  "source_identity": "Selected dependency snapshot excludes volatile metadata. Raw repository SHA identifies the exact bytes decoded once; neither digest is substituted for the other.",
+  "precision": "New source parser rejects nonzero underflow and lossy typed-array identity casts; legacy loader unchanged.",
+  "iteration_note": "Earlier source-validation and lint findings are retained. Final Python precedes an AST-equivalent unused-key rename; final compiled run covers the renamed source.",
+  "preview_url": "http://127.0.0.1:8004/index.html?view=thermal",
+  "main_baseline_url": "http://127.0.0.1:8003/index.html",
+  "fuji_browser": {
+    "device": "Fuji_2MBI100XAA120-50",
+    "temperature_c": 48.7630505537806,
+    "power_w": 37.63050559418907,
+    "residual_k": 5.638305822230905e-09,
+    "tolerance_k": 1e-08,
+    "oracle_temperature_c": 48.763050559454264,
+    "oracle_power_w": 37.63050559454264
+  },
+  "evidence_policy": "Real native records and full responses remain outside tracked evidence. Public screenshots and CSV use a synthetic in-memory provider; calculations are not mocked.",
+  "proof_manifests": {
+    "owner-manifest.json": "1841dadd8524b6f3ab1623a8d00c8891a0b5e0801c7b722f49da1c137eadfc22",
+    "independent-sourceparsefinal-manifest.json": "064d1563a830c0393909a618ac5b51d947243cb27b21cbbbecc65ab8bf044b5f",
+    "verifier-manifest.json": "3678369f5085ad97023e851bdbdab343fc30f96f3cd24a58356700122e0aba0a"
+  }
+}

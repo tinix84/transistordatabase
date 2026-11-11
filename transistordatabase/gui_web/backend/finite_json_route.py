@@ -8,6 +8,20 @@ from fastapi.responses import JSONResponse
 from transistordatabase.gui_web.backend.parameter_routes import ParameterRoute
 
 
+def binary64_number(value):
+    """Validate an original JSON numeric value before a typed float conversion."""
+    if isinstance(value, bool) or not isinstance(value, (int, float, Decimal)):
+        raise ValueError('Supply an actual JSON number')
+    try:
+        number = float(value)
+    except (OverflowError, ValueError) as error:
+        raise ValueError('The number exceeds the finite binary64 range') from error
+    if (not math.isfinite(number) or (number == 0 and value != 0)
+            or (isinstance(value, (int, Decimal)) and Decimal(str(number)) != Decimal(value))):
+        raise ValueError('The number exceeds accepted binary64 precision')
+    return number
+
+
 class FiniteJsonRoute(ParameterRoute):
     """Bound actual request bytes before JSON parsing or validation."""
 

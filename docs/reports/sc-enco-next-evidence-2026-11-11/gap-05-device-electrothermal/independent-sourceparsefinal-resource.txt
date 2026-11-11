@@ -1,0 +1,23 @@
+	Command being timed: "/home/tinix/miniconda3/envs/ntbees2/bin/python -B -m pytest -q --noconftest --import-mode=importlib -p no:cacheprovider -p anyio.pytest_plugin --basetemp /tmp/tdb-device-feedback-independent-b36bde1f-5845-4d23-885c-dddbe9b1ce0b/pytest-tmp --junitxml /tmp/tdb-device-feedback-independent-b36bde1f-5845-4d23-885c-dddbe9b1ce0b/junit.xml tests/test_device_electrothermal_independent.py"
+	User time (seconds): 13.27
+	System time (seconds): 0.95
+	Percent of CPU this job got: 147%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:09.62
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 260740
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 69849
+	Voluntary context switches: 602
+	Involuntary context switches: 518
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 432
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

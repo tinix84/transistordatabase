@@ -35,6 +35,9 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, Backg
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import ValidationError
+from transistordatabase.gui_web.backend.device_electrothermal_routes import (
+    router as device_thermal_router, device_repository as native_thermal_repository,
+)
 from transistordatabase.gui_web.backend.gate_charge_routes import router as gate_charge_router
 
 from transistordatabase.backend.concrete_services import (
@@ -320,6 +323,8 @@ class _LazyRepository:
 _repo = _LazyRepository(lambda: JsonTransistorRepository(_default_db_dir))
 _loader = JsonTransistorLoader()
 app.dependency_overrides[plecs_repository] = lambda: _repo
+app.dependency_overrides[native_thermal_repository] = lambda: _repo
+app.include_router(device_thermal_router)
 
 # Default switching pairs directory
 _default_pairs_dir = Path(__file__).resolve().parent.parent.parent.parent / "switching_pairs"

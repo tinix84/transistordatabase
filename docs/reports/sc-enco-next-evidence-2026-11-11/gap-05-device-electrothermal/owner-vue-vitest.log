@@ -1,0 +1,20 @@
+
+> transistor-database-web@1.0.0 test:run
+> vitest run --maxWorkers=1 --minWorkers=1 src/tests/unit/NativeDeviceElectrothermal.test.js src/tests/unit/ThermalWorkbench.test.js src/tests/unit/SpectrumAnalysis.test.js src/tests/unit/GateChargeCalculator.test.js src/tests/unit/WaveformWorkbench.test.js src/tests/unit/GridEnergyWorkbench.test.js
+
+
+ RUN  v2.1.9 /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web
+
+ ✓ src/tests/unit/GridEnergyWorkbench.test.js (9 tests) 845ms
+   ✓ finite grid and conditioned energy evidence > bounds the prepared matrix and lazy source evidence before mounting a large accepted response 366ms
+ ✓ src/tests/unit/WaveformWorkbench.test.js (11 tests) 1277ms
+ ✓ src/tests/unit/GateChargeCalculator.test.js (11 tests) 679ms
+ ✓ src/tests/unit/ThermalWorkbench.test.js (11 tests) 638ms
+ ✓ src/tests/unit/NativeDeviceElectrothermal.test.js (9 tests) 573ms
+ ✓ src/tests/unit/SpectrumAnalysis.test.js (16 tests) 348ms
+
+ Test Files  6 passed (6)
+      Tests  67 passed (67)
+   Start at  21:36:14
+   Duration  15.58s (transform 1.71s, setup 57ms, collect 4.12s, tests 4.36s, environment 3.95s, prepare 947ms)
+

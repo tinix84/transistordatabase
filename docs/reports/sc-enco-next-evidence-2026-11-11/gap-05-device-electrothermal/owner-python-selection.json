@@ -1,0 +1,7 @@
+[
+  "tests/test_device_electrothermal.py",
+  "tests/test_device_electrothermal_independent.py",
+  "tests/test_thermal_workbench.py",
+  "tests/test_comparison_thermal_union.py",
+  "tests/test_waveform_workbench.py"
+]

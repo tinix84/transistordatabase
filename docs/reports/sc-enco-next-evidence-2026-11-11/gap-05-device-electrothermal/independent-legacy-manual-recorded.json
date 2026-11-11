@@ -1,0 +1,185 @@
+{
+  "url": "http://127.0.0.1:8003/api/thermal/analyze",
+  "mode": "recorded",
+  "request": {
+    "operation": "electrothermal",
+    "source": "Independent manual thermal fixture",
+    "conditions": {},
+    "sink_temperature_c": 25,
+    "common_resistance_k_w": 0,
+    "branch_resistances_k_w": [
+      10
+    ],
+    "initial_temperatures_c": [
+      25
+    ],
+    "tolerance_k": 1e-09,
+    "relaxation": 1.0,
+    "max_iterations": 100,
+    "loss_models": [
+      {
+        "source": "Independent calibrated source",
+        "conditions": {
+          "current_a": 10
+        },
+        "temperature_min_c": 25,
+        "temperature_max_c": 125,
+        "mode": "recorded",
+        "temperature_c": [
+          25,
+          125
+        ],
+        "power_w": [
+          0.5,
+          0.7
+        ]
+      }
+    ]
+  },
+  "response": {
+    "operation": "electrothermal",
+    "request": {
+      "source": "Independent manual thermal fixture",
+      "conditions": {},
+      "operation": "electrothermal",
+      "sink_temperature_c": 25.0,
+      "common_resistance_k_w": 0.0,
+      "branch_resistances_k_w": [
+        10.0
+      ],
+      "initial_temperatures_c": [
+        25.0
+      ],
+      "loss_models": [
+        {
+          "source": "Independent calibrated source",
+          "conditions": {
+            "current_a": 10.0
+          },
+          "mode": "recorded",
+          "temperature_min_c": 25.0,
+          "temperature_max_c": 125.0,
+          "temperature_c": [
+            25.0,
+            125.0
+          ],
+          "power_w": [
+            0.5,
+            0.7
+          ]
+        }
+      ],
+      "tolerance_k": 1e-09,
+      "max_iterations": 100,
+      "relaxation": 1.0
+    },
+    "result": {
+      "status": "converged",
+      "accepted_solution": {
+        "iteration": 6,
+        "temperature_c": [
+          30.102040816
+        ],
+        "power_w": [
+          0.510204081632
+        ],
+        "residual_k": [
+          3.200006926107335e-10
+        ]
+      },
+      "history": [
+        {
+          "iteration": 0,
+          "temperature_c": [
+            25.0
+          ],
+          "power_w": [
+            0.5
+          ],
+          "residual_k": [
+            5.0
+          ]
+        },
+        {
+          "iteration": 1,
+          "temperature_c": [
+            30.0
+          ],
+          "power_w": [
+            0.51
+          ],
+          "residual_k": [
+            0.10000000000000009
+          ]
+        },
+        {
+          "iteration": 2,
+          "temperature_c": [
+            30.1
+          ],
+          "power_w": [
+            0.5102
+          ],
+          "residual_k": [
+            0.0019999999999997797
+          ]
+        },
+        {
+          "iteration": 3,
+          "temperature_c": [
+            30.102
+          ],
+          "power_w": [
+            0.510204
+          ],
+          "residual_k": [
+            4.0000000000040004e-05
+          ]
+        },
+        {
+          "iteration": 4,
+          "temperature_c": [
+            30.10204
+          ],
+          "power_w": [
+            0.51020408
+          ],
+          "residual_k": [
+            7.999999995789153e-07
+          ]
+        },
+        {
+          "iteration": 5,
+          "temperature_c": [
+            30.1020408
+          ],
+          "power_w": [
+            0.5102040816
+          ],
+          "residual_k": [
+            1.600000021362291e-08
+          ]
+        },
+        {
+          "iteration": 6,
+          "temperature_c": [
+            30.102040816
+          ],
+          "power_w": [
+            0.510204081632
+          ],
+          "residual_k": [
+            3.200006926107335e-10
+          ]
+        }
+      ],
+      "tolerance_k": 1e-09,
+      "boundary": "fixed sink steady; bounded source losses at each branch temperature",
+      "nonconvergence_scope": "Iteration failure does not prove no physical solution exists"
+    },
+    "units": "s, W, J, K/W, J/K, m\u00b2; temperatures \u00b0C and temperature differences K"
+  },
+  "raw_sha256": "3326a7c361837c44b7ebd9ac420c6a599478d5248da03d6e97db9cfc5ccdd5b7",
+  "canonical_sha256": "5136a17e5dc27e78ed087cf54ae121f5baac36e17901545b73402aaaa5ce2e98",
+  "status": 200
+}

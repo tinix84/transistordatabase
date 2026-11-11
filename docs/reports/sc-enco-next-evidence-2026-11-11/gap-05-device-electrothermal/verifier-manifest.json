@@ -1,0 +1,112 @@
+{
+  "feature": "One native switch junction at a fixed sink",
+  "browser_cases": 10,
+  "calculation_policy": "Actual compiled UI and actual API/core solver; no calculation mocks. One explicit synthetic ID uses the documented test-only in-memory provider; actual Fuji requests use the normal file repository.",
+  "coverage": [
+    "Synthetic affine equilibrium 25+8/.92 C",
+    "Active zero-current Eon/Eoff yields35 C",
+    "Missing E0 support rejects",
+    "Source-domain exit and iteration-limit have no accepted solution",
+    "Original numeric boundaries, scalar CSV/JSON, dependency stability and stale clearing",
+    "Actual copied Fuji equilibrium48.763050559 C /37.630505595 W with raw SHA and stale409",
+    "Unchanged simultaneous-contact regression; desktop and390px mobile width<=391"
+  ],
+  "private_evidence_policy": "Full actual-native responses, downloads and repository records remain unchanged in the external audit. Public summaries retain device identity, raw-file SHA and computed oracle results. Screenshots and CSV here use only synthetic fixture data.",
+  "artifacts": [
+    {
+      "path": "verifier-ruff.log",
+      "bytes": 822,
+      "sha256": "432b1d8111a0eb4bcedffb6ce7a0c2f623a47887d4467b658b7e8745faeabc74"
+    },
+    {
+      "path": "verifier-ruff-receipt.json",
+      "bytes": 199,
+      "sha256": "844f7035d994d5c40d5f3e2fb85fb1e94f5849be5e576922e8fffab98373302b"
+    },
+    {
+      "path": "verifier-headless-qt-blocked.json",
+      "bytes": 3244,
+      "sha256": "97d0f6170cfe2b837e4d3caf9185b6319d6340704962aa4bd0b8c5ae5d766f8d"
+    },
+    {
+      "path": "verifier-build.log",
+      "bytes": 1622,
+      "sha256": "48f4a5f2e65de4f9177c9ee65121e805b367aeb25ac4a2795999be8db55cb652"
+    },
+    {
+      "path": "verifier-build-receipt.json",
+      "bytes": 360,
+      "sha256": "29e16b88963120678509188d38ec63f4835645549b4ced2bcb911c35e76c8cf4"
+    },
+    {
+      "path": "verifier-browser.log",
+      "bytes": 3292,
+      "sha256": "1261e75fd0e10c0f409a5b07573e04b8aa19a9d06be496d2092b32692afc6207"
+    },
+    {
+      "path": "verifier-browser-receipt.json",
+      "bytes": 407,
+      "sha256": "e1d27b2b96e3fca5b757b271bceea00546edfb95d11d519e4419b70eb90fcbbb"
+    },
+    {
+      "path": "verifier-source-before.json",
+      "bytes": 50637,
+      "sha256": "249a90b800656741b63236b3a67b006e21e5b926783e622144ad168ef29c3d05"
+    },
+    {
+      "path": "verifier-postacceptance-proof.json",
+      "bytes": 1210,
+      "sha256": "25335b5e17b3fcd43920fbe8f3804d72750854550d1d607c64fa839bff9aaf74"
+    },
+    {
+      "path": "verifier-server-process.json",
+      "bytes": 535,
+      "sha256": "2be380e64f5a960509819d3f80a79ca64915cab4d8ce211bf6e766bd259f055b"
+    },
+    {
+      "path": "verifier-browser-results.json",
+      "bytes": 170239,
+      "sha256": "47230cd43f754256e09c404fb64400589a4e22385d327b5267cd5d210fc6a297"
+    },
+    {
+      "path": "verifier-tested-spec.js",
+      "bytes": 12025,
+      "sha256": "4279b789ec6e587a3d34784163049da9f0b4f8aa5180584c7a02b475941b1512"
+    },
+    {
+      "path": "verifier-tested-config.js",
+      "bytes": 939,
+      "sha256": "99427ed6b3b695daca5f11b67fca99cbbf43afa662ea7e6a98d5041b8d426f7c"
+    },
+    {
+      "path": "verifier-synthetic-provider.py",
+      "bytes": 3354,
+      "sha256": "fb6cebb54d936e3f647790e7411fab24aabd3da9349660b09dea3118f1d53769"
+    },
+    {
+      "path": "verifier-1-synthetic-affine-root.png",
+      "bytes": 473616,
+      "sha256": "490786a5f5024dded084e4ac3005c3564f85ad4e569f1ffd01478a225d2e58c1"
+    },
+    {
+      "path": "verifier-2-synthetic-affine-root.png",
+      "bytes": 385409,
+      "sha256": "c42a14fd9679659c8fa381af51150a8fd91b336a1c995e3c2ff8c7b3c773c15a"
+    },
+    {
+      "path": "verifier-1-synthetic-active-E0.png",
+      "bytes": 488643,
+      "sha256": "7a931911f1d2fef4a220a1b0ad00baecdd88aff644759f02f9ad53dcbc254e43"
+    },
+    {
+      "path": "verifier-2-synthetic-active-E0.png",
+      "bytes": 377372,
+      "sha256": "388644123d36ffe01475e16888557e8a0214ea2030a29e097b1acecbeaf7abc9"
+    },
+    {
+      "path": "verifier-synthetic-affine-losses.csv",
+      "bytes": 644,
+      "sha256": "22e03510d7efd8ee3144fa958712ad3ced6728c905b3624402dfb4ce7bab134f"
+    }
+  ]
+}

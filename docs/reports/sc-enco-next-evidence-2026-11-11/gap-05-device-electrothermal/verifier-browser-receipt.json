@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/usr/bin/node",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/node_modules/@playwright/test/cli.js",
+    "test",
+    "--config",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/playwright.device-electrothermal.acceptance.config.js"
+  ],
+  "returncode": 0,
+  "wall_s": 95.82590426800016
+}

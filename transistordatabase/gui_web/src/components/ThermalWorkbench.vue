@@ -2,11 +2,13 @@
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import CurvePlotter from './CurvePlotter.vue'
 import ThermalInterfaceContacts from './ThermalInterfaceContacts.vue'
+import NativeDeviceElectrothermal from './NativeDeviceElectrothermal.vue'
 import { finiteDecimal, analysisCsv } from './analysisFiles.js'
 import { thermalApi } from '../services/api.js'
 
 const props = defineProps({ stagedHandoff: { type: Object, default: null } })
 const handoffReviewed = ref(false)
+const nativePanel = ref(null)
 
 const input = reactive({ operation: 'steady', source: 'Editable thermal hand fixture; replace with recorded source',
   sink: 25, pf: 10, pr: 0, rc: .2, rf: 1, rr: 2,
@@ -122,6 +124,7 @@ function exportContacts() {
   download(analysisCsv(rows), 'thermal-interface-evidence.csv', 'text/csv')
 }
 async function calculate() {
+  if (input.operation === 'native-device') return nativePanel.value?.calculate()
   const token = ++revision; busy.value = true; result.value = null; error.value = ''; stale.value = false
   try {
     const value = await thermalApi.analyze(request())
@@ -187,9 +190,10 @@ const branchResult = computed(() => result.value?.result.accepted_solution || re
       <details><summary>Source, omissions and exact handoff evidence</summary><pre>{{ JSON.stringify(stagedHandoff, null, 2) }}</pre></details>
     </section>
     <form @submit.prevent="calculate">
-      <div class="fields"><label>Calculation<select v-model="input.operation" :disabled="!!stagedHandoff" aria-label="Thermal operation"><option value="steady">Steady common and branch paths</option><option value="transient">Fixed-case Foster transient</option><option value="electrothermal">Bounded steady electrothermal iteration</option><option value="screening">Reference-path current screening</option></select></label>
-        <label>Source / assumptions<input v-model="input.source" aria-label="Thermal source" required></label></div>
-      <template v-if="!input.advanced">
+      <div class="fields"><label>Calculation<select v-model="input.operation" :disabled="!!stagedHandoff" aria-label="Thermal operation"><option value="steady">Steady common and branch paths</option><option value="native-device">Native device electrothermal feedback</option><option value="transient">Fixed-case Foster transient</option><option value="electrothermal">Bounded steady electrothermal iteration</option><option value="screening">Reference-path current screening</option></select></label>
+        <label v-if="input.operation !== 'native-device'">Source / assumptions<input v-model="input.source" aria-label="Thermal source" required></label></div>
+      <NativeDeviceElectrothermal v-if="input.operation === 'native-device'" ref="nativePanel"/>
+      <template v-else-if="!input.advanced">
         <label>{{ input.operation === 'transient' ? 'Fixed case temperature' : 'Sink / selected reference temperature' }} (°C)<input v-model="input.sink" type="number" step="any" aria-label="Reference temperature"></label>
         <div v-if="input.operation === 'steady'" class="fields">
           <label>Forward branch heat (W)<input v-model="input.pf" type="number" step="any" min="0" aria-label="Forward heat"></label>
@@ -216,9 +220,9 @@ const branchResult = computed(() => result.value?.result.accepted_solution || re
         </template>
         <template v-else><div class="fields"><label>Reference boundary<select v-model="input.referenceKind"><option>case</option><option>heatsink</option><option>coolant</option></select></label><label>Junction limit (°C)<input v-model="input.tjmax" type="number" step="any"></label><label>Complete reference path (K/W)<input v-model="input.path" type="number" step="any"></label><label>Conduction threshold (V)<input v-model="input.v0" type="number" step="any"></label><label>Conduction resistance (Ω)<input v-model="input.resistance" type="number" step="any"></label><label>Model temperature condition (°C)<input v-model="input.modelTemperature" type="number" step="any"></label><label>Gate condition (V), blank = unknown<input v-model="input.gate" type="number" step="any"></label><label class="check"><input v-model="input.packageEnabled" type="checkbox">Report a separate package limit</label><template v-if="input.packageEnabled"><label>Package current limit (A)<input v-model="input.packageCurrent" type="number" step="any"></label><label>Package applicability / conditions<input v-model="input.packageApplicability"></label></template></div><p>This is a fixed-condition screening estimate; it does not solve self-heating or establish a datasheet current rating.</p></template>
       </template>
-      <details v-if="!stagedHandoff"><summary>Advanced reproducible request</summary><button v-if="!input.advanced" type="button" @click="prepareJson">Prepare JSON from these fields</button><label class="check"><input v-model="input.advanced" type="checkbox">Use advanced JSON</label><textarea v-if="input.advanced" v-model="input.json" rows="14" aria-label="Thermal JSON"></textarea></details>
+      <details v-if="!stagedHandoff && input.operation !== 'native-device'"><summary>Advanced reproducible request</summary><button v-if="!input.advanced" type="button" @click="prepareJson">Prepare JSON from these fields</button><label class="check"><input v-model="input.advanced" type="checkbox">Use advanced JSON</label><textarea v-if="input.advanced" v-model="input.json" rows="14" aria-label="Thermal JSON"></textarea></details>
       <label v-if="stagedHandoff" class="check"><input v-model="handoffReviewed" type="checkbox">I reviewed the thermal source, network, fixed case, initial state and instantaneous event convention.</label>
-      <button type="submit" :disabled="busy">{{ busy ? 'Calculating…' : 'Calculate thermal result' }}</button>
+      <button v-if="input.operation !== 'native-device'" type="submit" :disabled="busy">{{ busy ? 'Calculating…' : 'Calculate thermal result' }}</button>
     </form>
     <p v-if="error" role="alert">{{ error }}</p><p v-if="stale" role="status">Inputs changed. Calculate again to restore results and exports.</p>
     <section v-if="result" aria-label="Thermal result"><h3>Python thermal result</h3><p>Source: {{ result.request.source }}</p><table><tbody><tr v-for="[label, value] in summary" :key="label"><th>{{ label }}</th><td>{{ value }}</td></tr></tbody></table>

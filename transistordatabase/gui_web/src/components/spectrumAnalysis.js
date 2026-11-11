@@ -1,25 +1,13 @@
-import { finiteDecimal } from './analysisFiles.js'
+import { finiteDecimal, binary64Decimal } from './analysisFiles.js'
 
 export function defaultSpectrumAnalysis() {
   return { maskEnabled: false, maskCsv: 'frequency_hz,limit_peak\n', maskSource: '', interpolation: 'exact',
     bandsEnabled: false, bandsCsv: 'name,lower_hz,upper_hz,endpoints\n' }
 }
 
-function decimalIdentity(value) {
-  const text = String(value).trim(), negative = text.startsWith('-')
-  const [mantissa, exponent = '0'] = text.replace(/^[+-]/, '').split(/[eE]/)
-  const [whole, decimals = ''] = mantissa.split('.')
-  let digits = (whole + decimals).replace(/^0+/, '')
-  if (!digits) return '0'
-  const trailing = digits.match(/0+$/)?.[0].length ?? 0
-  digits = digits.slice(0, digits.length - trailing)
-  return `${negative ? '-' : ''}${digits}e${BigInt(exponent) - BigInt(decimals.length) + BigInt(trailing)}`
-}
-
 function coordinate(value, label) {
-  const number = finiteDecimal(value, label)
+  const number = binary64Decimal(value, label)
   if (number < 0) throw new Error(`${label} must be nonnegative`)
-  if (decimalIdentity(value) !== decimalIdentity(number)) throw new Error(`${label} exceeds the accepted FFT coordinate precision`)
   return number
 }
 
