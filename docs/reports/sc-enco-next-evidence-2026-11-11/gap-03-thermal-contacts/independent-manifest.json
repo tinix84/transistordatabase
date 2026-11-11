@@ -1,0 +1,91 @@
+{
+  "receipt_type": "Independent thermal contact verification",
+  "runs": [
+    {
+      "passed": 9,
+      "pytest_seconds": 15.71,
+      "source_files_frozen": 4,
+      "scope": "Original thermal network plus legacy HTTP compatibility"
+    },
+    {
+      "passed": 17,
+      "pytest_seconds": 15.004,
+      "source_files_frozen": 10,
+      "scope": "11 thermal checks plus 6 adjacent body-limit, Unicode and numeric guard cases"
+    }
+  ],
+  "entries": [
+    {
+      "name": "independent-legacy-absent.json",
+      "bytes": 1611,
+      "sha256": "1009331e8a926fd3272dbdc9930c585f16adee1ccd4a06a70fa93273cc3a399a",
+      "source": "HTTP 200 synthetic thermal fixture"
+    },
+    {
+      "name": "independent-legacy-singular.json",
+      "bytes": 2030,
+      "sha256": "b74fc4475c106cd2714e9c506a6425bcdd9020873e9a154dd09d32e9c91450b2",
+      "source": "HTTP 200 synthetic thermal fixture"
+    },
+    {
+      "name": "independent-9-source-start.json",
+      "bytes": 477,
+      "sha256": "0ad528bb4bdc738ed1ba6c8d1ec3b2fc571fc99cedbe45bd1764507bc0166f76",
+      "source": "/tmp/tdb-thermal-interfaces-independent-755535d2-1967-4ae8-8c5b-6986a798d9de/source-start.json"
+    },
+    {
+      "name": "independent-9-source-end.json",
+      "bytes": 477,
+      "sha256": "0ad528bb4bdc738ed1ba6c8d1ec3b2fc571fc99cedbe45bd1764507bc0166f76",
+      "source": "/tmp/tdb-thermal-interfaces-independent-755535d2-1967-4ae8-8c5b-6986a798d9de/source-end.json"
+    },
+    {
+      "name": "independent-9-pytest.log",
+      "bytes": 621,
+      "sha256": "55220e1162c79d62be729f029efc5d9d9778edfceaba6d968bcb9be57fbdb14e",
+      "source": "/tmp/tdb-thermal-interfaces-independent-755535d2-1967-4ae8-8c5b-6986a798d9de/pytest.log"
+    },
+    {
+      "name": "independent-9-resource.txt",
+      "bytes": 1108,
+      "sha256": "227c20553744ccc4c853e105a2f04a226afe3edf86f9905bf543abc8641d04db",
+      "source": "/tmp/tdb-thermal-interfaces-independent-755535d2-1967-4ae8-8c5b-6986a798d9de/resource.txt"
+    },
+    {
+      "name": "independent-9-junit.xml",
+      "bytes": 1785,
+      "sha256": "b77adee30e24987ce9e11fee6865583a862f8da2ad1a7541eafc90b355d9cff9",
+      "source": "/tmp/tdb-thermal-interfaces-independent-755535d2-1967-4ae8-8c5b-6986a798d9de/junit.xml"
+    },
+    {
+      "name": "independent-17-source-start.json",
+      "bytes": 1208,
+      "sha256": "f7bedd4a4b284979454e37864677fc60802efbee5ca61ba1ad83c7067cbfb2e7",
+      "source": "/tmp/tdb-thermal-interfaces-independent-4eaaded7-22b7-4339-8d70-489aabe7500d/source-start.json"
+    },
+    {
+      "name": "independent-17-source-end.json",
+      "bytes": 1208,
+      "sha256": "f7bedd4a4b284979454e37864677fc60802efbee5ca61ba1ad83c7067cbfb2e7",
+      "source": "/tmp/tdb-thermal-interfaces-independent-4eaaded7-22b7-4339-8d70-489aabe7500d/source-end.json"
+    },
+    {
+      "name": "independent-17-pytest.log",
+      "bytes": 622,
+      "sha256": "ae758c9c732c585f0b1a7ef62345c688c8d40b76fcc93b381c69a35d6362b34d",
+      "source": "/tmp/tdb-thermal-interfaces-independent-4eaaded7-22b7-4339-8d70-489aabe7500d/pytest.log"
+    },
+    {
+      "name": "independent-17-resource.txt",
+      "bytes": 1288,
+      "sha256": "c34648142bf9c2bfb5265ec1b07189394a3865aea5f468309603ad63fe04242d",
+      "source": "/tmp/tdb-thermal-interfaces-independent-4eaaded7-22b7-4339-8d70-489aabe7500d/resource.txt"
+    },
+    {
+      "name": "independent-17-junit.xml",
+      "bytes": 2926,
+      "sha256": "f3ad96dd2b637df5900ffbf85c976ea5c11b7d7964f0c19403dfe4858807ceb7",
+      "source": "/tmp/tdb-thermal-interfaces-independent-4eaaded7-22b7-4339-8d70-489aabe7500d/junit.xml"
+    }
+  ]
+}

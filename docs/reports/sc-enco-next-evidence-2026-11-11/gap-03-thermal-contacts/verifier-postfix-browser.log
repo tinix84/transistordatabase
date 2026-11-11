@@ -1,0 +1,29 @@
+
+Running 2 tests using 1 worker
+
+[1A[2K[1/2] [desktop] › src/tests/e2e/thermal-contacts-acceptance.spec.js:132:1 › thermal contact acceptance metadata postfix preserves prototype-like condition own keys in real requests and exports
+[1A[2K[2/2] [mobile-390] › src/tests/e2e/thermal-contacts-acceptance.spec.js:132:1 › thermal contact acceptance metadata postfix preserves prototype-like condition own keys in real requests and exports
+[1A[2K  2 passed (14.8s)
+	Command being timed: "/usr/bin/node /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/node_modules/@playwright/test/cli.js test --config /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/playwright.thermal-contacts.acceptance.config.js --grep metadata postfix"
+	User time (seconds): 14.73
+	System time (seconds): 3.39
+	Percent of CPU this job got: 104%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:17.28
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 277132
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 76
+	Minor (reclaiming a frame) page faults: 221419
+	Voluntary context switches: 14757
+	Involuntary context switches: 95
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 11584
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

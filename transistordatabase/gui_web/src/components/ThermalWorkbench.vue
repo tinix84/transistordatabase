@@ -1,6 +1,8 @@
 <script setup>
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import CurvePlotter from './CurvePlotter.vue'
+import ThermalInterfaceContacts from './ThermalInterfaceContacts.vue'
+import { finiteDecimal, analysisCsv } from './analysisFiles.js'
 import { thermalApi } from '../services/api.js'
 
 const props = defineProps({ stagedHandoff: { type: Object, default: null } })
@@ -9,6 +11,7 @@ const handoffReviewed = ref(false)
 const input = reactive({ operation: 'steady', source: 'Editable thermal hand fixture; replace with recorded source',
   sink: 25, pf: 10, pr: 0, rc: .2, rf: 1, rr: 2,
   interfaceEnabled: false, interfacePath: 'forward', rho: .001, area: .01,
+  interfaceList: false, contacts: [{ interface_id: 'contact-1', path: 'common', rho: '', area: '', source: '', conditionsText: '' }],
   poles: '.2,.01\n.3,.1', poleMode: 'tau', total: '', initialMode: 'cold', initial: '0,0',
   gap: 'reject', eventMode: 'none', events: '', samples: 20, networkOwner: 'forward',
   segments: '0,0.01,100,0,0,0\n0.01,0.037,0,0,0,0\n0.037,0.1,50,0,0,0',
@@ -48,15 +51,15 @@ function rows(text, count, name) {
 function vector(text, name) { return text.trim().split(/[,;\t ]+/).map(cell => number(cell, name)) }
 function request() {
   if (props.stagedHandoff && !handoffReviewed.value) throw new Error('Review the thermal source, network, fixed case, initial state and event convention before calculation.')
-  if (input.advanced) return JSON.parse(input.json)
+  if (input.advanced) { JSON.parse(input.json); return input.json }
   const context = { operation: input.operation, source: input.source, conditions: {} }
   const sink = number(input.sink, 'Reference temperature')
   if (input.operation === 'steady') return { ...context, sink_temperature_c: sink,
     forward_power_w: number(input.pf, 'Forward power'), reverse_power_w: number(input.pr, 'Reverse power'),
     common_resistance_k_w: number(input.rc, 'Common resistance'), forward_resistance_k_w: number(input.rf, 'Forward resistance'),
     reverse_resistance_k_w: number(input.rr, 'Reverse resistance'),
-    interface: input.interfaceEnabled ? { source: input.source, conditions: {}, path: input.interfacePath,
-      resistivity_k_m2_w: number(input.rho, 'Interface resistivity'), area_m2: number(input.area, 'Interface area') } : null }
+    ...(input.interfaceList ? { interfaces: contactsRequest(), interface: null } : { interface: input.interfaceEnabled ? { source: input.source, conditions: {}, path: input.interfacePath,
+      resistivity_k_m2_w: number(input.rho, 'Interface resistivity'), area_m2: number(input.area, 'Interface area') } : null }) }
   if (input.operation === 'transient') {
     const poles = rows(input.poles, 2, 'Foster poles')
     const events = props.stagedHandoff ? props.stagedHandoff.thermal_input.events : input.events.trim() ? input.events.trim().split(/\r?\n/).map((row, i) => {
@@ -94,6 +97,30 @@ function request() {
     package_limit: input.packageEnabled ? { current_a: number(input.packageCurrent, 'Package limit'), source: input.source,
       conditions: {}, applicability: input.packageApplicability } : null }
 }
+function contactsRequest() {
+  const ids = new Set()
+  return input.contacts.map(row => {
+    const id = row.interface_id.trim(), source = row.source.trim()
+    if (!id || ids.has(id)) throw new Error('Physical interface IDs must be nonblank and unique')
+    ids.add(id)
+    if (!source) throw new Error('Each physical contact needs a source')
+    const conditions = Object.create(null)
+    for (const line of row.conditionsText.split(/\r?\n/).filter(value => value.trim())) {
+      const cells = line.split(',').map(value => value.trim())
+      if (cells.length !== 2 || !cells[0] || Object.hasOwn(conditions, cells[0])) throw new Error('Contact conditions need unique name,value rows')
+      conditions[cells[0]] = cells[1] === '' ? null : finiteDecimal(cells[1], 'Contact condition')
+    }
+    return { interface_id: id, path: row.path, resistivity_k_m2_w: finiteDecimal(row.rho, 'Contact resistivity'),
+      area_m2: finiteDecimal(row.area, 'Contact area'), source, conditions }
+  })
+}
+function exportContacts() {
+  const out = result.value.result
+  const rows = out.interface_contributions.map(row => ({ ...row, conditions: JSON.stringify(row.conditions),
+    added_path_resistance_k_w: out.added_path_resistances_k_w[row.path], effective_path_resistance_k_w: out.path_resistances_k_w[row.path],
+    shared_temperature_c: out.shared_temperature_c, forward_temperature_c: out.forward_temperature_c, reverse_temperature_c: out.reverse_temperature_c }))
+  download(analysisCsv(rows), 'thermal-interface-evidence.csv', 'text/csv')
+}
 async function calculate() {
   const token = ++revision; busy.value = true; result.value = null; error.value = ''; stale.value = false
   try {
@@ -106,7 +133,7 @@ async function calculate() {
     }
   } finally { if (!disposed) busy.value = false }
 }
-function prepareJson() { input.json = JSON.stringify(request(), null, 2); input.advanced = true }
+function prepareJson() { const value = request(); input.json = typeof value === 'string' ? value : JSON.stringify(value, null, 2); input.advanced = true }
 function download(text, name, type) {
   const url = URL.createObjectURL(new Blob([text], { type })), anchor = document.createElement('a')
   anchor.href = url; anchor.download = name; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
@@ -133,7 +160,7 @@ function display(value) {
 const summary = computed(() => {
   if (!result.value) return []
   const out = result.value.result
-  const labels = { forward_temperature_c: 'Forward junction temperature (°C)', reverse_temperature_c: 'Reverse junction temperature (°C)',
+  const labels = { shared_temperature_c: 'Shared temperature after the common path (°C)', forward_temperature_c: 'Forward junction temperature (°C)', reverse_temperature_c: 'Reverse junction temperature (°C)',
     interface_resistance_k_w: 'Added interface resistance (K/W)', final_temperature_c: 'Final junction temperature (°C)',
     sampled_max_temperature_c: 'Sampled maximum temperature (°C)', conduction_energy_j: 'Conduction heat energy (J)',
     switching_energy_j: 'Switching heat energy (J)', event_mode: 'Event deposition convention', network_heat_owner: 'Physical junction heat owner',
@@ -170,8 +197,10 @@ const branchResult = computed(() => result.value?.result.accepted_solution || re
           <label>Common path (K/W)<input v-model="input.rc" type="number" step="any" min="0"></label>
           <label>Forward branch path (K/W)<input v-model="input.rf" type="number" step="any" min="0"></label>
           <label>Reverse branch path (K/W)<input v-model="input.rr" type="number" step="any" min="0"></label>
-          <label class="check"><input v-model="input.interfaceEnabled" type="checkbox">Add an explicit interface term</label>
-          <template v-if="input.interfaceEnabled"><label>Interface path<select v-model="input.interfacePath"><option>common</option><option>forward</option><option>reverse</option></select></label><label>Area-specific resistivity (K·m²/W)<input v-model="input.rho" type="number" step="any"></label><label>Contact area (m²)<input v-model="input.area" type="number" step="any"></label></template>
+          <label class="check"><input v-model="input.interfaceList" type="checkbox" data-testid="thermal-contacts-enabled">Supply simultaneous identified physical contacts</label>
+          <ThermalInterfaceContacts v-if="input.interfaceList" v-model="input.contacts"/>
+          <label class="check"><input v-model="input.interfaceEnabled" type="checkbox" :disabled="input.interfaceList">Add an explicit interface term</label>
+          <template v-if="input.interfaceEnabled && !input.interfaceList"><label>Interface path<select v-model="input.interfacePath"><option>common</option><option>forward</option><option>reverse</option></select></label><label>Area-specific resistivity (K·m²/W)<input v-model="input.rho" type="number" step="any"></label><label>Contact area (m²)<input v-model="input.area" type="number" step="any"></label></template>
         </div>
         <template v-else-if="input.operation === 'transient'">
           <div class="fields"><label>Physical junction / heat ownership<select v-model="input.networkOwner" :disabled="!!stagedHandoff"><option value="forward">Forward junction only</option><option value="reverse">Reverse junction only</option><option value="shared-junction">Both branches explicitly share this one junction</option></select></label><label>Second pole column<select v-model="input.poleMode"><option value="tau">Time constant τ (s)</option><option value="capacity">Capacity C (J/K), τ=R·C</option></select></label><label>Foster poles: R (K/W), τ (s) or C (J/K)<textarea v-model="input.poles" rows="4" aria-label="Foster poles"></textarea></label><label>Recorded total R (K/W), optional<input v-model="input.total" type="number" step="any"></label>
@@ -193,6 +222,12 @@ const branchResult = computed(() => result.value?.result.accepted_solution || re
     </form>
     <p v-if="error" role="alert">{{ error }}</p><p v-if="stale" role="status">Inputs changed. Calculate again to restore results and exports.</p>
     <section v-if="result" aria-label="Thermal result"><h3>Python thermal result</h3><p>Source: {{ result.request.source }}</p><table><tbody><tr v-for="[label, value] in summary" :key="label"><th>{{ label }}</th><td>{{ value }}</td></tr></tbody></table>
+      <section v-if="result.result.interface_contributions" data-testid="thermal-contact-evidence">
+        <h4>Physical contact evidence</h4><p>Each resistance retains its own physical ID, source, and conditions. Path totals include the declared base resistance.</p>
+        <div class="table-scroll"><table><thead><tr><th>ID / path</th><th>Resistivity (K·m²/W)</th><th>Area (m²)</th><th>Contact R (K/W)</th><th>Source / conditions</th></tr></thead><tbody><tr v-for="row in result.result.interface_contributions" :key="row.interface_id"><td>{{ row.interface_id }} / {{ row.path }}</td><td>{{ display(row.resistivity_k_m2_w) }}</td><td>{{ display(row.area_m2) }}</td><td>{{ display(row.resistance_k_w) }}</td><td>{{ row.source }}<pre>{{ JSON.stringify(row.conditions, null, 2) }}</pre></td></tr></tbody></table></div>
+        <p v-for="(value, path) in result.result.added_path_resistances_k_w" :key="path">{{ path }} added contact resistance: {{ display(value) }} K/W.</p>
+        <button type="button" @click="exportContacts" data-testid="thermal-contacts-download">Export every contact and path CSV</button>
+      </section>
       <template v-if="branchResult"><h4>{{ result.result.accepted_solution ? 'Accepted branch solution' : 'Last iterate — not an accepted solution' }}</h4><table class="branch-results"><thead><tr><th>Branch</th><th>Junction (°C)</th><th>Loss (W)</th><th>Residual (K)</th></tr></thead><tbody><tr v-for="(temperature, i) in branchResult.temperature_c" :key="i"><th>{{ i + 1 }}</th><td>{{ display(temperature) }}</td><td>{{ display(branchResult.power_w?.[i]) }}</td><td>{{ display(branchResult.residual_k?.[i]) }}</td></tr></tbody></table></template>
       <table v-if="result.result.final_pole_rises_k"><thead><tr><th>Foster pole</th><th>Final rise above case (K)</th></tr></thead><tbody><tr v-for="(rise, i) in result.result.final_pole_rises_k" :key="i"><th>{{ i + 1 }}</th><td>{{ display(rise) }}</td></tr></tbody></table>
       <p v-for="key in ['boundary', 'scope', 'maximum_scope', 'nonconvergence_scope']" :key="key">{{ result.result[key] || '' }}</p>
@@ -205,6 +240,7 @@ const branchResult = computed(() => result.value?.result.accepted_solution || re
 </template>
 
 <style scoped>
+.table-scroll { max-width: 100%; overflow-x: auto; }
 .thermal-workbench { max-width:1100px; margin:auto; padding:1rem; min-width:0; }
 .handoff { padding:1rem; border:1px solid #638399; border-radius:6px; overflow-wrap:anywhere; }
 .fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:.8rem; margin:.8rem 0; }

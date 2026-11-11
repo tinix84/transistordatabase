@@ -1,0 +1,132 @@
+{
+  "count": 21,
+  "bytes": 1511913,
+  "artifacts": [
+    {
+      "file": "verifier-ruff.log",
+      "bytes": 873,
+      "sha256": "5599f9532b9021acd708893c46543bfd20fa1fd7f86838a127c7a5cc559daaf5",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-ruff-receipt.json",
+      "bytes": 259,
+      "sha256": "774f4d2fd9bf7c35b0213dde41992a523b8b6bacd85aa9ea32960d82bfd06a54",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-headless-qt-blocked.json",
+      "bytes": 1871,
+      "sha256": "893be385c804fe84a844f339e34973061083984582f6110c35104b78a2bdb97b",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-initial-build.log",
+      "bytes": 1617,
+      "sha256": "18a7fa996570ee709beebfcb5ee417020d502224dfde5193375b385b065c0466",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-initial-build-receipt.json",
+      "bytes": 305,
+      "sha256": "8fc56fa32791d9688138dc9bafd27f822e63ef9ac4bfe469323e47f9ebae0d65",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-initial-browser.log",
+      "bytes": 3294,
+      "sha256": "336eb4c70f22027a409ddcc71bed2993d0dff4ffae61dc03fef12a67c28d552f",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-initial-browser-receipt.json",
+      "bytes": 788,
+      "sha256": "8222451f10c7fe77c030b837e430092865aacd61c2c8f240d3413b573b4de222",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-initial-source-proof.json",
+      "bytes": 2633,
+      "sha256": "b51419e343ff085d1951d2345d7a384b716d335c4fca13441c97ecbc565c0003",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-initial-tested-spec.js.txt",
+      "bytes": 9789,
+      "sha256": "14f24afe8a60b1c23d414806c64b44713b492a2441bf13a5316007dd86579ebf",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-postfix-build.log",
+      "bytes": 1616,
+      "sha256": "d050497088524c17f245806c46933d2fb7b61576cac2a83ad06a98099eed8258",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-postfix-build-receipt.json",
+      "bytes": 414,
+      "sha256": "d0cc4cf1f0d78de6fcbfd7c9cb1ca79693f01849b54fc1ff0ad6875b60dc8018",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-postfix-browser.log",
+      "bytes": 1522,
+      "sha256": "299ba77ddb3e2954f735ed3ab92544e61f2fdd19a3ba43ea8920ab852955cb02",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-postfix-browser-receipt.json",
+      "bytes": 1153,
+      "sha256": "c1170cca3a2d3fee692e40f4884dc479240694073b3e9f12043bb5cdba643c8a",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-final-source-dist-database-proof.json",
+      "bytes": 3492,
+      "sha256": "1207c374d7d7db0aec8f01b59f07d053f2f80cc0996f1cf8f2a34088b69594b1",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-initial-browser-results.json",
+      "bytes": 175555,
+      "sha256": "43f79a996002e8d56d993fff04ed95f5efe8e7036e03c659a039784fdc9f03a1",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-postfix-browser-results.json",
+      "bytes": 23483,
+      "sha256": "ec8dc60d3a32e1d7c3200736d7966a24a3666a902b224af6f3e8cee51beb5d61",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-initial-three-contacts-desktop.png",
+      "bytes": 346391,
+      "sha256": "c4578634d3dd003f9bd13553cc4199b9b6c628fb2e9bc2612f33d42f9b7e2ded",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-initial-three-contacts-mobile-390.png",
+      "bytes": 289495,
+      "sha256": "81ab8f425970ecd9686b8066bae6493a86af772ac208d0c409271926a9c031c8",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-postfix-conditions-desktop.png",
+      "bytes": 351617,
+      "sha256": "861819e3be206949547ccf63472ce05ee38721d96a1eaaea7e44104b6d389f37",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-postfix-conditions-mobile-390.png",
+      "bytes": 294088,
+      "sha256": "6ef98cbbf0d3a219a005ca8106a706af4e729d70e2190d96aaa8bad2cf9f1a92",
+      "copy_matches_source": true
+    },
+    {
+      "file": "verifier-configuration-and-scope.json",
+      "bytes": 1658,
+      "sha256": "382037f5c099607a2b0ff522a37356bbf01540355d85fc901a3868c2168a6afa",
+      "new_receipt": true
+    }
+  ]
+}

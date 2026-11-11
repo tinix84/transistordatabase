@@ -1,0 +1,20 @@
+{
+  "scope": "Final13 thermal UI/API cases after one-line null-prototype condition-map correction. Prior48-case evidence remains unchanged.",
+  "artifacts": [
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-metadata-api-final.log",
+      "bytes": 1374,
+      "sha256": "d6b35237f77a1a3c18209c5c7b7a02114c5dfb806451cf12b712e8f647779b21"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-metadata-api-final-resource.log",
+      "bytes": 856,
+      "sha256": "f166ebc5b7d9c0d1ff0de6392143a0822da41df126da9ddbe3e772c3bbb87829"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-metadata-api-final.json",
+      "bytes": 739,
+      "sha256": "f9f805dd4a79f8c5db0ca3493afda382ba39fd53e8d332959b10d13fd2dce6d0"
+    }
+  ]
+}

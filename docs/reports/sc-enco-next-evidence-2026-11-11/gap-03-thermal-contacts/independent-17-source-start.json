@@ -1,0 +1,12 @@
+{
+  "tests/test_thermal_interfaces_independent.py": "c252e15b474040c58415aeecf98fc169a000f67d930ab7df3c0a946a32b61f2a",
+  "tests/test_converter_losses.py": "d3e6e878846568170a7dd99ad69489ef9f85b9c841a16f187ebf96e409313448",
+  "tests/test_current_allocation.py": "5197cb8bcf7893608c8281a6782ba8e875e4d7fcd2284fc67245c05be28529eb",
+  "transistordatabase/thermal.py": "8c683fa31643c4b4664ac1c05c1b3c72edd415c8f3cf20f45189035f87abc86a",
+  "transistordatabase/gui_web/backend/thermal_routes.py": "06d0177dc2f24f6a703304c9678840a542a0173b26b4b526e61aee247d41afbe",
+  "transistordatabase/gui_web/backend/parameter_routes.py": "28d813957f45059acbcf30c303f6b88f6770e842d17632a1a908b088696d821d",
+  "transistordatabase/gui_web/backend/finite_json_route.py": "8b9d37a1379c89b26882a0b564f4999d7359f235133857d68458dc7a40c967bd",
+  "transistordatabase/gui_web/backend/converter_routes.py": "9c1e40fff7eb63ef2d100173f25231a69ff0121dc9b367facd6b099479c12498",
+  "transistordatabase/gui_web/backend/waveform_routes.py": "8ee9c1af813231b9815e7dc30a6f5b55d2556d0ef2f884f4cf568c49028eabc7",
+  "transistordatabase/gui_web/backend/current_allocation_routes.py": "d164929c47712f2fa454c83704b4bbaba0422466b5b8e47744af910fc0355968"
+}

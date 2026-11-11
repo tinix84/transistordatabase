@@ -1,0 +1,35 @@
+
+> transistor-database-web@1.0.0 test:run
+> vitest run --maxWorkers=1 --minWorkers=1 src/tests/unit/ThermalWorkbench.test.js src/tests/unit/ThermalApi.test.js
+
+
+ RUN  v2.1.9 /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web
+
+ ✓ src/tests/unit/ThermalWorkbench.test.js (11 tests) 681ms
+stdout | src/tests/unit/ThermalApi.test.js
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/ThermalApi.test.js > preserves advanced thermal numeric lexemes until backend validation
+[API Request] POST /api/thermal/analyze
+
+stderr | src/tests/unit/ThermalApi.test.js > preserves advanced thermal numeric lexemes until backend validation
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: { detail: 'Original numeric literal is outside the supported range' },
+  url: '/api/thermal/analyze'
+}
+
+stdout | src/tests/unit/ThermalApi.test.js > keeps existing thermal object requests in ordinary JSON transport
+[API Request] POST /api/thermal/analyze
+[API Response] POST /api/thermal/analyze: 200 undefined
+[API Response] Data type: object
+
+ ✓ src/tests/unit/ThermalApi.test.js (2 tests) 51ms
+
+ Test Files  2 passed (2)
+      Tests  13 passed (13)
+   Start at  19:40:17
+   Duration  5.10s (transform 894ms, setup 30ms, collect 1.42s, tests 732ms, environment 1.51s, prepare 407ms)
+

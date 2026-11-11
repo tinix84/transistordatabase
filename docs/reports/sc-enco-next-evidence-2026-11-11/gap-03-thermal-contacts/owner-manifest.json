@@ -1,0 +1,75 @@
+{
+  "artifacts": [
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-python-selection.json",
+      "bytes": 340,
+      "sha256": "448fe37e961043f007cbc99e22391dfec302b029ec6ab8c06154270d8485f292"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-python-source-start.json",
+      "bytes": 27240,
+      "sha256": "a5a7f7c884cb1103ff5a7c24655dc4a2c3d0b5226c91a0fcbcf4bb90cb17a8ff"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-python-source-end.json",
+      "bytes": 27240,
+      "sha256": "a5a7f7c884cb1103ff5a7c24655dc4a2c3d0b5226c91a0fcbcf4bb90cb17a8ff"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-python-junit.xml",
+      "bytes": 26993,
+      "sha256": "6268950bc14bf219b4aa30337ba41919494416f31279ebfff8cfdbf520e9ab3e"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-python-pytest.log",
+      "bytes": 783,
+      "sha256": "0090c8aae4452e3856bc82806d9d4d08db69a14bba426d5d00dff64b8aa76fee"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-python-resource.log",
+      "bytes": 1424,
+      "sha256": "598da03cc9ddd86b5f34872410c93b9764a117ab0472089d6055b7cd1cbf1944"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-vue-selection.json",
+      "bytes": 226,
+      "sha256": "b6c43f9e3124b0125d54822c45e6aa1ec3d71edabcc11874663ab58073543f4d"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-vue-source-start.json",
+      "bytes": 28154,
+      "sha256": "e56171248baff0625d2ffbd4dcc5e435d761d8ddd3e24f425a4603da3050081d"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-vue-source-end.json",
+      "bytes": 28154,
+      "sha256": "e56171248baff0625d2ffbd4dcc5e435d761d8ddd3e24f425a4603da3050081d"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-vue-vitest.log",
+      "bytes": 3361,
+      "sha256": "07769aabe81301a9ea7af57940c9f094b5fe2e8dd3a0a3737f8fd005a1d49cb8"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-vue-resource.log",
+      "bytes": 986,
+      "sha256": "c271e74608f276fd4c9ffa21885404367a4f912b668ca0ca6485d93f8560f868"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-legacy-body-policy-proof.json",
+      "bytes": 644,
+      "sha256": "a4a5e0be82c96269eac9c6bf320187bb5c6d55483ffee2b360e7110d02dc2d1b"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-legacy-body-policy.log",
+      "bytes": 914,
+      "sha256": "8c4e687e28ee44ec9bdccdfb6dd3b20178c6b866f7f5872ec3c45b2a8e1c2c6d"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-03-thermal-contacts/owner-legacy-body-policy-resource.log",
+      "bytes": 1274,
+      "sha256": "eeb608b066ef30d96cdc2a4f10fba69433a461502892418804960984449c24a8"
+    }
+  ],
+  "scope": "195 adjacent Python, 48 focused Vue, moderate 5188153-byte legacy transient compatibility; all final logs with source hashes."
+}

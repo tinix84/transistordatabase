@@ -1,0 +1,39 @@
+{
+  "modules": [
+    {
+      "name": "transistordatabase.core",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/core/__init__.py",
+      "sha256": "b2112fb9d9600bebfe74be09c1a496171621dec2f4a5364194123e52f1989cfd"
+    },
+    {
+      "name": "transistordatabase.thermal",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/thermal.py",
+      "sha256": "8c683fa31643c4b4664ac1c05c1b3c72edd415c8f3cf20f45189035f87abc86a"
+    },
+    {
+      "name": "transistordatabase.spectrum_analysis",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/spectrum_analysis.py",
+      "sha256": "8bf6c2c98b8f92554573f6d72e764f3a5ecd2a741a1f61ce30d0b568c77c4ca8"
+    },
+    {
+      "name": "transistordatabase.gui_web.backend.finite_json_route",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/backend/finite_json_route.py",
+      "sha256": "8b9d37a1379c89b26882a0b564f4999d7359f235133857d68458dc7a40c967bd"
+    },
+    {
+      "name": "transistordatabase.gui_web.backend.thermal_routes",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/backend/thermal_routes.py",
+      "sha256": "06d0177dc2f24f6a703304c9678840a542a0173b26b4b526e61aee247d41afbe"
+    },
+    {
+      "name": "transistordatabase.gui_web.backend.main",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/backend/main.py",
+      "sha256": "3710ebd535dd60c2ac0c84738c64af90846c7ec63386ec17a605ba97e21b2671"
+    }
+  ],
+  "qt_attempts": [],
+  "qt_loaded": false,
+  "wall_s": 5.3270294229987485,
+  "max_rss_kib": 243628,
+  "python": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:13:31) [GCC 14.3.0]"
+}

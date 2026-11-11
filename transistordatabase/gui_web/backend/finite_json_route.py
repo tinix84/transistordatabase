@@ -22,7 +22,7 @@ class FiniteJsonRoute(ParameterRoute):
             size = 0
             async for chunk in request.stream():
                 size += len(chunk)
-                if size > self.max_body_bytes:
+                if self.max_body_bytes is not None and size > self.max_body_bytes:
                     return JSONResponse(status_code=413, content={
                         "detail": f"The request exceeds the {self.max_body_bytes} byte limit"})
                 chunks.append(chunk)

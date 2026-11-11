@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "/usr/bin/npm",
+    "--prefix",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web",
+    "run",
+    "build",
+    "--",
+    "--emptyOutDir",
+    "false"
+  ],
+  "returncode": 0,
+  "wall_s": 21.127560870998423,
+  "source_files": 375,
+  "index_sha256": "703075d510a6bd3a9e8a9c246251c9645b7fa2b894a552b6d8145553ba511eb9"
+}

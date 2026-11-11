@@ -1,0 +1,73 @@
+{
+  "source_files_verified": 373,
+  "changed_sources": [],
+  "database_records_verified": 24,
+  "database_bytes": 28903083,
+  "all_original_and_copied_record_hashes_unchanged": true,
+  "database_ignored_count": 24,
+  "old_hashed_assets_preserved": [
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-DwhnJuQe.css",
+      "sha256": "514a79c300ac1d74150d4244492f27ad569cf9676cb8220241f8ba9762a4bedb",
+      "bytes": 143660
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-B-uDa43d.js",
+      "sha256": "46acfa0c7e0fac6f6a28365be49ada296064e2274556709b1c54990df093c59a",
+      "bytes": 1088039
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-BiqYnh0l.css",
+      "sha256": "850cdb88d50563901946a80c89d4a215066e84f196c129f2040262179f4d8749",
+      "bytes": 142590
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-11is31Q7.js",
+      "sha256": "42ddb9c1b8d94352f2e92a2f97f9cb95fae41725979651d0952955c4aaff58cb",
+      "bytes": 1098554
+    }
+  ],
+  "old_index_preserved_in_audit": "compiled-index-before.html",
+  "current_dist": [
+    {
+      "path": "transistordatabase/gui_web/dist/index.html",
+      "bytes": 481,
+      "sha256": "2b68fd9341d0fbb6c9f766552892dc502f05107d82bcbb2cd758e2f834c282ab"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/vite.svg",
+      "bytes": 1497,
+      "sha256": "4a748afd443918bb16591c834c401dae33e87861ab5dbad0811c3a3b4a9214fb"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-Cd-9xTOa.js",
+      "bytes": 1104645,
+      "sha256": "73bf8a357296e40d3ca9917bf2958c48cfc3dbd89ae7f585846379ca06348fa2"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-DwhnJuQe.css",
+      "bytes": 143660,
+      "sha256": "514a79c300ac1d74150d4244492f27ad569cf9676cb8220241f8ba9762a4bedb"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-B-uDa43d.js",
+      "bytes": 1088039,
+      "sha256": "46acfa0c7e0fac6f6a28365be49ada296064e2274556709b1c54990df093c59a"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-BiqYnh0l.css",
+      "bytes": 142590,
+      "sha256": "850cdb88d50563901946a80c89d4a215066e84f196c129f2040262179f4d8749"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-BsmDSL5R.css",
+      "bytes": 144314,
+      "sha256": "cf7b5160ca6c0a303b90d80d21e3f4feda53fc353437ff69792c5ae39fa74528"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-11is31Q7.js",
+      "bytes": 1098554,
+      "sha256": "42ddb9c1b8d94352f2e92a2f97f9cb95fae41725979651d0952955c4aaff58cb"
+    }
+  ]
+}

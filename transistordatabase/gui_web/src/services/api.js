@@ -148,7 +148,8 @@ export const matApi = {
 
 export const thermalApi = {
   async analyze(request) {
-    return (await api.post('/api/thermal/analyze', request)).data
+    const config = typeof request === 'string' ? { headers: { 'Content-Type': 'application/json' }, transformRequest: [value => value] } : undefined
+    return (await api.post('/api/thermal/analyze', request, config)).data
   }
 }
 

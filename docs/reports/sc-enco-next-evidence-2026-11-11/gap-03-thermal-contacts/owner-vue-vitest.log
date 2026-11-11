@@ -1,0 +1,52 @@
+
+> transistor-database-web@1.0.0 test:run
+> vitest run --maxWorkers=1 --minWorkers=1 src/tests/unit/ThermalWorkbench.test.js src/tests/unit/ThermalApi.test.js src/tests/unit/WaveformWorkbench.test.js src/tests/unit/SpectrumAnalysis.test.js src/tests/unit/GridEnergyWorkbench.test.js
+
+
+ RUN  v2.1.9 /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web
+
+ ✓ src/tests/unit/GridEnergyWorkbench.test.js (9 tests) 2898ms
+   ✓ finite grid and conditioned energy evidence > uses exact selected Python traces, separate frequency axis and explicit unavailable coverage 448ms
+   ✓ finite grid and conditioned energy evidence > invalidates completed and pending grid responses after a source edit 422ms
+   ✓ finite grid and conditioned energy evidence > bounds the prepared matrix and lazy source evidence before mounting a large accepted response 1520ms
+ ✓ src/tests/unit/WaveformWorkbench.test.js (11 tests) 4809ms
+   ✓ signed waveform workflow > rejects a cleared known condition before JSON transport 493ms
+   ✓ signed waveform workflow > sends explicit model selection/omissions and renders returned SI traces 628ms
+   ✓ signed waveform workflow > keeps linked visual ranges separate from the calculation interval 666ms
+   ✓ signed waveform workflow > selects hysteretic events without changing gate samples and exposes returned state evidence 337ms
+   ✓ signed waveform workflow > adds spectrum policies only when selected and invalidates stale policy evidence 424ms
+   ✓ signed waveform workflow > preserves original advanced numeric lexemes for authoritative backend validation 360ms
+   ✓ signed waveform workflow > invalidates completed and in-flight results on input edits 347ms
+   ✓ signed waveform workflow > preserves adjacent final CSV mask blanks and chooses a single delimiter 662ms
+   ✓ signed waveform workflow > rejects missing numeric CSV values and clears structured errors after edits 430ms
+ ✓ src/tests/unit/ThermalWorkbench.test.js (10 tests) 1259ms
+   ✓ thermal workbench > sends explicit common/branch paths and renders the Python result 304ms
+   ✓ thermal workbench > sends identified simultaneous contacts and preserves source conditions and stale evidence 409ms
+ ✓ src/tests/unit/SpectrumAnalysis.test.js (16 tests) 434ms
+stdout | src/tests/unit/ThermalApi.test.js
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/ThermalApi.test.js > preserves advanced thermal numeric lexemes until backend validation
+[API Request] POST /api/thermal/analyze
+
+stderr | src/tests/unit/ThermalApi.test.js > preserves advanced thermal numeric lexemes until backend validation
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: { detail: 'Original numeric literal is outside the supported range' },
+  url: '/api/thermal/analyze'
+}
+
+stdout | src/tests/unit/ThermalApi.test.js > keeps existing thermal object requests in ordinary JSON transport
+[API Request] POST /api/thermal/analyze
+[API Response] POST /api/thermal/analyze: 200 undefined
+[API Response] Data type: object
+
+ ✓ src/tests/unit/ThermalApi.test.js (2 tests) 126ms
+
+ Test Files  5 passed (5)
+      Tests  48 passed (48)
+   Start at  19:27:26
+   Duration  28.55s (transform 3.15s, setup 87ms, collect 7.33s, tests 9.53s, environment 6.29s, prepare 1.71s)
+
