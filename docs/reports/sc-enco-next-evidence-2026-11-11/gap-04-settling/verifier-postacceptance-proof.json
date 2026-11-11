@@ -1,0 +1,27 @@
+{
+  "source_files": 381,
+  "source_unchanged": true,
+  "database": {
+    "files": 24,
+    "bytes": 28903083,
+    "all_source_and_copy_sha256_match": true
+  },
+  "old_dist_assets_retained": {
+    "vite.svg": true,
+    "assets/index-Cd-9xTOa.js": true,
+    "assets/index-g-r-JQ0i.js": true,
+    "assets/index-DERh4duk.css": true,
+    "assets/index-SnRinjk2.css": true,
+    "assets/index-DwhnJuQe.css": true,
+    "assets/index-CfzCuJjG.js": true,
+    "assets/index-B-uDa43d.js": true,
+    "assets/index-BiqYnh0l.css": true,
+    "assets/index-BsmDSL5R.css": true,
+    "assets/index-11is31Q7.js": true
+  },
+  "compiled_index_sha256": "c9ae2f49043b144dcadf11699b096f46935a21b006f17bd654d658b2920654d8",
+  "e2e": {
+    "transistordatabase/gui_web/playwright.gate-settling.acceptance.config.js": "99b178fade013e21f11ecb98786b8a3128dfeb811ad6b15b7a27e0db30942f6b",
+    "transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js": "18dce7b623870e403bb147893382830995eed8714db32b971facea694ed80c5a"
+  }
+}

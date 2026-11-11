@@ -1,0 +1,49 @@
+{
+  "modules": [
+    {
+      "name": "transistordatabase.core",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/core/__init__.py",
+      "sha256": "b2112fb9d9600bebfe74be09c1a496171621dec2f4a5364194123e52f1989cfd"
+    },
+    {
+      "name": "transistordatabase.analytical_models",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/analytical_models.py",
+      "sha256": "8b9540f2cf9b034e780c82a1483b8e6ac7f9031a57775a224134486fca2c6582"
+    },
+    {
+      "name": "transistordatabase.gate_states",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gate_states.py",
+      "sha256": "9fcf91737e41acee502c625a5fd8d16bb36ce1654f266e04acb6bb32c85b3ed4"
+    },
+    {
+      "name": "transistordatabase.spectrum_analysis",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/spectrum_analysis.py",
+      "sha256": "8bf6c2c98b8f92554573f6d72e764f3a5ecd2a741a1f61ce30d0b568c77c4ca8"
+    },
+    {
+      "name": "transistordatabase.thermal",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/thermal.py",
+      "sha256": "8c683fa31643c4b4664ac1c05c1b3c72edd415c8f3cf20f45189035f87abc86a"
+    },
+    {
+      "name": "transistordatabase.gui_web.backend.schemas",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/backend/schemas.py",
+      "sha256": "a6d799dae9cb43b182857bb1820f90815b303763207ed09d812672d81819e8d9"
+    },
+    {
+      "name": "transistordatabase.gui_web.backend.gate_charge_routes",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/backend/gate_charge_routes.py",
+      "sha256": "557efbf406c6f4b778038f9bfc15b277d73c13ca5b0dd1eee5481360050f5ed0"
+    },
+    {
+      "name": "transistordatabase.gui_web.backend.main",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/backend/main.py",
+      "sha256": "d6b706e6841b7f41e5f2ad9156943e6d3f5e475d2f4b6ceb78195942f886dd19"
+    }
+  ],
+  "qt_attempts": [],
+  "qt_loaded": false,
+  "wall_s": 3.039283038000576,
+  "max_rss_kib": 244788,
+  "python": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:13:31) [GCC 14.3.0]"
+}

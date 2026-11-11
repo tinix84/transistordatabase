@@ -1,0 +1,46 @@
+{
+  "receipt_type": "Post-Miller gate settling, independent full HTTP and numerical checks",
+  "passed": 14,
+  "frozen_sources": 4,
+  "pytest_seconds": 11.189,
+  "wall_seconds": 17.49,
+  "max_rss_kib": 258716,
+  "entries": [
+    {
+      "name": "independent-source-start.json",
+      "bytes": 463,
+      "sha256": "aad8aadd4e8b49a8964340111766afca6dd1c830c3d7e6675268e18e9125d799",
+      "source": "/tmp/tdb-gate-settling-independent-93401e54-7349-4692-a03a-6d770d0f1c98/source-start.json"
+    },
+    {
+      "name": "independent-source-end.json",
+      "bytes": 463,
+      "sha256": "aad8aadd4e8b49a8964340111766afca6dd1c830c3d7e6675268e18e9125d799",
+      "source": "/tmp/tdb-gate-settling-independent-93401e54-7349-4692-a03a-6d770d0f1c98/source-end.json"
+    },
+    {
+      "name": "independent-pytest.log",
+      "bytes": 622,
+      "sha256": "b812ec8ab57a1481b0b5ba57a2b3533cc0f0dd012582def5a23713cf01615bc0",
+      "source": "/tmp/tdb-gate-settling-independent-93401e54-7349-4692-a03a-6d770d0f1c98/pytest.log"
+    },
+    {
+      "name": "independent-resource.txt",
+      "bytes": 1098,
+      "sha256": "a6bd06b407b8b3aac60e17d8b53046f301249c95205f5d9fe59aeacd63d5f72f",
+      "source": "/tmp/tdb-gate-settling-independent-93401e54-7349-4692-a03a-6d770d0f1c98/resource.txt"
+    },
+    {
+      "name": "independent-junit.xml",
+      "bytes": 2349,
+      "sha256": "343192699a18d3fa4ebdfbef3ec4c3e344626fb7c74fed2a6c521547e8ba4788",
+      "source": "/tmp/tdb-gate-settling-independent-93401e54-7349-4692-a03a-6d770d0f1c98/junit.xml"
+    },
+    {
+      "name": "independent-legacy-http.json",
+      "bytes": 26731,
+      "sha256": "fae1475d379ff4b34b5e31f6ff8964c7d87e785f7ab58ae625af098cb14c9d0e",
+      "source": "Synthetic HTTP fixture from merged app"
+    }
+  ]
+}

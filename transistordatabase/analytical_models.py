@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
+from fractions import Fraction
 from typing import Optional
 
 import numpy as np
@@ -140,8 +141,101 @@ class GateChargeModel:
         """
         return self._intervals(v_driver, v_off)['turn_off']
 
+    def _turn_on_settling(self, target_v, v_driver, anchor_s):
+        """Estimate a separate gate-only phase after the existing Miller endpoint."""
+        if isinstance(target_v, (bool, np.bool_)):
+            raise ValueError('The settling target must be a finite gate voltage')
+        try:
+            target = float(target_v)
+        except (ValueError, TypeError, OverflowError) as error:
+            raise ValueError('The settling target must be a finite gate voltage') from error
+        if target != target_v:
+            raise ValueError('The settling target exceeds accepted binary64 input precision')
+        p = self.params
+        if not np.isfinite(target) or not p.v_plateau < target < v_driver:
+            raise ValueError('Require Vplateau < settling target < Von')
+        def exact(value):
+            number = float(value)
+            if number != value:
+                raise ValueError('Settling model parameters exceed accepted binary64 input precision')
+            return Fraction.from_float(number)
+        residual = exact(p.q_g) - exact(p.q_gs) - exact(p.q_gd)
+        if residual < 0:
+            raise ValueError('The exact residual post-plateau charge must be nonnegative')
+        span = exact(v_driver) - exact(p.v_plateau)
+        delta = exact(target) - exact(p.v_plateau)
+        gap = exact(v_driver) - exact(target)
+        capacitance = residual / span
+        charge = capacitance * delta
+        resistance = p.r_g + p.r_g_int
+        exact(p.r_g)
+        exact(p.r_g_int)
+        exact_resistance = exact(resistance)
+
+        def finite(value, label):
+            try:
+                result = float(value)
+            except OverflowError as error:
+                raise ValueError(f'{label} exceeds the finite SI range') from error
+            if not np.isfinite(result) or (result == 0 and value != 0):
+                raise ValueError(f'{label} exceeds the nonzero finite SI range')
+            return result
+
+        def extended(value, label):
+            with np.errstate(over='ignore', under='ignore', invalid='ignore'):
+                result = np.longdouble(str(value.numerator)) / np.longdouble(str(value.denominator))
+            if not np.isfinite(result) or (result == 0 and value != 0):
+                raise ValueError(f'{label} exceeds this platform numerical range')
+            return result
+
+        result = {'method': 'constant-capacitance-post-miller-v1',
+                  'target_gate_v': target, 'initial_gate_v': float(p.v_plateau),
+                  'driver_voltage_v': float(v_driver), 'resistance_ohm': float(resistance),
+                  'post_plateau_capacitance_f': finite(capacitance, 'Post-plateau capacitance'),
+                  'residual_charge_c': finite(residual, 'Residual post-plateau charge'),
+                  'incremental_charge_c': finite(charge, 'Incremental target charge'),
+                  'anchor_s': anchor_s,
+                  'time_basis': 'Relative seconds after the existing Miller-end anchor_s; old switching timings remain unchanged',
+                  'scope': 'Gate charging estimate only; no physical drain waveform or switching energy is inferred',
+                  'charge_reference': 'Qg remains specified at Von; the target does not redefine the charge measurement'}
+        if residual == 0:
+            result.update(status='instantaneous-ideal-crossing', instantaneous=True,
+                          duration_s=0.0, relative_time_s=[0.0, 0.0],
+                          v_gate_v=[float(p.v_plateau), target], i_gate_a=[None, None],
+                          initial_gate_current_a=None, final_gate_current_a=None,
+                          absolute_end_s=anchor_s, absolute_time_status='instantaneous-ideal-crossing',
+                          assumption='Zero residual charge declares an ideal voltage crossing; no finite-time current pulse is defined')
+            return result
+        tau = extended(exact_resistance * capacitance, 'Post-plateau RC time constant')
+        ratio = extended(delta / gap, 'Target voltage gap ratio')
+        with np.errstate(over='ignore', under='ignore', invalid='ignore'):
+            elapsed = tau * np.log1p(ratio)
+        duration = finite(elapsed, 'Positive gate settling duration')
+        if duration <= 0:
+            raise ValueError('Positive post-plateau charge requires a resolvable positive duration')
+        times = sorted({0.0, duration, *(duration * (i / 32) for i in range(1, 32))})
+        voltage = []
+        rail_span = extended(span, 'Post-plateau voltage span')
+        for time in times:
+            value = np.longdouble(p.v_plateau) + rail_span * -np.expm1(-np.longdouble(time) / tau)
+            voltage.append(finite(value, 'Settling gate voltage'))
+        voltage[0], voltage[-1] = float(p.v_plateau), target
+        currents = [finite(extended(exact(v_driver) - exact(value), 'Resistive voltage gap') /
+                           np.longdouble(resistance), 'Settling gate current') for value in voltage]
+        with np.errstate(over='ignore', invalid='ignore'):
+            absolute = float(np.longdouble(anchor_s) + elapsed)
+        resolved = np.isfinite(absolute) and absolute > anchor_s
+        result.update(status='computed', instantaneous=False, duration_s=duration,
+                      relative_time_s=times, v_gate_v=voltage, i_gate_a=currents,
+                      initial_gate_current_a=currents[0], final_gate_current_a=currents[-1],
+                      absolute_end_s=absolute if resolved else None,
+                      absolute_time_status='resolved' if resolved else 'unresolved-use-relative-time',
+                      assumption='Constant post-plateau capacitance and an ideal resistive driver')
+        return result
+
     def calc_switching_estimate(
-        self, v_driver: float = 15.0, v_off: float = 0.0
+        self, v_driver: float = 15.0, v_off: float = 0.0, *,
+        settling_target_v: float | None = None,
     ) -> dict:
         """Return SI timings, phase boundaries and normalized drain illustrations.
 
@@ -209,6 +303,9 @@ class GateChargeModel:
             for key in ('time_s', 'v_gate_v', 'i_gate_a', 'id_normalized', 'vds_normalized'):
                 if not np.all(np.isfinite(result[direction][key])):
                     raise ValueError('Parameters exceed the finite numerical range of the traces')
+        if settling_target_v is not None:
+            result['turn_on_settling'] = self._turn_on_settling(
+                settling_target_v, v_driver, result['turn_on']['times_s']['t_total'])
         return result
 
 

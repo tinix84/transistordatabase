@@ -35,6 +35,7 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, Backg
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import ValidationError
+from transistordatabase.gui_web.backend.gate_charge_routes import router as gate_charge_router
 
 from transistordatabase.backend.concrete_services import (
     ConcreteServiceFactory,
@@ -2808,7 +2809,7 @@ async def calculate_biela(request: BielaModelRequest) -> Dict[str, Any]:
 app.include_router(biela_router)
 
 
-@app.post("/api/analytical/gate_charge")
+@gate_charge_router.post("/api/analytical/gate_charge")
 async def calculate_gate_charge(request: GateChargeModelRequest) -> Dict[str, Any]:
     """Calculate switching times using gate charge model.
 
@@ -2824,7 +2825,7 @@ async def calculate_gate_charge(request: GateChargeModelRequest) -> Dict[str, An
             r_g=request.r_g, r_g_int=request.r_g_int,
         )
         estimate = GateChargeModel(params).calc_switching_estimate(
-            request.v_driver, request.v_off
+            request.v_driver, request.v_off, settling_target_v=request.settling_target_v
         )
         timing_ns = {
             key + '_times': {k: v * 1e9 for k, v in estimate[key]['times_s'].items()}
@@ -2841,11 +2842,15 @@ async def calculate_gate_charge(request: GateChargeModelRequest) -> Dict[str, An
             'v_th': request.v_th, 'v_plateau': request.v_plateau,
             'r_g_total': request.r_g + request.r_g_int,
             'v_driver': request.v_driver, 'v_off': request.v_off,
+            **({'settling_target_v': request.settling_target_v} if request.settling_target_v is not None else {}),
         },
         # Keep the existing web timing contract in ns; traces remain explicit SI.
         **timing_ns,
         'estimate': estimate,
     }
+
+app.include_router(gate_charge_router)
+
 
 @app.post("/api/dpt/generate_netlist")
 async def generate_dpt_netlist(

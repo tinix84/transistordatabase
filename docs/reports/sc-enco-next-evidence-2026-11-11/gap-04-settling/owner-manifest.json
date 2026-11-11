@@ -1,0 +1,60 @@
+{
+  "artifacts": [
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-python-selection.json",
+      "bytes": 250,
+      "sha256": "901df906f0a8e9bcc8ca50aebca0b07964a1de22cbd8c797d650cc587fa6aebc"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-python-source-start.json",
+      "bytes": 27454,
+      "sha256": "123bee22fff6bbc729c2e284ed56b3fada06c2b3ce2c2cb01e28c5f260295cce"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-python-source-end.json",
+      "bytes": 27454,
+      "sha256": "123bee22fff6bbc729c2e284ed56b3fada06c2b3ce2c2cb01e28c5f260295cce"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-python-junit.xml",
+      "bytes": 33060,
+      "sha256": "530f4c703fdc6dc8da242332f4d585c633a67e2fc06a2e16465eec96f2d7e75f"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-python-pytest.log",
+      "bytes": 862,
+      "sha256": "2fcdea8e5437d36aed98bc74ae1dbfa0cbd8dfbce64463377b8a9b4b3ce3c631"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-python-resource.log",
+      "bytes": 1419,
+      "sha256": "3a29c82c452f9e87dbec158c9fe6b669ccc00fb7c0d4d9243e81b4e6e2ce05f1"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-vue-selection.json",
+      "bytes": 188,
+      "sha256": "d9f90bf19ddadc6ef412cdf4aadd9588bded7d14ca1334f04a6a5438ea60472e"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-vue-source-start.json",
+      "bytes": 28304,
+      "sha256": "bf62cca02f80344a6fcfe4e3014356614f4cd1f888ec6fab04d2de19ff789c5a"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-vue-source-end.json",
+      "bytes": 28304,
+      "sha256": "bf62cca02f80344a6fcfe4e3014356614f4cd1f888ec6fab04d2de19ff789c5a"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-vue-vitest.log",
+      "bytes": 2357,
+      "sha256": "7ff5e3f23cbdbc3b84046583d6822e095efd375205e8cc31825f9a642aa70f7a"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-vue-resource.log",
+      "bytes": 956,
+      "sha256": "f597aed6ba9afe1893d4e7f0c324343908b40a411daf462d3ff3e0566d6d2d86"
+    }
+  ],
+  "scope": "232 adjacent Python cases include independent14 before its later large-SI API case. Final42Vue include acceptedlargeSIplot, all source snapshots unchanged."
+}

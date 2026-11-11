@@ -1,0 +1,23 @@
+	Command being timed: "/home/tinix/miniconda3/envs/ntbees2/bin/python -B -c import pytest; raise SystemExit(pytest.main(["--noconftest","-p","no:cacheprovider","--import-mode=importlib","--basetemp=/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/gate-settling-owner-76dae802-7bf9-47ee-a34f-6e0d699c91f0/raw-final-basetemp","--junitxml=/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/gate-settling-owner-76dae802-7bf9-47ee-a34f-6e0d699c91f0/python-raw-final-junit.xml","-q",'tests/test_analytical_models.py','tests/test_gate_settling.py','tests/test_gate_settling_independent.py']))"
+	User time (seconds): 14.66
+	System time (seconds): 1.99
+	Percent of CPU this job got: 138%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:12.00
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 264044
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 346
+	Minor (reclaiming a frame) page faults: 69983
+	Voluntary context switches: 1797
+	Involuntary context switches: 1156
+	Swaps: 0
+	File system inputs: 76728
+	File system outputs: 32
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

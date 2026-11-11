@@ -1,0 +1,20 @@
+{
+  "artifacts": [
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-responsive-vue-final.log",
+      "bytes": 490,
+      "sha256": "7cf1e5623d10965f95d43eea41de471a9370721ac0b029f8ce0b5070bfc1f2b9"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-responsive-vue-final-resource.log",
+      "bytes": 829,
+      "sha256": "0627501a2aa5fc951080aa1c561c3f4b39c0cefd5c75b49eb834e0fc7a2cc773"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-responsive-vue-final.json",
+      "bytes": 232,
+      "sha256": "a91f936c4a521e2743aa5f0eb3252da38b04c5e6e3d5d2a68226e9f871cd603d"
+    }
+  ],
+  "scope": "Final11 gate UI cases after bounded local table scrolling. Earlier42Vue proof remains unchanged. No scientific value or API change."
+}

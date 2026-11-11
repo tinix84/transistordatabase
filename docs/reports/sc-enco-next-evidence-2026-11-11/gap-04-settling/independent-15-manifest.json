@@ -1,0 +1,44 @@
+{
+  "receipt_type": "Post-Miller gate settling with finite large SI duration",
+  "passed": 15,
+  "pytest_seconds": 3.512,
+  "wall_seconds": 5.38,
+  "max_rss_kib": 260120,
+  "frozen_sources": 4,
+  "earlier_legacy_http_manifest": {
+    "name": "independent-manifest.json",
+    "sha256": "52bc5e9cc3b38f7437c7c7606232eafd70a869e721cbe6d06adaa46343af9b82"
+  },
+  "entries": [
+    {
+      "name": "independent-15-source-start.json",
+      "bytes": 463,
+      "sha256": "4ccf03d788cc04597aa38076faac2e440a179fe4b16323a2da94cd9476418024",
+      "source": "/tmp/tdb-gate-settling-independent-c7931ecc-e1bd-47e0-95da-5974a04126fb/source-start.json"
+    },
+    {
+      "name": "independent-15-source-end.json",
+      "bytes": 463,
+      "sha256": "4ccf03d788cc04597aa38076faac2e440a179fe4b16323a2da94cd9476418024",
+      "source": "/tmp/tdb-gate-settling-independent-c7931ecc-e1bd-47e0-95da-5974a04126fb/source-end.json"
+    },
+    {
+      "name": "independent-15-pytest.log",
+      "bytes": 621,
+      "sha256": "b393d10d7d9b576ad63be6b6ce675800546fc239043eec98c1017a42ebb85671",
+      "source": "/tmp/tdb-gate-settling-independent-c7931ecc-e1bd-47e0-95da-5974a04126fb/pytest.log"
+    },
+    {
+      "name": "independent-15-junit.xml",
+      "bytes": 2499,
+      "sha256": "017dc6bb17e6077c6aba6e449f5f1549d747f4b7a237295fa60dce42f8932303",
+      "source": "/tmp/tdb-gate-settling-independent-c7931ecc-e1bd-47e0-95da-5974a04126fb/junit.xml"
+    },
+    {
+      "name": "independent-15-resource.txt",
+      "bytes": 1093,
+      "sha256": "bb5348c0973136f335608e36e217c10ba86820220d073662598eee48e3f15d9b",
+      "source": "/tmp/tdb-gate-settling-independent-c7931ecc-e1bd-47e0-95da-5974a04126fb/resource.txt"
+    }
+  ]
+}

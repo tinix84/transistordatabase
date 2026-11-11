@@ -1,0 +1,50 @@
+{
+  "receipt_type": "Independent gate-settling HTTP, numerical and original-token checks",
+  "passed": 21,
+  "pytest_seconds": 2.669,
+  "wall_seconds": 4.32,
+  "max_rss_kib": 260592,
+  "frozen_sources": 6,
+  "earlier_manifests": [
+    {
+      "name": "independent-manifest.json",
+      "sha256": "52bc5e9cc3b38f7437c7c7606232eafd70a869e721cbe6d06adaa46343af9b82"
+    },
+    {
+      "name": "independent-15-manifest.json",
+      "sha256": "38ce2e94934597b11083aa2c97d30a46f640ce2d8fdae6fbf617c86a7fda4c65"
+    }
+  ],
+  "entries": [
+    {
+      "name": "independent-final-source-start.json",
+      "source": "/tmp/tdb-gate-settling-independent-b4a7db34-3294-4282-b45b-27077385e33b/source-start.json",
+      "bytes": 722,
+      "sha256": "9f636b42822b2339582a912da165a1a388cec56fa802b60ed5ea4211a33ece36"
+    },
+    {
+      "name": "independent-final-source-end.json",
+      "source": "/tmp/tdb-gate-settling-independent-b4a7db34-3294-4282-b45b-27077385e33b/source-end.json",
+      "bytes": 722,
+      "sha256": "9f636b42822b2339582a912da165a1a388cec56fa802b60ed5ea4211a33ece36"
+    },
+    {
+      "name": "independent-final-pytest.log",
+      "source": "/tmp/tdb-gate-settling-independent-b4a7db34-3294-4282-b45b-27077385e33b/pytest.log",
+      "bytes": 621,
+      "sha256": "d606cd047d818c7ac70b593d33cd02a7f6614ef0b046332e55065cee3d73515f"
+    },
+    {
+      "name": "independent-final-junit.xml",
+      "source": "/tmp/tdb-gate-settling-independent-b4a7db34-3294-4282-b45b-27077385e33b/junit.xml",
+      "bytes": 3823,
+      "sha256": "b08c0b81991311dd8f6ab70be190e0bd43b89d7d90461655002dfd1ab14c9996"
+    },
+    {
+      "name": "independent-final-resource.txt",
+      "source": "/tmp/tdb-gate-settling-independent-b4a7db34-3294-4282-b45b-27077385e33b/resource.txt",
+      "bytes": 1093,
+      "sha256": "de4238b5482094110eefda505eb7207c90fe12e92de109a9fa0865782132bf1c"
+    }
+  ]
+}

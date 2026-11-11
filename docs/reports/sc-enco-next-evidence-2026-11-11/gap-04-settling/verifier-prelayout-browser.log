@@ -1,0 +1,233 @@
+
+Running 10 tests using 1 worker
+
+[1A[2K[1/10] [desktop] › transistordatabase/gui_web/src/tests/e2e/gate-hysteresis-acceptance.spec.js:56:1 › actual noisy waveform has two on one off brackets and independent seven millijoule oracle
+[1A[2K[2/10] [desktop] › transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:48:1 › gate settling acceptance RC oracle preserves legacy phases exports and stale evidence
+[1A[2K[3/10] [desktop] › transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:82:1 › gate settling acceptance zero charge has no current pulse and strict target bounds reject
+[1A[2K[4/10] [desktop] › transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:124:1 › gate settling acceptance near bounds collapsed absolute clock and huge finite SI duration remain honest
+[1A[2K[5/10] [desktop] › transistordatabase/gui_web/src/tests/e2e/thermal-contacts-acceptance.spec.js:46:1 › thermal contact acceptance actual controls preserve three contacts and 28 32 31 oracle with exports
+[1A[2K[6/10] [mobile-390] › transistordatabase/gui_web/src/tests/e2e/gate-hysteresis-acceptance.spec.js:56:1 › actual noisy waveform has two on one off brackets and independent seven millijoule oracle
+[1A[2K[7/10] [mobile-390] › transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:48:1 › gate settling acceptance RC oracle preserves legacy phases exports and stale evidence
+[1A[2K[8/10] [mobile-390] › transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:82:1 › gate settling acceptance zero charge has no current pulse and strict target bounds reject
+[1A[2K  1) [mobile-390] › transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:82:1 › gate settling acceptance zero charge has no current pulse and strict target bounds reject 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeLessThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: <= [32m391[39m
+    Received:    [31m443[39m
+
+      43 |   expect(info.capture.failed_requests).toEqual([])
+      44 |   expect(info.capture.http5xx).toEqual([])
+    > 45 |   if (info.project.name === 'mobile-390') expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(391)
+         |                                                                                                                   ^
+      46 | })
+      47 |
+      48 | test('gate settling acceptance RC oracle preserves legacy phases exports and stale evidence', async ({ page }, info) => {
+        at /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:45:115
+
+    Error: page.waitForEvent: Test timeout of 60000ms exceeded.
+    =========================== logs ===========================
+    waiting for event "download"
+    ============================================================
+
+      19 | }
+      20 | async function download(page, id, info, name) {
+    > 21 |   const ready = page.waitForEvent('download')
+         |                      ^
+      22 |   await page.getByTestId(id).click()
+      23 |   const item = await ready, path = info.outputPath(name)
+      24 |   await item.saveAs(path)
+        at download (/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:21:22)
+        at /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:94:21
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('gate-settling-csv')[22m
+    [2m    - locator resolved to <button data-v-1badff7e="" data-testid="gate-settling-csv">Export relative gate settling trace CSV</button>[22m
+    [2m  - attempting click action[22m
+    [2m    - waiting for element to be visible, enabled and stable[22m
+    [2m    - element is visible, enabled and stable[22m
+    [2m    - scrolling into view if needed[22m
+    [2m    - done scrolling[22m
+    [2m    - <p data-v-1badff7e="">No finite-time gate current pulse is defined for …</p> from <div data-v-1badff7e="" class="gate-plots">…</div> subtree intercepts pointer events[22m
+    [2m  - retrying click action[22m
+    [2m    - waiting for element to be visible, enabled and stable[22m
+    [2m    - element is visible, enabled and stable[22m
+    [2m    - scrolling into view if needed[22m
+    [2m    - done scrolling[22m
+    [2m    - <button data-v-1badff7e="" data-testid="gate-settling-json">Export gate request and result JSON</button> intercepts pointer events[22m
+    [2m  - retrying click action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is visible, enabled and stable[22m
+    [2m      - scrolling into view if needed[22m
+    [2m      - done scrolling[22m
+    [2m      - <p data-v-1badff7e="">No finite-time gate current pulse is defined for …</p> from <div data-v-1badff7e="" class="gate-plots">…</div> subtree intercepts pointer events[22m
+    [2m    - retrying click action[22m
+    [2m      - waiting 100ms[22m
+    [2m    27 × waiting for element to be visible, enabled and stable[22m
+    [2m       - element is visible, enabled and stable[22m
+    [2m       - scrolling into view if needed[22m
+    [2m       - done scrolling[22m
+    [2m       - <p data-v-1badff7e="">No finite-time gate current pulse is defined for …</p> from <div data-v-1badff7e="" class="gate-plots">…</div> subtree intercepts pointer events[22m
+    [2m     - retrying click action[22m
+    [2m       - waiting 500ms[22m
+    [2m       - waiting for element to be visible, enabled and stable[22m
+    [2m       - element is visible, enabled and stable[22m
+    [2m       - scrolling into view if needed[22m
+    [2m       - done scrolling[22m
+    [2m       - <button data-v-1badff7e="" data-testid="gate-settling-json">Export gate request and result JSON</button> intercepts pointer events[22m
+    [2m     - retrying click action[22m
+    [2m       - waiting 500ms[22m
+    [2m       - waiting for element to be visible, enabled and stable[22m
+    [2m       - element is visible, enabled and stable[22m
+    [2m       - scrolling into view if needed[22m
+    [2m       - done scrolling[22m
+    [2m       - <p data-v-1badff7e="">No finite-time gate current pulse is defined for …</p> from <div data-v-1badff7e="" class="gate-plots">…</div> subtree intercepts pointer events[22m
+    [2m     - retrying click action[22m
+    [2m       - waiting 500ms[22m
+    [2m       - waiting for element to be visible, enabled and stable[22m
+    [2m       - element is visible, enabled and stable[22m
+    [2m       - scrolling into view if needed[22m
+    [2m       - done scrolling[22m
+    [2m       - <p data-v-1badff7e="">No finite-time gate current pulse is defined for …</p> from <div data-v-1badff7e="" class="gate-plots">…</div> subtree intercepts pointer events[22m
+    [2m     - retrying click action[22m
+    [2m       - waiting 500ms[22m
+    [2m    - waiting for element to be visible, enabled and stable[22m
+    [2m    - element is visible, enabled and stable[22m
+    [2m    - scrolling into view if needed[22m
+    [2m    - done scrolling[22m
+    [2m    - <p data-v-1badff7e="">No finite-time gate current pulse is defined for …</p> from <div data-v-1badff7e="" class="gate-plots">…</div> subtree intercepts pointer events[22m
+    [2m  - retrying click action[22m
+    [2m    - waiting 500ms[22m
+    [2m    - waiting for element to be visible, enabled and stable[22m
+
+
+      20 | async function download(page, id, info, name) {
+      21 |   const ready = page.waitForEvent('download')
+    > 22 |   await page.getByTestId(id).click()
+         |                              ^
+      23 |   const item = await ready, path = info.outputPath(name)
+      24 |   await item.saveAs(path)
+      25 |   return readFile(path, 'utf8')
+        at download (/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:22:30)
+        at /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:94:21
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../transistordatabase-integration-audit-20261111/gate-settling-browser-715aa2bcd3304ea6a1c487e64519e090/browser-results-53c44ec3a1d8431487f1312ae2428bac/test-results/gate-settling-acceptance-g-0941e-strict-target-bounds-reject-mobile-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../transistordatabase-integration-audit-20261111/gate-settling-browser-715aa2bcd3304ea6a1c487e64519e090/browser-results-53c44ec3a1d8431487f1312ae2428bac/test-results/gate-settling-acceptance-g-0941e-strict-target-bounds-reject-mobile-390/error-context.md
+
+
+[1A[2K[9/10] [mobile-390] › transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:124:1 › gate settling acceptance near bounds collapsed absolute clock and huge finite SI duration remain honest
+[1A[2K  2) [mobile-390] › transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:124:1 › gate settling acceptance near bounds collapsed absolute clock and huge finite SI duration remain honest 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeLessThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: <= [32m391[39m
+    Received:    [31m822[39m
+
+      43 |   expect(info.capture.failed_requests).toEqual([])
+      44 |   expect(info.capture.http5xx).toEqual([])
+    > 45 |   if (info.project.name === 'mobile-390') expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(391)
+         |                                                                                                                   ^
+      46 | })
+      47 |
+      48 | test('gate settling acceptance RC oracle preserves legacy phases exports and stale evidence', async ({ page }, info) => {
+        at /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:45:115
+
+    Error: page.waitForEvent: Test timeout of 60000ms exceeded.
+    =========================== logs ===========================
+    waiting for event "download"
+    ============================================================
+
+      19 | }
+      20 | async function download(page, id, info, name) {
+    > 21 |   const ready = page.waitForEvent('download')
+         |                      ^
+      22 |   await page.getByTestId(id).click()
+      23 |   const item = await ready, path = info.outputPath(name)
+      24 |   await item.saveAs(path)
+        at download (/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:21:22)
+        at /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:149:27
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('gate-settling-json')[22m
+    [2m    - locator resolved to <button data-v-1badff7e="" data-testid="gate-settling-json">Export gate request and result JSON</button>[22m
+    [2m  - attempting click action[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is visible, enabled and stable[22m
+    [2m      - scrolling into view if needed[22m
+    [2m      - done scrolling[22m
+    [2m      - <canvas width="266" height="400" data-v-dbff0814=""></canvas> from <div data-v-1badff7e="" class="gate-plots">…</div> subtree intercepts pointer events[22m
+    [2m    - retrying click action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is visible, enabled and stable[22m
+    [2m      - scrolling into view if needed[22m
+    [2m      - done scrolling[22m
+    [2m      - <canvas width="266" height="400" data-v-dbff0814=""></canvas> from <div data-v-1badff7e="" class="gate-plots">…</div> subtree intercepts pointer events[22m
+    [2m    - retrying click action[22m
+    [2m      - waiting 100ms[22m
+    [2m    102 × waiting for element to be visible, enabled and stable[22m
+    [2m        - element is visible, enabled and stable[22m
+    [2m        - scrolling into view if needed[22m
+    [2m        - done scrolling[22m
+    [2m        - <canvas width="266" height="400" data-v-dbff0814=""></canvas> from <div data-v-1badff7e="" class="gate-plots">…</div> subtree intercepts pointer events[22m
+    [2m      - retrying click action[22m
+    [2m        - waiting 500ms[22m
+    [2m    - waiting for element to be visible, enabled and stable[22m
+
+
+      20 | async function download(page, id, info, name) {
+      21 |   const ready = page.waitForEvent('download')
+    > 22 |   await page.getByTestId(id).click()
+         |                              ^
+      23 |   const item = await ready, path = info.outputPath(name)
+      24 |   await item.saveAs(path)
+      25 |   return readFile(path, 'utf8')
+        at download (/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:22:30)
+        at /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:149:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../transistordatabase-integration-audit-20261111/gate-settling-browser-715aa2bcd3304ea6a1c487e64519e090/browser-results-53c44ec3a1d8431487f1312ae2428bac/test-results/gate-settling-acceptance-g-c6861-e-SI-duration-remain-honest-mobile-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../transistordatabase-integration-audit-20261111/gate-settling-browser-715aa2bcd3304ea6a1c487e64519e090/browser-results-53c44ec3a1d8431487f1312ae2428bac/test-results/gate-settling-acceptance-g-c6861-e-SI-duration-remain-honest-mobile-390/error-context.md
+
+
+[1A[2K[10/10] [mobile-390] › transistordatabase/gui_web/src/tests/e2e/thermal-contacts-acceptance.spec.js:46:1 › thermal contact acceptance actual controls preserve three contacts and 28 32 31 oracle with exports
+[1A[2K  2 failed
+    [mobile-390] › transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:82:1 › gate settling acceptance zero charge has no current pulse and strict target bounds reject 
+    [mobile-390] › transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js:124:1 › gate settling acceptance near bounds collapsed absolute clock and huge finite SI duration remain honest 
+  8 passed (3.0m)
+Command exited with non-zero status 1
+	Command being timed: "/usr/bin/node /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/node_modules/@playwright/test/cli.js test --config /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/playwright.gate-settling.acceptance.config.js"
+	User time (seconds): 35.59
+	System time (seconds): 9.62
+	Percent of CPU this job got: 24%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 3:04.34
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 355936
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 1349
+	Minor (reclaiming a frame) page faults: 457054
+	Voluntary context switches: 70019
+	Involuntary context switches: 581
+	Swaps: 0
+	File system inputs: 193200
+	File system outputs: 56776
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 1
