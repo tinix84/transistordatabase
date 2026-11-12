@@ -1,0 +1,20 @@
+{
+  "actual_scalar_calls": 32,
+  "analytical_receipt_sha256": "a19e4f0da226eb7b0fe09786730cb3dcd9d7cfd49ec4aba1d464dcadc89d4790",
+  "encoded_result_bytes": 232814,
+  "launch_receipt_sha256": "ee33a8cc96de3b1b4327140ec6d04bd3c705645938c3564d47c9efd60260e780",
+  "peak_rss_kib": 223700,
+  "qualification": "Power-balanced included-loss estimate; voltage closure unproved",
+  "sample_points": 20000,
+  "scalar_coordinates": 40000,
+  "scope": "Maximum calls/source points, not maximum solver iterations",
+  "source_hashes": {
+    "transistordatabase/topologies/boost_grid_bounds.py": "07d7d6383e491a9e04541191398c2a380b27592914966bbd6acf68152caa846b",
+    "transistordatabase/topologies/operating_point.py": "45ec877fa71db05d67848248658ffa9d2593ed576082e1ec79af9022427db1f0",
+    "transistordatabase/topologies/semiconductor_pareto.py": "2a7a67aeb59c50fdc8b9fe893e44b013f36c767420f56d783391d77d8b2409c9"
+  },
+  "source_unchanged": true,
+  "status": "PASS",
+  "supervisor_receipt_sha256": "22fe64ae8d0e23e327a06caccec2f864f073b86709747188a9c46f2f9a22117b",
+  "wall_s": 73.19472204400518
+}

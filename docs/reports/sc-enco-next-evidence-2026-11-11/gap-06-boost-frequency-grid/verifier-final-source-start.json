@@ -1,0 +1,118 @@
+{
+  "created_utc": "2026-11-12T00:05:07.6645567Z",
+  "source": [
+    {
+      "path": "src\\components\\TopologyCalculator.vue",
+      "sha256": "06BB2912C3EAA6831C2624564EE15538DF9BB7420FF9C2D25EC9AD13A50676D9",
+      "bytes": 51771
+    },
+    {
+      "path": "src\\components\\TopologyParetoPanel.vue",
+      "sha256": "0A2B0358F455FAAB4C16C6791431FE46054FF2D266C71BCD135C5A20DE3699AA",
+      "bytes": 28182
+    },
+    {
+      "path": "src\\tests\\e2e\\boost-frequency-grid-acceptance.spec.js",
+      "sha256": "D5C9BA347B68358ABA2CC5AD078C5FC20601C523D9DE5784C68C865C5ABCDFCC",
+      "bytes": 17235
+    },
+    {
+      "path": "playwright.boost-frequency-grid.acceptance.config.js",
+      "sha256": "A7596F0ED363E87AC2AD0351CE29C1EDA23982F48FEF67354FF3FAE5F7B3B79B",
+      "bytes": 727
+    }
+  ],
+  "index_before": "949732B45122E76DDCFABC6DDE329C841EEE2A19B7E6C18C13D9C3280C1566BA",
+  "retained_assets": [
+    {
+      "sha256": "42DDB9C1B8D94352F2E92A2F97F9CB95FAE41725979651D0952955C4AAFF58CB",
+      "name": "index-11is31Q7.js",
+      "bytes": 1098554
+    },
+    {
+      "sha256": "46ACFA0C7E0FAC6F6A28365BE49ADA296064E2274556709B1C54990DF093C59A",
+      "name": "index-B-uDa43d.js",
+      "bytes": 1088039
+    },
+    {
+      "sha256": "685F25BE8122C85F38D2E3B96E1CDEDE598D3396C5CA0515F3BA6A6D3FD3E63B",
+      "name": "index-B6TvftXk.js",
+      "bytes": 1121767
+    },
+    {
+      "sha256": "850CDB88D50563901946A80C89D4A215066E84F196C129F2040262179F4D8749",
+      "name": "index-BiqYnh0l.css",
+      "bytes": 142590
+    },
+    {
+      "sha256": "5B2B3D7E48DBF9F21DBD622039877D310587EA8CF7AEA9A9C760CEF49D4D658C",
+      "name": "index-BQ-q-3_s.js",
+      "bytes": 1128266
+    },
+    {
+      "sha256": "CF7B5160CA6C0A303B90D80D21E3F4FEDA53FC353437FF69792C5AE39FA74528",
+      "name": "index-BsmDSL5R.css",
+      "bytes": 144314
+    },
+    {
+      "sha256": "73BF8A357296E40D3CA9917BF2958C48CFC3DBD89AE7F585846379CA06348FA2",
+      "name": "index-Cd-9xTOa.js",
+      "bytes": 1104645
+    },
+    {
+      "sha256": "5B0BACED0CD98D25FA6D97510A3FE6E4749A9C4FAB88E149BE15688897221CAD",
+      "name": "index-CfzCuJjG.js",
+      "bytes": 1104662
+    },
+    {
+      "sha256": "C91C989BCAD66D8AF6255D9C9DAD2750BEB2B713D86C92DD90746870395C8EA1",
+      "name": "index-DEGD4GTA.css",
+      "bytes": 146057
+    },
+    {
+      "sha256": "D62C6D57E7D86482D870545F6FC5F237FFC257F3C288A1DE359ADF6AB5E2AC7A",
+      "name": "index-DERh4duk.css",
+      "bytes": 144314
+    },
+    {
+      "sha256": "8A9DAA2E9B18685C04E1C3595A1C7CD93ED7B37F07A25BCCBCA2850A74303B83",
+      "name": "index-DFMz6lo5.css",
+      "bytes": 146057
+    },
+    {
+      "sha256": "0723DDD8FEB7E338BBF4CBDB1AF118A214919B744292AD9BE6B643FA5026DD64",
+      "name": "index-Dh9GZBYy.js",
+      "bytes": 1109006
+    },
+    {
+      "sha256": "68A1E0A61B2FD6C6A4C5DEAB30DCC4737AEC00A8D9E58DFFF8B70E1A469E7C60",
+      "name": "index-Djcupi58.css",
+      "bytes": 144601
+    },
+    {
+      "sha256": "514A79C300AC1D74150D4244492F27AD569CF9676CB8220241F8BA9762A4BEDB",
+      "name": "index-DwhnJuQe.css",
+      "bytes": 143660
+    },
+    {
+      "sha256": "82946925FBFE4A65FD8F3E99C5393C79EFF8DDA9F65A77E7E0130D6E4308F674",
+      "name": "index-g-r-JQ0i.js",
+      "bytes": 1108916
+    },
+    {
+      "sha256": "DD671A1BA9ED217D4972FE6D71A4C1C2165B7C9588F2F2E07FC731BD6E582BB0",
+      "name": "index-SnRinjk2.css",
+      "bytes": 144368
+    },
+    {
+      "sha256": "D32C63C264D4240E14CA229C664D4B9F35F359B7A135F49E98EDDAD603195B0E",
+      "name": "index-u5jEtrgK.css",
+      "bytes": 145759
+    },
+    {
+      "sha256": "6DF8AFC2D6DDD8A7D5C63D2308CCCDF400D1643118D2D4751B639056F15B5799",
+      "name": "index-xyyq5K5Z.js",
+      "bytes": 1129872
+    }
+  ]
+}

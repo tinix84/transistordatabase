@@ -1,0 +1,34 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.0.3, pluggy-1.6.0 -- /home/tinix/miniconda3/envs/ntbees2/bin/python
+rootdir: /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111
+configfile: pyproject.toml
+collecting ... collected 19 items
+
+tests/test_boost_frequency_grid_independent.py::test_existing_estimate_and_frequency_line_keep_full_merged_response[False-8045914116fef11afb03e3e85c3095bed94f05ea6127810b5cdf9a673d58b976] PASSED [  5%]
+tests/test_boost_frequency_grid_independent.py::test_existing_estimate_and_frequency_line_keep_full_merged_response[True-73ed8f52b1eafbb59cbdae4ff800c7c84b97a646847ff28b84e9b1e26651f07c] PASSED [ 10%]
+tests/test_boost_frequency_grid_independent.py::test_existing_pareto_without_opt_in_preserves_complete_failure_population PASSED [ 15%]
+tests/test_boost_frequency_grid_independent.py::test_mixed_line_retains_frequency_position_and_matches_independent_scalar_solves PASSED [ 21%]
+tests/test_boost_frequency_grid_independent.py::test_lossless_limit_is_a_supported_measured_zero_at_every_frequency PASSED [ 26%]
+tests/test_boost_frequency_grid_independent.py::test_missing_switching_curve_keeps_gaps_distinct_from_zero_heat PASSED [ 31%]
+tests/test_boost_frequency_grid_independent.py::test_each_frequency_has_its_own_complete_ranked_population PASSED [ 36%]
+tests/test_boost_frequency_grid_independent.py::test_shared_grid_has_only_distinct_finite_positive_frequencies[frequencies0] PASSED [ 42%]
+tests/test_boost_frequency_grid_independent.py::test_shared_grid_has_only_distinct_finite_positive_frequencies[frequencies1] PASSED [ 47%]
+tests/test_boost_frequency_grid_independent.py::test_shared_grid_has_only_distinct_finite_positive_frequencies[frequencies2] PASSED [ 52%]
+tests/test_boost_frequency_grid_independent.py::test_resource_budget_applies_across_all_candidates_and_frequencies PASSED [ 57%]
+tests/test_boost_frequency_grid_independent.py::test_api_snapshots_each_shared_device_and_missing_identity_once PASSED [ 63%]
+tests/test_boost_frequency_grid_independent.py::test_normal_service_solves_exactly_listed_coordinates_and_retains_rejected_grid[True] PASSED [ 68%]
+tests/test_boost_frequency_grid_independent.py::test_normal_service_solves_exactly_listed_coordinates_and_retains_rejected_grid[False] PASSED [ 73%]
+tests/test_boost_frequency_grid_independent.py::test_bounded_core_rejects_unsized_frequency_iterables_without_enumeration PASSED [ 78%]
+tests/test_boost_frequency_grid_independent.py::test_list_backed_oversize_graph_rejects_before_a_scalar_solve PASSED [ 84%]
+tests/test_boost_frequency_grid_independent.py::test_dedicated_transport_enforces_four_mib_of_actual_json_before_parsing[/api/topology/switching-frequency-grid] PASSED [ 89%]
+tests/test_boost_frequency_grid_independent.py::test_dedicated_transport_enforces_four_mib_of_actual_json_before_parsing[/api/topology/switching-frequency-pareto] PASSED [ 94%]
+tests/test_boost_frequency_grid_independent.py::test_legacy_paths_identify_dedicated_transport_for_new_inputs PASSED [100%]
+
+=============================== warnings summary ===============================
+../../miniconda3/envs/ntbees2/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /home/tinix/miniconda3/envs/ntbees2/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /mnt/c/Users/tinix/.codex/transistordatabase-audit/gap6-independent-final-3566a518-bf1f-4e4f-bbbb-038389f1fdd8/junit.xml -
+======================== 19 passed, 1 warning in 17.87s ========================

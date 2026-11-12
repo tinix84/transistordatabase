@@ -144,4 +144,66 @@ describe('Topology Pareto browser workflow', () => {
     expect(createObjectURL).toHaveBeenCalledOnce()
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:pareto-result')
   })
+  it('keeps complete same-frequency populations and clears stale switching evidence', async () => {
+    const population = { ...sourceResponse, mode: 'switching-loss-balanced',
+      candidates: sourceResponse.candidates.map(row => ({ ...row,
+        objectives: row.objectives ? { ...row.objectives, included_loss_w: 60 } : null,
+        power_balance_residual_w: 0 })) }
+    calculateTopologyPareto.mockResolvedValueOnce({ mode: 'switching-loss-balanced',
+      rows: [{ frequency_hz: 10000, population }, { frequency_hz: 20000, population }] })
+    await wrapper.get('[data-testid="pareto-switching-mode"]').setValue(true)
+    for (const input of wrapper.findAll('.candidate-card input')) {
+      const label = input.element.closest('label').textContent
+      if (label.includes('Turn-off gate voltage')) await input.setValue('-5')
+      if (label.includes('gate resistance')) await input.setValue('10')
+    }
+    await wrapper.get('[data-testid="pareto-frequency-grid"]').setValue('10000,20000')
+    await wrapper.get('[data-testid="pareto-voltage-tolerance"]').setValue('4')
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+    expect(calculateTopologyPareto.mock.calls[0][0]).toMatchObject({
+      boundary: { mode: 'switching-loss-balanced', voltage_residual_tolerance_v: 4 }, frequencies_hz: [10000, 20000] })
+    expect(wrapper.text()).toContain('Voltage closure is not enforced or proved')
+    expect(wrapper.get('[data-testid="pareto-result-frequency"]').findAll('option')).toHaveLength(2)
+    await wrapper.get('[data-testid="pareto-result-frequency"]').setValue('1')
+    expect(wrapper.text()).toContain('Missing exact curve')
+    await wrapper.get('[data-testid="pareto-frequency-grid"]').setValue('10000,30000')
+    expect(wrapper.find('[data-testid="pareto-result-frequency"]').exists()).toBe(false)
+  })
+
+  const switchingSourceFields = [
+    ['Junction temperature', 't_j'], ['Switch gate voltage', 'v_g'],
+    ['Rectifier curve gate voltage', 'diode_v_g'], ['Turn-off gate voltage', 'v_g_off'],
+    ['Turn-on gate resistance', 'r_g_on'], ['Turn-off gate resistance', 'r_g_off']
+  ]
+  async function enterSwitchingSourceFields() {
+    await wrapper.get('[data-testid="pareto-switching-mode"]').setValue(true)
+    for (const card of wrapper.findAll('.candidate-card')) {
+      for (const label of card.findAll('label')) {
+        if (label.text().startsWith('Turn-off gate voltage')) await label.get('input').setValue('-5')
+        if (label.text().includes('gate resistance')) await label.get('input').setValue('10')
+      }
+    }
+  }
+  it.each(switchingSourceFields.flatMap(([label, field]) =>
+    ['1e-400', '1.0000000000000000001'].map(token => [label, field, token])
+  ))('rejects original Pareto source %s=%s token %s before a request', async (labelText, field, token) => {
+    await enterSwitchingSourceFields()
+    const label = wrapper.findAll('label').find(item => item.text().startsWith(labelText))
+    await label.get('input').setValue(token)
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+    expect(calculateTopologyPareto).not.toHaveBeenCalled()
+    expect(wrapper.text()).toMatch(/too small|precision/i)
+  })
+  it.each(switchingSourceFields)('preserves recorded zero for Pareto source %s', async (labelText, field) => {
+    await enterSwitchingSourceFields()
+    const label = wrapper.findAll('label').find(item => item.text().startsWith(labelText))
+    await label.get('input').setValue('0')
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+    expect(calculateTopologyPareto).toHaveBeenCalledTimes(1)
+    const payload = calculateTopologyPareto.mock.calls[0][0]
+    expect(field === 't_j' ? payload.boundary[field] : payload.candidates[0][field]).toBe(0)
+  })
 })

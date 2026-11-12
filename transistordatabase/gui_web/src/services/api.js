@@ -437,7 +437,8 @@ export const transistorApi = {
 
   // Topology calculations and Python-generated sweeps
   async calculateTopology(params) {
-    const response = await api.post('/api/topology/calculate', params)
+    const endpoint = params.mode === 'switching-loss-balanced' && params.sweep ? '/api/topology/switching-frequency-grid' : '/api/topology/calculate'
+    const response = await api.post(endpoint, params)
     return response.data
   },
 
@@ -447,7 +448,8 @@ export const transistorApi = {
   },
 
     async calculateTopologyPareto(params) {
-      const response = await api.post('/api/topology/pareto', params)
+      const endpoint = params.boundary?.mode === 'switching-loss-balanced' ? '/api/topology/switching-frequency-pareto' : '/api/topology/pareto'
+      const response = await api.post(endpoint, params)
       return response.data
     },
 

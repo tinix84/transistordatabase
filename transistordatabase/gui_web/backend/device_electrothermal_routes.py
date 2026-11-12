@@ -79,18 +79,21 @@ def _validate_stored_casts(document):
             pending.extend(value.get('values', []))
 
 
-def _snapshot(repository, name):
+def _snapshot(repository, name, *, max_bytes=MAX_SOURCE_BYTES):
+    if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes < 0:
+        raise ValueError('Source read allowance must be a nonnegative integer')
+    max_bytes = min(MAX_SOURCE_BYTES, max_bytes)
     storage = getattr(repository, '_storage_path', None)
     source = None
     if callable(storage):
         path = storage(name)
         try:
             with path.open('rb') as stream:
-                raw = stream.read(MAX_SOURCE_BYTES + 1)
+                raw = stream.read(max_bytes + 1)
         except FileNotFoundError as error:
             raise HTTPException(status_code=404, detail='The selected device does not exist') from error
-        if len(raw) > MAX_SOURCE_BYTES:
-            raise DeviceThermalResourceError('Native device source exceeds16MiB; no file was changed')
+        if len(raw) > max_bytes:
+            raise DeviceThermalResourceError('Native device source exceeds the bounded read allowance (at most16MiB); no file was changed')
         document = json.loads(raw, parse_float=_stored_float, parse_constant=_stored_float)
         _validate_stored_casts(document)
         device = JsonTransistorLoader().load_from_dict(document)

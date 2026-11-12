@@ -3,11 +3,11 @@
     <summary>Fixed-boundary Boost semiconductor Pareto screen</summary>
     <p class="intro">
       Every candidate is evaluated at the same Boost CCM boundary. Loss uses the
-      loss-balanced channel-conduction model. Cost and dimensions are request
+      {{ switchingMode ? 'power-balanced channel and switching included-loss estimate' : 'loss-balanced channel-conduction model' }}. Cost and dimensions are request
       metadata and are never written into TDB records.
     </p>
     <div class="limits" role="note">
-      <strong>Screening limits:</strong> switching, reverse-recovery, gate-drive,
+      <strong>Screening limits:</strong> {{ switchingMode ? 'reverse-recovery, gate-drive,' : 'switching, reverse-recovery, gate-drive,' }}
       passive and magnetic losses are excluded. The rating screen checks only
       absolute blocking voltage and peak current, not SOA or thermal safety.
       Temperature remains unavailable when the TDB lacks usable thermal
@@ -16,6 +16,12 @@
 
     <section class="pareto-section">
       <h4>Shared electrical boundary</h4>
+      <label><input v-model="switchingMode" type="checkbox" data-testid="pareto-switching-mode"> Include turn-on/off feedback (qualified power-balanced estimate)</label>
+      <div v-if="switchingMode" class="pareto-grid">
+        <label>Shared frequency grid (Hz, comma-separated; blank uses the fixed frequency)<input v-model="frequencyText" data-testid="pareto-frequency-grid" type="text"></label>
+        <label>Optional voltage-residual eligibility tolerance (V)<input v-model="voltageTolerance" data-testid="pareto-voltage-tolerance" type="text"></label>
+        <p>At most 32 total candidate × frequency scalar calls. Every frequency uses the complete candidate population. No cross-frequency optimum is inferred. Voltage closure is not enforced or proved.</p>
+      </div>
       <div class="pareto-grid boundary-grid">
         <label>Input voltage (V)<input v-model.number="boundary.v_in" type="number" min="0.001" step="any"></label>
         <label>Output voltage (V)<input v-model.number="boundary.v_out" type="number" min="0.001" step="any"></label>
@@ -23,7 +29,7 @@
         <label>Switching frequency (kHz)<input v-model.number="boundary.f_sw_khz" type="number" min="0.001" step="any"></label>
         <label>Inductance (µH)<input v-model.number="boundary.l_value_uh" type="number" min="0.001" step="any"></label>
         <label>Output capacitance (µF)<input v-model.number="boundary.c_out_uf" type="number" min="0.001" step="any"></label>
-        <label>Junction temperature (°C)<input v-model.number="boundary.t_j" type="number" step="any"></label>
+        <label>Junction temperature (°C)<input v-model="boundary.t_j" :key="switchingMode" :type="switchingMode ? 'text' : 'number'" step="any"></label>
         <label>Fixed case/sink temperature (°C)<input v-model.number="boundary.t_case" type="number" step="any"></label>
       </div>
     </section>
@@ -58,8 +64,13 @@
             </label>
             <label>Parallel switches<input v-model.number="candidate.parallel_switches" type="number" min="1" max="100" step="1"></label>
             <label>Parallel rectifiers<input v-model.number="candidate.parallel_diodes" type="number" min="1" max="100" step="1"></label>
-            <label>Switch gate voltage (V)<input v-model.number="candidate.v_g" type="number" step="any"></label>
-            <label>Rectifier curve gate voltage (V, optional)<input v-model="candidate.diode_v_g" type="number" step="any"></label>
+            <label>Switch gate voltage (V)<input v-model="candidate.v_g" :key="'v_g-' + switchingMode" :type="switchingMode ? 'text' : 'number'" step="any"></label>
+            <label>Rectifier curve gate voltage (V, optional)<input v-model="candidate.diode_v_g" :key="'diode_v_g-' + switchingMode" :type="switchingMode ? 'text' : 'number'" step="any"></label>
+            <template v-if="switchingMode">
+              <label>Turn-off gate voltage (V)<input v-model="candidate.v_g_off" type="text" step="any"></label>
+              <label>Turn-on gate resistance (Ω)<input v-model="candidate.r_g_on" type="text" min="0" step="any"></label>
+              <label>Turn-off gate resistance (Ω)<input v-model="candidate.r_g_off" type="text" min="0" step="any"></label>
+            </template>
           </div>
         </article>
       </div>
@@ -88,25 +99,29 @@
         {{ loading ? 'Screening…' : 'Calculate Pareto screen' }}
       </button>
       <button type="button" class="btn btn-info" :disabled="!screenResult" @click="downloadResults">Download JSON</button>
+      <button v-if="switchingMode" type="button" class="btn btn-info" :disabled="!screenResult" @click="downloadGridCsv">Download scalar CSV</button>
     </div>
     <p v-if="errorMessage" class="error-message" role="alert">{{ errorMessage }}</p>
 
     <section v-if="screenResult" class="pareto-section results" aria-live="polite">
       <h4>Pareto results</h4>
+      <label v-if="gridResult">Inspect complete population at frequency (Hz)<select v-model.number="frequencyIndex" data-testid="pareto-result-frequency"><option v-for="(row,index) in gridResult.rows" :key="row.frequency_hz" :value="index">{{ row.frequency_hz }}</option></select></label>
+      <p v-if="screenResult.mode === 'switching-loss-balanced'">Power-balanced included-loss estimate. Voltage closure is not enforced or proved. Signed voltage and power residuals are retained for every calculated candidate.</p>
       <p class="hint">
         {{ screenResult.eligible_candidate_count }} of {{ screenResult.candidates.length }} candidates are eligible.
         All listed objectives are minimized. {{ screenResult.dominance_rule }}
       </p>
-      <p class="hint">Cost basis: {{ screenResult.cost_basis }}. Pareto membership is calculated in Python from channel-conduction loss, package-body volume, and component cost.</p>
+      <p class="hint">Cost basis: {{ screenResult.cost_basis }}. Pareto membership is calculated in Python from {{ switchingMode ? 'included channel and switching loss' : 'channel-conduction loss' }}, package-body volume, and component cost.</p>
       <div class="table-scroll">
         <table>
-          <thead><tr><th>Candidate</th><th>Status</th><th>Channel loss (W)</th><th>Volt-second residual (V)</th><th>Body volume (mm³)</th><th>Cost (USD)</th><th>Ratings</th></tr></thead>
+          <thead><tr><th>Candidate</th><th>Status</th><th>{{ switchingMode ? 'Included loss (W)' : 'Channel loss (W)' }}</th><th>Volt-second residual (V)</th><th v-if="switchingMode">Power residual (W)</th><th>Body volume (mm³)</th><th>Cost (USD)</th><th>Ratings</th></tr></thead>
           <tbody>
             <tr v-for="candidate in screenResult.candidates" :key="candidate.candidate_id" :class="{ frontier: candidate.pareto, excluded: !candidate.eligible }">
               <th scope="row">{{ candidate.label }}</th>
               <td>{{ candidate.pareto ? 'Pareto' : candidate.eligible ? 'Dominated' : 'Ineligible' }}</td>
-              <td>{{ format(candidate.objectives?.channel_conduction_loss_w, 3) }}</td>
+              <td>{{ format(candidate.objectives?.[switchingMode ? 'included_loss_w' : 'channel_conduction_loss_w'], 3) }}</td>
               <td>{{ format(candidate.operating_point?.calculated?.inductor_volt_second_residual_v, 6) }}</td>
+              <td v-if="switchingMode">{{ format(candidate.power_balance_residual_w, 9) }}</td>
               <td>{{ format(candidate.objectives?.package_body_volume_mm3, 1) }}</td>
               <td>{{ format(candidate.objectives?.component_cost_usd, 2) }}</td>
               <td>{{ candidate.ratings?.pass == null ? 'Unavailable' : candidate.ratings.pass ? 'Pass' : 'Fail' }}</td>
@@ -161,6 +176,7 @@
 
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
+import { binary64Decimal, analysisCsv, downloadAnalysis } from './analysisFiles.js'
 import { transistorApi } from '../services/api.js'
 
 const props = defineProps({ transistors: { type: Array, default: () => [] } })
@@ -204,6 +220,14 @@ const catalog = reactive({
   }
 })
 const screenResult = ref(null)
+const gridResult = ref(null)
+const switchingMode = ref(false)
+const frequencyText = ref('')
+const voltageTolerance = ref('')
+const frequencyIndex = ref(0)
+watch(frequencyIndex, index => {
+  if (gridResult.value) screenResult.value = { request: gridResult.value.request, ...gridResult.value.rows[index].population }
+})
 const errorMessage = ref('')
 const loading = ref(false)
 let requestSequence = 0
@@ -214,11 +238,11 @@ const partIds = computed(() => [...new Set(candidates.value.flatMap(candidate =>
   candidate.diode_transistor_id
 ]).filter(Boolean))])
 const eligibleCandidates = computed(() => screenResult.value?.candidates?.filter(candidate => candidate.eligible) || [])
-const plots = [
+const plots = computed(() => [
   { x: 'channel_conduction_loss_w', y: 'package_body_volume_mm3', title: 'Channel loss vs package volume', xLabel: 'Channel loss (W)', yLabel: 'Body volume (mm³)' },
   { x: 'channel_conduction_loss_w', y: 'component_cost_usd', title: 'Channel loss vs one-unit cost', xLabel: 'Channel loss (W)', yLabel: 'Cost (USD)' },
   { x: 'package_body_volume_mm3', y: 'component_cost_usd', title: 'Package volume vs one-unit cost', xLabel: 'Body volume (mm³)', yLabel: 'Cost (USD)' }
-]
+].map(plot => switchingMode.value ? { ...plot, x: plot.x === 'channel_conduction_loss_w' ? 'included_loss_w' : plot.x, title: plot.title.replace('Channel loss', 'Included loss'), xLabel: plot.xLabel.replace('Channel loss', 'Included loss') } : plot))
 
 function deviceId(device) {
   return device?.id || device?.metadata?.name || device?.name || ''
@@ -239,6 +263,7 @@ function ensureCatalog(partId) {
 function invalidateResults() {
   requestSequence += 1
   screenResult.value = null
+  gridResult.value = null
   errorMessage.value = ''
   loading.value = false
 }
@@ -246,7 +271,7 @@ watch(candidates, () => {
   partIds.value.forEach(ensureCatalog)
   invalidateResults()
 }, { deep: true })
-watch([boundary, catalog], invalidateResults, { deep: true })
+watch([boundary, catalog, switchingMode, frequencyText, voltageTolerance], invalidateResults, { deep: true })
 
 function addCandidate() {
   if (candidates.value.length >= maxCandidates) return
@@ -272,6 +297,10 @@ function optionalNumber(value) {
   const number = Number(value)
   return Number.isFinite(number) ? number : undefined
 }
+function optionalSourceNumber(value, name) {
+  if (value == null || String(value).trim() === '') return undefined
+  return binary64Decimal(value, name)
+}
 function buildRequest() {
   const partCatalog = Object.fromEntries(partIds.value.map(partId => {
     const item = catalog[partId]
@@ -293,13 +322,16 @@ function buildRequest() {
       p_out: Number(boundary.p_out), f_sw: Number(boundary.f_sw_khz) * 1000,
       l_value: Number(boundary.l_value_uh) * 1e-6,
       c_out: Number(boundary.c_out_uf) * 1e-6,
-      t_j: Number(boundary.t_j), t_case: optionalNumber(boundary.t_case)
+      t_j: switchingMode.value ? binary64Decimal(boundary.t_j, 'Junction temperature') : Number(boundary.t_j), t_case: optionalNumber(boundary.t_case),
+      ...(switchingMode.value ? { mode: 'switching-loss-balanced', voltage_residual_tolerance_v: voltageTolerance.value.trim() ? binary64Decimal(voltageTolerance.value, 'Voltage residual tolerance') : undefined } : {})
     },
     candidates: candidates.value.map(candidate => ({
       ...candidate,
-      v_g: optionalNumber(candidate.v_g),
-      diode_v_g: optionalNumber(candidate.diode_v_g)
+      v_g: switchingMode.value ? binary64Decimal(candidate.v_g, 'Switch gate voltage') : optionalNumber(candidate.v_g),
+      diode_v_g: switchingMode.value ? optionalSourceNumber(candidate.diode_v_g, 'Rectifier gate voltage') : optionalNumber(candidate.diode_v_g),
+      ...(switchingMode.value ? { v_g_off: binary64Decimal(candidate.v_g_off, 'Turn-off gate'), r_g_on: binary64Decimal(candidate.r_g_on, 'Turn-on gate resistance'), r_g_off: binary64Decimal(candidate.r_g_off, 'Turn-off gate resistance') } : {})
     })),
+    ...(switchingMode.value && frequencyText.value.trim() ? { frequencies_hz: frequencyText.value.split(',').map(token => { if (!token.trim() || !Number.isFinite(Number(token)) || Number(token) <= 0) throw new Error('Frequency grid requires positive finite Hz values'); return binary64Decimal(token, 'Frequency') }) } : {}),
     catalog: partCatalog
   }
 }
@@ -311,7 +343,11 @@ async function calculate() {
     const request = buildRequest()
     const response = await transistorApi.calculateTopologyPareto(request)
     if (sequence !== requestSequence) return
-    screenResult.value = { request, ...response }
+    if (response.rows) {
+      gridResult.value = { request, ...response }
+      frequencyIndex.value = 0
+      screenResult.value = { request, ...response.rows[0].population }
+    } else { gridResult.value = null; screenResult.value = { request, ...response } }
   } catch (error) {
     if (sequence !== requestSequence) return
     screenResult.value = null
@@ -348,12 +384,28 @@ function project(plot) {
     }
   })
 }
+function downloadGridCsv() {
+  if (!screenResult.value) return
+  const populations = gridResult.value?.rows || [{ frequency_hz: screenResult.value.boundary.f_sw, population: screenResult.value }]
+  const rows = populations.flatMap(row => row.population.candidates.map(candidate => ({
+    frequency_hz: row.frequency_hz, candidate_id: candidate.candidate_id,
+    eligible: candidate.eligible, pareto: candidate.pareto,
+    included_loss_w: candidate.objectives?.included_loss_w ?? null,
+    package_body_volume_mm3: candidate.objectives?.package_body_volume_mm3 ?? null,
+    component_cost_usd: candidate.objectives?.component_cost_usd ?? null,
+    voltage_law_residual_v: candidate.voltage_law_residual_v ?? null,
+    power_balance_residual_w: candidate.power_balance_residual_w ?? null,
+    diagnostic: candidate.ineligible_reasons.join('; '),
+    qualification: 'power-balanced included-loss estimate; voltage closure unproved'
+  })))
+  downloadAnalysis(analysisCsv(rows), 'boost-frequency-populations.csv', 'text/csv')
+}
 function downloadResults() {
   if (!screenResult.value) return
   const exportData = {
     workflow: 'fixed-boundary-boost-semiconductor-pareto',
     request: screenResult.value.request,
-    result: screenResult.value,
+    result: gridResult.value || screenResult.value,
     exported_at: new Date().toISOString()
   }
   const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
@@ -383,10 +435,10 @@ defineExpose({ buildRequest, calculate })
 .pareto-section { margin-top: 1.5rem; }
 .pareto-section h4 { margin: 0 0 .8rem; color: #2c3e50; }
 .pareto-grid { display: grid; gap: .8rem; }
-.boundary-grid { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
-.candidate-grid, .catalog-grid { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.boundary-grid { grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); }
+.candidate-grid, .catalog-grid { grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr)); }
 .pareto-grid label, .section-heading label { display: flex; flex-direction: column; gap: .3rem; color: #47535c; font-size: .9rem; }
-.pareto-grid input, .pareto-grid select, .section-heading input { min-width: 0; padding: .45rem .55rem; border: 1px solid #c8d0d5; border-radius: 4px; font: inherit; }
+.pareto-grid input, .pareto-grid select, .section-heading input { box-sizing: border-box; max-width: 100%; min-width: 0; padding: .45rem .55rem; border: 1px solid #c8d0d5; border-radius: 4px; font: inherit; }
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: .75rem; }
 .section-heading h4 { margin: 0; }
 .candidate-list { display: grid; gap: .8rem; }
@@ -402,7 +454,10 @@ defineExpose({ buildRequest, calculate })
 .remove-button { flex: 0 0 auto; }
 .pareto-actions { display: flex; gap: .75rem; margin-top: 1.5rem; }
 .error-message, .error-list { color: #9c2525; }
-.table-scroll { overflow-x: auto; }
+.table-scroll { overflow-x: auto; max-width: 100%; min-width: 0; }
+.pareto-section, .candidate-card, .catalog-card, .plot-card { min-width: 0; overflow-wrap: anywhere; }
+.pareto-grid > label { min-width: 0; }
+.pareto-grid input { min-width: 0; max-width: 100%; }
 table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-variant-numeric: tabular-nums; }
 th, td { padding: .55rem .6rem; border-bottom: 1px solid #dbe0e3; text-align: right; white-space: nowrap; }
 th:first-child, td:first-child { text-align: left; }
@@ -415,7 +470,7 @@ tr.excluded { color: #69757d; }
 .candidate-assumptions ul { margin: .35rem 0; padding-left: 1.2rem; color: #4c5860; }
 .source-list { margin: .35rem 0; padding-left: 1.2rem; }
 .source-list a { color: #145d80; }
-.plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: .8rem; margin-top: 1.2rem; }
+.plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: .8rem; margin-top: 1.2rem; }
 .plot-card h5 { margin: 0 0 .5rem; text-align: center; }
 .pareto-plot { display: block; width: 100%; height: auto; overflow: visible; }
 .pareto-plot line { stroke: #75838c; stroke-width: 1; }

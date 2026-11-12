@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-12",
+  "selection": "tests/test_boost_frequency_grid_independent.py",
+  "previous_independent_19": {
+    "name": "independent-manifest.json",
+    "sha256": "30d00b57e18f7f88f7944d54729e3d9df60834ffbf0b8559b2ee330a4be4897a"
+  },
+  "tests_passed": 32,
+  "tests_failed": 0,
+  "duration_s": 8.51,
+  "wall_time_s": 9.99,
+  "peak_rss_kib": 271236,
+  "source_files_unchanged": 10,
+  "new_checks": {
+    "invalid_nonnumeric_types_before_source_read": 10,
+    "known_zero_optional_null_and_numeric_text_identity_controls": 2,
+    "legacy_numeric_string_full_response_parity": 1
+  },
+  "legacy_response_sha256": {
+    "estimate": "8045914116fef11afb03e3e85c3095bed94f05ea6127810b5cdf9a673d58b976",
+    "frequency_line": "73ed8f52b1eafbb59cbdae4ff800c7c84b97a646847ff28b84e9b1e26651f07c",
+    "pareto": "84f7e942ecb1d3278c18142b153b5138923cdd48875a499de9a18c595c9e1916"
+  },
+  "source_artifacts": {
+    "resource_sha256": "891fa80e571622570429904a4b421d7a7eb889781d74024a63ecac96ddcf5cf7",
+    "pytest_log_sha256": "409eeea5e3bc30e14498c067731493abe6a66c7a006a5963e9b831997a9e5e18"
+  },
+  "artifacts": [
+    {
+      "name": "independent-token-guard-source-start.json",
+      "bytes": 1617,
+      "sha256": "33483b1d061c1c266dc69a1ebae40f75e592469fc660ff54b6b8169963f51732"
+    },
+    {
+      "name": "independent-token-guard-source-end.json",
+      "bytes": 1617,
+      "sha256": "33483b1d061c1c266dc69a1ebae40f75e592469fc660ff54b6b8169963f51732"
+    },
+    {
+      "name": "independent-token-guard-cases.json",
+      "bytes": 5448,
+      "sha256": "ff054ed5fd7075d63538bba1d3cfe92d16d6aab527dce5d49437d8c501dce8ea"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+........................................................................ [ 31%]
+........................................................................ [ 62%]
+........................................................................ [ 93%]
+...............                                                          [100%]
+=============================== warnings summary ===============================
+../../miniconda3/envs/ntbees2/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /home/tinix/miniconda3/envs/ntbees2/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+231 passed, 1 warning in 41.93s
+	Command being timed: "/home/tinix/miniconda3/envs/ntbees2/bin/python -B -m pytest -q --noconftest --import-mode=importlib -p no:cacheprovider -p anyio.pytest_plugin --basetemp=/tmp/tdb-merge-postfix-445391cc-07ba-42f9-bd29-856de2d9294b --junitxml=/mnt/c/Users/tinix/.codex/transistordatabase-audit/merge-postfix-python-445391cc-07ba-42f9-bd29-856de2d9294b/junit.xml tests/test_topology_operating_point.py tests/test_topology_api.py tests/test_topology_pareto.py tests/test_boost_frequency_grid_independent.py tests/test_boost_grid_source_budget.py tests/test_device_electrothermal.py tests/test_device_electrothermal_independent.py"
+	User time (seconds): 41.35
+	System time (seconds): 0.75
+	Percent of CPU this job got: 101%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:41.42
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 292748
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 155102
+	Voluntary context switches: 2914
+	Involuntary context switches: 177
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 824
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

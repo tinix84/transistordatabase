@@ -1,0 +1,14 @@
+{
+  "status": 0,
+  "abnormal_rss_stop": false,
+  "wall_s": 19.956298377000167,
+  "peak_rss_kib": 271380,
+  "guest_after": [
+    "MemTotal:       16373920 kB",
+    "MemAvailable:   14854924 kB",
+    "SwapTotal:       8388608 kB",
+    "SwapFree:        8388608 kB"
+  ],
+  "end_utc": "2026-11-11T21:50:27.241583+00:00",
+  "source_unchanged": true
+}

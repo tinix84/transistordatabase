@@ -1,0 +1,90 @@
+{
+  "source_unchanged": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "vite_modules": 216,
+  "http_status": 200,
+  "rss_kib": null,
+  "retained": [
+    {
+      "unchanged": true,
+      "name": "index-11is31Q7.js"
+    },
+    {
+      "unchanged": true,
+      "name": "index-B-uDa43d.js"
+    },
+    {
+      "unchanged": true,
+      "name": "index-B6TvftXk.js"
+    },
+    {
+      "unchanged": true,
+      "name": "index-BiqYnh0l.css"
+    },
+    {
+      "unchanged": true,
+      "name": "index-BQ-q-3_s.js"
+    },
+    {
+      "unchanged": true,
+      "name": "index-BsmDSL5R.css"
+    },
+    {
+      "unchanged": true,
+      "name": "index-Cd-9xTOa.js"
+    },
+    {
+      "unchanged": true,
+      "name": "index-CfzCuJjG.js"
+    },
+    {
+      "unchanged": true,
+      "name": "index-DEGD4GTA.css"
+    },
+    {
+      "unchanged": true,
+      "name": "index-DERh4duk.css"
+    },
+    {
+      "unchanged": true,
+      "name": "index-DFMz6lo5.css"
+    },
+    {
+      "unchanged": true,
+      "name": "index-Dh9GZBYy.js"
+    },
+    {
+      "unchanged": true,
+      "name": "index-Djcupi58.css"
+    },
+    {
+      "unchanged": true,
+      "name": "index-DwhnJuQe.css"
+    },
+    {
+      "unchanged": true,
+      "name": "index-g-r-JQ0i.js"
+    },
+    {
+      "unchanged": true,
+      "name": "index-SnRinjk2.css"
+    },
+    {
+      "unchanged": true,
+      "name": "index-u5jEtrgK.css"
+    },
+    {
+      "unchanged": true,
+      "name": "index-xyyq5K5Z.js"
+    }
+  ],
+  "asset_count": 20,
+  "index_sha256": "EB5CBB03AC32ABA9A9E6BF826CDF550004A30701801504B5D8B67095044AB743",
+  "vite_seconds": 5.89,
+  "tool_wall_seconds": 8.5127354,
+  "exit_code": 0
+}

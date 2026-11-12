@@ -160,7 +160,7 @@ describe('TopologyCalculator API workflow', () => {
     })
     await wrapper.findAll('button.topology-card').find(button => button.text().includes('Boost')).trigger('click')
     await setSelect('Calculation mode', 'switching-loss-balanced')
-    expect(wrapper.find('.sweep-toggle input').element.disabled).toBe(true)
+    expect(wrapper.find('.sweep-toggle input').element.disabled).toBe(false)
     expect(wrapper.findAll('button').find(button => button.text().includes('Compare topologies')).element.disabled).toBe(true)
     await wrapper.get('button.btn-primary').trigger('click')
     await flushPromises()
@@ -175,7 +175,7 @@ describe('TopologyCalculator API workflow', () => {
     expect(wrapper.text()).toContain('Reverse recovery is excluded')
   })
 
-  it('guards switching feedback to Boost CCM and hides retained sweep settings', async () => {
+  it('guards switching feedback to Boost CCM and constrains its frequency line', async () => {
     const modeOption = wrapper.find('option[value="switching-loss-balanced"]')
     expect(modeOption.element.disabled).toBe(true)
 
@@ -189,11 +189,16 @@ describe('TopologyCalculator API workflow', () => {
     const sweepToggle = wrapper.find('.sweep-toggle input')
     await sweepToggle.setValue(true)
     expect(wrapper.text()).toContain('Sweep type')
+    await setInput('X points', 50)
 
     await setSelect('Calculation mode', 'switching-loss-balanced')
-    expect(sweepToggle.element.disabled).toBe(true)
-    expect(wrapper.text()).not.toContain('Sweep type')
-    expect(wrapper.text()).toContain('Saved sweep settings are hidden and will not be submitted')
+    expect(sweepToggle.element.disabled).toBe(false)
+    expect(wrapper.text()).toContain('Sweep type')
+    expect(wrapper.text()).toContain('Frequency line only')
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+    expect(calculateTopology.mock.calls.at(-1)[0].sweep).toMatchObject({ x_axis: 'f_sw', x_points: 32 })
+    expect(calculateTopology.mock.calls.at(-1)[0].sweep.y_axis).toBeUndefined()
 
     await wrapper.findAll('button.topology-card').find(button => button.text().includes('Buck')).trigger('click')
     expect(wrapper.get('button.btn-primary').element.disabled).toBe(true)
@@ -887,5 +892,30 @@ describe('TopologyCalculator API workflow', () => {
     await flushPromises()
     expect(wrapper.find('.results-panel').exists()).toBe(false)
     expect(wrapper.find('.header-actions button.btn-info').element.disabled).toBe(true)
+  })
+  const switchingConditionFields = [
+    ['Junction temperature', 't_j'], ['Switch gate voltage', 'v_g'],
+    ['Diode channel gate voltage', 'diode_v_g'], ['Turn-off gate voltage', 'v_g_off'],
+    ['Turn-on gate resistance', 'r_g_on'], ['Turn-off gate resistance', 'r_g_off']
+  ]
+  it.each(switchingConditionFields.flatMap(([label, field]) =>
+    ['1e-400', '1.0000000000000000001'].map(token => [label, field, token])
+  ))('rejects original switching condition %s=%s token %s before an API call', async (label, field, token) => {
+    await wrapper.findAll('button.topology-card').find(button => button.text().includes('Boost')).trigger('click')
+    await setSelect('Calculation mode', 'switching-loss-balanced')
+    await setInput(label, token)
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+    expect(calculateTopology).not.toHaveBeenCalled()
+    expect(wrapper.text()).toMatch(/too small|precision/i)
+  })
+  it.each(switchingConditionFields)('preserves explicitly declared zero for switching condition %s', async (label, field) => {
+    await wrapper.findAll('button.topology-card').find(button => button.text().includes('Boost')).trigger('click')
+    await setSelect('Calculation mode', 'switching-loss-balanced')
+    await setInput(label, '0')
+    await wrapper.get('button.btn-primary').trigger('click')
+    await flushPromises()
+    expect(calculateTopology).toHaveBeenCalledTimes(1)
+    expect(calculateTopology.mock.calls[0][0][field]).toBe(0)
   })
 })

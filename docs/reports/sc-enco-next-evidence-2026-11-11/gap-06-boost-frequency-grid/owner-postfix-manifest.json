@@ -1,0 +1,37 @@
+{
+  "status": "PASS",
+  "python_passed": 231,
+  "vue_passed": 62,
+  "files": [
+    {
+      "path": "owner-postfix-python-junit.xml",
+      "bytes": 36429,
+      "sha256": "ae38b0d85eb50e8187a8151f32c5fcfecd3dd0eb663a1146f5ddf35ad1cc0e71"
+    },
+    {
+      "path": "owner-postfix-python-pytest.log",
+      "bytes": 2199,
+      "sha256": "e6eb55227986de68960b38fe8048d9a7ac2aaddb7d105a3470be7f8a4a2b475a"
+    },
+    {
+      "path": "owner-postfix-python-source-end.json",
+      "bytes": 7604,
+      "sha256": "866dab6815f52f985e3812a5cf790a9812d6fae81f83134d553c700fa29a6498"
+    },
+    {
+      "path": "owner-postfix-python-source-start.json",
+      "bytes": 4842,
+      "sha256": "35afb554072a40255cb614dee291f046b1571eff6b14ef1f0aea4744a7a783c6"
+    },
+    {
+      "path": "owner-postfix-summary.json",
+      "bytes": 1554,
+      "sha256": "970a163f04c0adde04834f786b036acc29d3faad12d192fbeb138d19a750ce7c"
+    },
+    {
+      "path": "owner-postfix-vue-tool.json",
+      "bytes": 2213,
+      "sha256": "c0df83fb63f9750c053592507468bdadefcbd6536a5333e32231dec4ea089368"
+    }
+  ]
+}

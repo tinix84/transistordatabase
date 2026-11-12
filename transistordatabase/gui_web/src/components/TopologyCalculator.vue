@@ -93,7 +93,7 @@
             </label>
           </div>
           <p class="hint">Estimate mode does not use device curves. Conduction-only mode requires exact-condition switch and diode channel curves. Detailed mode also requires exact-condition turn-on and turn-off curves. Loss-balanced mode requires exact-condition switch and diode channel curves. Scalar DCM feedback is available for Buck, Boost, inverting Buck-Boost, and Flyback. All curve extrapolation is rejected.</p>
-          <p v-if="switchingLossBalanced" class="hint">This mode supports scalar Boost CCM only. It requires exact TDB Eon/Eoff graph_i_e curves at the Boost blocking voltage, selected temperature, both gate voltages, and each gate resistance. Eon/Eoff current extrapolation, sweeps, and topology comparison are rejected. Reverse recovery is excluded because Eon provenance does not establish whether it is already included.</p>
+          <p v-if="switchingLossBalanced" class="hint">This mode supports Boost CCM scalar estimates and bounded frequency lines. It requires exact TDB Eon/Eoff graph_i_e curves at the Boost blocking voltage, selected temperature, both gate voltages, and each gate resistance. Eon/Eoff current extrapolation, contours, and topology comparison are rejected. Frequency grids retain unsupported rows and do not enforce voltage closure. Reverse recovery is excluded because Eon provenance does not establish whether it is already included.</p>
           <p v-if="switchingLossBalanced && !switchingLossBalancedSupported" class="hint" role="alert">Switching-loss-balanced requires Boost with CCM selected. Choose Boost/CCM or select another calculation mode before calculating.</p>
         </div>
 
@@ -101,41 +101,41 @@
           <h4>Curve and thermal conditions</h4>
           <div class="param-grid">
             <label class="param-item">Junction temperature
-              <input v-model.number="form.t_j" type="number" step="any"><span class="unit">°C</span>
+              <input v-model="form.t_j" :key="'t_j-' + switchingLossBalanced" :type="switchingLossBalanced ? 'text' : 'number'" step="any"><span class="unit">°C</span>
             </label>
             <label class="param-item">Case / sink reference temperature
               <input v-model.number="form.t_case" type="number" step="any"><span class="unit">°C</span>
             </label>
             <label class="param-item">Switch gate voltage
-              <input v-model.number="form.v_g" type="number" step="any"><span class="unit">V</span>
+              <input v-model="form.v_g" :key="'v_g-' + switchingLossBalanced" :type="switchingLossBalanced ? 'text' : 'number'" step="any"><span class="unit">V</span>
             </label>
             <label class="param-item">Diode channel gate voltage (optional; required for gate-conditioned curves)
-              <input v-model.number="form.diode_v_g" type="number" step="any"><span class="unit">V</span>
+              <input v-model="form.diode_v_g" :key="'diode_v_g-' + switchingLossBalanced" :type="switchingLossBalanced ? 'text' : 'number'" step="any"><span class="unit">V</span>
             </label>
             <label class="param-item">Turn-off gate voltage{{ switchingLossBalanced ? ' (required)' : ' (optional)' }}
-              <input v-model.number="form.v_g_off" type="number" step="any"><span class="unit">V</span>
+              <input v-model="form.v_g_off" :key="'v_g_off-' + switchingLossBalanced" :type="switchingLossBalanced ? 'text' : 'number'" step="any"><span class="unit">V</span>
             </label>
             <label class="param-item">Turn-on gate resistance{{ switchingLossBalanced ? ' (required)' : ' (optional)' }}
-              <input v-model.number="form.r_g_on" type="number" min="0" step="any"><span class="unit">Ω</span>
+              <input v-model="form.r_g_on" :key="'r_g_on-' + switchingLossBalanced" :type="switchingLossBalanced ? 'text' : 'number'" min="0" step="any"><span class="unit">Ω</span>
             </label>
             <label class="param-item">Turn-off gate resistance{{ switchingLossBalanced ? ' (required)' : ' (optional)' }}
-              <input v-model.number="form.r_g_off" type="number" min="0" step="any"><span class="unit">Ω</span>
+              <input v-model="form.r_g_off" :key="'r_g_off-' + switchingLossBalanced" :type="switchingLossBalanced ? 'text' : 'number'" min="0" step="any"><span class="unit">Ω</span>
             </label>
           </div>
         </div>
 
         <div class="param-section">
           <h4>Python generated sweep</h4>
-          <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox" :disabled="switchingLossBalanced"> Include line or contour sweep</label>
+          <label class="sweep-toggle"><input v-model="form.sweep_enabled" type="checkbox" > Include line or contour sweep</label>
           <p v-if="form.mode === 'loss-balanced'" class="hint">Loss-balanced sweeps solve each CCM or DCM point from exact-condition channel curves. DCM uses the scalar ramp and charge solve; every point must be supported and below the CCM boundary. No curve extrapolation is used.</p>
           <p v-if="lossBalancedDcm" class="hint">DCM sweeps expose the independently checked power-balance and averaged inductor volt-second residuals. Temperature values are one-pass estimates at the selected curve temperature; electrothermal iteration is not implemented.</p>
-          <p v-if="switchingLossBalanced && form.sweep_enabled" class="hint">Saved sweep settings are hidden and will not be submitted while switching-loss-balanced is selected.</p>
-          <div v-if="form.sweep_enabled && !switchingLossBalanced" class="param-grid">
+          <p v-if="switchingLossBalanced && form.sweep_enabled" class="hint">Frequency line only, at most 32 scalar calls. Each point is a power-balanced included-loss estimate. Voltage closure is not enforced; unsupported rows remain visible.</p>
+          <div v-if="form.sweep_enabled" class="param-grid">
             <label class="param-item">Sweep type
-              <select v-model="form.sweep_kind"><option value="line">Line</option><option value="contour">Contour</option></select>
+              <select v-model="form.sweep_kind" :disabled="switchingLossBalanced"><option value="line">Line</option><option value="contour">Contour</option></select>
             </label>
             <label class="param-item">X axis
-              <select v-model="form.x_axis"><option v-for="axis in axes" :key="axis.id" :value="axis.id">{{ axis.label }}</option></select>
+              <select v-model="form.x_axis" :disabled="switchingLossBalanced"><option v-for="axis in axes" :key="axis.id" :value="axis.id">{{ axis.label }}</option></select>
             </label>
             <label class="param-item">X minimum ({{ axisUnit(form.x_axis) }})
               <input v-model.number="form.x_min" type="number" min="0.001" step="any">
@@ -164,7 +164,7 @@
               <select v-model="form.metric"><option v-for="metric in metrics" :key="metric.id" :value="metric.id">{{ metric.label }}</option></select>
             </label>
           </div>
-          <p class="hint">Contour requests are limited to 2,500 operating points. Every sweep point must be supported; invalid regions return an error instead of extrapolated values.</p>
+          <p v-if="!switchingLossBalanced" class="hint">Contour requests are limited to 2,500 operating points. Every sweep point must be supported; invalid regions return an error instead of extrapolated values.</p>
         </div>
 
         <div class="calculation-actions">
@@ -265,6 +265,12 @@
             </table>
           </div>
         </details>
+        <div v-if="results.sweep?.rows" class="table-scroll" data-testid="switching-frequency-rows">
+          <p>Summary frequency: {{ results.summary_frequency_hz ?? 'Unavailable' }} Hz. {{ results.summary_basis }}</p>
+          <p>{{ results.sweep.qualification }}. Voltage closure is not enforced or proved.</p>
+          <table><thead><tr><th>Frequency (Hz)</th><th>Status</th><th>Metric</th><th>Signed voltage residual (V)</th><th>Signed power residual (W)</th><th>Diagnostic</th></tr></thead>
+          <tbody><tr v-for="row in results.sweep.rows" :key="row.frequency_hz"><td>{{ row.frequency_hz }}</td><td>{{ row.status }}</td><td>{{ row.value ?? 'Unavailable' }}</td><td>{{ row.voltage_law_residual_v ?? 'Unavailable' }}</td><td>{{ row.power_balance_residual_w ?? 'Unavailable' }}</td><td>{{ row.diagnostic }}</td></tr></tbody></table>
+        </div>
         <details v-if="results.model.curve_conditions"><summary>Curve conditions and provenance</summary><pre>{{ JSON.stringify(results.model.curve_conditions, null, 2) }}</pre></details>
       </section>
 
@@ -323,6 +329,7 @@
 import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import Chart from 'chart.js/auto'
 import TopologyParetoPanel from './TopologyParetoPanel.vue'
+import { binary64Decimal } from './analysisFiles.js'
 import { transistorApi } from '../services/api.js'
 
 const props = defineProps({ transistors: { type: Array, default: () => [] } })
@@ -488,13 +495,20 @@ function optionalNumber(value) {
   const number = Number(value)
   return Number.isFinite(number) ? number : undefined
 }
+watch(switchingLossBalanced, active => {
+  if (active) { form.sweep_kind = 'line'; form.x_axis = 'f_sw'; form.x_points = Math.min(32, form.x_points) }
+})
+function conditionNumber(value, name, optional = false) {
+  if (optional && (value == null || String(value).trim() === '')) return undefined
+  return switchingLossBalanced.value ? binary64Decimal(value, name) : optional ? optionalNumber(value) : Number(value)
+}
 function buildSweep() {
   if (!form.sweep_enabled) return undefined
   const sweep = {
-    x_axis: form.x_axis, x_min: toSi(form.x_axis, form.x_min),
+    x_axis: switchingLossBalanced.value ? 'f_sw' : form.x_axis, x_min: toSi(form.x_axis, form.x_min),
     x_max: toSi(form.x_axis, form.x_max), x_points: Number(form.x_points), metric: form.metric
   }
-  if (form.sweep_kind === 'contour') {
+  if (form.sweep_kind === 'contour' && !switchingLossBalanced.value) {
     Object.assign(sweep, {
       y_axis: form.y_axis, y_min: toSi(form.y_axis, form.y_min),
       y_max: toSi(form.y_axis, form.y_max), y_points: Number(form.y_points)
@@ -516,14 +530,14 @@ function buildPayload(includeSweep = true, includeFlybackComparison = false) {
     parallel_switches: Number(form.parallel_switches), parallel_diodes: Number(form.parallel_diodes),
     switch_transistor_id: form.switch_transistor_id || undefined,
     diode_transistor_id: form.diode_transistor_id || undefined,
-    t_j: form.mode !== 'estimate' ? Number(form.t_j) : undefined,
+    t_j: form.mode !== 'estimate' ? conditionNumber(form.t_j, 'Junction temperature') : undefined,
     t_case: form.mode !== 'estimate' ? optionalNumber(form.t_case) : undefined,
-    v_g: form.mode !== 'estimate' ? Number(form.v_g) : undefined,
-    diode_v_g: form.mode !== 'estimate' ? optionalNumber(form.diode_v_g) : undefined,
-    v_g_off: ['detailed', 'switching-loss-balanced'].includes(form.mode) ? optionalNumber(form.v_g_off) : undefined,
-    r_g_on: ['detailed', 'switching-loss-balanced'].includes(form.mode) ? optionalNumber(form.r_g_on) : undefined,
-    r_g_off: ['detailed', 'switching-loss-balanced'].includes(form.mode) ? optionalNumber(form.r_g_off) : undefined,
-    ...(includeSweep && !switchingLossBalanced.value && buildSweep()
+    v_g: form.mode !== 'estimate' ? conditionNumber(form.v_g, 'Switch gate voltage') : undefined,
+    diode_v_g: form.mode !== 'estimate' ? conditionNumber(form.diode_v_g, 'Diode gate voltage', true) : undefined,
+    v_g_off: ['detailed', 'switching-loss-balanced'].includes(form.mode) ? (switchingLossBalanced.value ? binary64Decimal(form.v_g_off, 'Turn-off gate voltage') : optionalNumber(form.v_g_off)) : undefined,
+    r_g_on: ['detailed', 'switching-loss-balanced'].includes(form.mode) ? (switchingLossBalanced.value ? binary64Decimal(form.r_g_on, 'Turn-on gate resistance') : optionalNumber(form.r_g_on)) : undefined,
+    r_g_off: ['detailed', 'switching-loss-balanced'].includes(form.mode) ? (switchingLossBalanced.value ? binary64Decimal(form.r_g_off, 'Turn-off gate resistance') : optionalNumber(form.r_g_off)) : undefined,
+    ...(includeSweep && buildSweep()
       ? { sweep: buildSweep() }
       : {})
   }
@@ -717,13 +731,15 @@ onBeforeUnmount(destroyCharts)
 
 .calc-content {
   display: grid;
-  grid-template-columns: 350px 400px 1fr;
+  grid-template-columns: 350px 400px minmax(0, 1fr);
   gap: 2rem;
 }
 
 .topology-panel,
 .parameters-panel,
 .results-panel {
+  min-width: 0;
+  overflow-wrap: anywhere;
   background: white;
   padding: 1.5rem;
   border-radius: 8px;
@@ -867,6 +883,7 @@ onBeforeUnmount(destroyCharts)
 }
 
 .param-item {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -878,7 +895,11 @@ onBeforeUnmount(destroyCharts)
   color: #555;
 }
 
-.param-item input {
+.param-item input,
+.param-item select {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
   flex: 1;
   padding: 0.5rem;
   border: 1px solid #ddd;
@@ -1085,6 +1106,12 @@ onBeforeUnmount(destroyCharts)
   font-weight: 600;
 }
 
+.table-scroll {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .sweep-data-scroll {
   max-height: 20rem;
   margin-top: 0.75rem;
@@ -1181,12 +1208,22 @@ onBeforeUnmount(destroyCharts)
 
 @media (max-width: 1400px) {
   .calc-content {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
   }
 }
 
 @media (max-width: 768px) {
+  .param-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .param-item input,
+  .param-item select {
+    width: 100%;
+  }
+
   .calc-header {
     flex-direction: column;
     gap: 1rem;

@@ -316,9 +316,21 @@ class TopologyCalculationRequest(BaseModel):
     r_g_off: float | None = Field(None, description="Switch turn-off gate resistance in Ohm")
     sweep: TopologySweepRequest | None = None
 
+    @model_validator(mode="before")
+    @classmethod
+    def validate_switching_grid_tokens(cls, value):
+        """Preserve original numeric semantics only for the optional frequency grid."""
+        if isinstance(value, dict) and value.get("mode") == "switching-loss-balanced" and value.get("sweep") is not None:
+            from transistordatabase.gui_web.backend.boost_grid_routes import normalize_grid_numbers, validate_grid_numeric_positions
+            return normalize_grid_numbers(validate_grid_numeric_positions(value, 'line'))
+        return value
+
 
 class BoostParetoBoundaryRequest(BaseModel):
     """One shared SI-unit Boost CCM boundary for a semiconductor screen."""
+
+    mode: Literal["loss-balanced", "switching-loss-balanced"] | None = None
+    voltage_residual_tolerance_v: float | None = Field(None, ge=0, allow_inf_nan=False)
 
     v_in: float = Field(..., gt=0, allow_inf_nan=False)
     v_out: float = Field(..., gt=0, allow_inf_nan=False)
@@ -356,6 +368,10 @@ class ParetoCandidateRequest(BaseModel):
     v_g: float | None = Field(None, allow_inf_nan=False)
     diode_v_g: float | None = Field(None, allow_inf_nan=False)
 
+    v_g_off: float | None = Field(None, allow_inf_nan=False)
+    r_g_on: float | None = Field(None, ge=0, allow_inf_nan=False)
+    r_g_off: float | None = Field(None, ge=0, allow_inf_nan=False)
+
     @field_validator("candidate_id", "label")
     @classmethod
     def strip_candidate_text(cls, value: str) -> str:
@@ -378,10 +394,20 @@ class BoostSemiconductorParetoRequest(BaseModel):
 
     boundary: BoostParetoBoundaryRequest
     candidates: list[ParetoCandidateRequest] = Field(..., min_length=2, max_length=20)
+    frequencies_hz: list[float] | None = Field(None, min_length=2, max_length=32)
     catalog: dict[str, Any] = Field(
         default_factory=dict,
         description="Raw sourced package and price metadata keyed by TDB identity",
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_switching_population_tokens(cls, value):
+        """Reject lossy new-mode thresholds and normalize numeric catalog metadata."""
+        if isinstance(value, dict) and isinstance(value.get("boundary"), dict) and value["boundary"].get("mode") == "switching-loss-balanced":
+            from transistordatabase.gui_web.backend.boost_grid_routes import normalize_grid_numbers, validate_grid_numeric_positions
+            return normalize_grid_numbers(validate_grid_numeric_positions(value, 'pareto'))
+        return value
 
     @model_validator(mode="after")
     def validate_candidate_ids(self) -> BoostSemiconductorParetoRequest:

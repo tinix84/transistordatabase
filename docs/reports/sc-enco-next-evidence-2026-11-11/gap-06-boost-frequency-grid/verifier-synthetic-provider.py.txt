@@ -1,0 +1,40 @@
+"""Test-only in-memory source additions. No persisted records or calculation mocks."""
+from pathlib import Path
+import sys
+ROOT=Path('/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111')
+sys.path.insert(0,str(ROOT))
+import numpy as np
+from transistordatabase.core.models import ChannelCharacteristics,ElectricalRatings,SwitchingLossData,ThermalProperties,Transistor,TransistorMetadata
+from transistordatabase.gui_web.backend import main
+def fixture(name,on=.001,off=.002,rg=10):
+    d=Transistor(TransistorMetadata(name,'MOSFET','Verifier','Verifier','Verifier'),ElectricalRatings(1200,100,50,175),ThermalProperties(.001,.001))
+    d.switch.channel_data=[ChannelCharacteristics(25,np.array([[0.,0.],[0.,100.]]),15)]
+    d.diode.channel_data=[ChannelCharacteristics(25,np.array([[0.,0.],[0.,100.]]),None)]
+    for key,energy in (('e_on_data',on),('e_off_data',off)):
+        if energy is not None:
+            setattr(d.switch,key,[SwitchingLossData('graph_i_e',25,200,15,r_g=rg,v_g_off=-5,graph_i_e=np.array([[0.,100.],[energy,energy]]),commutation_device='Verifier rectifier',measurement_testbench='Independent analytic grid')])
+    return d
+synthetic={name:fixture(name,*energies) for name,energies in {
+    'Verifier_Grid_Constant':(.001,.002),
+    'Verifier_Grid_Zero':(0.,0.),
+    'Verifier_Grid_Missing':(.001,None),
+    'Verifier_Grid_KnownZeroRg':(.001,.002,0)}.items()}
+original_repo=main._repo
+class WithSynthetic:
+    def list_all(self): return list(original_repo.list_all())+list(synthetic)
+    def get_by_name(self,name): return synthetic[name] if name in synthetic else original_repo.get_by_name(name)
+    def __getattr__(self,name): return getattr(original_repo,name)
+main._repo=WithSynthetic()
+original_factory=main._new_grid_source_loader
+def in_memory_factory():
+    original,snapshots=original_factory()
+    def load(name):
+        if name in synthetic:
+            snapshots[name]=None
+            return synthetic[name]
+        return original(name)
+    return load,snapshots
+main._new_grid_source_loader=in_memory_factory
+if __name__=='__main__':
+    import uvicorn
+    uvicorn.run(main.app,host='127.0.0.1',port=8004,reload=False)
