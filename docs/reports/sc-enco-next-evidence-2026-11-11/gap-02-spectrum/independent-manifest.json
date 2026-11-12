@@ -1,0 +1,45 @@
+{
+  "scope": "Independent final public spectrum checks after the canonical peak-array equality fix. Both earlier no-policy response hashes match.",
+  "passed": 19,
+  "source_files_frozen": 7,
+  "pytest_seconds": 2.185,
+  "wall_seconds": 3.45,
+  "peak_rss_kib": 246036,
+  "prior_receipts": {
+    "name": "independent-18-manifest.json",
+    "bytes": 2061,
+    "sha256": "751dc98892a2e6405cd752b8417e58c374355a091be1a89adec965380a7630cf"
+  },
+  "files": [
+    {
+      "name": "independent-final-junit.xml",
+      "bytes": 3067,
+      "sha256": "ab0f2d7a0bb37b08e666b79fc0c9c39b6233c238adab78a1c4d6d19183913092",
+      "source": "/tmp/tdb-spectrum-independent-67435dd4-c525-49ef-b05b-1de802f0e331/junit.xml"
+    },
+    {
+      "name": "independent-final-pytest.log",
+      "bytes": 621,
+      "sha256": "6f6daa11f59bac54608cbd7c7bc9013f319ca49a6f74eefe2449c018de5cd79e",
+      "source": "/tmp/tdb-spectrum-independent-67435dd4-c525-49ef-b05b-1de802f0e331/pytest.log"
+    },
+    {
+      "name": "independent-final-resource.txt",
+      "bytes": 1086,
+      "sha256": "3a9a424b3860cb44e3d291b8d1928934bd777cee54010595c4ea468d525ef18a",
+      "source": "/tmp/tdb-spectrum-independent-67435dd4-c525-49ef-b05b-1de802f0e331/resource.txt"
+    },
+    {
+      "name": "independent-final-source-start.json",
+      "bytes": 833,
+      "sha256": "e2f4a4347a6e9aa504f84b89720c0f9fd6ce95ab1a23596f825b513520cfe96d",
+      "source": "/tmp/tdb-spectrum-independent-67435dd4-c525-49ef-b05b-1de802f0e331/source-start.json"
+    },
+    {
+      "name": "independent-final-source-end.json",
+      "bytes": 833,
+      "sha256": "e2f4a4347a6e9aa504f84b89720c0f9fd6ce95ab1a23596f825b513520cfe96d",
+      "source": "/tmp/tdb-spectrum-independent-67435dd4-c525-49ef-b05b-1de802f0e331/source-end.json"
+    }
+  ]
+}

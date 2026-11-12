@@ -1,0 +1,6 @@
+[
+  "src/tests/unit/GateChargeCalculator.test.js",
+  "src/tests/unit/ThermalWorkbench.test.js",
+  "src/tests/unit/SpectrumAnalysis.test.js",
+  "src/tests/unit/GateAllocationApi.test.js"
+]

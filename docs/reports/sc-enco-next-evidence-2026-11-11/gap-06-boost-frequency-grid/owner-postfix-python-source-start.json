@@ -1,0 +1,115 @@
+{
+  "selection": [
+    "tests/test_topology_operating_point.py",
+    "tests/test_topology_api.py",
+    "tests/test_topology_pareto.py",
+    "tests/test_boost_frequency_grid_independent.py",
+    "tests/test_boost_grid_source_budget.py",
+    "tests/test_device_electrothermal.py",
+    "tests/test_device_electrothermal_independent.py"
+  ],
+  "purpose": "New transport-fix regression; separate state from completed manual218",
+  "basetemp_absent_verified": true,
+  "sources": [
+    {
+      "path": "docs/api/boost-frequency-grid.md",
+      "sha256": "dc59a3d08647d1a5d72d900f584fd09f1419ced7153fbb0c844b4cfdf6b5821d"
+    },
+    {
+      "path": "transistordatabase/topologies/operating_point.py",
+      "sha256": "45ec877fa71db05d67848248658ffa9d2593ed576082e1ec79af9022427db1f0"
+    },
+    {
+      "path": "transistordatabase/topologies/semiconductor_pareto.py",
+      "sha256": "2a7a67aeb59c50fdc8b9fe893e44b013f36c767420f56d783391d77d8b2409c9"
+    },
+    {
+      "path": "transistordatabase/topologies/boost_grid_bounds.py",
+      "sha256": "07d7d6383e491a9e04541191398c2a380b27592914966bbd6acf68152caa846b"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/main.py",
+      "sha256": "5f3d4bf96b41ebe9396a3801b1ec575b2022a19e254b22d140e2bdb3e34d0111"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/schemas.py",
+      "sha256": "93020af04d5d20d9389730a40ee8344875bf6fe69f1f4c0aa2237b8955e63d51"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/topology_service.py",
+      "sha256": "6cb22a9d4da7ba783323232d0138e5d2efc0dd5f7ab0e0ce5a26970d7303daca"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/boost_grid_routes.py",
+      "sha256": "a91c54edc4a30bc13da1bea7c60f718a4b55a258b57b5990dbf933c96da6d532"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/device_electrothermal_routes.py",
+      "sha256": "e7e6369a6d9a0205acf22147346ae429f1a5f2ea45632cf3895ff42eff0e4338"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/components/TopologyCalculator.vue",
+      "sha256": "40325305bb26ea683e2f9c038da3a050fc374a16b65f571ef4742165dcd3e8b5"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/components/TopologyParetoPanel.vue",
+      "sha256": "ebb341965d23e899347d0154044a4768fb2be35a0715912649e027d5a51094dc"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/services/api.js",
+      "sha256": "21dc1e9686ff1749cf164bbeed874fdc81fd8efd1fcdedd27c7f1bb8f8831194"
+    },
+    {
+      "path": "tests/test_topology_api.py",
+      "sha256": "cc3619d0b5144b4e9254c181066e6dfded0c8896af4e55749486c207ce24ecb1"
+    },
+    {
+      "path": "tests/test_boost_frequency_grid_independent.py",
+      "sha256": "9bd18c06aac0893f22d75760e3cdb9182ba0335548b1c82f7b2db347494cef2e"
+    },
+    {
+      "path": "tests/test_boost_grid_source_budget.py",
+      "sha256": "a086387d3eef2425af78d8ae4fb5dba4511792ee189e65136cfec6b6cdbe5639"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/tests/unit/TopologyWorkflow.test.js",
+      "sha256": "e4061b9036fe5ac75971c4a666fbfc66084e2c1ca31c92a1096420f5a5766898"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/tests/unit/TopologyParetoWorkflow.test.js",
+      "sha256": "cc7f42fdd6e4938e417a5ec1be3cf8ef7f1a6d118e4cf9e10822b2f8615c19d3"
+    },
+    {
+      "path": "transistordatabase/gui_web/playwright.boost-frequency-grid.acceptance.config.js",
+      "sha256": "a7596f0ed363e87ac2ad0351ce29c1eda23982f48fef67354ff3fae5f7b3b79b"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/tests/e2e/boost-frequency-grid-acceptance.spec.js",
+      "sha256": "e72fa87072f34e0acb19e60ec5f1d57f618c9fbf6024cd5dc6a6f543a01dc002"
+    },
+    {
+      "path": "docs/reports/semiconductor-next-gap-audit-2026-11-11.md",
+      "sha256": "5c01f0531de2858af4c58dab705d12f65e291bd27144b7a495025ade229b75d8"
+    },
+    {
+      "path": "docs/reports/semiconductor-next-gap-audit-2026-11-11.json",
+      "sha256": "4d5543b14a37084fc62c43b47104acf71a39c5ab71eb62735204ffd0201fbb0a"
+    },
+    {
+      "path": "docs/reports/semiconductor-reference-family-census-2026-11-11.md",
+      "sha256": "498058fa6f87cc11df95ecfa5a64f7f85e24ac140c3c1730085b3e9b2c0d15f9"
+    },
+    {
+      "path": "docs/reports/semiconductor-reference-family-census-2026-11-11.json",
+      "sha256": "0d5125b36ce5a2798a5fdc16e4fa2aed19c86d25f8210db6cd73ccdccd839ea7"
+    },
+    {
+      "path": "docs/reports/semiconductor-reference-qualification-2026-11-11.md",
+      "sha256": "0bf788b0147fe07697c513b9f262ea65e4d9a97f3be1630d03e85a629566ed0b"
+    },
+    {
+      "path": "docs/reports/semiconductor-reference-qualification-2026-11-11.json",
+      "sha256": "ab3f1e933c3c35886aa81266b7af2fca5926e2bf09a6d3b8ed50d47ef4bbb53c"
+    }
+  ]
+}

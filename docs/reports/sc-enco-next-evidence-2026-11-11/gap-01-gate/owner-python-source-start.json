@@ -1,0 +1,8 @@
+{
+  "transistordatabase/gate_states.py": "f1471bc5a659014249cf3ff884117d29824111c63ee3a7bc79ff030a8df8d55a",
+  "transistordatabase/current_allocation.py": "33913482335246932f06b331075958f3e40bc725414f36d2122795da1e2e1dfd",
+  "transistordatabase/waveform_losses.py": "8a78bf1b6f8515b82ca85c4b1f0cbbaf4c52553deb22393ab74f79500f078e2f",
+  "transistordatabase/gui_web/backend/gate_policy.py": "daf0e903578b64b99a17052e7d5d605cbc33a8f80174c03cd722854bf6bc3020",
+  "transistordatabase/gui_web/backend/current_allocation_routes.py": "d164929c47712f2fa454c83704b4bbaba0422466b5b8e47744af910fc0355968",
+  "transistordatabase/gui_web/backend/waveform_routes.py": "b091d8621838d8b18bc4720261755c365f937003416967b1180cb9c014ee3550"
+}

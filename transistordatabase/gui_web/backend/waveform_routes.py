@@ -6,8 +6,11 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, HTTPException
 from pydantic import Field, model_serializer
 
-from transistordatabase.gui_web.backend.parameter_routes import ParameterRoute, Strict
+from transistordatabase.gui_web.backend.parameter_routes import Strict
+from transistordatabase.gui_web.backend.finite_json_route import FiniteJsonRoute
 from transistordatabase.waveform_losses import WaveformResourceLimitError, analyze_waveform
+from transistordatabase.gui_web.backend.gate_policy import HysteresisPolicy
+from transistordatabase.gui_web.backend.spectrum_policy import SpectrumMask, SpectrumBand
 
 Vector = Annotated[list[float], Field(min_length=2, max_length=10000)]
 Conditions = dict[str, float | None]
@@ -87,11 +90,20 @@ class Conduction(Strict):
 class EventPolicy(Strict):
     """Gate > threshold, explicit N-1 masks, or a reasoned omission."""
 
-    mode: Literal["gate", "masks", "omitted"]
+    mode: Literal["gate", "hysteresis", "masks", "omitted"]
     threshold_v: float | None = None
     turn_on: list[bool] | None = None
     turn_off: list[bool] | None = None
     omission_reason: str = ""
+    digitizer: HysteresisPolicy | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_existing_policy(self, handler):
+        """Omit new optional settings when an existing request does not supply them."""
+        data = handler(self)
+        if "digitizer" not in self.model_fields_set:
+            data.pop("digitizer", None)
+        return data
 
 
 class SwitchingComponent(Strict):
@@ -116,6 +128,8 @@ class Spectrum(Strict):
     window: Literal["rectangular", "hann"]
     detrend: Literal["none", "mean"]
     relative_threshold: float = Field(default=0.1, ge=0, le=1)
+    mask: SpectrumMask | None = None
+    bands: Annotated[list[SpectrumBand], Field(min_length=1, max_length=32)] | None = None
 
     @model_serializer(mode="wrap")
     def canonical_settings(self, handler):
@@ -123,6 +137,9 @@ class Spectrum(Strict):
         data = handler(self)
         if "relative_threshold" not in self.model_fields_set:
             data.pop("relative_threshold", None)
+        for field in ("mask", "bands"):
+            if field not in self.model_fields_set:
+                data.pop(field, None)
         return data
 
 
@@ -146,7 +163,7 @@ class WaveformRequest(Strict):
     provenance: Provenance | None = None
 
 
-router = APIRouter(prefix="/api/waveform", tags=["Signed waveforms"], route_class=ParameterRoute)
+router = APIRouter(prefix="/api/waveform", tags=["Signed waveforms"], route_class=FiniteJsonRoute)
 
 
 @router.post("/analyze")

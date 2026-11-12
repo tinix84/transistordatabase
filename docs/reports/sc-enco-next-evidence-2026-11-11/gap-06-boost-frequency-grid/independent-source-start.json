@@ -1,0 +1,62 @@
+{
+  "utc": "2026-11-11T21:50:07.1952916Z",
+  "sources": [
+    {
+      "path": "tests/test_boost_frequency_grid_independent.py",
+      "bytes": 16483,
+      "sha256": "c5a52828e0257db7bdfbc8058d1e107c2764925cf328984cf9903f37b59f1efb"
+    },
+    {
+      "path": "transistordatabase/topologies/operating_point.py",
+      "bytes": 96175,
+      "sha256": "45ec877fa71db05d67848248658ffa9d2593ed576082e1ec79af9022427db1f0"
+    },
+    {
+      "path": "transistordatabase/topologies/semiconductor_pareto.py",
+      "bytes": 23900,
+      "sha256": "2a7a67aeb59c50fdc8b9fe893e44b013f36c767420f56d783391d77d8b2409c9"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/topology_service.py",
+      "bytes": 5605,
+      "sha256": "6cb22a9d4da7ba783323232d0138e5d2efc0dd5f7ab0e0ce5a26970d7303daca"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/main.py",
+      "bytes": 188671,
+      "sha256": "5f3d4bf96b41ebe9396a3801b1ec575b2022a19e254b22d140e2bdb3e34d0111"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/schemas.py",
+      "bytes": 33714,
+      "sha256": "b94a215c04a3686e8078a443635af28c4a6cbc914979dd2007124145d73d75d0"
+    },
+    {
+      "path": "transistordatabase/topologies/boost_grid_bounds.py",
+      "bytes": 4785,
+      "sha256": "07d7d6383e491a9e04541191398c2a380b27592914966bbd6acf68152caa846b"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/boost_grid_routes.py",
+      "bytes": 750,
+      "sha256": "9ce0da5cc5c419cc62b2b191f61906057f2b00c61a7e09cc5f2cf6ba0fda053c"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/device_electrothermal_routes.py",
+      "bytes": 11454,
+      "sha256": "e7e6369a6d9a0205acf22147346ae429f1a5f2ea45632cf3895ff42eff0e4338"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/finite_json_route.py",
+      "bytes": 3758,
+      "sha256": "527b7d959357f680e75d5f479b5b6b157915e1045d5922c96bacb9f49eafbfc7"
+    }
+  ],
+  "windows_free_kib": 15553396,
+  "windows_total_kib": 58348208,
+  "prior_collect_manifest_sha": "833AEDF733F02FB83C3ADDDEA0889DC67DED2641071BCFF3B0F6D6B1C204BA67",
+  "intended_nodes": [
+    "tests/test_boost_frequency_grid_independent.py"
+  ],
+  "expected_boost_mode": "switching-loss-balanced"
+}

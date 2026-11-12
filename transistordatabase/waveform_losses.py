@@ -12,6 +12,9 @@ from math import frexp, ldexp
 from typing import Optional
 
 import numpy as np
+
+from transistordatabase.gate_states import hysteretic_gate_states
+from transistordatabase.spectrum_analysis import analyze_spectrum_bins
 import numpy.typing as npt
 
 from transistordatabase.condition_tables import MeasuredTable, require_conditions
@@ -233,8 +236,21 @@ def _conduction(signals, duration, spec):
     return _component(cumulative, duration, directional_energy_j=directional), segments, plot
 
 
-def _event_indices(signals, policy):
+def _event_indices(signals, policy, *, gate_values=None):
     mode = policy.get("mode")
+    if mode != "hysteresis" and policy.get("digitizer") is not None:
+        raise ValueError("Hysteresis settings require the hysteresis event mode")
+    if mode == "hysteresis":
+        if any(policy.get(name) is not None for name in ("threshold_v", "turn_on", "turn_off")):
+            raise ValueError("Hysteresis and threshold or mask event detection are mutually exclusive")
+        if "gate_v" not in signals:
+            raise ValueError("Gate signal required for hysteresis event detection")
+        values = signals["gate_v"].tolist() if gate_values is None else gate_values
+        digitization = hysteretic_gate_states(values, policy.get("digitizer"))
+        evidence = digitization["evidence"]
+        return {"turn_on": np.asarray(evidence["turn_on_brackets"], dtype=int),
+                "turn_off": np.asarray(evidence["turn_off_brackets"], dtype=int),
+                "digitization": evidence}
     if mode == "gate":
         if any(policy.get(name) is not None for name in ("turn_on", "turn_off")):
             raise ValueError("Gate detection and explicit event masks are mutually exclusive")
@@ -390,7 +406,7 @@ def waveform_statistics(time_s, values):
 
 
 def series_spectrum(time_s, values, *, window="rectangular", detrend="none",
-                    relative_threshold=0.1):
+                    relative_threshold=0.1, mask=None, bands=None, signal_unit=None):
     """Uniform-sample rFFT with explicit window/normalization and Parseval evidence.
 
     The discrete sequence period is N*dt, not the N-1 interval waveform duration.
@@ -410,14 +426,21 @@ def series_spectrum(time_s, values, *, window="rectangular", detrend="none",
         raise ValueError("FFT requires uniform samples; no implicit resampling")
     if window not in {"rectangular", "hann"} or detrend not in {"none", "mean"}:
         raise ValueError("Unsupported FFT window or detrending")
+    analysis_requested = mask is not None or bands is not None
+    original_nonzero = values != 0 if analysis_requested else None
     scale = float(np.max(abs(values)))
     values = values / scale if scale else values.copy()
+    if analysis_requested and np.any(original_nonzero & (values == 0)):
+        raise ValueError("Spectrum normalization loses nonzero samples outside the supported dynamic range")
     values = values - np.mean(values) if detrend == "mean" else values
     weights = np.ones(len(values)) if window == "rectangular" else np.hanning(len(values))
     gain = float(np.mean(weights))
     if gain <= 0:
         raise ValueError("FFT window has zero coherent gain; use more samples")
-    transformed = np.fft.rfft(values * weights)
+    windowed = values * weights
+    if analysis_requested and np.any((values != 0) & (weights != 0) & (windowed == 0)):
+        raise ValueError("Windowed spectrum loses nonzero samples outside the supported dynamic range")
+    transformed = np.fft.rfft(windowed)
     multiplicity = np.full(len(transformed), 2.0)
     multiplicity[0] = 1
     if len(values) % 2 == 0:
@@ -447,15 +470,21 @@ def series_spectrum(time_s, values, *, window="rectangular", detrend="none",
             "window": window, "detrend": detrend, "coherent_gain": gain,
             "normalization": "One-sided peak amplitude; double interior bins only",
             "resampling": "none"}
+    if analysis_requested:
+        result.update(analyze_spectrum_bins(result["frequency_hz"], transformed.tolist(),
+            sample_count=len(values), sample_interval_s=dt, amplitude_scale=scale,
+            peak_amplitudes=result["magnitude"],
+            coherent_gain=gain, window_power_gain=float(np.mean(weights ** 2)),
+            signal_unit=signal_unit, window=window, detrend=detrend, mask=mask, bands=bands))
     _assert_finite_tree(result)
     return result
 
 
 def waveform_spectrum(time_s, values, *, window="rectangular", detrend="none",
-                      relative_threshold=0.1):
+                      relative_threshold=0.1, mask=None, bands=None):
     """Expose the generic FFT with the established current-specific SI names."""
     result = series_spectrum(time_s, values, window=window, detrend=detrend,
-                             relative_threshold=relative_threshold)
+                             relative_threshold=relative_threshold, mask=mask, bands=bands, signal_unit="A")
     for generic, current in (("magnitude", "amplitude_a"), ("real", "real_a"),
                              ("imaginary", "imaginary_a"),
                              ("mean_square_amplitude_scale", "mean_square_amplitude_scale_a"),
@@ -500,7 +529,7 @@ def analyze_waveform(request: dict) -> dict:
     """
     request = _plain_snapshot(request)
     signals, duration = _waveform(request["waveform"])
-    indices = _event_indices(signals, request["events"])
+    indices = _event_indices(signals, request["events"], gate_values=request["waveform"].get("gate_v"))
     conduction, segments, plot = _conduction(signals, duration, request["conduction"])
     switching, events = _switching(signals, duration, request["switching"], indices)
     components = {"conduction": conduction, **switching}
@@ -535,6 +564,8 @@ def analyze_waveform(request: dict) -> dict:
                               "Switching energies are event impulses, not finite power pulses",
                               "Power averages use the complete supplied time interval",
                               "Measured device voltage is distinct from switching bus voltage"]}
+    if indices is not None and "digitization" in indices:
+        result["gate_digitization"] = indices["digitization"]
     if request.get("spectrum") is not None:
         result["spectrum"] = waveform_spectrum(signals["time_s"], signals["current_a"], **request["spectrum"])
     _assert_finite_tree(result)

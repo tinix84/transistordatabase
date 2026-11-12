@@ -1,0 +1,43 @@
+{
+  "initial_cases": {
+    "total": 12,
+    "new_thermal": 8,
+    "unchanged_gate": 2,
+    "unchanged_spectrum": 2,
+    "passed": 12,
+    "retries": 0,
+    "skips": 0
+  },
+  "postfix_cases": {
+    "total": 2,
+    "passed": 2,
+    "retries": 0,
+    "skips": 0,
+    "purpose": "Preserve __proto__, constructor and toString own condition keys in actual request/result/CSV/JSON; retain 28/32/31 degC and mobile width <=391."
+  },
+  "calculation_mocks": false,
+  "workers": 1,
+  "viewports": [
+    "desktop",
+    "390x844"
+  ],
+  "base_url": "http://127.0.0.1:8004",
+  "app_entrypoint": "/index.html?view=thermal",
+  "test_source": "transistordatabase/gui_web/src/tests/e2e/thermal-contacts-acceptance.spec.js",
+  "test_sha256": "7ad2180d90a0dee12856885105c14a1053ba44cc0c06fb3a3a0e623b09b996f5",
+  "config_source": "transistordatabase/gui_web/playwright.thermal-contacts.acceptance.config.js",
+  "config_sha256": "b29b318811ea8732c76b589967573fd3ecd1e24f404dfb205c6a57a707ad4d87",
+  "explicit_final_commit_files": [
+    "transistordatabase/gui_web/src/tests/e2e/thermal-contacts-acceptance.spec.js",
+    "transistordatabase/gui_web/playwright.thermal-contacts.acceptance.config.js"
+  ],
+  "harness_qualification": "First targeted invocation selected no tests because base config and CLI filters intersected. Only added test title changed to match existing acceptance-prefix filter. All assertions unchanged.",
+  "runtime": {
+    "owned_server_pid": 1685625,
+    "port": 8004,
+    "autoreload": false,
+    "original8002_main8003": "untouched"
+  },
+  "database_records_published": false,
+  "private_database_per_file_receipts": "Retained outside repository only"
+}

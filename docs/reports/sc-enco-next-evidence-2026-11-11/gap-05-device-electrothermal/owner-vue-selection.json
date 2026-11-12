@@ -1,0 +1,8 @@
+[
+  "src/tests/unit/NativeDeviceElectrothermal.test.js",
+  "src/tests/unit/ThermalWorkbench.test.js",
+  "src/tests/unit/SpectrumAnalysis.test.js",
+  "src/tests/unit/GateChargeCalculator.test.js",
+  "src/tests/unit/WaveformWorkbench.test.js",
+  "src/tests/unit/GridEnergyWorkbench.test.js"
+]

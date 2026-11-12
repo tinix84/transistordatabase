@@ -1,0 +1,54 @@
+{
+  "scope": "Independent Boost switching-loss frequency lines and same-frequency Pareto populations",
+  "passed": 19,
+  "skipped": 0,
+  "source_file_count": 10,
+  "pytest_seconds": 17.831,
+  "wall_seconds": 19.956,
+  "peak_rss_kib": 271380,
+  "raw_evidence_manifest_sha256": "e5ebc966d3a117296b0877c781fc7e22369de729f54ad85dc791aae3c82936ea",
+  "earlier_fixture_correction": {
+    "passed": 17,
+    "failed": 2,
+    "manifest_sha256": "47df31239dd63a033f0240d9b5df6e27c34a9f26221d388209caa40f0e8d5d1c",
+    "reason": "The first size check sent two bytes with an overstated Content-Length. The corrected tests send exactly 4194305 bytes to the two dedicated routes."
+  },
+  "entries": [
+    {
+      "name": "independent-source-start.json",
+      "bytes": 2290,
+      "sha256": "1eeb3cd35cd3cfbe397ef7a2f8c0b5857a1e8f9576972690fd2aa95db4ecbd4f",
+      "source_name": "static-and-host.json"
+    },
+    {
+      "name": "independent-source-end.json",
+      "bytes": 1257,
+      "sha256": "14366086ca31b7b1f37dbeee5686e9047d7419f5e7264dadcd034d19d4af841e",
+      "source_name": "verified-source-end.json"
+    },
+    {
+      "name": "independent-junit.xml",
+      "bytes": 3508,
+      "sha256": "f37255a83e5cdc55edadce8e38339cef5e3e3b93e06282a8148340fb73def3be",
+      "source_name": "junit.xml"
+    },
+    {
+      "name": "independent-pytest.log",
+      "bytes": 3829,
+      "sha256": "afd8eff0291d8e5ef1f514c0e1e10314fe421972e734bedabe777370f8ea47e2",
+      "source_name": "pytest.log"
+    },
+    {
+      "name": "independent-resource.json",
+      "bytes": 345,
+      "sha256": "81d5c9c53529a7a4ececaba0fab5840aa91e48c6e0556c1b8db03b3765ce0eec",
+      "source_name": "result.json"
+    },
+    {
+      "name": "independent-legacy-http.json",
+      "bytes": 39895,
+      "sha256": "a01958f03e355e82f8a6d59a7b805b03b48117db0a663bc4ad6b5768a8474748",
+      "source_name": "recaptured-legacy-http.json"
+    }
+  ]
+}

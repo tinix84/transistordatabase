@@ -1,0 +1,52 @@
+{
+  "baseline_commit": "e41cc8a56e3caa254a124672a16eef4a7b4c5863",
+  "case": "absent",
+  "path": "/api/thermal/analyze",
+  "method": "POST",
+  "status": 200,
+  "request": {
+    "operation": "steady",
+    "source": "synthetic thermal compatibility fixture",
+    "conditions": {
+      "clamp_pressure_pa": null
+    },
+    "sink_temperature_c": 25,
+    "forward_power_w": 2,
+    "reverse_power_w": 1,
+    "common_resistance_k_w": 1,
+    "forward_resistance_k_w": 2,
+    "reverse_resistance_k_w": 3
+  },
+  "response": {
+    "operation": "steady",
+    "request": {
+      "source": "synthetic thermal compatibility fixture",
+      "conditions": {
+        "clamp_pressure_pa": null
+      },
+      "operation": "steady",
+      "sink_temperature_c": 25.0,
+      "forward_power_w": 2.0,
+      "reverse_power_w": 1.0,
+      "common_resistance_k_w": 1.0,
+      "forward_resistance_k_w": 2.0,
+      "reverse_resistance_k_w": 3.0,
+      "interface": null
+    },
+    "result": {
+      "forward_temperature_c": 32.0,
+      "reverse_temperature_c": 31.0,
+      "interface_resistance_k_w": 0.0,
+      "path_resistances_k_w": {
+        "common": 1.0,
+        "forward": 2.0,
+        "reverse": 3.0
+      },
+      "boundary": "steady fixed sink; explicit ideal zero paths allowed"
+    },
+    "units": "s, W, J, K/W, J/K, m²; temperatures °C and temperature differences K"
+  },
+  "original_canonical_sha256": "da74222662a6d19d5c58a046ad38b5c5dd64d9c7fe866d0a37a64399443a9b15",
+  "recaptured_at_utc": "2026-11-11T18:30:14.019745+00:00",
+  "raw_response_sha256": "8d8b4adea50da87765744efab0638dd108cdec418eae614b06e1544b53822eec"
+}

@@ -40,6 +40,50 @@ neither a physical reference temperature nor a time-weighted heat profile;
 instead of mislabeling case-to-sink resistance as junction-to-case, averaging
 unweighted samples and assuming 25°C.
 
+### Simultaneous physical contacts
+
+For multiple contacts, supply `interfaces` instead of a nonnull `interface`.
+The list contains 1 to 32 records with the existing interface fields and a
+required unique `interface_id`. Each record retains its own source and conditions.
+Distinct contacts on the same path form a series stack. Repeated physical IDs
+are rejected. The common path carries total heat. Each branch path carries only
+that branch's heat.
+
+```json
+{
+  "interface_id": "forward-contact-1",
+  "path": "forward",
+  "resistivity_k_m2_w": 0.001,
+  "area_m2": 0.01,
+  "source": "Explicit illustrative contact; replace with recorded data",
+  "conditions": {"pressure_pa": null}
+}
+```
+
+The calculation resolves each SI ratio before rounding its resistance.
+It sums the exact ratios on each path before rounding the effective resistance.
+Contact order does not change the result. Nonzero resistance outside the
+supported finite range is rejected. A sourced zero resistivity remains an
+explicit ideal contact. Missing base resistances remain invalid.
+
+Plural results contain `interface_contributions`, `added_path_resistances_k_w`,
+`path_resistances_k_w`, and `shared_temperature_c`, with both junction temperatures.
+Each contact row includes its resolved `resistance_k_w` and original evidence.
+The result does not combine unrelated branch resistances into one scalar.
+Existing absent and single-interface requests retain their response format.
+
+With a 25 °C sink, 2 W forward heat, 1 W reverse heat, and ideal base paths,
+contact contributions of 1, 2, and 3 K/W on common, forward, and reverse paths
+give 28 °C shared, 32 °C forward, and 31 °C reverse temperatures.
+These values are an independent synthetic fixture, not a device rating.
+
+The steady form provides contact rows with separate source and condition entry.
+Blank condition values mean unknown. The contact CSV includes each contact and
+its added and effective path resistance. JSON retains the complete request and
+result. Contact edits invalidate results and downloads.
+The advanced editor sends its original JSON text for finite-literal validation.
+Thermal input retains its existing body-size policy and numerical work budgets.
+
 ## Fixed-case Foster transient
 
 The network has complete positive aligned `r_th_vector` and `tau_vector`, or
@@ -161,3 +205,11 @@ stable screening roots, unknown metadata, strict finite validation and 413.
 The convolution moments are also compared to independent adaptive quadrature.
 Browser and independent review results are recorded separately in the parity
 sprint; fixtures establish equations and interfaces, not measured-device accuracy.
+
+## Native-device curve feedback
+
+The optional native-device source uses explicit indexed channel and switching
+families to derive a bounded temperature/loss table.
+It passes that table to the existing one-junction fixed-sink iteration.
+See [native-device electrothermal feedback](device-electrothermal.md) for source
+identity, fixed conditions, inactive terms, bounds, and replay details.

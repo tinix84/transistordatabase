@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/usr/bin/node",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/node_modules/@playwright/test/cli.js",
+    "test",
+    "--config",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/playwright.gate-settling.acceptance.config.js"
+  ],
+  "returncode": 1,
+  "wall_s": 184.34760023200215
+}

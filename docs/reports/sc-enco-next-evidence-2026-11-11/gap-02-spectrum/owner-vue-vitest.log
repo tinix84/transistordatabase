@@ -1,0 +1,56 @@
+
+> transistor-database-web@1.0.0 test:run
+> vitest run --maxWorkers=1 --minWorkers=1 src/tests/unit/SpectrumAnalysis.test.js src/tests/unit/WaveformWorkbench.test.js src/tests/unit/GateAllocationPanel.test.js src/tests/unit/GateAllocationApi.test.js src/tests/unit/gateHysteresis.test.js src/tests/unit/GridEnergyWorkbench.test.js
+
+
+ RUN  v2.1.9 /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web
+
+ ✓ src/tests/unit/GridEnergyWorkbench.test.js (9 tests) 651ms
+ ✓ src/tests/unit/WaveformWorkbench.test.js (11 tests) 712ms
+ ✓ src/tests/unit/GateAllocationPanel.test.js (8 tests) 257ms
+ ✓ src/tests/unit/SpectrumAnalysis.test.js (16 tests) 127ms
+ ✓ src/tests/unit/gateHysteresis.test.js (5 tests) 10ms
+stdout | src/tests/unit/GateAllocationApi.test.js
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/GateAllocationApi.test.js > keeps raw allocation evidence text and negative zero
+[API Request] POST /api/waveform/gate-allocation
+[API Response] POST /api/waveform/gate-allocation: 200 undefined
+[API Response] Data type: string
+
+stdout | src/tests/unit/GateAllocationApi.test.js > retains structured allocation validation errors
+[API Request] POST /api/waveform/gate-allocation
+
+stderr | src/tests/unit/GateAllocationApi.test.js > retains structured allocation validation errors
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: '{"detail":"Binary gate state is invalid"}',
+  url: '/api/waveform/gate-allocation'
+}
+
+stdout | src/tests/unit/GateAllocationApi.test.js > sends the original advanced waveform JSON and explicit media type without reserialization
+[API Request] POST /api/waveform/analyze
+
+stderr | src/tests/unit/GateAllocationApi.test.js > sends the original advanced waveform JSON and explicit media type without reserialization
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: { detail: 'Original numeric precision rejected' },
+  url: '/api/waveform/analyze'
+}
+
+stdout | src/tests/unit/GateAllocationApi.test.js > keeps object waveform requests in the ordinary JSON transport
+[API Request] POST /api/waveform/analyze
+[API Response] POST /api/waveform/analyze: 200 undefined
+[API Response] Data type: object
+
+ ✓ src/tests/unit/GateAllocationApi.test.js (4 tests) 28ms
+
+ Test Files  6 passed (6)
+      Tests  53 passed (53)
+   Start at  18:53:01
+   Duration  7.34s (transform 972ms, setup 31ms, collect 2.08s, tests 1.79s, environment 1.76s, prepare 547ms)
+

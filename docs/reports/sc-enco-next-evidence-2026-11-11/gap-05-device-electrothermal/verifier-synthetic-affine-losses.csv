@@ -1,0 +1,3 @@
+"temperature_c","conduction_power_w","turn_on_power_w","turn_off_power_w","total_power_w","current_a","duty","frequency_hz","device_id","selected_dependency_sha256","repository_file_sha256","scope"
+"25","4","0","0","4","2","1","0","Verifier_Synthetic_Electrothermal","1de2a3e7930cb2e02ca12a12863420f0130c4c9c9a74faa8b88d2a0f594feb5e","null","One switch junction only; no diode, package or shared-junction heat inferred"
+"125","8","0","0","8","2","1","0","Verifier_Synthetic_Electrothermal","1de2a3e7930cb2e02ca12a12863420f0130c4c9c9a74faa8b88d2a0f594feb5e","null","One switch junction only; no diode, package or shared-junction heat inferred"

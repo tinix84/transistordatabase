@@ -1,0 +1,271 @@
+{
+  "matched_original_service_commit": "e41cc8a",
+  "case": "main",
+  "recaptured_at_utc": "2026-11-11T17:38:09.045106+00:00",
+  "status": 200,
+  "method": "POST",
+  "path": "/api/waveform/analyze",
+  "request": {
+    "waveform": {
+      "time_s": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "current_a": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1
+      ]
+    },
+    "conduction": {
+      "omit": true,
+      "omission_reason": "spectrum calibration fixture"
+    },
+    "events": {
+      "mode": "omitted",
+      "omission_reason": "spectrum only"
+    },
+    "switching": {
+      "turn_on": {
+        "omit": true,
+        "omission_reason": "spectrum calibration fixture"
+      },
+      "turn_off": {
+        "omit": true,
+        "omission_reason": "spectrum calibration fixture"
+      }
+    },
+    "spectrum": {
+      "window": "rectangular",
+      "detrend": "none"
+    }
+  },
+  "response": {
+    "duration_s": 0.875,
+    "components": {
+      "conduction": {
+        "status": "omitted",
+        "reason": "spectrum calibration fixture",
+        "energy_j": null,
+        "power_w": null
+      },
+      "turn_on": {
+        "status": "omitted",
+        "reason": "spectrum calibration fixture",
+        "energy_j": null,
+        "power_w": null
+      },
+      "turn_off": {
+        "status": "omitted",
+        "reason": "spectrum calibration fixture",
+        "energy_j": null,
+        "power_w": null
+      }
+    },
+    "known_component_energy_j": 0,
+    "known_component_power_w": 0.0,
+    "total_energy_j": null,
+    "total_power_w": null,
+    "total_status": "partial-explicit-omissions",
+    "power_segments": [],
+    "conduction_plot": [],
+    "events": [],
+    "switching_cumulative_plot": [],
+    "signals": {
+      "time_s": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "current_a": [
+        1.0,
+        -1.0,
+        1.0,
+        -1.0,
+        1.0,
+        -1.0,
+        1.0,
+        -1.0
+      ]
+    },
+    "current_statistics": {
+      "mean": 0.0,
+      "rms": 0.5773502691896257,
+      "minimum": -1.0,
+      "maximum": 1.0,
+      "interval_derivative": [
+        -16.0,
+        16.0,
+        -16.0,
+        16.0,
+        -16.0,
+        16.0,
+        -16.0
+      ],
+      "interval_start_s": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75
+      ],
+      "interval_end_s": [
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "method": "Exact time-weighted piecewise-linear integrals"
+    },
+    "event_policy": {
+      "mode": "omitted",
+      "omission_reason": "spectrum only"
+    },
+    "request": {
+      "waveform": {
+        "time_s": [
+          0.0,
+          0.125,
+          0.25,
+          0.375,
+          0.5,
+          0.625,
+          0.75,
+          0.875
+        ],
+        "current_a": [
+          1.0,
+          -1.0,
+          1.0,
+          -1.0,
+          1.0,
+          -1.0,
+          1.0,
+          -1.0
+        ]
+      },
+      "conduction": {
+        "omit": true,
+        "omission_reason": "spectrum calibration fixture",
+        "duty": 1.0
+      },
+      "events": {
+        "mode": "omitted",
+        "omission_reason": "spectrum only"
+      },
+      "switching": {
+        "turn_on": {
+          "omit": true,
+          "omission_reason": "spectrum calibration fixture"
+        },
+        "turn_off": {
+          "omit": true,
+          "omission_reason": "spectrum calibration fixture"
+        }
+      },
+      "spectrum": {
+        "window": "rectangular",
+        "detrend": "none"
+      }
+    },
+    "waveform_provenance": {
+      "source": null,
+      "calibration_notes": null,
+      "imported_filename": null
+    },
+    "assumptions": [
+      "Piecewise-linear current, voltage-drop curves and duty",
+      "Exact cubic conduction integration; gate does not mask conduction",
+      "Pre-edge event sample i for bracket [i,i+1]; no initial or wrapped event",
+      "Switching energies are event impulses, not finite power pulses",
+      "Power averages use the complete supplied time interval",
+      "Measured device voltage is distinct from switching bus voltage"
+    ],
+    "spectrum": {
+      "frequency_hz": [
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0
+      ],
+      "phase_rad": [
+        null,
+        null,
+        null,
+        null,
+        0.0
+      ],
+      "phase_reference": "first supplied sample",
+      "relative_threshold": 0.1,
+      "selected_bin_indices": [
+        4
+      ],
+      "windowed_bin_mean_square_normalized": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "mean_square_normalization": "Multiply normalized bins by amplitude_scale_a squared; RMS is evaluated before squaring that SI scale",
+      "discrete_input_rms_definition": "Discrete samples after selected detrending, before windowing; separate from continuous time-weighted RMS",
+      "n": 8,
+      "sample_interval_s": 0.125,
+      "sequence_period_s": 1.0,
+      "window": "rectangular",
+      "detrend": "none",
+      "coherent_gain": 1.0,
+      "normalization": "One-sided peak amplitude; double interior bins only",
+      "resampling": "none",
+      "amplitude_a": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "real_a": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "imaginary_a": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_square_amplitude_scale_a": 1.0,
+      "discrete_input_rms_a": 1.0,
+      "windowed_discrete_rms_a": 1.0,
+      "parseval_rms_a": 1.0
+    }
+  },
+  "raw_response_sha256": "6c0ced124b84fa8cc21703f45c40a614971463ab1d52fe399e52f5bb52202e72",
+  "canonical_response_sha256": "0bc2ed1d6c1f30dd63ecc8f32db611c4bf3d6aa80c5ee81a6c31a9e84006557d"
+}

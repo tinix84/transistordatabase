@@ -36,9 +36,22 @@ class TopologyCalculatorService:
         values = dict(parameters)
         sweep = values.pop("sweep", None)
         if sweep is not None and values.get("mode") == "switching-loss-balanced":
-            raise ValueError(
-                "switching-loss-balanced supports scalar Boost CCM only; sweeps are unsupported"
-            )
+            grid = calculate_topology_sweep(topology, values, sweep, switch_transistor, diode_transistor)
+            qualified = [row for row in grid["rows"] if row["operating_point"] is not None]
+            summary = next((row for row in qualified if row["frequency_hz"] == values.get("f_sw")),
+                           qualified[0] if qualified else None)
+            if summary is not None:
+                result = dict(summary["operating_point"])
+            else:
+                result = {"topology": "boost", "supported": False,
+                          "model": {"mode": "switching-loss-balanced", "assumptions": []},
+                          "calculated": {}, "losses": None, "performance": {},
+                          "temperatures": None, "waveforms": None}
+            result.update(sweep=grid,
+                          summary_frequency_hz=summary["frequency_hz"] if summary else None,
+                          summary_basis="Existing requested-frequency row if qualified, otherwise first qualified grid row; no extra scalar evaluation")
+            from transistordatabase.topologies.boost_grid_bounds import bounded_grid_result
+            return bounded_grid_result(result)
         result = calculate_topology_operating_point(
             topology, values, switch_transistor, diode_transistor
         )

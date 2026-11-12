@@ -1,0 +1,54 @@
+
+> transistor-database-web@1.0.0 test:run
+> vitest run --maxWorkers=1 --minWorkers=1 src/tests/unit/GateChargeCalculator.test.js src/tests/unit/ThermalWorkbench.test.js src/tests/unit/SpectrumAnalysis.test.js src/tests/unit/GateAllocationApi.test.js
+
+
+ RUN  v2.1.9 /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web
+
+ ✓ src/tests/unit/GateChargeCalculator.test.js (11 tests) 746ms
+ ✓ src/tests/unit/ThermalWorkbench.test.js (11 tests) 1133ms
+ ✓ src/tests/unit/SpectrumAnalysis.test.js (16 tests) 448ms
+stdout | src/tests/unit/GateAllocationApi.test.js
+[API] Initialized with BASE_URL: 
+
+stdout | src/tests/unit/GateAllocationApi.test.js > keeps raw allocation evidence text and negative zero
+[API Request] POST /api/waveform/gate-allocation
+[API Response] POST /api/waveform/gate-allocation: 200 undefined
+[API Response] Data type: string
+
+stdout | src/tests/unit/GateAllocationApi.test.js > retains structured allocation validation errors
+[API Request] POST /api/waveform/gate-allocation
+
+stderr | src/tests/unit/GateAllocationApi.test.js > retains structured allocation validation errors
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: '{"detail":"Binary gate state is invalid"}',
+  url: '/api/waveform/gate-allocation'
+}
+
+stdout | src/tests/unit/GateAllocationApi.test.js > sends the original advanced waveform JSON and explicit media type without reserialization
+[API Request] POST /api/waveform/analyze
+
+stderr | src/tests/unit/GateAllocationApi.test.js > sends the original advanced waveform JSON and explicit media type without reserialization
+[API Error]: {
+  message: 'Request failed with status code 422',
+  status: 422,
+  statusText: undefined,
+  data: { detail: 'Original numeric precision rejected' },
+  url: '/api/waveform/analyze'
+}
+
+stdout | src/tests/unit/GateAllocationApi.test.js > keeps object waveform requests in the ordinary JSON transport
+[API Request] POST /api/waveform/analyze
+[API Response] POST /api/waveform/analyze: 200 undefined
+[API Response] Data type: object
+
+ ✓ src/tests/unit/GateAllocationApi.test.js (4 tests) 64ms
+
+ Test Files  4 passed (4)
+      Tests  42 passed (42)
+   Start at  20:03:21
+   Duration  15.48s (transform 1.69s, setup 58ms, collect 3.86s, tests 2.39s, environment 5.39s, prepare 1.33s)
+

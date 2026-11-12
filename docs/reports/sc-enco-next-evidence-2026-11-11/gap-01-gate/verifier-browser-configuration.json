@@ -1,0 +1,13 @@
+{
+  "kind": "new acceptance specification and config; no original test files adapted",
+  "baseURL": "http://127.0.0.1:8004",
+  "app_entrypoint": "/index.html?view=waveform",
+  "workers": 1,
+  "calculation_mocks": false,
+  "spec_path": "transistordatabase/gui_web/src/tests/e2e/gate-hysteresis-acceptance.spec.js",
+  "spec_sha256": "7cda203a72aad086c7e82a933c0848408725909a0cb3a3e49950d91bbb37fd5c",
+  "config_path": "transistordatabase/gui_web/playwright.gate-hysteresis.acceptance.config.js",
+  "config_sha256": "f722b3449e9ded6131dcda359da3475afb91bde4bd52f1436157399895e851ea",
+  "outputs": "fresh absent UUID path outside repository",
+  "console_network": "per-test console messages, page errors, failed requests and HTTP5xx captured in verifier-browser-results.json; assertions required zero page errors, failed requests and HTTP5xx; intended422 validation responses retained"
+}

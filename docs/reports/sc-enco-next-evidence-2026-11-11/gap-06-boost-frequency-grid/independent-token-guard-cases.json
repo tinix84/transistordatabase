@@ -1,0 +1,148 @@
+{
+  "pre_fix": {
+    "test": "test_bounded_http_rejects_nonnumeric_tokens_before_source_access[line-quoted-temperature]",
+    "field": "t_j",
+    "sent_json_string": "25.0000000000000000001",
+    "http_actual": 200,
+    "http_expected": 422,
+    "source_junit_sha256": "1f3bd280112de1db7f8de38f419adaab84ecc3715914743db9a6620f3c4e2ef4"
+  },
+  "post_fix": {
+    "tests": 32,
+    "passed": 32,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "source_junit_sha256": "c6e9f43d25a4f745977aa68e032e19a9386d7998eec08251a47a2a79763ca5df",
+    "cases": [
+      {
+        "name": "test_existing_estimate_and_frequency_line_keep_full_merged_response[False-8045914116fef11afb03e3e85c3095bed94f05ea6127810b5cdf9a673d58b976]",
+        "duration_s": 0.008
+      },
+      {
+        "name": "test_existing_estimate_and_frequency_line_keep_full_merged_response[True-73ed8f52b1eafbb59cbdae4ff800c7c84b97a646847ff28b84e9b1e26651f07c]",
+        "duration_s": 0.005
+      },
+      {
+        "name": "test_existing_pareto_without_opt_in_preserves_complete_failure_population",
+        "duration_s": 0.005
+      },
+      {
+        "name": "test_mixed_line_retains_frequency_position_and_matches_independent_scalar_solves",
+        "duration_s": 1.378
+      },
+      {
+        "name": "test_lossless_limit_is_a_supported_measured_zero_at_every_frequency",
+        "duration_s": 0.022
+      },
+      {
+        "name": "test_missing_switching_curve_keeps_gaps_distinct_from_zero_heat",
+        "duration_s": 0.001
+      },
+      {
+        "name": "test_each_frequency_has_its_own_complete_ranked_population",
+        "duration_s": 2.603
+      },
+      {
+        "name": "test_shared_grid_has_only_distinct_finite_positive_frequencies[frequencies0]",
+        "duration_s": 0.001
+      },
+      {
+        "name": "test_shared_grid_has_only_distinct_finite_positive_frequencies[frequencies1]",
+        "duration_s": 0.0
+      },
+      {
+        "name": "test_shared_grid_has_only_distinct_finite_positive_frequencies[frequencies2]",
+        "duration_s": 0.0
+      },
+      {
+        "name": "test_resource_budget_applies_across_all_candidates_and_frequencies",
+        "duration_s": 0.0
+      },
+      {
+        "name": "test_api_snapshots_each_shared_device_and_missing_identity_once",
+        "duration_s": 1.325
+      },
+      {
+        "name": "test_normal_service_solves_exactly_listed_coordinates_and_retains_rejected_grid[True]",
+        "duration_s": 0.826
+      },
+      {
+        "name": "test_normal_service_solves_exactly_listed_coordinates_and_retains_rejected_grid[False]",
+        "duration_s": 0.001
+      },
+      {
+        "name": "test_bounded_core_rejects_unsized_frequency_iterables_without_enumeration",
+        "duration_s": 0.0
+      },
+      {
+        "name": "test_list_backed_oversize_graph_rejects_before_a_scalar_solve",
+        "duration_s": 0.001
+      },
+      {
+        "name": "test_dedicated_transport_enforces_four_mib_of_actual_json_before_parsing[/api/topology/switching-frequency-grid]",
+        "duration_s": 0.008
+      },
+      {
+        "name": "test_dedicated_transport_enforces_four_mib_of_actual_json_before_parsing[/api/topology/switching-frequency-pareto]",
+        "duration_s": 0.006
+      },
+      {
+        "name": "test_legacy_paths_identify_dedicated_transport_for_new_inputs",
+        "duration_s": 0.01
+      },
+      {
+        "name": "test_existing_estimate_still_accepts_its_original_numeric_string_input",
+        "duration_s": 0.007
+      },
+      {
+        "name": "test_bounded_http_rejects_nonnumeric_tokens_before_source_access[line-quoted-temperature]",
+        "duration_s": 0.007
+      },
+      {
+        "name": "test_bounded_http_rejects_nonnumeric_tokens_before_source_access[line-quoted-underflow]",
+        "duration_s": 0.005
+      },
+      {
+        "name": "test_bounded_http_rejects_nonnumeric_tokens_before_source_access[line-quoted-zero]",
+        "duration_s": 0.005
+      },
+      {
+        "name": "test_bounded_http_rejects_nonnumeric_tokens_before_source_access[line-boolean-gate]",
+        "duration_s": 0.006
+      },
+      {
+        "name": "test_bounded_http_rejects_nonnumeric_tokens_before_source_access[line-quoted-count]",
+        "duration_s": 0.005
+      },
+      {
+        "name": "test_bounded_http_rejects_nonnumeric_tokens_before_source_access[population-quoted-temperature]",
+        "duration_s": 0.006
+      },
+      {
+        "name": "test_bounded_http_rejects_nonnumeric_tokens_before_source_access[population-quoted-underflow]",
+        "duration_s": 0.006
+      },
+      {
+        "name": "test_bounded_http_rejects_nonnumeric_tokens_before_source_access[population-quoted-zero]",
+        "duration_s": 0.006
+      },
+      {
+        "name": "test_bounded_http_rejects_nonnumeric_tokens_before_source_access[population-boolean-gate]",
+        "duration_s": 0.005
+      },
+      {
+        "name": "test_bounded_http_rejects_nonnumeric_tokens_before_source_access[population-quoted-frequency]",
+        "duration_s": 0.006
+      },
+      {
+        "name": "test_bounded_http_preserves_numeric_identity_labels_and_known_zero[grid]",
+        "duration_s": 0.032
+      },
+      {
+        "name": "test_bounded_http_preserves_numeric_identity_labels_and_known_zero[pareto]",
+        "duration_s": 0.06
+      }
+    ]
+  }
+}

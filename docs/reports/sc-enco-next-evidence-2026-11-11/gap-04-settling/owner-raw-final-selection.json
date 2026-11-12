@@ -1,0 +1,5 @@
+[
+  "tests/test_analytical_models.py",
+  "tests/test_gate_settling.py",
+  "tests/test_gate_settling_independent.py"
+]

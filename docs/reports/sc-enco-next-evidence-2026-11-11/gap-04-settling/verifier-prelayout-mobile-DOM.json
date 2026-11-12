@@ -1,0 +1,396 @@
+[
+  {
+    "kind": "zero",
+    "scroll": {
+      "x": 0,
+      "y": 8062
+    },
+    "inner": {
+      "width": 443,
+      "height": 959
+    },
+    "visual": {
+      "width": 390,
+      "height": 844,
+      "offsetTop": 115,
+      "scale": 1
+    },
+    "nodes": [
+      {
+        "tag": "TD",
+        "testid": "gate-settling-duration",
+        "text": "0.00000",
+        "rect": {
+          "x": 185.21875,
+          "y": -321.515625,
+          "width": 159.28125,
+          "height": 97.78125,
+          "top": -321.515625,
+          "right": 344.5,
+          "bottom": -223.734375,
+          "left": 185.21875
+        },
+        "style": {
+          "display": "table-cell",
+          "position": "static",
+          "height": "97.7812px",
+          "minHeight": "0px",
+          "overflow": "visible",
+          "gridTemplateRows": "none",
+          "gridTemplateColumns": "none",
+          "transform": "none",
+          "margin": "0px",
+          "padding": "10px"
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "Post-Miller gate voltage estimate\n💾\n\nNo finite-time gate current pulse is defined for the ideal zero-charge crossing.",
+        "rect": {
+          "x": 45,
+          "y": 208.890625,
+          "width": 300,
+          "height": 585.1875,
+          "top": 208.890625,
+          "right": 345,
+          "bottom": 794.078125,
+          "left": 45
+        },
+        "style": {
+          "display": "grid",
+          "position": "static",
+          "height": "585.188px",
+          "minHeight": "0px",
+          "overflow": "visible",
+          "gridTemplateRows": "497.188px 72px",
+          "gridTemplateColumns": "300px",
+          "transform": "none",
+          "margin": "0px",
+          "padding": "0px"
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "Post-Miller gate voltage estimate\n💾",
+        "rect": {
+          "x": 45,
+          "y": 208.890625,
+          "width": 300,
+          "height": 497.1875,
+          "top": 208.890625,
+          "right": 345,
+          "bottom": 706.078125,
+          "left": 45
+        },
+        "style": {
+          "display": "block",
+          "position": "static",
+          "height": "497.188px",
+          "minHeight": "auto",
+          "overflow": "visible",
+          "gridTemplateRows": "none",
+          "gridTemplateColumns": "none",
+          "transform": "none",
+          "margin": "0px",
+          "padding": "16px"
+        }
+      },
+      {
+        "tag": "P",
+        "text": "No finite-time gate current pulse is defined for the ideal zero-charge crossing.",
+        "rect": {
+          "x": 45,
+          "y": 722.078125,
+          "width": 300,
+          "height": 72,
+          "top": 722.078125,
+          "right": 345,
+          "bottom": 794.078125,
+          "left": 45
+        },
+        "style": {
+          "display": "block",
+          "position": "static",
+          "height": "72px",
+          "minHeight": "auto",
+          "overflow": "visible",
+          "gridTemplateRows": "none",
+          "gridTemplateColumns": "none",
+          "transform": "none",
+          "margin": "0px",
+          "padding": "0px"
+        }
+      },
+      {
+        "tag": "BUTTON",
+        "testid": "gate-settling-json",
+        "text": "Export gate request and result JSON",
+        "rect": {
+          "x": 45,
+          "y": 794.078125,
+          "width": 300,
+          "height": 60,
+          "top": 794.078125,
+          "right": 345,
+          "bottom": 854.078125,
+          "left": 45
+        },
+        "style": {
+          "display": "inline-block",
+          "position": "static",
+          "height": "60px",
+          "minHeight": "0px",
+          "overflow": "visible",
+          "gridTemplateRows": "none",
+          "gridTemplateColumns": "none",
+          "transform": "none",
+          "margin": "0px",
+          "padding": "12px 20px"
+        }
+      },
+      {
+        "tag": "BUTTON",
+        "testid": "gate-settling-csv",
+        "text": "Export relative gate settling trace CSV",
+        "rect": {
+          "x": 45,
+          "y": 854.078125,
+          "width": 300,
+          "height": 60,
+          "top": 854.078125,
+          "right": 345,
+          "bottom": 914.078125,
+          "left": 45
+        },
+        "style": {
+          "display": "inline-block",
+          "position": "static",
+          "height": "60px",
+          "minHeight": "0px",
+          "overflow": "visible",
+          "gridTemplateRows": "none",
+          "gridTemplateColumns": "none",
+          "transform": "none",
+          "margin": "0px",
+          "padding": "12px 20px"
+        }
+      }
+    ],
+    "hits": [
+      {
+        "button": "gate-settling-json",
+        "center": [
+          195,
+          824.078125
+        ],
+        "hit": "<button data-v-1badff7e=\"\" data-testid=\"gate-settling-json\">Export gate request and result JSON</button>"
+      },
+      {
+        "button": "gate-settling-csv",
+        "center": [
+          195,
+          884.078125
+        ],
+        "hit": "<button data-v-1badff7e=\"\" data-testid=\"gate-settling-csv\">Export relative gate settling trace CSV</button>"
+      }
+    ],
+    "click": "locator.click: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('gate-settling-csv')\u001b[22m\n\u001b[2m    - locator resolved to <button data-v-1badff7e=\"\" data-testid=\"gate-settling-csv\">Export relative gate settling trace CSV</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <p data-v-1badff7e=\"\">No finite-time gate current pulse is defined for …</p> from <div data-v-1badff7e=\"\" class=\"gate-plots\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <button data-v-1badff7e=\"\" data-testid=\"gate-settling-json\">Export gate request and result JSON</button> intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <p data-v-1badff7e=\"\">No finite-time gate current pulse is defined for …</p> from <div data-v-1badff7e=\"\" class=\"gate-plots\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <p data-v-1badff7e=\"\">No finite-time gate current pulse is defined for …</p> from <div data-v-1badff7e=\"\" class=\"gate-plots\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button data-v-1badff7e=\"\" data-testid=\"gate-settling-json\">Export gate request and result JSON</button> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <p data-v-1badff7e=\"\">No finite-time gate current pulse is defined for …</p> from <div data-v-1badff7e=\"\" class=\"gate-plots\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <p data-v-1badff7e=\"\">No finite-time gate current pulse is defined for …</p> from <div data-v-1badff7e=\"\" class=\"gate-plots\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <p data-v-1badff7e=\"\">No finite-time gate current pulse is defined for …</p> from <div data-v-1badff7e=\"\" class=\"gate-plots\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n"
+  },
+  {
+    "kind": "huge",
+    "scroll": {
+      "x": 0,
+      "y": 7490
+    },
+    "inner": {
+      "width": 822,
+      "height": 1777
+    },
+    "visual": {
+      "width": 390,
+      "height": 844,
+      "offsetTop": 933,
+      "scale": 1
+    },
+    "nodes": [
+      {
+        "tag": "TD",
+        "testid": "gate-settling-duration",
+        "text": "6.93147e+300",
+        "rect": {
+          "x": 194.390625,
+          "y": 122.515625,
+          "width": 150.109375,
+          "height": 97.78125,
+          "top": 122.515625,
+          "right": 344.5,
+          "bottom": 220.296875,
+          "left": 194.390625
+        },
+        "style": {
+          "display": "table-cell",
+          "position": "static",
+          "height": "97.7812px",
+          "minHeight": "0px",
+          "overflow": "visible",
+          "gridTemplateRows": "none",
+          "gridTemplateColumns": "none",
+          "transform": "none",
+          "margin": "0px",
+          "padding": "10px"
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "Post-Miller gate voltage estimate\n💾\nPost-Miller gate current estimate\n💾",
+        "rect": {
+          "x": 45,
+          "y": 601.734375,
+          "width": 300,
+          "height": 1010.375,
+          "top": 601.734375,
+          "right": 345,
+          "bottom": 1612.109375,
+          "left": 45
+        },
+        "style": {
+          "display": "grid",
+          "position": "static",
+          "height": "1010.38px",
+          "minHeight": "0px",
+          "overflow": "visible",
+          "gridTemplateRows": "497.188px 497.188px",
+          "gridTemplateColumns": "300px",
+          "transform": "none",
+          "margin": "0px",
+          "padding": "0px"
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "Post-Miller gate voltage estimate\n💾",
+        "rect": {
+          "x": 45,
+          "y": 601.734375,
+          "width": 300,
+          "height": 497.1875,
+          "top": 601.734375,
+          "right": 345,
+          "bottom": 1098.921875,
+          "left": 45
+        },
+        "style": {
+          "display": "block",
+          "position": "static",
+          "height": "497.188px",
+          "minHeight": "auto",
+          "overflow": "visible",
+          "gridTemplateRows": "none",
+          "gridTemplateColumns": "none",
+          "transform": "none",
+          "margin": "0px",
+          "padding": "16px"
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "Post-Miller gate current estimate\n💾",
+        "rect": {
+          "x": 45,
+          "y": 1114.921875,
+          "width": 300,
+          "height": 497.1875,
+          "top": 1114.921875,
+          "right": 345,
+          "bottom": 1612.109375,
+          "left": 45
+        },
+        "style": {
+          "display": "block",
+          "position": "static",
+          "height": "497.188px",
+          "minHeight": "auto",
+          "overflow": "visible",
+          "gridTemplateRows": "none",
+          "gridTemplateColumns": "none",
+          "transform": "none",
+          "margin": "0px",
+          "padding": "16px"
+        }
+      },
+      {
+        "tag": "BUTTON",
+        "testid": "gate-settling-json",
+        "text": "Export gate request and result JSON",
+        "rect": {
+          "x": 45,
+          "y": 1612.109375,
+          "width": 300,
+          "height": 60,
+          "top": 1612.109375,
+          "right": 345,
+          "bottom": 1672.109375,
+          "left": 45
+        },
+        "style": {
+          "display": "inline-block",
+          "position": "static",
+          "height": "60px",
+          "minHeight": "0px",
+          "overflow": "visible",
+          "gridTemplateRows": "none",
+          "gridTemplateColumns": "none",
+          "transform": "none",
+          "margin": "0px",
+          "padding": "12px 20px"
+        }
+      },
+      {
+        "tag": "BUTTON",
+        "testid": "gate-settling-csv",
+        "text": "Export relative gate settling trace CSV",
+        "rect": {
+          "x": 45,
+          "y": 1672.109375,
+          "width": 300,
+          "height": 60,
+          "top": 1672.109375,
+          "right": 345,
+          "bottom": 1732.109375,
+          "left": 45
+        },
+        "style": {
+          "display": "inline-block",
+          "position": "static",
+          "height": "60px",
+          "minHeight": "0px",
+          "overflow": "visible",
+          "gridTemplateRows": "none",
+          "gridTemplateColumns": "none",
+          "transform": "none",
+          "margin": "0px",
+          "padding": "12px 20px"
+        }
+      }
+    ],
+    "hits": [
+      {
+        "button": "gate-settling-json",
+        "center": [
+          195,
+          1642.109375
+        ],
+        "hit": "<button data-v-1badff7e=\"\" data-testid=\"gate-settling-json\">Export gate request and result JSON</button>"
+      },
+      {
+        "button": "gate-settling-csv",
+        "center": [
+          195,
+          1702.109375
+        ],
+        "hit": "<button data-v-1badff7e=\"\" data-testid=\"gate-settling-csv\">Export relative gate settling trace CSV</button>"
+      }
+    ],
+    "click": "locator.click: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('gate-settling-json')\u001b[22m\n\u001b[2m    - locator resolved to <button data-v-1badff7e=\"\" data-testid=\"gate-settling-json\">Export gate request and result JSON</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <canvas width=\"266\" height=\"400\" data-v-dbff0814=\"\"></canvas> from <div data-v-1badff7e=\"\" class=\"gate-plots\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <canvas width=\"266\" height=\"400\" data-v-dbff0814=\"\"></canvas> from <div data-v-1badff7e=\"\" class=\"gate-plots\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    9 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <canvas width=\"266\" height=\"400\" data-v-dbff0814=\"\"></canvas> from <div data-v-1badff7e=\"\" class=\"gate-plots\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n"
+  }
+]

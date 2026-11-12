@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "/usr/bin/node",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/node_modules/@playwright/test/cli.js",
+    "test",
+    "--config",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/playwright.gate-hysteresis.acceptance.config.js"
+  ],
+  "returncode": 0,
+  "wall_s": 33.185785822999605,
+  "output": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/gate-hysteresis-browser-bc6722d432ca4090b2973b4f67689bd0/browser-295c35a7fb2747619ce905010594a3c1",
+  "spec_sha256": "7cda203a72aad086c7e82a933c0848408725909a0cb3a3e49950d91bbb37fd5c",
+  "config_sha256": "f722b3449e9ded6131dcda359da3475afb91bde4bd52f1436157399895e851ea"
+}

@@ -3,9 +3,10 @@
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, HTTPException
-from pydantic import Field
+from pydantic import Field, model_serializer
 
-from transistordatabase.gui_web.backend.parameter_routes import ParameterRoute, Strict
+from transistordatabase.gui_web.backend.parameter_routes import Strict
+from transistordatabase.gui_web.backend.finite_json_route import FiniteJsonRoute
 from transistordatabase.thermal import ThermalResourceLimitError, analyze_thermal
 
 Values = Annotated[list[float], Field(min_length=1, max_length=10000)]
@@ -26,6 +27,12 @@ class Interface(Context):
     area_m2: float = Field(gt=0)
 
 
+class ContactInterface(Interface):
+    """One identified physical contact in an explicit series stack."""
+
+    interface_id: str = Field(min_length=1, max_length=200)
+
+
 class Steady(Context):
     """Explicit common and independent branch thermal paths."""
 
@@ -37,6 +44,15 @@ class Steady(Context):
     forward_resistance_k_w: float = Field(ge=0)
     reverse_resistance_k_w: float = Field(ge=0)
     interface: Interface | None = None
+    interfaces: Annotated[list[ContactInterface], Field(min_length=1, max_length=32)] | None = None
+
+    @model_serializer(mode="wrap")
+    def canonical_settings(self, handler):
+        """Keep the existing steady request unchanged when no list is supplied."""
+        result = handler(self)
+        if "interfaces" not in self.model_fields_set:
+            result.pop("interfaces", None)
+        return result
 
 
 class Network(Context):
@@ -149,8 +165,14 @@ class Screening(Context):
 Request = Annotated[
     Steady | Transient | Electrothermal | Screening, Field(discriminator="operation")
 ]
+class ThermalJsonRoute(FiniteJsonRoute):
+    """Preserve the existing thermal body policy with finite-literal validation."""
+
+    max_body_bytes = None
+
+
 router = APIRouter(
-    prefix="/api/thermal", tags=["Thermal workbench"], route_class=ParameterRoute
+    prefix="/api/thermal", tags=["Thermal workbench"], route_class=ThermalJsonRoute
 )
 
 

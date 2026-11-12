@@ -1,12 +1,14 @@
 <script setup>
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import CurvePlotter from './CurvePlotter.vue'
+import HysteresisGateControls from './HysteresisGateControls.vue'
+import { defaultHysteresis, hysteresisRequest, gateDigitizationColumns } from './gateHysteresis.js'
 import { waveformApi } from '../services/api.js'
 import { analysisCsv, analysisError, downloadAnalysis, finiteDecimal as finite } from './analysisFiles.js'
 import { returnedPlotBounds } from './returnedPlotBounds.js'
 
 const props = defineProps({ parseSamples: { type: Function, required: true }, sampleRevision: { type: String, required: true }, provenance: { type: Object, required: true } })
-const input = reactive({ mode: 'binary', threshold: .5, selected: false, source: '', temperature: '', gateVoltage: '' })
+const input = reactive({ mode: 'binary', threshold: .5, hysteresis: defaultHysteresis(), selected: false, source: '', temperature: '', gateVoltage: '' })
 const result = ref(null), rawJson = ref(''), error = ref(''), busy = ref(false), stale = ref(false)
 let revision = 0, disposed = false
 watch([input, () => props.sampleRevision, () => props.provenance], () => {
@@ -33,6 +35,7 @@ const gateDataset = computed(() => [{ label: 'Gate state (0 = low, 1 = high)', s
 const csv = computed(() => analysisCsv(rows.value.map(row => ({ ...row, source: result.value.inputs.source,
   conditions: result.value.inputs.conditions, provenance: result.value.inputs.provenance,
   gate_policy: result.value.inputs.gate.mode, threshold_v: result.value.inputs.gate.threshold_v ?? null,
+  ...gateDigitizationColumns(result.value.result.gate_digitization),
   semantics: result.value.result.semantics, scope: result.value.result.scope,
   input_sha256: result.value.evidence.input_sha256, result_sha256: result.value.evidence.result_sha256 }))))
 function request() {
@@ -41,6 +44,7 @@ function request() {
   const columns = props.parseSamples(true, input.mode === 'binary')
   if (!columns.gate_v) throw new Error('Gate allocation requires a gate_v sample at every time')
   const gate = input.mode === 'binary' ? { mode: 'binary', state: columns.gate_v }
+    : input.mode === 'hysteresis' ? { mode: 'hysteresis', gate_v: columns.gate_v, digitizer: hysteresisRequest(input.hysteresis) }
     : { mode: 'threshold', gate_v: columns.gate_v, threshold_v: finite(input.threshold, 'Allocation gate threshold') }
   if (input.mode === 'binary' && columns.gate_v.some(value => value !== 0 && value !== 1)) throw new Error('Binary gate state requires numeric 0/1 samples')
   return { time_s: columns.time_s, current_a: columns.current_a, gate, selected: true, source: input.source.trim(),
@@ -66,8 +70,9 @@ async function calculate() {
       <p>This panel reads the waveform CSV above, including when the loss calculation uses advanced JSON. Gate-on current is the channel allocation. Gate-off current is the diode allocation.</p>
       <p>These command-state allocations do not identify physical current paths or simultaneous sharing. They do not change the waveform loss calculation.</p>
       <form @submit.prevent="calculate">
-        <label>Allocation gate policy<select v-model="input.mode" data-testid="allocation-mode"><option value="binary">Binary gate_v: numeric 0/1 only</option><option value="threshold">Voltage gate_v &gt; declared threshold; equality is low</option></select></label>
+        <label>Allocation gate policy<select v-model="input.mode" data-testid="allocation-mode"><option value="binary">Binary gate_v: numeric 0/1 only</option><option value="threshold">Voltage gate_v &gt; declared threshold; equality is low</option><option value="hysteresis">Hysteresis: strict crossings and deadband hold</option></select></label>
         <label v-if="input.mode === 'threshold'">Allocation threshold (V)<input :value="input.threshold" @input="input.threshold = $event.target.value" type="number" step="any" data-testid="allocation-threshold"></label>
+        <HysteresisGateControls v-if="input.mode === 'hysteresis'" v-model="input.hysteresis" label="Allocation"/>
         <label>Allocation source / assumption<input v-model="input.source" data-testid="allocation-source" placeholder="State the source and the command-state assumption"></label>
         <div class="columns"><label>Junction temperature (°C), blank = unknown<input :value="input.temperature" @input="input.temperature = $event.target.value" type="number" step="any"></label><label>Gate-on voltage (V), blank = unknown<input :value="input.gateVoltage" @input="input.gateVoltage = $event.target.value" type="number" step="any"></label></div>
         <label class="check"><input v-model="input.selected" type="checkbox" data-testid="allocation-selected"> I select the command-state allocation assumption.</label>
@@ -78,6 +83,7 @@ async function calculate() {
       <section v-if="result" data-testid="allocation-results">
         <h3>{{ result.result.sample_count }} original signed samples</h3>
         <p>{{ result.result.semantics }} {{ result.result.scope }}</p>
+        <p v-if="result.result.gate_digitization" data-testid="allocation-hysteresis-evidence">Hysteresis: low {{ result.result.gate_digitization.low_v }} V, high {{ result.result.gate_digitization.high_v }} V. Initial state {{ result.result.gate_digitization.initial_state ? 'on' : 'off' }} ({{ result.result.gate_digitization.initial_state_source }}). {{ result.result.gate_digitization.semantics }}</p>
         <p>Source: {{ result.inputs.source }}. Waveform source: {{ result.inputs.provenance?.source ?? 'Unknown' }}.</p>
         <CurvePlotter title="Signed sample allocations" :datasets="datasets" x-label="Time (s)" y-label="Current (A)" :y-min="bounds.min" :y-max="bounds.max" :allow-zoom="false"/>
         <CurvePlotter title="Original sample gate state" :datasets="gateDataset" x-label="Time (s)" y-label="Gate state (0/1)" :y-min="-.1" :y-max="1.1" :allow-zoom="false"/>

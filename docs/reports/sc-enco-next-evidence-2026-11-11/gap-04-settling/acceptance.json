@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "record_type": "Point-in-time acceptance evidence for one capability",
+  "date": "2026-11-11",
+  "capability": "Separate gate settling after the Miller plateau",
+  "queue_scope": "Gap4 only. Other SC/ENCO capabilities remain separate.",
+  "source_reference_ids": [
+    "sc-c80bf13d1ab64d22",
+    "sc-4a918516adc31129"
+  ],
+  "reference_handling": "Read-only source inspection. Independent implementation. No reference code copied.",
+  "contract": {
+    "opt_in": "Optional settling_target_v strictly between Vplateau and Von. Existing no-target full HTTP response and handler remain unchanged.",
+    "source_meaning": "Qg remains specified at Von; the target does not redefine the original charge reference.",
+    "timing": "Separate turn_on_settling sibling. Existing turn_on and turn_off intervals/traces stay unchanged. Local phase time is relative to existing Miller-end anchor_s.",
+    "numeric_method": "Exact accepted binary64 charge/voltage differences, extended positive-gap log1p and gate-voltage expm1. Unsupported nonzero outputs reject.",
+    "precision_boundary": "Direct higher-precision values reject if conversion changes them, including resistance before ideal-zero return. Optional-only original HTTP token checks preserve canonical decimal notation and reject numeric strings, unsupported precision or residual sign/zero classification changes.",
+    "zero_charge": "Explicit instantaneous ideal voltage crossing; duration/charge0, undefined current endpoints and no finite-time current pulse.",
+    "absolute_time": "A positive local duration survives unresolved absolute timestamp addition; absolute_end_s null identifies that precision limit.",
+    "units": "New phase displays/plots/exports use SI seconds, preventing nanosecond conversion overflow. Old direction nanosecond contracts stay unchanged.",
+    "scope": "Gate charging estimate only. No physical drain waveform, nonlinear capacitance, or drain switching energy is inferred.",
+    "browser": "Explicit target selection; separate evidence, relative gate-only plots, JSON/CSV, stale result invalidation. Tables scroll locally on mobile without hiding values."
+  },
+  "oracle": {
+    "driver_voltage_v": 10,
+    "plateau_voltage_v": 4,
+    "target_voltage_v": 7,
+    "total_resistance_ohm": 2,
+    "post_plateau_capacitance_f": 1e-09,
+    "additional_duration_s": 1.3862943611198906e-09,
+    "incremental_charge_c": 3e-09,
+    "initial_gate_current_a": 3,
+    "final_gate_current_a": 1.5
+  },
+  "validation": {
+    "adjacent_python_before_precision_guards": {
+      "passed": 232,
+      "seconds": 8.76,
+      "wall_seconds": 11.29,
+      "maximum_rss_kib": 268452
+    },
+    "focused_final_python": {
+      "passed": 45,
+      "seconds": 8.74,
+      "wall_seconds": 12,
+      "maximum_rss_kib": 264044,
+      "scope": "Final optional raw/direct guards; includes prior15 independent cases. Final21 has separate frozen run."
+    },
+    "independent_final": {
+      "passed": 21,
+      "skipped": 0,
+      "seconds": 2.67,
+      "wall_seconds": 4.32,
+      "maximum_rss_kib": 260592,
+      "scope": "Nominal/near-bound/zero/absolute-collapse/large-SI cases, raw guards, full legacy response hash."
+    },
+    "vue_before_responsive_fix": {
+      "passed": 42,
+      "files": 4,
+      "seconds": 15.48,
+      "wall_seconds": 19.5,
+      "maximum_rss_kib": 174436
+    },
+    "vue_final_responsive": {
+      "passed": 11,
+      "files": 1,
+      "seconds": 1.31,
+      "wall_seconds": 2.15,
+      "maximum_rss_kib": 154112
+    },
+    "compiled_initial": {
+      "passed": 8,
+      "failed": 2,
+      "scope": "Actual mobile intrinsic table overflow blocked normal export clicks. Failure artifacts retained. No forced clicks."
+    },
+    "compiled_final": {
+      "passed": 10,
+      "skipped": 0,
+      "retries": 0,
+      "mocked": 0,
+      "playwright_seconds": 32.254,
+      "wall_seconds": 33.556,
+      "maximum_rss_kib": 354872,
+      "scope": "Actual desktop/mobile RC/zero/boundary/large-SI/exports/stale/raw-transport and retained thermal/gate regressions. Mobile document width<=391px; normal clicks."
+    },
+    "final_build": {
+      "modules": 214,
+      "wall_seconds": 5.074,
+      "maximum_rss_kib": 555016
+    },
+    "ruff": {
+      "findings": 0,
+      "wall_seconds": 0.049
+    },
+    "headless": {
+      "module_imports": 8,
+      "qt_imports": "blocked",
+      "wall_seconds": 3.039,
+      "maximum_rss_kib": 244788
+    }
+  },
+  "main_runtime": "Main e41cc8a remains unchanged on port8003. Feature verification uses separate port8004.",
+  "history": "Previous dated proof remains unchanged. This checkpoint is local only.",
+  "receipts": {
+    "source-manifest.json": "21673c7e5d7b632c7702a35c71cfa86b620183aed67aaed7c5f1df275c5d290d",
+    "owner-manifest.json": "539031ee53acbd942e298737ea4b321baf714125afc5f9871bcc450b0d535213",
+    "owner-raw-final-manifest.json": "dbe03af546698ada622ae69bf79d28fe4250679cf78dd373219367d02d3e1b55",
+    "owner-responsive-manifest.json": "58ff50098d64ee9772d9ac9d50423960ecb8855362fe794ecf2dc2e7339221d7",
+    "independent-final-manifest.json": "53d2517819591505d87189a9fc112ec5c9c1c8afc6b1337161997f2314a9715d",
+    "verifier-manifest.json": "e8e44ca2d3a21dad4707968ffdee4bdb023345be9ece7bf611f7fca664d40a51"
+  },
+  "preservation": {
+    "final_source_test_hashes_unchanged": 381,
+    "database_files_unchanged": 24,
+    "old_hashed_assets_retained": 11
+  }
+}

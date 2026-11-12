@@ -3,9 +3,10 @@ from typing import Annotated, Literal
 from decimal import Decimal
 
 from fastapi import APIRouter, HTTPException
-from pydantic import Field, StrictBool, StrictFloat, StrictInt, field_validator
+from pydantic import Field, StrictBool, StrictFloat, StrictInt, field_validator, model_serializer
 
 from transistordatabase.current_allocation import allocate_gate_current
+from transistordatabase.gui_web.backend.gate_policy import HysteresisPolicy, HysteresisEvidence
 from transistordatabase.gui_web.backend.finite_json_route import FiniteJsonRoute
 from transistordatabase.gui_web.backend.parameter_routes import Strict
 from transistordatabase.gui_web.backend.waveform_routes import Provenance
@@ -38,12 +39,20 @@ class ThresholdGate(Strict):
     threshold_v: float
 
 
+class HysteresisGate(Strict):
+    """Original gate samples with explicitly selected hysteresis."""
+
+    mode: Literal["hysteresis"]
+    gate_v: Vector
+    digitizer: HysteresisPolicy
+
+
 class AllocationRequest(Strict):
     """Reproducible samples, source conditions and explicit assumption selection."""
 
     time_s: Vector
     current_a: Vector
-    gate: Annotated[BinaryGate | ThresholdGate, Field(discriminator="mode")]
+    gate: Annotated[BinaryGate | ThresholdGate | HysteresisGate, Field(discriminator="mode")]
     selected: bool
     source: str = Field(min_length=1, max_length=2000)
     conditions: dict[str, float | None]
@@ -68,6 +77,15 @@ class AllocationResult(Strict):
     semantics: str
     scope: str
     units: dict[str, str]
+    gate_digitization: HysteresisEvidence | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_existing_result(self, handler):
+        """Keep legacy response bodies and result hashes unchanged."""
+        data = handler(self)
+        if self.gate_digitization is None:
+            data.pop("gate_digitization", None)
+        return data
 
 
 class Evidence(Strict):

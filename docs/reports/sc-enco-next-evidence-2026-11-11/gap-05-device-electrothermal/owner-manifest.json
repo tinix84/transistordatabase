@@ -1,0 +1,65 @@
+{
+  "artifacts": [
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-05-device-electrothermal/owner-python-selection.json",
+      "bytes": 216,
+      "sha256": "2fee447b0b463968f5391b0e5ae31420feffae20c026cebe4d5be1e34bdae4da"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-05-device-electrothermal/owner-python-source-start.json",
+      "bytes": 28071,
+      "sha256": "6bd68530cf7d4efc7564233768af86193a3d7eb220fbee731f000630cba6adb2"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-05-device-electrothermal/owner-python-source-end.json",
+      "bytes": 28071,
+      "sha256": "6bd68530cf7d4efc7564233768af86193a3d7eb220fbee731f000630cba6adb2"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-05-device-electrothermal/owner-python-junit.xml",
+      "bytes": 17834,
+      "sha256": "e78ea1d0260a735336d1c129ae600cda555480141c500ac36715ea5222a334e9"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-05-device-electrothermal/owner-python-pytest.log",
+      "bytes": 702,
+      "sha256": "bf3d595e36d32cde7f2a40b1a45f856b8fea0a56180219f3c829c53ac7ad66c6"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-05-device-electrothermal/owner-python-resource.log",
+      "bytes": 1407,
+      "sha256": "f0e7a057a381403835fec76c6e6f0f2c2e5954197f2be32c121733ff1c802d3b"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-05-device-electrothermal/owner-vue-selection.json",
+      "bytes": 291,
+      "sha256": "6d03c7726cb9a6de7e632c4094f59e163ac1ad94d8f323115bf7cf91e6e893f9"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-05-device-electrothermal/owner-vue-source-start.json",
+      "bytes": 28902,
+      "sha256": "6f1e747eecc7eac7bb4747c0871d965ec1d35e05a51a0a82d98a616915bab870"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-05-device-electrothermal/owner-vue-source-end.json",
+      "bytes": 28902,
+      "sha256": "6f1e747eecc7eac7bb4747c0871d965ec1d35e05a51a0a82d98a616915bab870"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-05-device-electrothermal/owner-vue-vitest.log",
+      "bytes": 1182,
+      "sha256": "3a0cec0c138e70dc710c7e33761981855840db03b2c885b1c87a29e93497a406"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-05-device-electrothermal/owner-vue-resource.log",
+      "bytes": 1050,
+      "sha256": "573c711222565b4b124cd1f4749166dfa4b54f6daaa1d399283b63972d551abb"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-05-device-electrothermal/owner-lint-alpha-equivalence.json",
+      "bytes": 134,
+      "sha256": "12fbc1909e03bb6eaa3e909336b72d359a1dbaa3126626add1d6c7a2aa89b867"
+    }
+  ],
+  "scope": "124Python include independent35 and final typed-integer regression;67Vue cover new/manual/shared helpers. After execution only unusedbinding key\u2192_key changed; normalizedAST identical, final verifier covers resulting source."
+}

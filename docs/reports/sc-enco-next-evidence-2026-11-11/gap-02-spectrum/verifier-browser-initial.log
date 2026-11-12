@@ -1,0 +1,103 @@
+
+Running 10 tests using 1 worker
+
+[1A[2K[1/10] [desktop] › src/tests/e2e/gate-hysteresis-acceptance.spec.js:56:1 › actual noisy waveform has two on one off brackets and independent seven millijoule oracle
+[1A[2K[2/10] [desktop] › src/tests/e2e/spectrum-acceptance.spec.js:47:1 › spectrum acceptance actual controls resolve independent peak mask and raw band RMS
+[1A[2K[3/10] [desktop] › src/tests/e2e/spectrum-acceptance.spec.js:81:1 › spectrum acceptance all bins remain independent of display selection gaps and exact canonical equality
+[1A[2K  1) [desktop] › src/tests/e2e/spectrum-acceptance.spec.js:81:1 › spectrum acceptance all bins remain independent of display selection gaps and exact canonical equality 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('spectrum-mask-results').getByRole('heading')
+    Expected: [32m"Declared mask: uncovered"[39m
+    Error: strict mode violation: getByTestId('spectrum-mask-results').getByRole('heading') resolved to 2 elements:
+        1) <h5 data-v-4f2d1623="">Declared mask: uncovered</h5> aka getByRole('heading', { name: 'Declared mask: uncovered' })
+        2) <h4 data-v-dbff0814="">All observed peak bins and covered mask limits</h4> aka getByRole('heading', { name: 'All observed peak bins and' })
+
+    Call log:
+    [2m  - Expect "toHaveText" with timeout 15000ms[22m
+    [2m  - waiting for getByTestId('spectrum-mask-results').getByRole('heading')[22m
+
+
+       99 |   result = await advanced(page, data); expect(result.status).toBe(200)
+      100 |   expect(result.body.spectrum.mask_screening.status).toBe('uncovered'); expect(result.body.spectrum.mask_screening.covered_bin_count).toBe(0)
+    > 101 |   await expect(page.getByTestId('spectrum-mask-results').getByRole('heading')).toHaveText('Declared mask: uncovered')
+          |                                                                                ^
+      102 | })
+      103 |
+      104 | test('spectrum acceptance advanced raw JSON preserves rejected coordinate underflow and hysteresis lexemes', async ({ page }, info) => {
+        at /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/src/tests/e2e/spectrum-acceptance.spec.js:101:80
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../transistordatabase-integration-audit-20261111/spectrum-browser-9c9ad3dd9ad242c2921b04f78c080a7e/browser-27929644d9f34fa091f0a30b660dcf5b/test-results/spectrum-acceptance-spectr-c8094-nd-exact-canonical-equality-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../transistordatabase-integration-audit-20261111/spectrum-browser-9c9ad3dd9ad242c2921b04f78c080a7e/browser-27929644d9f34fa091f0a30b660dcf5b/test-results/spectrum-acceptance-spectr-c8094-nd-exact-canonical-equality-desktop/error-context.md
+
+
+[1A[2K[4/10] [desktop] › src/tests/e2e/spectrum-acceptance.spec.js:104:1 › spectrum acceptance advanced raw JSON preserves rejected coordinate underflow and hysteresis lexemes
+[1A[2K[5/10] [desktop] › src/tests/e2e/spectrum-acceptance.spec.js:121:1 › spectrum acceptance tiny raw band RMS remains nonzero while mask-only peak underflow rejects
+[1A[2K[6/10] [mobile-390] › src/tests/e2e/gate-hysteresis-acceptance.spec.js:56:1 › actual noisy waveform has two on one off brackets and independent seven millijoule oracle
+[1A[2K[7/10] [mobile-390] › src/tests/e2e/spectrum-acceptance.spec.js:47:1 › spectrum acceptance actual controls resolve independent peak mask and raw band RMS
+[1A[2K[8/10] [mobile-390] › src/tests/e2e/spectrum-acceptance.spec.js:81:1 › spectrum acceptance all bins remain independent of display selection gaps and exact canonical equality
+[1A[2K  2) [mobile-390] › src/tests/e2e/spectrum-acceptance.spec.js:81:1 › spectrum acceptance all bins remain independent of display selection gaps and exact canonical equality 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('spectrum-mask-results').getByRole('heading')
+    Expected: [32m"Declared mask: uncovered"[39m
+    Error: strict mode violation: getByTestId('spectrum-mask-results').getByRole('heading') resolved to 2 elements:
+        1) <h5 data-v-4f2d1623="">Declared mask: uncovered</h5> aka getByRole('heading', { name: 'Declared mask: uncovered' })
+        2) <h4 data-v-dbff0814="">All observed peak bins and covered mask limits</h4> aka getByRole('heading', { name: 'All observed peak bins and' })
+
+    Call log:
+    [2m  - Expect "toHaveText" with timeout 15000ms[22m
+    [2m  - waiting for getByTestId('spectrum-mask-results').getByRole('heading')[22m
+
+
+       99 |   result = await advanced(page, data); expect(result.status).toBe(200)
+      100 |   expect(result.body.spectrum.mask_screening.status).toBe('uncovered'); expect(result.body.spectrum.mask_screening.covered_bin_count).toBe(0)
+    > 101 |   await expect(page.getByTestId('spectrum-mask-results').getByRole('heading')).toHaveText('Declared mask: uncovered')
+          |                                                                                ^
+      102 | })
+      103 |
+      104 | test('spectrum acceptance advanced raw JSON preserves rejected coordinate underflow and hysteresis lexemes', async ({ page }, info) => {
+        at /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/src/tests/e2e/spectrum-acceptance.spec.js:101:80
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../transistordatabase-integration-audit-20261111/spectrum-browser-9c9ad3dd9ad242c2921b04f78c080a7e/browser-27929644d9f34fa091f0a30b660dcf5b/test-results/spectrum-acceptance-spectr-c8094-nd-exact-canonical-equality-mobile-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../transistordatabase-integration-audit-20261111/spectrum-browser-9c9ad3dd9ad242c2921b04f78c080a7e/browser-27929644d9f34fa091f0a30b660dcf5b/test-results/spectrum-acceptance-spectr-c8094-nd-exact-canonical-equality-mobile-390/error-context.md
+
+
+[1A[2K[9/10] [mobile-390] › src/tests/e2e/spectrum-acceptance.spec.js:104:1 › spectrum acceptance advanced raw JSON preserves rejected coordinate underflow and hysteresis lexemes
+[1A[2K[10/10] [mobile-390] › src/tests/e2e/spectrum-acceptance.spec.js:121:1 › spectrum acceptance tiny raw band RMS remains nonzero while mask-only peak underflow rejects
+[1A[2K  2 failed
+    [desktop] › src/tests/e2e/spectrum-acceptance.spec.js:81:1 › spectrum acceptance all bins remain independent of display selection gaps and exact canonical equality 
+    [mobile-390] › src/tests/e2e/spectrum-acceptance.spec.js:81:1 › spectrum acceptance all bins remain independent of display selection gaps and exact canonical equality 
+  8 passed (53.1s)
+Command exited with non-zero status 1
+	Command being timed: "/usr/bin/node /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/node_modules/@playwright/test/cli.js test --config /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/playwright.spectrum.acceptance.config.js"
+	User time (seconds): 25.12
+	System time (seconds): 7.46
+	Percent of CPU this job got: 59%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:55.05
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 324960
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 444
+	Minor (reclaiming a frame) page faults: 440063
+	Voluntary context switches: 39540
+	Involuntary context switches: 198
+	Swaps: 0
+	File system inputs: 14080
+	File system outputs: 60320
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 1

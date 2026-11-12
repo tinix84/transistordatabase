@@ -1,0 +1,45 @@
+{
+  "device": "Fuji_2MBI100XAA120-50",
+  "serial_format": "legacy-flat",
+  "raw_source_sha256": "4a4bc6bc5f5d287a843a4961af8591685b2b02cc33adcb036e9f9e6c4eef4a27",
+  "source_bytes": 52056,
+  "current_a": 50,
+  "duty": 0.5,
+  "frequency_hz": 1000,
+  "sink_temperature_c": 45,
+  "resistance_k_w": 0.1,
+  "expected_temperature_c": 48.763050559454264,
+  "expected_power_w": 37.63050559454264,
+  "actual_accepted_solution": {
+    "iteration": 5,
+    "temperature_c": [
+      48.76305055941891
+    ],
+    "power_w": [
+      37.63050559454041
+    ],
+    "residual_k": [
+      3.5134208042908455e-11
+    ]
+  },
+  "component_power_w": {
+    "channel": 28.795103095605864,
+    "turn_on": 4.2293513656410635,
+    "turn_off": 4.606051133293484,
+    "sum_component_power_w": 37.63050559454041,
+    "solver_power_w": 37.63050559454041
+  },
+  "temperature_knots_c": [
+    25.0,
+    125.0,
+    150.0,
+    175.0
+  ],
+  "derived_loss_w": [
+    36.14975128145544,
+    42.381082184793726,
+    43.921893285804856,
+    45.56618348838266
+  ],
+  "selected_dependency_sha256": "54c6fbee97f96ea31d74855aae11e439425de1e153df70a4ab2bbd2c7780616f"
+}

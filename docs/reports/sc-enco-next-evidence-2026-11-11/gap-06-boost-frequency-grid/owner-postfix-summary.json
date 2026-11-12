@@ -1,0 +1,38 @@
+{
+  "purpose": "Final owner regression evidence for application consolidation",
+  "python": {
+    "passed": 231,
+    "failed": 0,
+    "skipped": 0,
+    "pytest_seconds": 41.93,
+    "gnu_time_wall_seconds": 41.42,
+    "peak_rss_kib": 292748,
+    "swaps": 0,
+    "exit_code": 0,
+    "timing_note": "Both reported clocks are recorded without adjustment",
+    "source_note": "All Python inputs unchanged; subsequent differences are two CSS-only Vue files and the verifier-owned E2E fixture"
+  },
+  "vue": {
+    "passed": 62,
+    "files": 2,
+    "failed": 0,
+    "vitest_seconds": 3.25,
+    "gnu_time_wall_seconds": 3.91,
+    "peak_rss_kib": 299496,
+    "swaps": 0,
+    "exit_code": 0,
+    "calculator_sha256": "06bb2912c3eaa6831c2624564ee15538df9bb7420ff9c2d25ec9ad13a50676d9",
+    "pareto_sha256": "0a2b0358f455faab4c16c6791431fe46054ff2d266c71bcd135c5a20de3699aa"
+  },
+  "iteration": {
+    "original_ui_red_cases": 2,
+    "observed": "A real DOM input token 1e-400 was sent as r_g_on=0 in both components",
+    "fix": "New-mode text bindings preserve original lexemes before binary64 validation",
+    "responsive_failure": "Desktop passed; mobile intrinsic grid minimum increased document width and blocked normal touch",
+    "responsive_fix": "Bound grid tracks and controls; retain local table scrolling"
+  },
+  "limits": [
+    "Ruff, Pages checks, and existing-open-PR checks remain stopped by user",
+    "Corrected resource benchmark and Qt-blocked headless checks remain mandatory manual gates before commit"
+  ]
+}

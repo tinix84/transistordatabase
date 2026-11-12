@@ -316,9 +316,21 @@ class TopologyCalculationRequest(BaseModel):
     r_g_off: float | None = Field(None, description="Switch turn-off gate resistance in Ohm")
     sweep: TopologySweepRequest | None = None
 
+    @model_validator(mode="before")
+    @classmethod
+    def validate_switching_grid_tokens(cls, value):
+        """Preserve original numeric semantics only for the optional frequency grid."""
+        if isinstance(value, dict) and value.get("mode") == "switching-loss-balanced" and value.get("sweep") is not None:
+            from transistordatabase.gui_web.backend.boost_grid_routes import normalize_grid_numbers, validate_grid_numeric_positions
+            return normalize_grid_numbers(validate_grid_numeric_positions(value, 'line'))
+        return value
+
 
 class BoostParetoBoundaryRequest(BaseModel):
     """One shared SI-unit Boost CCM boundary for a semiconductor screen."""
+
+    mode: Literal["loss-balanced", "switching-loss-balanced"] | None = None
+    voltage_residual_tolerance_v: float | None = Field(None, ge=0, allow_inf_nan=False)
 
     v_in: float = Field(..., gt=0, allow_inf_nan=False)
     v_out: float = Field(..., gt=0, allow_inf_nan=False)
@@ -356,6 +368,10 @@ class ParetoCandidateRequest(BaseModel):
     v_g: float | None = Field(None, allow_inf_nan=False)
     diode_v_g: float | None = Field(None, allow_inf_nan=False)
 
+    v_g_off: float | None = Field(None, allow_inf_nan=False)
+    r_g_on: float | None = Field(None, ge=0, allow_inf_nan=False)
+    r_g_off: float | None = Field(None, ge=0, allow_inf_nan=False)
+
     @field_validator("candidate_id", "label")
     @classmethod
     def strip_candidate_text(cls, value: str) -> str:
@@ -378,10 +394,20 @@ class BoostSemiconductorParetoRequest(BaseModel):
 
     boundary: BoostParetoBoundaryRequest
     candidates: list[ParetoCandidateRequest] = Field(..., min_length=2, max_length=20)
+    frequencies_hz: list[float] | None = Field(None, min_length=2, max_length=32)
     catalog: dict[str, Any] = Field(
         default_factory=dict,
         description="Raw sourced package and price metadata keyed by TDB identity",
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_switching_population_tokens(cls, value):
+        """Reject lossy new-mode thresholds and normalize numeric catalog metadata."""
+        if isinstance(value, dict) and isinstance(value.get("boundary"), dict) and value["boundary"].get("mode") == "switching-loss-balanced":
+            from transistordatabase.gui_web.backend.boost_grid_routes import normalize_grid_numbers, validate_grid_numeric_positions
+            return normalize_grid_numbers(validate_grid_numeric_positions(value, 'pareto'))
+        return value
 
     @model_validator(mode="after")
     def validate_candidate_ids(self) -> BoostSemiconductorParetoRequest:
@@ -484,6 +510,44 @@ class GateChargeModelRequest(BaseModel):
                     else value for key, value in values.items()}
         return values
 
+    @model_validator(mode='before')
+    @classmethod
+    def settling_input_precision(cls, values):
+        """Reject optional-phase precision loss before original tokens become floats."""
+        from decimal import Decimal
+        from fractions import Fraction
+        from math import isfinite
+
+        if not isinstance(values, dict) or values.get('settling_target_v') is None:
+            return values
+        names = ('q_gs', 'q_gd', 'q_g', 'v_th', 'v_plateau', 'r_g', 'r_g_int',
+                 'v_driver', 'v_off', 'settling_target_v')
+        for name in names:
+            if name not in values:
+                continue
+            value = values[name]
+            if isinstance(value, bool) or not isinstance(value, (int, float, Decimal)):
+                raise ValueError('Settling mode requires actual numeric model parameters')
+            try:
+                number = float(value)
+            except (OverflowError, ValueError) as error:
+                raise ValueError('Settling model input exceeds the finite numerical range') from error
+            if not isfinite(number) or (isinstance(value, (int, Decimal))
+                    and Decimal(str(number)) != Decimal(value)):
+                raise ValueError('Settling model input exceeds accepted binary64 precision')
+        if all(name in values for name in ('q_g', 'q_gs', 'q_gd')):
+            raw = Fraction(values['q_g']) - Fraction(values['q_gs']) - Fraction(values['q_gd'])
+            rounded = (Fraction.from_float(float(values['q_g']))
+                       - Fraction.from_float(float(values['q_gs']))
+                       - Fraction.from_float(float(values['q_gd'])))
+            if ((raw > 0) - (raw < 0)) != ((rounded > 0) - (rounded < 0)):
+                raise ValueError('Residual post-plateau charge classification changes at binary64 precision')
+        result = dict(values)
+        for name in names:
+            if name in result:
+                result[name] = float(result[name])
+        return result
+
     q_gs: float = Field(..., description="Gate-source charge in C", gt=0)
     q_gd: float = Field(..., description="Gate-drain (Miller) charge in C", ge=0)
     q_g: float = Field(..., description="Total gate charge in C", gt=0)
@@ -493,6 +557,8 @@ class GateChargeModelRequest(BaseModel):
     r_g_int: float = Field(0.0, description="Internal gate resistance in Ohm", ge=0)
     v_driver: float = Field(15.0, description="Gate driver voltage in V", gt=0)
     v_off: float = Field(0.0, description="Gate driver off-state voltage in V")
+    settling_target_v: float | None = Field(None, strict=True, allow_inf_nan=False,
+                                            description="Optional post-Miller gate settling target in V")
 
 
 class DPTConfigRequest(BaseModel):

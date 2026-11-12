@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "record_type": "Point-in-time comparative engineering audit",
+  "date": "2026-11-11",
+  "baseline_commit": "e41cc8a56e3caa254a124672a16eef4a7b4c5863",
+  "scope": "Seven selected user-visible operations absent at the audited baseline. The issue tracker and subsequent code determine current status.",
+  "inventory_definitions": {
+    "sc": 385,
+    "enco": 1746,
+    "current": 1013,
+    "total": 3144
+  },
+  "previously_qualified_workflows": 10,
+  "method": "Read-only inspection of selected reference definitions, callers, notebooks and public application boundaries. No reference code executed. Independent calculated oracles are proposed checks.",
+  "record_sha256": {
+    "docs/sprints/semiconductor-function-gap-ledger.json": "d744750e9bd140e0f6b61af3dcd7f8735ee954a5be799f73a8a7268a17651c71",
+    "docs/reports/semiconductor-remaining-gaps-2026-11-10.json": "b8e82ec034a89a9aa58f977db24eb184c04c251a1ae31ab0e26100f9ad6f04c3",
+    "docs/reports/semiconductor-gap-closure-2026-11-11.json": "92210fc8ef68aad583a2a89a10129b8f2aca5adb6c6db1cdd6d00d8356302d34"
+  },
+  "runtime_qualification": {
+    "scope": "Windows-native CLI to WSL decoder only. Independent local RC fixture produced after baseline review.",
+    "simulator": "LTspice 26.0.1.0",
+    "decoder": "spicelib 1.6.4",
+    "samples": 1018,
+    "time_constant_s": 0.001,
+    "voltage_at_time_constant_v": 0.632120321523,
+    "max_abs_error_v": 7.90895e-7,
+    "tolerance_v": 0.0002,
+    "process_receipt_sha256": "2b376c955a0968aef38378f9eb18449fc43ba6805ae760436c9044c46d7ac153",
+    "decode_receipt_sha256": "1b17b312ec26ba86204450b66968e701d226cff07e1b7a6400ecb57dcf5dc700"
+  },
+  "sources": [
+    {
+      "id": "sc-23fcb8242eb20e0e",
+      "source": "sc",
+      "path": "matlab_func/Bridgeless_PFC/calc_bridgeless_semiconductor_loss.m",
+      "symbol": "calc_bridgeless_semiconductor_loss",
+      "line": 1,
+      "end_line": 98,
+      "source_file_sha256": "160c93e2970f3a6b24358abde867b226ee01611e66197789271c725d611c658d"
+    },
+    {
+      "id": "sc-c80bf13d1ab64d22",
+      "source": "sc",
+      "path": "matlab_func/mosfet_switching_losses_refactor.py",
+      "symbol": "Mosfet.calc_turnon_interval_t3tend",
+      "line": 129,
+      "end_line": 138,
+      "source_file_sha256": "89b98635f37f8188720ebefd51ee56d4ea99c6dcbabcae45f110c08270e4f23e"
+    },
+    {
+      "id": "sc-ae25213abbd6b0bf",
+      "source": "sc",
+      "path": "matlab_func/SemiconductorTemperature.m",
+      "symbol": "SemiconductorTemperature",
+      "line": 1,
+      "end_line": 42,
+      "source_file_sha256": "50cdf6127bce51709451e3ef372259d58d8803b9ddccd6b2733f40cd881d40c2"
+    },
+    {
+      "id": "sc-ac4a029737f1d352",
+      "source": "sc",
+      "path": "mfiles/SemiconductorTemperature.m",
+      "symbol": "SemiconductorTemperature",
+      "line": 1,
+      "end_line": 42,
+      "source_file_sha256": "50cdf6127bce51709451e3ef372259d58d8803b9ddccd6b2733f40cd881d40c2"
+    },
+    {
+      "id": "sc-4a918516adc31129",
+      "source": "sc",
+      "path": "semiconductors/mosfet.py",
+      "symbol": "Mosfet.calc_turnon_interval_t3tend",
+      "line": 113,
+      "end_line": 122,
+      "source_file_sha256": "4633f1d5e2138d100851444adad137d7acc694bb9f857417dfeb8622b12e96a9"
+    },
+    {
+      "id": "enco-9e1c1b9f8b030bf6",
+      "source": "enco",
+      "path": "enco/packages/enco-analysis/src/enco_analysis/circuit/optimizer/list.py",
+      "symbol": "ListOptimizer.optimize",
+      "line": 38,
+      "end_line": 115,
+      "source_file_sha256": "e59d9ef4fdfefbb7e7041b6b49a8f0f47c3c49d035c63484014301b04d4adb52"
+    },
+    {
+      "id": "enco-4e88504bb2cf271e",
+      "source": "enco",
+      "path": "enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py",
+      "symbol": "MOSFET.get_temperature_delta",
+      "line": 365,
+      "end_line": 435,
+      "source_file_sha256": "b0e7c67b7d0479eb5319c85c9b03ad7187f0d5e9ff6a5fca08d1bcb50f979f6c"
+    },
+    {
+      "id": "enco-e4a3722b969ba6c9",
+      "source": "enco",
+      "path": "enco/packages/enco-core/src/enco_core/series/frequency_series.py",
+      "symbol": "FrequencySeries.get_violations",
+      "line": 228,
+      "end_line": 258,
+      "source_file_sha256": "8a9508ae2ae3f7f5d737336222fb32684e4c883fca0eca0ccd707ba21a1e458b"
+    },
+    {
+      "id": "enco-b1f5ac73901175b7",
+      "source": "enco",
+      "path": "enco/packages/enco-core/src/enco_core/series/series_container.py",
+      "symbol": "SeriesContainer.join",
+      "line": 201,
+      "end_line": 243,
+      "source_file_sha256": "d7ff6a2d2faa8cd8e688e26a8990d4d8d327b3d5485ec178ce2173c10c965fa5"
+    },
+    {
+      "id": "enco-cc098d72d654f83f",
+      "source": "enco",
+      "path": "enco/packages/enco-core/src/enco_core/series/series_container.py",
+      "symbol": "SeriesContainer.digital",
+      "line": 879,
+      "end_line": 918,
+      "source_file_sha256": "d7ff6a2d2faa8cd8e688e26a8990d4d8d327b3d5485ec178ce2173c10c965fa5"
+    },
+    {
+      "id": "enco-146b5eb9e4fd7616",
+      "source": "enco",
+      "path": "enco/packages/enco-core/src/enco_core/series/time_series.py",
+      "symbol": "TimeSeries.digital",
+      "line": 261,
+      "end_line": 275,
+      "source_file_sha256": "b27c5536d0b852a6a4d038d547826663a45d216947ac070626e655dc2b99115a"
+    },
+    {
+      "id": "enco-67bbd03435606c68",
+      "source": "enco",
+      "path": "enco/packages/enco-simulation/src/enco_simulation/ltspice/adapter.py",
+      "symbol": "LTSpiceAdapter._run",
+      "line": 190,
+      "end_line": 202,
+      "source_file_sha256": "3c66c3776539cc7259a04511047c678ef87e1cd711fc8255c97144ed8569657f"
+    },
+    {
+      "id": "enco-48ba649ce6ff6607",
+      "source": "enco",
+      "path": "enco/packages/enco-simulation/src/enco_simulation/ltspice/adapter.py",
+      "symbol": "LTSpiceAdapter._load",
+      "line": 207,
+      "end_line": 223,
+      "source_file_sha256": "3c66c3776539cc7259a04511047c678ef87e1cd711fc8255c97144ed8569657f"
+    }
+  ],
+  "queue": [
+    {
+      "rank": 1,
+      "id": "gate-hysteresis",
+      "title": "Hysteretic gate digitization",
+      "refs": [
+        "enco-cc098d72d654f83f",
+        "enco-146b5eb9e4fd7616"
+      ],
+      "kind": "signal processing",
+      "current": [
+        "transistordatabase/current_allocation.py::allocate_gate_current",
+        "transistordatabase/waveform_losses.py::_event_indices"
+      ],
+      "observed": "The reference switches above the high threshold and below the low threshold. The baseline uses a binary trace, a single threshold, or explicit event masks.",
+      "missing": "Convert analog gate voltage to one state per sample with two thresholds. Use the same state history for allocation and switching events.",
+      "bounds": "Specify low < high in volts. Hold state at equality. Infer the initial state only outside the band, or require a seed. Count transitions between known samples only. Keep the existing default.",
+      "qualified": "The reference seeds undecided samples as off. Relative thresholds also need a nonzero measured span. An unknown first sample establishes neither zero current nor a switching event.",
+      "oracle": "With low 2.5 V, high 7.5 V, and [0,8,4,6,4,2,10] V, expect [0,1,1,1,1,0,1]. Turn-on uses intervals 0 and 5. Turn-off uses interval 4. At 2 mJ per turn-on and 3 mJ per turn-off, total energy is 7 mJ. Over 6 ms, mean power is 7/6 W.",
+      "depends": "A declared initial-state policy, gate units, existing event index convention, and sourced event energies."
+    },
+    {
+      "rank": 2,
+      "id": "spectrum-mask",
+      "title": "Frequency masks for current spectra",
+      "refs": [
+        "enco-e4a3722b969ba6c9",
+        "enco-b1f5ac73901175b7"
+      ],
+      "kind": "signal processing",
+      "current": [
+        "transistordatabase/waveform_losses.py::series_spectrum",
+        "transistordatabase/waveform_losses.py::waveform_spectrum",
+        "transistordatabase/gui_web/backend/waveform_routes.py::Spectrum"
+      ],
+      "observed": "The reference compares magnitude with a limit. The baseline calculates one-sided current amplitudes and selects ten bins for display.",
+      "missing": "Compare every computed bin with a frequency-indexed limit in peak amperes. Report excess, passing bins and uncovered bins.",
+      "bounds": "An exact coordinate match supports a point limit. Explicit piecewise-linear interpolation can support a declared contiguous segment. Leave mask gaps and out-of-range bins uncovered. Equality passes. Preserve detrending and window normalization.",
+      "qualified": "The reference joins equal-length columns by position. Its optional decibel conversion uses a 1 µ-unit reference without checking the quantity. Neither behavior establishes an ampere limit.",
+      "oracle": "For eight uniform samples at 8 Hz, use 2 cos(2πn/8) + cos(4πn/8) A. The 1 Hz component exceeds 1.5 A by 0.5 A. Test equality with an exactly representable constant or Nyquist component. A covered zero is a valid measurement.",
+      "depends": "Reuse all normalized bins before display selection. The API admits 10,000 samples, or at most 5,001 one-sided bins. Bound the number of mask points."
+    },
+    {
+      "rank": 3,
+      "id": "thermal-interfaces",
+      "title": "Simultaneous thermal interfaces",
+      "refs": [
+        "sc-ae25213abbd6b0bf",
+        "sc-ac4a029737f1d352"
+      ],
+      "kind": "thermal network",
+      "current": [
+        "transistordatabase/thermal.py::steady_paths"
+      ],
+      "observed": "The reference applies separate contact corrections to common, forward and reverse paths. The baseline accepts three aggregate resistances and one sourced contact.",
+      "missing": "Supply simultaneous contacts for distinct paths. Retain each source, contact area, resistivity and resulting resistance.",
+      "bounds": "Require positive contact area and nonnegative resistivity. Compute each added resistance as resistivity divided by area. Apply the common path to total heat and branch paths to their own heat.",
+      "qualified": "Manual aggregation can already yield the correct temperatures. The gap concerns simultaneous contact inputs and their evidence. A missing resistance needs a declared treatment.",
+      "oracle": "Use 25 °C sink temperature, 2 W forward power and 1 W reverse power. With ideal zero base resistances, set contact contributions to 1, 2 and 3 K/W on common, forward and reverse paths. Expect 28 °C shared temperature, 32 °C forward and 31 °C reverse.",
+      "depends": "Sourced area and resistivity for each supplied path. Preserve the existing single-contact input."
+    },
+    {
+      "rank": 4,
+      "id": "post-miller-settling",
+      "title": "Gate settling after the Miller plateau",
+      "refs": [
+        "sc-c80bf13d1ab64d22",
+        "sc-4a918516adc31129"
+      ],
+      "kind": "analytical gate model",
+      "current": [
+        "transistordatabase/analytical_models.py::GateChargeModel.calc_switching_estimate",
+        "transistordatabase/analytical_models.py::GateChargeModel._intervals"
+      ],
+      "observed": "The SC supporting script evaluates a target after the plateau. The baseline derives post-plateau capacitance and ends its turn-on estimate at the plateau.",
+      "missing": "Report turn-on settling to an explicit finite gate-voltage target, including elapsed time, gate current and charge.",
+      "bounds": "Use the baseline constant-capacitance resistive driver model. Specify plateau < target < positive rail. Treat a zero-charge phase explicitly. Preserve the original turn-on result when the option is absent.",
+      "qualified": "The supporting script samples the nearest plotted voltage. The named switching-loss notebook stops earlier. The estimate describes gate charging and gives no drain switching energy.",
+      "oracle": "With a 10 V rail, 4 V plateau, 7 V target, 2 Ω total resistance and 1 nF post-plateau capacitance, expect 2 ln(2) ns. Gate current changes from 3 A to 1.5 A. The added charge is 3 nC.",
+      "depends": "Known gate-charge components and a finite target voltage. Supporting calculation in matlab_func/mosfet_switching_losses.py, lines 74–117."
+    },
+    {
+      "rank": 5,
+      "id": "native-device-electrothermal",
+      "title": "Electrothermal feedback from native device curves",
+      "refs": [
+        "enco-4e88504bb2cf271e"
+      ],
+      "kind": "device data integration",
+      "current": [
+        "transistordatabase/thermal.py::electrothermal",
+        "transistordatabase/thermal.py::_loss_at",
+        "transistordatabase/static_losses.py::static_duty_losses"
+      ],
+      "observed": "The reference recomputes device losses at each trial temperature. The baseline thermal solver accepts a supplied loss table or affine model. The static device loss calculation accepts fixed conditions.",
+      "missing": "Construct a conditioned loss-versus-temperature table directly from native channel and switching-energy records. Feed the table to the existing fixed-point solver.",
+      "bounds": "Start with one switch at fixed nonnegative current, duty, frequency and thermal resistance. Require current and temperature coverage for each active contribution. Keep distinct gate, voltage and resistance selections for turn-on and turn-off.",
+      "qualified": "The reference returns its last value after its iteration limit. Publish convergence, residual and domain exits. The Fuji example records +15 V on turn-on and −15 V on turn-off. Their field meanings require explicit selection.",
+      "oracle": "For a conduction-only case use 2 A, unit duty, 25 °C sink and 2 K/W. Set R(T) = [1 + 0.01(T − 25)] Ω on a covering interval. The root is 25 + 8/0.92 = 33.69565217 °C. Also exercise temperature-domain exit and nonconvergence.",
+      "depends": "At least two temperatures per active matched curve family. Identify source records, temperature coverage, measured operating conditions and file hash. An inactive event contribution can be zero by construction."
+    },
+    {
+      "rank": 6,
+      "id": "boost-switching-balanced-grid",
+      "title": "Boost sweep with switching-loss feedback",
+      "refs": [
+        "enco-9e1c1b9f8b030bf6",
+        "sc-23fcb8242eb20e0e"
+      ],
+      "kind": "bounded application extension",
+      "current": [
+        "transistordatabase/topologies/operating_point.py::calculate_topology_operating_point",
+        "transistordatabase/gui_web/backend/topology_service.py",
+        "transistordatabase/topologies/semiconductor_pareto.py::calculate_boost_semiconductor_pareto"
+      ],
+      "observed": "The reference evaluates finite configuration lists. The baseline solves a single Boost point with switching-loss feedback. Its sweep rejects this mode. Its separate Pareto result reports conduction losses.",
+      "missing": "Evaluate a finite list of comparable Boost points with the existing scalar solver. Make switching-loss feedback and source coverage visible for each point.",
+      "bounds": "Start with one frequency axis and fixed supply, load and device conditions in continuous conduction mode. Bound the grid. Retain ties and rejected points. Rank only comparable loss scopes and sourced objectives.",
+      "qualified": "The SC Pareto notebook shows linked catalog scatter plots. Its bridgeless converter calculation concerns a different circuit. Neither supplies a numerical Boost feedback oracle.",
+      "oracle": "Each valid grid point must reproduce an independent scalar request. Check power balance and volt-second balance. Exercise zero-energy and ideal-resistance limits. An unsupported energy curve or a discontinuous-conduction point needs a diagnostic.",
+      "depends": "The qualified scalar solver, curve-condition coverage, and a per-request work bound. Cost or volume rankings require a common sourced population."
+    },
+    {
+      "rank": 7,
+      "id": "web-simulator-job",
+      "title": "Web execution of a double-pulse simulation",
+      "refs": [
+        "enco-67bbd03435606c68",
+        "enco-48ba649ce6ff6607"
+      ],
+      "kind": "local application integration",
+      "current": [
+        "transistordatabase/utils/ltspice_dpt.py::LTspiceDPT.run_simulation",
+        "transistordatabase/utils/ltspice_dpt.py::LTspiceDPT.analyze_waveforms",
+        "transistordatabase/gui_web/backend/main.py::POST /api/dpt/generate_netlist"
+      ],
+      "observed": "The reference executes a simulator and reads its results. The baseline has a blocking Python runner. The web interface generates a netlist and separately imports RAW waveforms.",
+      "missing": "Start a locally configured simulator from the web workflow. Associate job state, netlist, executable version, log, RAW waveform and import evidence.",
+      "bounds": "Use a fresh job directory and a supported generated netlist. Bound duration and simultaneous jobs. Report cancellation, process exit and output validation. Preserve previous job files.",
+      "qualified": "The reference removes existing output and does not establish a successful exit before loading results. A separate Windows-native LTspice 26.0.1.0 RC run and WSL waveform decode passed. Launching the Windows executable directly from WSL remains unverified.",
+      "oracle": "Run a real resistor-capacitor step. At one time constant the voltage fraction is 1 − exp(−1). Then verify pulse timing and inductor-current rise on a double-pulse fixture. Check the netlist, log and RAW hashes from that job.",
+      "depends": "A configured executable accessible to the local service, a validated simulator invocation, and the existing RAW import path. A generic switch model supports workflow verification only."
+    }
+  ]
+}

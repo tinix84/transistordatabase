@@ -1,0 +1,14 @@
+
+> transistor-database-web@1.0.0 test:run
+> vitest run --maxWorkers=1 --minWorkers=1 src/tests/unit/GateChargeCalculator.test.js
+
+
+ RUN  v2.1.9 /home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web
+
+ ✓ src/tests/unit/GateChargeCalculator.test.js (11 tests) 253ms
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  20:37:15
+   Duration  1.31s (transform 246ms, setup 8ms, collect 404ms, tests 253ms, environment 353ms, prepare 106ms)
+

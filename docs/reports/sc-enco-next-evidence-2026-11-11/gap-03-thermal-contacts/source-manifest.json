@@ -1,0 +1,57 @@
+{
+  "paths": {
+    "docs/api/thermal-workbench.md": {
+      "bytes": 12203,
+      "sha256": "10efae46bd6d8b3176861b66be6e4ad4caef855f248df33386296ecdbe956b8b"
+    },
+    "transistordatabase/gui_web/backend/finite_json_route.py": {
+      "bytes": 3081,
+      "sha256": "8b9d37a1379c89b26882a0b564f4999d7359f235133857d68458dc7a40c967bd"
+    },
+    "transistordatabase/gui_web/backend/thermal_routes.py": {
+      "bytes": 6209,
+      "sha256": "06d0177dc2f24f6a703304c9678840a542a0173b26b4b526e61aee247d41afbe"
+    },
+    "transistordatabase/gui_web/src/components/ThermalWorkbench.vue": {
+      "bytes": 28566,
+      "sha256": "3112d30f261f1cd5d1339ec8e1b62c0d5aece64b20f302aa981bdf4131f1e668"
+    },
+    "transistordatabase/gui_web/src/services/api.js": {
+      "bytes": 18314,
+      "sha256": "db797bad6a48ce4f5285a4de03ecb5ef651ab69e20605f3b9d7a31acad56335b"
+    },
+    "transistordatabase/gui_web/src/tests/unit/ThermalWorkbench.test.js": {
+      "bytes": 9848,
+      "sha256": "aad819e0964b99397e25ab9a05397776db2cf14de9dc2b711f626a202c8284a0"
+    },
+    "transistordatabase/thermal.py": {
+      "bytes": 32635,
+      "sha256": "8c683fa31643c4b4664ac1c05c1b3c72edd415c8f3cf20f45189035f87abc86a"
+    },
+    "tests/test_thermal_interfaces.py": {
+      "bytes": 5187,
+      "sha256": "3bc81c025954ef5dfce19815c7d823fe57a137e265f5a9c351b06c7bf3577767"
+    },
+    "tests/test_thermal_interfaces_independent.py": {
+      "bytes": 8201,
+      "sha256": "c252e15b474040c58415aeecf98fc169a000f67d930ab7df3c0a946a32b61f2a"
+    },
+    "transistordatabase/gui_web/src/components/ThermalInterfaceContacts.vue": {
+      "bytes": 3144,
+      "sha256": "db30f8a1ad1fb0f4da075fc4d11c340734d957228eb802983ebd246bf8db2bff"
+    },
+    "transistordatabase/gui_web/src/tests/unit/ThermalApi.test.js": {
+      "bytes": 1185,
+      "sha256": "c285940a1c89dfe384e612456ef202e23a1e3de5dbbee4032edebb6c3ba19a3f"
+    },
+    "transistordatabase/gui_web/src/tests/e2e/thermal-contacts-acceptance.spec.js": {
+      "bytes": 12507,
+      "sha256": "7ad2180d90a0dee12856885105c14a1053ba44cc0c06fb3a3a0e623b09b996f5"
+    },
+    "transistordatabase/gui_web/playwright.thermal-contacts.acceptance.config.js": {
+      "bytes": 982,
+      "sha256": "b29b318811ea8732c76b589967573fd3ecd1e24f404dfb205c6a57a707ad4d87"
+    }
+  },
+  "scope": "Approved thermal contact source, tests, current API documentation, and exact compiled acceptance spec/config."
+}

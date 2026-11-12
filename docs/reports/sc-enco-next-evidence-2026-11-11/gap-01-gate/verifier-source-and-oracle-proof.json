@@ -1,0 +1,75 @@
+{
+  "head": "e41cc8a56e3caa254a124672a16eef4a7b4c5863",
+  "source_files_verified": 361,
+  "changed_source_paths": [],
+  "original_and_copied_database_records_verified": 24,
+  "database_bytes": 28903083,
+  "all_original_and_copied_record_hashes_unchanged": true,
+  "database_records_remain_ignored": true,
+  "private_per_record_manifest_retained_only_in_audit": true,
+  "dist": [
+    {
+      "path": "transistordatabase/gui_web/dist/index.html",
+      "bytes": 481,
+      "sha256": "f21e09a37323c9d904b0a6995268b9843974c68204d01fe61244bb76a2c5eb80"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/vite.svg",
+      "bytes": 1497,
+      "sha256": "4a748afd443918bb16591c834c401dae33e87861ab5dbad0811c3a3b4a9214fb"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-B-uDa43d.js",
+      "bytes": 1088039,
+      "sha256": "46acfa0c7e0fac6f6a28365be49ada296064e2274556709b1c54990df093c59a"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-BiqYnh0l.css",
+      "bytes": 142590,
+      "sha256": "850cdb88d50563901946a80c89d4a215066e84f196c129f2040262179f4d8749"
+    }
+  ],
+  "browser": {
+    "expected": 8,
+    "passed": 8,
+    "skipped": 0,
+    "retries": 0,
+    "viewports": [
+      "desktop",
+      "390x844"
+    ],
+    "calculation_mocks": false,
+    "noise_oracle": {
+      "gate": [
+        0,
+        8,
+        4,
+        6,
+        4,
+        2,
+        10
+      ],
+      "states": [
+        false,
+        true,
+        true,
+        true,
+        true,
+        false,
+        true
+      ],
+      "turn_on_brackets": [
+        0,
+        5
+      ],
+      "turn_off_brackets": [
+        4
+      ],
+      "known_energy_j": 0.007,
+      "known_power_w": 1.1666666666666667,
+      "total_power_w": null
+    }
+  },
+  "precision_review": "Derived nonzero threshold underflow rejects; exact zero cancellation remains valid. Original decimal fraction membership checked before browser normalization; wire -1e-400 rejects before -0 conversion.",
+  "resource_scope": "Existing web waveform/allocation and allocation core limits are 10000 samples. Generic waveform core other gate modes accept larger inputs; hysteresis helper limit is explicit. New state/bracket evidence is O(N); CSV row policy metadata is scalar."
+}

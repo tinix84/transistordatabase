@@ -1,0 +1,53 @@
+{
+  "source_files_verified": 369,
+  "changed_sources": [],
+  "database_records_verified": 24,
+  "database_bytes": 28903083,
+  "all_original_and_copied_hashes_unchanged": true,
+  "old_hashed_assets_preserved": [
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-B-uDa43d.js",
+      "bytes": 1088039,
+      "sha256": "46acfa0c7e0fac6f6a28365be49ada296064e2274556709b1c54990df093c59a"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-BiqYnh0l.css",
+      "bytes": 142590,
+      "sha256": "850cdb88d50563901946a80c89d4a215066e84f196c129f2040262179f4d8749"
+    }
+  ],
+  "compiled_index_before_preserved": "compiled-index-before.html",
+  "compiled_index_sha256": "dc7b46ffd0c7a17e4f94a9fd5b68168a4cd35166e2b703aee7f4cf857ac4d945",
+  "current_dist": [
+    {
+      "path": "transistordatabase/gui_web/dist/index.html",
+      "bytes": 481,
+      "sha256": "dc7b46ffd0c7a17e4f94a9fd5b68168a4cd35166e2b703aee7f4cf857ac4d945"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/vite.svg",
+      "bytes": 1497,
+      "sha256": "4a748afd443918bb16591c834c401dae33e87861ab5dbad0811c3a3b4a9214fb"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-DwhnJuQe.css",
+      "bytes": 143660,
+      "sha256": "514a79c300ac1d74150d4244492f27ad569cf9676cb8220241f8ba9762a4bedb"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-B-uDa43d.js",
+      "bytes": 1088039,
+      "sha256": "46acfa0c7e0fac6f6a28365be49ada296064e2274556709b1c54990df093c59a"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-BiqYnh0l.css",
+      "bytes": 142590,
+      "sha256": "850cdb88d50563901946a80c89d4a215066e84f196c129f2040262179f4d8749"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-11is31Q7.js",
+      "bytes": 1098554,
+      "sha256": "42ddb9c1b8d94352f2e92a2f97f9cb95fae41725979651d0952955c4aaff58cb"
+    }
+  ]
+}

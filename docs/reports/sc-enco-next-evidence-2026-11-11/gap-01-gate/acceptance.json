@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "record_type": "point-in-time acceptance evidence for one capability",
+  "date": "2026-11-11",
+  "capability": "sampled hysteretic gate digitization",
+  "queue_scope": "Gap 1 only. Other SC/ENCO gaps remain separate.",
+  "source_reference_ids": [
+    "enco-cc098d72d654f83f",
+    "enco-146b5eb9e4fd7616"
+  ],
+  "reference_handling": "Read-only source inspection. Independent implementation.",
+  "contract": {
+    "crossings": "strict > high and < low",
+    "deadband_and_equality": "retain preceding sampled state",
+    "initial_state": "infer at sample zero only outside band; otherwise explicit boolean; contradictory declared state rejects",
+    "time_basis": "N sampled states and N-1 pre-edge brackets; no pre-trace event or interpolated switching time",
+    "thresholds": [
+      "explicit absolute volts",
+      "fractions of an explicitly declared calibrated voltage range"
+    ],
+    "constant_trace": "Valid with a declared finite nondegenerate calibration; no observed-range inference",
+    "precision": "Exact weighted binary64 endpoint math rejects nonzero derived threshold underflow; original fraction lexemes cannot round out-of-domain inputs into one",
+    "resource_limits": "2 to 10000 samples; scalar CSV policy metadata per row"
+  },
+  "validation": {
+    "adjacent_python": {
+      "passed": 197,
+      "seconds": 3.83,
+      "scope": "Existing allocation, waveform, API and export regressions before the final new-mode precision-only correction"
+    },
+    "independent_final_python": {
+      "passed": 9,
+      "scope": "Final frozen scientific/API cases, including three actual main API body/hash comparisons"
+    },
+    "owner_final_vue": {
+      "passed": 24,
+      "files": 4,
+      "seconds": 7.22
+    },
+    "compiled_browser": {
+      "passed": 8,
+      "mocked": 0,
+      "viewports": [
+        "desktop",
+        "390px mobile"
+      ],
+      "seconds": 30.4
+    },
+    "build": {
+      "modules": 207,
+      "seconds": 5.54
+    },
+    "ruff": {
+      "findings": 0
+    },
+    "headless": "Qt imports blocked"
+  },
+  "oracle": {
+    "gate_v": [
+      0,
+      8,
+      4,
+      6,
+      4,
+      2,
+      10
+    ],
+    "low_v": 2.5,
+    "high_v": 7.5,
+    "states": [
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true
+    ],
+    "turn_on_brackets": [
+      0,
+      5
+    ],
+    "turn_off_brackets": [
+      4
+    ],
+    "duration_s": 0.006,
+    "known_switching_energy_j": 0.007,
+    "known_switching_power_w": 1.1666666666666667,
+    "conduction": "explicitly omitted; full total remains unknown"
+  },
+  "main_runtime": "Unchanged main e41cc8a remains on port8003; feature verification used separate port8004.",
+  "unchanged": {
+    "old_binary_and_threshold_response_hashes": true,
+    "main_app_source": true,
+    "original_databases": true
+  },
+  "receipts": {
+    "source_manifest_sha256": "b8acc1e9753186e8f8d074f64193d0d29099eceb02cc48b67edda28daeaa820d",
+    "independent_manifest_sha256": "f0212d1c7e4b917df7ac1b61e22681d224f135249a575eae026961ae086261e0",
+    "verifier_manifest_sha256": "bcc2fe0b6116d975e55beb26c3ab1bb0f32eb0b8ae939680ac52c20ab67c3968",
+    "owner_artifacts": [
+      {
+        "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-01-gate/owner-python-selection.json",
+        "sha256": "ff03979f679a95a07816cc5e893c175b1a331f9ae21b9b5741465dd7801d331c",
+        "bytes": 266
+      },
+      {
+        "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-01-gate/owner-python-source-start.json",
+        "sha256": "b0a6d10ac0588d4f91f91846442b0d7de4936f42d93f22cb909ae1db10a6cfd6",
+        "bytes": 722
+      },
+      {
+        "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-01-gate/owner-python-source-end.json",
+        "sha256": "b0a6d10ac0588d4f91f91846442b0d7de4936f42d93f22cb909ae1db10a6cfd6",
+        "bytes": 722
+      },
+      {
+        "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-01-gate/owner-python-junit.xml",
+        "sha256": "43550ed65e9681086d17b67e759d8ea5e1c3508776a338a3317013ecf7a52c18",
+        "bytes": 27954
+      },
+      {
+        "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-01-gate/owner-python-pytest.log",
+        "sha256": "8ed8e3f66ecde8e8eb633b502de989b0d179c15ea455ccaa4a1e5969c13abcbc",
+        "bytes": 782
+      },
+      {
+        "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-01-gate/owner-python-resource.log",
+        "sha256": "6c6ceba9556cd5aca373b348f2c921d48689f25de4296ebb00001c00a3d02966",
+        "bytes": 1329
+      },
+      {
+        "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-01-gate/owner-vue-selection.json",
+        "sha256": "12b7dc1a464fc7604c428c97d716d6d877882a3c382220502ab9330d0f3a7bbf",
+        "bytes": 186
+      },
+      {
+        "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-01-gate/owner-vue-source-start.json",
+        "sha256": "ec703283af6b23211e37fe3741eebd19244ab765ae98a730d8d11479966e25a3",
+        "bytes": 1014
+      },
+      {
+        "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-01-gate/owner-vue-source-end.json",
+        "sha256": "ec703283af6b23211e37fe3741eebd19244ab765ae98a730d8d11479966e25a3",
+        "bytes": 1014
+      },
+      {
+        "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-01-gate/owner-vue-vitest.log",
+        "sha256": "89e661afe573b3583a3f8547658ba79e0ff15e2bc292f5b8cca74cc30c79f833",
+        "bytes": 1584
+      },
+      {
+        "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-01-gate/owner-vue-resource.log",
+        "sha256": "0ec538b1bd1277a181e645c331514e8da59eb8dfa1d32091656c53c1028de0e9",
+        "bytes": 961
+      }
+    ]
+  }
+}

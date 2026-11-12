@@ -1,0 +1,129 @@
+{
+  "feature": "Optional post-Miller gate settling",
+  "browser_cases": 10,
+  "browser_policy": "Real API calculations; no calculation mocks; desktop and 390-pixel mobile",
+  "coverage": [
+    "RC 10 V / 4 V / 7 V oracle: 2 ln(2) ns, 3 nC",
+    "Legacy no-target phases unchanged",
+    "Strict bounds and original numeric token rejection; legacy raw control unchanged",
+    "Zero charge has no finite-time current pulse",
+    "Near-rail and unresolved absolute clock retain relative time",
+    "Finite 6.93e300-second SI duration, downloads, stale invalidation",
+    "Unchanged simultaneous-contact and noisy-gate browser regressions"
+  ],
+  "source_policy": "Final app/test source hashes match before and after build and browser run. Earlier pre-correction audit receipts remain separate.",
+  "layout_correction": "The initial unchanged suite passed 8 and failed 2 mobile export clicks. Intrinsic horizontal overflow widened the layout viewport. Local bounded table scrolling and wrapping corrected the layout; the full unchanged 10-case suite then passed with normal clicks and page width at most 391 pixels.",
+  "database_policy": "All 24 original and copied private records retain their prior hashes; no record contents or per-record inventory published.",
+  "artifacts": [
+    {
+      "path": "verifier-ruff-final.log",
+      "bytes": 820,
+      "sha256": "e5a272c27d91e2c712965bb5bbdaea1fa07815986bcd92c95fae01053208cfa0"
+    },
+    {
+      "path": "verifier-ruff-final-receipt.json",
+      "bytes": 199,
+      "sha256": "afd01f716d0f0d73ebd96629b56de4eea613e821e075402b06dd509c9097f4fd"
+    },
+    {
+      "path": "verifier-headless-qt-blocked-final.json",
+      "bytes": 2388,
+      "sha256": "580e175b48374a452d94eb91939a26cac6b417d77c9eb600b9d3ec96064d2e3f"
+    },
+    {
+      "path": "verifier-build.log",
+      "bytes": 1614,
+      "sha256": "363dae6ac55bff216f3351dc3ddb3757436e4bf66462e538fd003b29b18a91cb"
+    },
+    {
+      "path": "verifier-build-receipt.json",
+      "bytes": 359,
+      "sha256": "361be8f7f86ec50c2a1312ee76dd9fcb1cf1ae5500b1d9a89ec110e757a6eabc"
+    },
+    {
+      "path": "verifier-browser.log",
+      "bytes": 3173,
+      "sha256": "ef088c5868c2d5dc1b454547cc1f097889ac5002f28ef32e8fed7f19a6d6a9ca"
+    },
+    {
+      "path": "verifier-browser-receipt.json",
+      "bytes": 399,
+      "sha256": "4b48c2cfe66ae65f8032969efe3c4c9453eb4acdaa727c65993a43b00a381e63"
+    },
+    {
+      "path": "verifier-source-final-before.json",
+      "bytes": 49666,
+      "sha256": "5450f477ac9fa7e32af777f9eccdd4145dadfb4fec6477d8da86d289823676a9"
+    },
+    {
+      "path": "verifier-postacceptance-proof.json",
+      "bytes": 1009,
+      "sha256": "91baf0c329a3126cc8e90f4500331c6acadf12767e73ddf1d15e0f03e87224f8"
+    },
+    {
+      "path": "verifier-browser-results.json",
+      "bytes": 633463,
+      "sha256": "fe8decff945c5b2a2402fd71c7907a111f0780406efe7b58de24bad7194322b9"
+    },
+    {
+      "path": "verifier-tested-config.js",
+      "bytes": 1003,
+      "sha256": "99b178fade013e21f11ecb98786b8a3128dfeb811ad6b15b7a27e0db30942f6b"
+    },
+    {
+      "path": "verifier-tested-spec.js",
+      "bytes": 9586,
+      "sha256": "18dce7b623870e403bb147893382830995eed8714db32b971facea694ed80c5a"
+    },
+    {
+      "path": "verifier-prelayout-browser.log",
+      "bytes": 17129,
+      "sha256": "892be8ede3bd38cd1fe36bd9b717b3eaccda681b105ca2f379700fa78d9f9357"
+    },
+    {
+      "path": "verifier-prelayout-browser-receipt.json",
+      "bytes": 400,
+      "sha256": "cc48adb394d47f8e66a6f8534848f8623be70e331eda7f8101e78aad1263f198"
+    },
+    {
+      "path": "verifier-prelayout-source.json",
+      "bytes": 49666,
+      "sha256": "150e4db926bf1f6e3539daef8a30532f9c46e684334bcd432567078212a40f92"
+    },
+    {
+      "path": "verifier-prelayout-mobile-DOM.json",
+      "bytes": 16727,
+      "sha256": "9bb59d870b170f753b71065d0bd3e7fcc4166abfcf5600d7fced5e5134420abf"
+    },
+    {
+      "path": "verifier-prelayout-mobile-export-failure.png",
+      "bytes": 36876,
+      "sha256": "77ef8c07103242c0d9ba8629b5e8bd2042537bd3e43cc38e7f579669c5a75449"
+    },
+    {
+      "path": "verifier-RC-oracle-1.png",
+      "bytes": 533292,
+      "sha256": "d0c3870c2290fa47dd84274f97434c4bd0dc834a31ec448408b547b930440fbe"
+    },
+    {
+      "path": "verifier-RC-oracle-2.png",
+      "bytes": 468531,
+      "sha256": "1d34124659e13708c0b46b73066d7c5de17780c0003124dd8a687cca464b13e7"
+    },
+    {
+      "path": "verifier-finite-SI-1.png",
+      "bytes": 445670,
+      "sha256": "194b3427fb8d4cd3c4f821d2239c717e9f019167677fe9474005d7597c0af7ea"
+    },
+    {
+      "path": "verifier-settling-trace.csv",
+      "bytes": 15229,
+      "sha256": "6113ee5734897dee06734637ff523e21fa45b2dff50d1e98ce9533143fbca17e"
+    },
+    {
+      "path": "verifier-instantaneous-trace.csv",
+      "bytes": 1163,
+      "sha256": "28afe9feec6a4d3391b99180c429c8753417133daa37d385490e2b68b0ce1978"
+    }
+  ]
+}

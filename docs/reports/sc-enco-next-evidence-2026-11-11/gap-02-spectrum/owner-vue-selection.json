@@ -1,0 +1,8 @@
+[
+  "src/tests/unit/SpectrumAnalysis.test.js",
+  "src/tests/unit/WaveformWorkbench.test.js",
+  "src/tests/unit/GateAllocationPanel.test.js",
+  "src/tests/unit/GateAllocationApi.test.js",
+  "src/tests/unit/gateHysteresis.test.js",
+  "src/tests/unit/GridEnergyWorkbench.test.js"
+]

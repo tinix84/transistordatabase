@@ -35,6 +35,11 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, Backg
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import ValidationError
+from transistordatabase.gui_web.backend.device_electrothermal_routes import (
+    router as device_thermal_router, device_repository as native_thermal_repository,
+)
+from transistordatabase.gui_web.backend.gate_charge_routes import router as gate_charge_router
+from transistordatabase.gui_web.backend.boost_grid_routes import router as boost_grid_router
 
 from transistordatabase.backend.concrete_services import (
     ConcreteServiceFactory,
@@ -109,6 +114,7 @@ from transistordatabase.gui_web.backend.dpt_energy import (
 )
 from transistordatabase.gui_web.backend.topology_service import TopologyCalculatorService
 from transistordatabase.topologies.semiconductor_pareto import (
+    calculate_boost_frequency_grid,
     calculate_boost_semiconductor_pareto,
 )
 from transistordatabase.gui_web.backend.catalog_routes import router as catalog_router
@@ -319,6 +325,8 @@ class _LazyRepository:
 _repo = _LazyRepository(lambda: JsonTransistorRepository(_default_db_dir))
 _loader = JsonTransistorLoader()
 app.dependency_overrides[plecs_repository] = lambda: _repo
+app.dependency_overrides[native_thermal_repository] = lambda: _repo
+app.include_router(device_thermal_router)
 
 # Default switching pairs directory
 _default_pairs_dir = Path(__file__).resolve().parent.parent.parent.parent / "switching_pairs"
@@ -2442,14 +2450,74 @@ async def validate_curves(transistor_id: str) -> CurveValidationResult:
 # Topology Calculator (Phase 4)
 # ---------------------------------------------------------------------------
 
+def _new_grid_source_loader():
+    """Reuse bounded snapshots once per ID with a shared 32 MiB read allowance."""
+    from transistordatabase.gui_web.backend.device_electrothermal_routes import _snapshot
+    remaining = 32 * 1024 * 1024
+    cache = {}
+    snapshots = {}
+
+    def load(identity):
+        nonlocal remaining
+        if not isinstance(identity, str) or not 1 <= len(identity) <= 200:
+            raise HTTPException(status_code=422, detail="Supply a device identity of 1 to 200 characters")
+        if identity not in cache:
+            try:
+                allowance = 16 * 1024 * 1024
+                storage = getattr(_repo, '_storage_path', None)
+                if callable(storage):
+                    size = storage(identity).stat().st_size
+                    if size > allowance or size + 1 > remaining:
+                        raise HTTPException(status_code=422, detail="Grid source reads exceed16MiB per file or32MiB per request")
+                    allowance = size
+                    remaining -= size + 1  # Reserve the overflow sentinel before parsing.
+                device, source = _snapshot(_repo, identity, max_bytes=allowance)
+                cache[identity] = device
+                snapshots[identity] = source
+            except FileNotFoundError:
+                cache[identity] = HTTPException(status_code=404, detail="The selected device does not exist")
+            except HTTPException as error:
+                cache[identity] = HTTPException(status_code=error.status_code, detail=error.detail)
+            except (ValueError, TypeError, RecursionError, OverflowError) as error:
+                cache[identity] = HTTPException(status_code=422, detail=str(error)[:2048])
+        value = cache[identity]
+        if isinstance(value, HTTPException):
+            # A fresh exception avoids retaining source-reader frames in the cache.
+            raise HTTPException(status_code=value.status_code, detail=value.detail)
+        return value
+
+    return load, snapshots
+
+
 @app.post("/api/topology/calculate")
 def calculate_topology(request: TopologyCalculationRequest) -> Dict[str, Any]:
+    """Retain legacy transport and direct optional grids to their bounded route."""
+    if request.mode == "switching-loss-balanced" and request.sweep is not None:
+        raise HTTPException(status_code=422, detail="Use /api/topology/switching-frequency-grid for a bounded switching-loss grid")
+    return _calculate_topology_request(request)
+
+
+@boost_grid_router.post("/api/topology/switching-frequency-grid")
+def calculate_switching_frequency_grid(request: TopologyCalculationRequest) -> Dict[str, Any]:
+    """Reuse the topology service behind the streamed four-MiB request boundary."""
+    if request.mode != "switching-loss-balanced" or request.sweep is None:
+        raise HTTPException(status_code=422, detail="Select switching-loss-balanced and a frequency sweep")
+    from transistordatabase.topologies.operating_point import validate_switching_frequency_sweep
+    try:
+        validate_switching_frequency_sweep(request.topology, request.model_dump(), request.sweep.model_dump())
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    return _calculate_topology_request(request, grid_sources=True)
+
+
+def _calculate_topology_request(request: TopologyCalculationRequest, *, grid_sources=False) -> Dict[str, Any]:
     """Calculate a topology point and optional sweep through reusable Python code."""
     try:
         switch_id = request.switch_transistor_id or request.transistor_id
         diode_id = request.diode_transistor_id or request.transistor_id
-        switch_transistor = _get_transistor(switch_id) if switch_id else None
-        diode_transistor = _get_transistor(diode_id) if diode_id else None
+        load_source, snapshots = _new_grid_source_loader() if grid_sources else (_get_transistor, {})
+        switch_transistor = load_source(switch_id) if switch_id else None
+        diode_transistor = load_source(diode_id) if diode_id else None
         parameters = request.model_dump(exclude={
             "transistor_id", "switch_transistor_id", "diode_transistor_id",
         })
@@ -2459,6 +2527,10 @@ def calculate_topology(request: TopologyCalculationRequest) -> Dict[str, Any]:
             switch_transistor=switch_transistor,
             diode_transistor=diode_transistor,
         )
+        if grid_sources:
+            from transistordatabase.topologies.boost_grid_bounds import bounded_grid_result
+            result['source_snapshots'] = snapshots
+            result = bounded_grid_result(result)
         return result
     except HTTPException:
         raise
@@ -2492,7 +2564,22 @@ def compare_topologies(request: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @app.post("/api/topology/pareto")
-def calculate_boost_semiconductor_pareto_endpoint(
+def calculate_boost_semiconductor_pareto_endpoint(request: BoostSemiconductorParetoRequest) -> dict[str, Any]:
+    """Preserve the old screen and direct new populations to a bounded route."""
+    if request.boundary.mode == "switching-loss-balanced" or request.frequencies_hz is not None:
+        raise HTTPException(status_code=422, detail="Use /api/topology/switching-frequency-pareto for bounded switching-loss populations")
+    return _calculate_boost_pareto_request(request)
+
+
+@boost_grid_router.post("/api/topology/switching-frequency-pareto")
+def calculate_switching_frequency_pareto(request: BoostSemiconductorParetoRequest) -> dict[str, Any]:
+    """Screen one or several complete populations with bounded input bytes."""
+    if request.boundary.mode != "switching-loss-balanced":
+        raise HTTPException(status_code=422, detail="Select switching-loss-balanced mode")
+    return _calculate_boost_pareto_request(request)
+
+
+def _calculate_boost_pareto_request(
     request: BoostSemiconductorParetoRequest,
 ) -> dict[str, Any]:
     """Evaluate sourced semiconductor candidates at one Boost CCM boundary.
@@ -2502,6 +2589,14 @@ def calculate_boost_semiconductor_pareto_endpoint(
     :returns: Pareto objective rules and candidate-level screening results.
     :rtype: dict[str, Any]
     """
+    if request.boundary.mode == "switching-loss-balanced":
+        count = len(request.candidates) * (len(request.frequencies_hz) if request.frequencies_hz is not None else 1)
+        if count > 32:
+            raise HTTPException(status_code=400, detail="At most 32 total scalar calls are supported")
+    if request.frequencies_hz is not None and request.boundary.mode != "switching-loss-balanced":
+        raise HTTPException(status_code=400, detail="Frequency populations require switching-loss-balanced mode")
+    selected_source, source_snapshots = _new_grid_source_loader() if request.boundary.mode == 'switching-loss-balanced' else (_get_transistor, {})
+
     candidates: list[dict[str, Any]] = []
     for candidate_request in request.candidates:
         candidate = candidate_request.model_dump(mode="python")
@@ -2512,14 +2607,14 @@ def calculate_boost_semiconductor_pareto_endpoint(
             load_errors.append("Select a switch TDB device.")
         else:
             try:
-                candidate["switch_transistor"] = _get_transistor(switch_id)
+                candidate["switch_transistor"] = selected_source(switch_id)
             except HTTPException as exc:
                 load_errors.append(str(exc.detail))
         if not diode_id:
             load_errors.append("Select a rectifier TDB device.")
         else:
             try:
-                candidate["diode_transistor"] = _get_transistor(diode_id)
+                candidate["diode_transistor"] = selected_source(diode_id)
             except HTTPException as exc:
                 load_errors.append(str(exc.detail))
         if load_errors:
@@ -2528,9 +2623,24 @@ def calculate_boost_semiconductor_pareto_endpoint(
 
     catalog = request.catalog
     try:
-        return calculate_boost_semiconductor_pareto(
-            request.boundary.model_dump(mode="python"), candidates, catalog
-        )
+        boundary = request.boundary.model_dump(mode="python")
+        for key in ("mode", "voltage_residual_tolerance_v"):
+            if boundary.get(key) is None:
+                boundary.pop(key, None)
+        if request.frequencies_hz is not None:
+            if boundary.get("mode") != "switching-loss-balanced":
+                raise ValueError("Frequency Pareto populations require switching-loss-balanced mode")
+            result = calculate_boost_frequency_grid(
+                boundary, candidates, catalog, request.frequencies_hz,
+                voltage_residual_tolerance_v=boundary.get("voltage_residual_tolerance_v"),
+            )
+        else:
+            result = calculate_boost_semiconductor_pareto(boundary, candidates, catalog)
+        if request.boundary.mode == 'switching-loss-balanced':
+            from transistordatabase.topologies.boost_grid_bounds import bounded_grid_result
+            result['source_snapshots'] = source_snapshots
+            result = bounded_grid_result(result)
+        return result
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -2808,7 +2918,7 @@ async def calculate_biela(request: BielaModelRequest) -> Dict[str, Any]:
 app.include_router(biela_router)
 
 
-@app.post("/api/analytical/gate_charge")
+@gate_charge_router.post("/api/analytical/gate_charge")
 async def calculate_gate_charge(request: GateChargeModelRequest) -> Dict[str, Any]:
     """Calculate switching times using gate charge model.
 
@@ -2824,7 +2934,7 @@ async def calculate_gate_charge(request: GateChargeModelRequest) -> Dict[str, An
             r_g=request.r_g, r_g_int=request.r_g_int,
         )
         estimate = GateChargeModel(params).calc_switching_estimate(
-            request.v_driver, request.v_off
+            request.v_driver, request.v_off, settling_target_v=request.settling_target_v
         )
         timing_ns = {
             key + '_times': {k: v * 1e9 for k, v in estimate[key]['times_s'].items()}
@@ -2841,11 +2951,16 @@ async def calculate_gate_charge(request: GateChargeModelRequest) -> Dict[str, An
             'v_th': request.v_th, 'v_plateau': request.v_plateau,
             'r_g_total': request.r_g + request.r_g_int,
             'v_driver': request.v_driver, 'v_off': request.v_off,
+            **({'settling_target_v': request.settling_target_v} if request.settling_target_v is not None else {}),
         },
         # Keep the existing web timing contract in ns; traces remain explicit SI.
         **timing_ns,
         'estimate': estimate,
     }
+
+app.include_router(gate_charge_router)
+app.include_router(boost_grid_router)
+
 
 @app.post("/api/dpt/generate_netlist")
 async def generate_dpt_netlist(

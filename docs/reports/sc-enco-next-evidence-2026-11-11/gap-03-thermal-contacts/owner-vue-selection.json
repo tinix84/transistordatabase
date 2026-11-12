@@ -1,0 +1,7 @@
+[
+  "src/tests/unit/ThermalWorkbench.test.js",
+  "src/tests/unit/ThermalApi.test.js",
+  "src/tests/unit/WaveformWorkbench.test.js",
+  "src/tests/unit/SpectrumAnalysis.test.js",
+  "src/tests/unit/GridEnergyWorkbench.test.js"
+]

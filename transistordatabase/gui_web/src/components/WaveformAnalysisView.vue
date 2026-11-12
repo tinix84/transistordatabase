@@ -2,8 +2,10 @@
 import { computed, ref, watch } from 'vue'
 import CurvePlotter from './CurvePlotter.vue'
 import WaveformThermalTransfer from './WaveformThermalTransfer.vue'
+import SpectrumAnalysisView from './SpectrumAnalysisView.vue'
 import { analysisCsv } from './analysisFiles.js'
 import { returnedPlotBounds } from './returnedPlotBounds.js'
+import { gateDigitizationColumns } from './gateHysteresis.js'
 const props = defineProps({ result: { type: Object, required: true }, acceptedRequest: { type: Object, default: null }, identity: { type: String, default: '' } })
 const emit = defineEmits(['thermal-handoff'])
 const result = computed(() => props.result)
@@ -31,6 +33,18 @@ function signal(name, label) {
 function series(rows, x, y, label, extras = {}) { return rows.length ? [{ label, pointRadius: 0, data: rows.map(row => ({ x: row[x], y: row[y] })), ...extras }] : [] }
 const current = computed(() => signal('current_a', 'Signed current'))
 const gate = computed(() => signal('gate_v', 'Gate evidence'))
+const gateStates = computed(() => result.value.gate_digitization ? [{ label: 'Sampled hysteretic state', showLine: false, pointRadius: 4,
+  data: result.value.signals.time_s.map((time, index) => ({ x: time, y: Number(result.value.gate_digitization.states[index]) })) }] : [])
+const gateRows = computed(() => {
+  const evidence = result.value.gate_digitization
+  if (!evidence) return []
+  const on = new Set(evidence.turn_on_brackets), off = new Set(evidence.turn_off_brackets)
+  const context = gateDigitizationColumns(evidence)
+  return result.value.signals.time_s.map((time, index, times) => ({ sample_index: index, time_s: time,
+    gate_v: result.value.signals.gate_v[index], gate_on: evidence.states[index],
+    turn_on_bracket: index < times.length - 1 ? on.has(index) : null,
+    turn_off_bracket: index < times.length - 1 ? off.has(index) : null, ...context }))
+})
 const voltage = computed(() => signal('device_voltage_v', 'Measured device voltage'))
 const power = computed(() => series(result.value?.conduction_plot ?? [], 'time_s', 'power_w', 'Exact conduction power'))
 const cumulative = computed(() => [
@@ -69,6 +83,12 @@ function csvExport(rows, filename) {
     <section v-if="result" class="results" data-testid="waveform-results">
       <p v-if="identity" class="identity">Selected source: {{ identity }}</p>
       <p>Waveform source: {{ result.waveform_provenance?.source ?? 'Unknown' }}<template v-if="result.waveform_provenance?.imported_filename"> · {{ result.waveform_provenance.imported_filename }}</template></p>
+      <section v-if="result.gate_digitization" data-testid="waveform-hysteresis-evidence">
+        <h3>Hysteretic gate-state evidence</h3>
+        <p>Low {{ result.gate_digitization.low_v }} V, high {{ result.gate_digitization.high_v }} V. Initial state {{ result.gate_digitization.initial_state ? 'on' : 'off' }} ({{ result.gate_digitization.initial_state_source }}). {{ result.gate_digitization.semantics }}</p>
+        <CurvePlotter title="Sampled hysteretic gate state" :datasets="gateStates" x-label="Time (s)" y-label="Gate state (0/1)" :y-min="-.1" :y-max="1.1" :allow-zoom="false"/>
+        <button type="button" data-testid="waveform-gate-csv" @click="csvExport(gateRows, 'gate-digitization.csv')">Download gate-state evidence CSV</button>
+      </section>
       <h3>Losses over the complete {{ number(result.duration_s) }} s interval</h3>
       <p>Known component sum: <strong>{{ number(result.known_component_power_w) }} W</strong>. Full total: <strong>{{ number(result.total_power_w) }} W</strong> ({{ result.total_status }}). An omitted component remains unknown, never zero.</p>
       <figure class="component-stack" data-testid="loss-component-stack">
@@ -101,6 +121,7 @@ function csvExport(rows, filename) {
       </div>
       <template v-if="result.spectrum"><h4>Current spectrum — independent frequency axis</h4><p>{{ result.spectrum.normalization }}. N={{ result.spectrum.n }}, dt={{ number(result.spectrum.sample_interval_s) }} s, sequence period N·dt={{ number(result.spectrum.sequence_period_s) }} s. {{ result.spectrum.window }} window; detrend {{ result.spectrum.detrend }}. Discrete input RMS {{ number(result.spectrum.discrete_input_rms_a) }} A; windowed RMS {{ number(result.spectrum.windowed_discrete_rms_a) }} A; Parseval RMS {{ number(result.spectrum.parseval_rms_a) }} A. These describe discrete samples, separately from the continuous piecewise-linear current RMS above.</p><CurvePlotter title="Uniform-sample current spectrum" :datasets="spectrum" x-label="Frequency (Hz)" y-label="Peak amplitude (A)"/></template>
       <section v-if="result.spectrum?.selected_bin_indices" class="panel" data-testid="current-harmonics"><h4>Selected current harmonics</h4><p>Threshold {{ result.spectrum.relative_threshold }} of maximum amplitude. Up to 10 selected bins appear in frequency order. Phase uses the {{ result.spectrum.phase_reference }} and radians. Zero-magnitude phase is unavailable.</p><div v-if="harmonics.length" class="table-scroll"><table><thead><tr><th>Bin</th><th>Frequency (Hz)</th><th>Magnitude (A)</th><th>Real (A)</th><th>Imaginary (A)</th><th>Phase (rad)</th></tr></thead><tbody><tr v-for="index in harmonics" :key="index"><td>{{ index }}</td><td>{{ number(result.spectrum.frequency_hz[index]) }}</td><td>{{ number(result.spectrum.amplitude_a[index]) }}</td><td>{{ number(result.spectrum.real_a[index]) }}</td><td>{{ number(result.spectrum.imaginary_a[index]) }}</td><td>{{ number(result.spectrum.phase_rad[index]) }}</td></tr></tbody></table></div><p v-else>No bins exceed the selected threshold.</p></section>
+      <SpectrumAnalysisView v-if="result.spectrum?.analysis_basis" :spectrum="result.spectrum"/>
       <h4>Event audit</h4><div v-if="result.events.length" class="table-scroll"><table><thead><tr><th>Event</th><th>Index / bracket (s)</th><th>Current (A)</th><th>Energy (J)</th><th>Source / mode</th></tr></thead><tbody><tr v-for="event in result.events" :key="event.event + event.sample_index"><td>{{ event.event }}</td><td>{{ event.sample_index }} / {{ event.bracket_s.join(' → ') }}</td><td>{{ number(event.current_a) }}</td><td>{{ number(event.energy_j) }}</td><td>{{ event.source }} · {{ event.mode }}</td></tr></tbody></table></div><p v-else-if="result.event_policy.mode === 'omitted'">Event detection omitted: {{ result.event_policy.omission_reason }}.</p><p v-else>No observed events. Requested components with supported models have computed zero; omitted components stay null.</p>
       <details><summary>Assumptions, exact conditions and full evidence</summary><ul><li v-for="assumption in result.assumptions" :key="assumption">{{ assumption }}</li></ul><pre>{{ JSON.stringify(result.request, null, 2) }}</pre></details>
     </section>

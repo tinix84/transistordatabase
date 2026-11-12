@@ -1,0 +1,11 @@
+{
+  "pid": 2528982,
+  "cwd": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111",
+  "command": [
+    "/home/tinix/miniconda3/envs/ntbees2/bin/python",
+    "-B",
+    "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/device-thermal-fixture-server-3a716d58e4d44509885c4e45cf1c98ed.py"
+  ],
+  "fixture_launcher_sha256": "fb6cebb54d936e3f647790e7411fab24aabd3da9349660b09dea3118f1d53769",
+  "provider_policy": "One synthetic ID uses in-memory data; all other IDs use the unchanged application repository"
+}

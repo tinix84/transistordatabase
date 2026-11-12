@@ -1,0 +1,49 @@
+{
+  "paths": {
+    "transistordatabase/analytical_models.py": {
+      "bytes": 18103,
+      "sha256": "8b9540f2cf9b034e780c82a1483b8e6ac7f9031a57775a224134486fca2c6582"
+    },
+    "transistordatabase/gui_web/backend/main.py": {
+      "bytes": 182145,
+      "sha256": "d6b706e6841b7f41e5f2ad9156943e6d3f5e475d2f4b6ceb78195942f886dd19"
+    },
+    "transistordatabase/gui_web/backend/schemas.py": {
+      "bytes": 32274,
+      "sha256": "a6d799dae9cb43b182857bb1820f90815b303763207ed09d812672d81819e8d9"
+    },
+    "transistordatabase/gui_web/src/components/GateChargeCalculator.vue": {
+      "bytes": 11848,
+      "sha256": "1efa4f48beac382d9b2562a08aac0b82e4030090ea11b00d7d60abf60991093e"
+    },
+    "transistordatabase/gui_web/src/tests/unit/GateChargeCalculator.test.js": {
+      "bytes": 10640,
+      "sha256": "8e132fd7b49b7450a53de8db8e2d2453322d50dca3b5341e23ee409fd151a209"
+    },
+    "docs/api/gate-settling.md": {
+      "bytes": 3404,
+      "sha256": "015f7a7e1a06e3f434d1859f7814437ada5d40c4492df28ebd7f47df9bac862b"
+    },
+    "tests/test_gate_settling.py": {
+      "bytes": 7096,
+      "sha256": "f4c1244e47e20929d5050323d08cd862857e72bb124af613fd47cda80747e98b"
+    },
+    "tests/test_gate_settling_independent.py": {
+      "bytes": 8887,
+      "sha256": "2453840c49abdcbfca85d6759e4bfad4bfe56ee642f2a6798d8673bc10100ae6"
+    },
+    "transistordatabase/gui_web/backend/gate_charge_routes.py": {
+      "bytes": 1084,
+      "sha256": "557efbf406c6f4b778038f9bfc15b277d73c13ca5b0dd1eee5481360050f5ed0"
+    },
+    "transistordatabase/gui_web/playwright.gate-settling.acceptance.config.js": {
+      "bytes": 1003,
+      "sha256": "99b178fade013e21f11ecb98786b8a3128dfeb811ad6b15b7a27e0db30942f6b"
+    },
+    "transistordatabase/gui_web/src/tests/e2e/gate-settling-acceptance.spec.js": {
+      "bytes": 9586,
+      "sha256": "18dce7b623870e403bb147893382830995eed8714db32b971facea694ed80c5a"
+    }
+  },
+  "scope": "Final optional-phase core/API/UI, tests, current API reference and exact compiled acceptance spec/config."
+}

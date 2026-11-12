@@ -1,0 +1,95 @@
+{
+  "capture": "accepted gate-hysteresis implementation before normal commit hooks",
+  "files": [
+    {
+      "path": "docs/api/waveform-workbench.md",
+      "bytes": 9081,
+      "sha256": "14d875a7b0d891751ea3cad35291e981510600bb9d1de4b1b8734ae9c6579d8b"
+    },
+    {
+      "path": "transistordatabase/gate_states.py",
+      "bytes": 5753,
+      "sha256": "9fcf91737e41acee502c625a5fd8d16bb36ce1654f266e04acb6bb32c85b3ed4"
+    },
+    {
+      "path": "transistordatabase/current_allocation.py",
+      "bytes": 7182,
+      "sha256": "4fd8a154e251a46e69556d39bf32debdb8d619c3f11ceb6625aaef019f1132bc"
+    },
+    {
+      "path": "transistordatabase/waveform_losses.py",
+      "bytes": 33974,
+      "sha256": "8a78bf1b6f8515b82ca85c4b1f0cbbaf4c52553deb22393ab74f79500f078e2f"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/gate_policy.py",
+      "bytes": 2026,
+      "sha256": "daf0e903578b64b99a17052e7d5d605cbc33a8f80174c03cd722854bf6bc3020"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/current_allocation_routes.py",
+      "bytes": 3788,
+      "sha256": "d164929c47712f2fa454c83704b4bbaba0422466b5b8e47744af910fc0355968"
+    },
+    {
+      "path": "transistordatabase/gui_web/backend/waveform_routes.py",
+      "bytes": 5422,
+      "sha256": "b091d8621838d8b18bc4720261755c365f937003416967b1180cb9c014ee3550"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/components/GateAllocationPanel.vue",
+      "bytes": 10586,
+      "sha256": "8da7d30030d3e1954553fda63ef46b44d617cf882bb5bfd9b34cef128e261d4f"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/components/WaveformAnalysisView.vue",
+      "bytes": 18905,
+      "sha256": "f99dcbfc5bf829ec7a82e2f6c401452ac6cf30f1941fbba5a66fe2fd5837bdc7"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/components/WaveformWorkbench.vue",
+      "bytes": 16299,
+      "sha256": "36ea4d6456dfe30ce0254a8e4d51a245f041e6ec9e1b276bee0b73f4915f9229"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/components/HysteresisGateControls.vue",
+      "bytes": 2977,
+      "sha256": "1f6bf5cebe736b3140ace295762accce2e5a8fe67d83c94bc640b541775abd6d"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/components/gateHysteresis.js",
+      "bytes": 2671,
+      "sha256": "491cc3cae11f7c227194fd2738209aed97482c76b99313bcc321c5788e5988dd"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/tests/unit/GateAllocationPanel.test.js",
+      "bytes": 8561,
+      "sha256": "5cb3958c5f13cccc09396e217b6be859f4a9eaddd0c5a548bbf0e8dd2b759de8"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/tests/unit/WaveformWorkbench.test.js",
+      "bytes": 8933,
+      "sha256": "95f7723cc9d0c44c1dd89399a748091e4c6c1dafa50ddb3350aa4befdab9fb59"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/tests/unit/gateHysteresis.test.js",
+      "bytes": 3007,
+      "sha256": "c70e410199e379579c3f73b200cb5f49a949b7e7baa60200c1d2fee50ca7d763"
+    },
+    {
+      "path": "tests/test_gate_hysteresis_independent.py",
+      "bytes": 8253,
+      "sha256": "4748e73a3f9a7abcfb32cb641599f65dcfe85b846fe87d6069bba53e2683d9e4"
+    },
+    {
+      "path": "transistordatabase/gui_web/playwright.gate-hysteresis.acceptance.config.js",
+      "bytes": 815,
+      "sha256": "f722b3449e9ded6131dcda359da3475afb91bde4bd52f1436157399895e851ea"
+    },
+    {
+      "path": "transistordatabase/gui_web/src/tests/e2e/gate-hysteresis-acceptance.spec.js",
+      "bytes": 11229,
+      "sha256": "7cda203a72aad086c7e82a933c0848408725909a0cb3a3e49950d91bbb37fd5c"
+    }
+  ]
+}

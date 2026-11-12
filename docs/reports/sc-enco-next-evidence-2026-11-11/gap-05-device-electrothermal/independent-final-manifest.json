@@ -1,0 +1,44 @@
+{
+  "passed": 33,
+  "skipped": 0,
+  "frozen_source_count": 8,
+  "pytest_seconds": 3.557,
+  "wall_seconds": 5.87,
+  "max_rss_kib": 260780,
+  "earlier_fixtures_and_legacy_receipts": {
+    "name": "independent-manifest.json",
+    "sha256": "b3b17828d88a0386f0001da664bc807f472b14c4b0e919423a1580fff32814fc"
+  },
+  "entries": [
+    {
+      "name": "independent-final-source-start.json",
+      "bytes": 951,
+      "sha256": "04bf0f1c456d24c0d908d1eaf8d1cc6a9fadc6a72190cd4b8d27e6f318c39a83",
+      "source": "/tmp/tdb-device-feedback-independent-9fd0eb01-3271-4311-846d-c1ff033ff40e/source-start.json"
+    },
+    {
+      "name": "independent-final-source-end.json",
+      "bytes": 951,
+      "sha256": "04bf0f1c456d24c0d908d1eaf8d1cc6a9fadc6a72190cd4b8d27e6f318c39a83",
+      "source": "/tmp/tdb-device-feedback-independent-9fd0eb01-3271-4311-846d-c1ff033ff40e/source-end.json"
+    },
+    {
+      "name": "independent-final-junit.xml",
+      "bytes": 6021,
+      "sha256": "7fcd4817c400831ae7165641997e92dc9b6ec25a12d49bf6ae1d08200fe1499b",
+      "source": "/tmp/tdb-device-feedback-independent-9fd0eb01-3271-4311-846d-c1ff033ff40e/junit.xml"
+    },
+    {
+      "name": "independent-final-pytest.log",
+      "bytes": 621,
+      "sha256": "9ecb89653e270cb243d97245d95e30e6a9919f1f0f9a54a7d51d392b9c8d2bcf",
+      "source": "/tmp/tdb-device-feedback-independent-9fd0eb01-3271-4311-846d-c1ff033ff40e/pytest.log"
+    },
+    {
+      "name": "independent-final-resource.txt",
+      "bytes": 1106,
+      "sha256": "36c3102df78f67cd918a7fa4d8c628516b205523cf1e3e692caaaeaa0a2dfe14",
+      "source": "/tmp/tdb-device-feedback-independent-9fd0eb01-3271-4311-846d-c1ff033ff40e/resource.txt"
+    }
+  ]
+}

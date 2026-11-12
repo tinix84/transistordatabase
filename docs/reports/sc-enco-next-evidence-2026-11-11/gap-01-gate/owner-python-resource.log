@@ -1,0 +1,23 @@
+	Command being timed: "/home/tinix/miniconda3/envs/ntbees2/bin/python -B -c import pathlib,transistordatabase,pytest,json; assert pathlib.Path(transistordatabase.__file__).resolve().is_relative_to(pathlib.Path.cwd()); files=json.loads(pathlib.Path('/tmp/tdb-hysteresis-owner-e1b6093b-d706-4d5e-b724-f0a90e7f11bc/selection.json').read_text()); raise SystemExit(pytest.main(["--noconftest","-p","no:cacheprovider","--import-mode=importlib","--basetemp=/tmp/tdb-hysteresis-owner-e1b6093b-d706-4d5e-b724-f0a90e7f11bc/pytest-temp","--junitxml=/tmp/tdb-hysteresis-owner-e1b6093b-d706-4d5e-b724-f0a90e7f11bc/junit.xml","-q",*files]))"
+	User time (seconds): 12.50
+	System time (seconds): 0.61
+	Percent of CPU this job got: 166%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:07.90
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 291432
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 62809
+	Voluntary context switches: 1277
+	Involuntary context switches: 394
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 216
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

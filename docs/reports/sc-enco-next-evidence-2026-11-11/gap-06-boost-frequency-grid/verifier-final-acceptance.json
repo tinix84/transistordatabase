@@ -1,0 +1,240 @@
+{
+  "source": {
+    "current_candidate_files": [
+      {
+        "path": "docs/api/boost-frequency-grid.md",
+        "bytes": 4320,
+        "sha256": "DC59A3D08647D1A5D72D900F584FD09F1419CED7153FBB0C844B4CFDF6B5821D"
+      },
+      {
+        "path": "transistordatabase/topologies/operating_point.py",
+        "bytes": 96175,
+        "sha256": "45EC877FA71DB05D67848248658FFA9D2593ED576082E1EC79AF9022427DB1F0"
+      },
+      {
+        "path": "transistordatabase/topologies/semiconductor_pareto.py",
+        "bytes": 23900,
+        "sha256": "2A7A67AEB59C50FDC8B9FE893E44B013F36C767420F56D783391D77D8B2409C9"
+      },
+      {
+        "path": "transistordatabase/topologies/boost_grid_bounds.py",
+        "bytes": 4785,
+        "sha256": "07D7D6383E491A9E04541191398C2A380B27592914966BBD6ACF68152CAA846B"
+      },
+      {
+        "path": "transistordatabase/gui_web/backend/main.py",
+        "bytes": 188671,
+        "sha256": "5F3D4BF96B41EBE9396A3801B1EC575B2022A19E254B22D140E2BDB3E34D0111"
+      },
+      {
+        "path": "transistordatabase/gui_web/backend/schemas.py",
+        "bytes": 33864,
+        "sha256": "93020AF04D5D20D9389730A40EE8344875BF6FE69F1F4C0AA2237B8955E63D51"
+      },
+      {
+        "path": "transistordatabase/gui_web/backend/topology_service.py",
+        "bytes": 5605,
+        "sha256": "6CB22A9D4DA7BA783323232D0138E5D2EFC0DD5F7AB0E0CE5A26970D7303DACA"
+      },
+      {
+        "path": "transistordatabase/gui_web/backend/boost_grid_routes.py",
+        "bytes": 2234,
+        "sha256": "A91C54EDC4A30BC13DA1BEA7C60F718A4B55A258B57B5990DBF933C96DA6D532"
+      },
+      {
+        "path": "transistordatabase/gui_web/backend/device_electrothermal_routes.py",
+        "bytes": 11454,
+        "sha256": "E7E6369A6D9A0205ACF22147346AE429F1A5F2EA45632CF3895FF42EFF0E4338"
+      },
+      {
+        "path": "transistordatabase/gui_web/src/components/TopologyCalculator.vue",
+        "bytes": 51771,
+        "sha256": "06BB2912C3EAA6831C2624564EE15538DF9BB7420FF9C2D25EC9AD13A50676D9"
+      },
+      {
+        "path": "transistordatabase/gui_web/src/components/TopologyParetoPanel.vue",
+        "bytes": 28182,
+        "sha256": "0A2B0358F455FAAB4C16C6791431FE46054FF2D266C71BCD135C5A20DE3699AA"
+      },
+      {
+        "path": "transistordatabase/gui_web/src/services/api.js",
+        "bytes": 18828,
+        "sha256": "21DC1E9686FF1749CF164BBEED874FDC81FD8EFD1FCDEDD27C7F1BB8F8831194"
+      },
+      {
+        "path": "tests/test_topology_api.py",
+        "bytes": 46089,
+        "sha256": "CC3619D0B5144B4E9254C181066E6DFDED0C8896AF4E55749486C207CE24ECB1"
+      },
+      {
+        "path": "tests/test_boost_frequency_grid_independent.py",
+        "bytes": 21177,
+        "sha256": "9BD18C06AAC0893F22D75760E3CDB9182BA0335548B1C82F7B2DB347494CEF2E"
+      },
+      {
+        "path": "tests/test_boost_grid_source_budget.py",
+        "bytes": 1499,
+        "sha256": "A086387D3EEF2425AF78D8AE4FB5DBA4511792EE189E65136CFEC6B6CDBE5639"
+      },
+      {
+        "path": "transistordatabase/gui_web/src/tests/unit/TopologyWorkflow.test.js",
+        "bytes": 41651,
+        "sha256": "E4061B9036FE5AC75971C4A666FBFC66084E2C1CA31C92A1096420F5A5766898"
+      },
+      {
+        "path": "transistordatabase/gui_web/src/tests/unit/TopologyParetoWorkflow.test.js",
+        "bytes": 10162,
+        "sha256": "CC7F42FDD6E4938E417A5EC1BE3CF8EF7F1A6D118E4CF9E10822B2F8615C19D3"
+      },
+      {
+        "path": "transistordatabase/gui_web/playwright.boost-frequency-grid.acceptance.config.js",
+        "bytes": 727,
+        "sha256": "A7596F0ED363E87AC2AD0351CE29C1EDA23982F48FEF67354FF3FAE5F7B3B79B"
+      },
+      {
+        "path": "transistordatabase/gui_web/src/tests/e2e/boost-frequency-grid-acceptance.spec.js",
+        "bytes": 17235,
+        "sha256": "D5C9BA347B68358ABA2CC5AD078C5FC20601C523D9DE5784C68C865C5ABCDFCC"
+      },
+      {
+        "path": "docs/reports/semiconductor-next-gap-audit-2026-11-11.md",
+        "bytes": 15913,
+        "sha256": "5C01F0531DE2858AF4C58DAB705D12F65E291BD27144B7A495025ADE229B75D8"
+      },
+      {
+        "path": "docs/reports/semiconductor-next-gap-audit-2026-11-11.json",
+        "bytes": 17663,
+        "sha256": "4D5543B14A37084FC62C43B47104ACF71A39C5AB71EB62735204FFD0201FBB0A"
+      },
+      {
+        "path": "docs/reports/semiconductor-reference-family-census-2026-11-11.md",
+        "bytes": 19334,
+        "sha256": "498058FA6F87CC11DF95ECFA5A64F7F85E24AC140C3C1730085B3E9B2C0D15F9"
+      },
+      {
+        "path": "docs/reports/semiconductor-reference-family-census-2026-11-11.json",
+        "bytes": 116009,
+        "sha256": "0D5125B36CE5A2798A5FDC16E4FA2AED19C86D25F8210DB6CD73CCDCCD839EA7"
+      },
+      {
+        "path": "docs/reports/semiconductor-reference-qualification-2026-11-11.md",
+        "bytes": 17292,
+        "sha256": "0BF788B0147FE07697C513B9F262EA65E4D9A97F3BE1630D03E85A629566ED0B"
+      },
+      {
+        "path": "docs/reports/semiconductor-reference-qualification-2026-11-11.json",
+        "bytes": 24899,
+        "sha256": "AB3F1E933C3C35886AA81266B7AF2FCA5926E2BF09A6D3B8ED50D47EF4BBB53C"
+      }
+    ],
+    "tested_files_unchanged": true
+  },
+  "measurement_limits": [
+    "Direct build/browser RSS was not measured.",
+    "Final acceptance source is post-precision and post-CSS; prior development hashes are not described as final-frozen."
+  ],
+  "pending": [
+    "Corrected maximum-selected-points32-call benchmark requires manual actual PASS.",
+    "Qt-blocked32-module headless script requires manual actual PASS.",
+    "Ruff, Pages and PR actions remain stopped by user instruction."
+  ],
+  "created_utc": "2026-11-12T00:09:25.2178873Z",
+  "database": {
+    "three_checkout_hash_lists_equal": true,
+    "bytes_per_checkout": 28903083,
+    "json_files_per_checkout": 24,
+    "per_file_private_details": "Retained outside tracked docs in final-private-proof.json."
+  },
+  "development_history": [
+    "Previous UI mobile overflow was observed; retained private failure proof has desktop5 PASS/mobile5 FAIL. Narrow CSS fix followed focused62 PASS and this unchanged final10 PASS.",
+    "Earlier harness navigation/selectors corrected only after actual DOM/source proof; old files and output directories preserved."
+  ],
+  "build": {
+    "cli_exit_code": 0,
+    "index_sha256": "EB5CBB03AC32ABA9A9E6BF826CDF550004A30701801504B5D8B67095044AB743",
+    "vite_seconds": 5.89,
+    "new_asset_count": 20,
+    "old_assets_retained": 18,
+    "rss_kib": null,
+    "modules": 216
+  },
+  "artifacts": [
+    {
+      "source_copy_verified": true,
+      "sha256": "3DE9670C36A869D2B0C673A606ED135F7CC12E36F6BFB9A2BEF1EDF71C871B90",
+      "bytes": 3818,
+      "name": "verifier-final-source-start.json"
+    },
+    {
+      "source_copy_verified": true,
+      "sha256": "37BA4B8DC625A5DA1453221B9C905CFE821D47035D2B69BE4C7C2747C0E1C95B",
+      "bytes": 1731,
+      "name": "verifier-final-build.json"
+    },
+    {
+      "source_copy_verified": true,
+      "sha256": "83C3D08366A48023FEA885CF35EE8E4F5E7096C6EE037E035344EDEBACAAD624",
+      "bytes": 422342,
+      "name": "verifier-final-browser-results.json"
+    },
+    {
+      "source_copy_verified": true,
+      "sha256": "D5C9BA347B68358ABA2CC5AD078C5FC20601C523D9DE5784C68C865C5ABCDFCC",
+      "bytes": 17235,
+      "name": "verifier-tested-e2e.spec.js.txt"
+    },
+    {
+      "source_copy_verified": true,
+      "sha256": "A7596F0ED363E87AC2AD0351CE29C1EDA23982F48FEF67354FF3FAE5F7B3B79B",
+      "bytes": 727,
+      "name": "verifier-tested-config.js.txt"
+    },
+    {
+      "source_copy_verified": true,
+      "sha256": "8E7A57AF9C09C7733B9DD329884808A6F98A912D1F0E242AF182905B96308AAB",
+      "bytes": 2167,
+      "name": "verifier-synthetic-provider.py.txt"
+    },
+    {
+      "source_copy_verified": true,
+      "sha256": "75F761B9832B303671E612EEE7240FA25CF19544F3FB31764957729E5210B1B7",
+      "bytes": 639378,
+      "name": "verifier-desktop-mixed-frequency-line.png"
+    },
+    {
+      "source_copy_verified": true,
+      "sha256": "839BDC1D7F179B5804113FDA58A6965018562777878C6BC9CB4ED36537AABDB4",
+      "bytes": 585650,
+      "name": "verifier-mobile-390-mixed-frequency-line.png"
+    },
+    {
+      "source_copy_verified": true,
+      "sha256": "CB565F4F4819447CE1CBC55DFB3A10199D163859E4AD8B0F836D857380086F2F",
+      "bytes": 868461,
+      "name": "verifier-mobile-390-residual-qualified-populations.png"
+    },
+    {
+      "source_copy_verified": true,
+      "sha256": "285C69499D4671043AED6BBE73E04BB4F901A83DAD99BCFF6D6343D060D893EB",
+      "bytes": 576317,
+      "name": "verifier-mobile-390-known-zero-raw-token-rejection.png"
+    }
+  ],
+  "status": "PASS",
+  "browser": {
+    "skipped": 0,
+    "assertions": "Independent scalar equations, complete populations, residual eligibility, JSON/CSV downloads, stale clear, known-zero versus missing terms, raw token/API guards, legacy omitted shape, no page errors or unexpected network failures, mobile document width <=391px, normal clicks without force.",
+    "expected": 10,
+    "spec_sha256": "D5C9BA347B68358ABA2CC5AD078C5FC20601C523D9DE5784C68C865C5ABCDFCC",
+    "duration_ms": 37164.589,
+    "rss_kib": null,
+    "viewports": [
+      "desktop",
+      "390px mobile"
+    ],
+    "calculation_mocks": false,
+    "cli_exit_code": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

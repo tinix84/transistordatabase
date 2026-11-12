@@ -5,6 +5,23 @@ export function finiteDecimal(value, name) {
   return parsed
 }
 
+function decimalIdentity(value) {
+  const text = String(value).trim(), negative = text.startsWith('-')
+  const [mantissa, exponent = '0'] = text.replace(/^[+-]/, '').split(/[eE]/)
+  const [whole, decimals = ''] = mantissa.split('.')
+  let digits = (whole + decimals).replace(/^0+/, '')
+  if (!digits) return '0'
+  const trailing = digits.match(/0+$/)?.[0].length ?? 0
+  digits = digits.slice(0, digits.length - trailing)
+  return `${negative ? '-' : ''}${digits}e${BigInt(exponent) - BigInt(decimals.length) + BigInt(trailing)}`
+}
+
+export function binary64Decimal(value, name) {
+  const number = finiteDecimal(value, name)
+  if (decimalIdentity(value) !== decimalIdentity(number)) throw new Error(`${name} exceeds accepted binary64 precision.`)
+  return number
+}
+
 export function binaryDecimal(value, name) {
   const number = finiteDecimal(value, name)
   const digits = String(value).trim().split(/[eE]/)[0].replace(/[+\-.]/g, '').replace(/^0+|0+$/g, '')

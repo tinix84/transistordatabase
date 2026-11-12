@@ -1,0 +1,32 @@
+{
+  "modules": [
+    {
+      "name": "transistordatabase.core",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/core/__init__.py",
+      "sha256": "b2112fb9d9600bebfe74be09c1a496171621dec2f4a5364194123e52f1989cfd"
+    },
+    {
+      "name": "transistordatabase.gate_states",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gate_states.py",
+      "sha256": "9fcf91737e41acee502c625a5fd8d16bb36ce1654f266e04acb6bb32c85b3ed4"
+    },
+    {
+      "name": "transistordatabase.current_allocation",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/current_allocation.py",
+      "sha256": "4fd8a154e251a46e69556d39bf32debdb8d619c3f11ceb6625aaef019f1132bc"
+    },
+    {
+      "name": "transistordatabase.waveform_losses",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/waveform_losses.py",
+      "sha256": "8a78bf1b6f8515b82ca85c4b1f0cbbaf4c52553deb22393ab74f79500f078e2f"
+    },
+    {
+      "name": "transistordatabase.gui_web.backend.main",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/backend/main.py",
+      "sha256": "3710ebd535dd60c2ac0c84738c64af90846c7ec63386ec17a605ba97e21b2671"
+    }
+  ],
+  "qt_loaded": false,
+  "elapsed_s": 2.0310644330020295,
+  "python": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:13:31) [GCC 14.3.0]"
+}

@@ -1,0 +1,6 @@
+{
+  "tests/test_thermal_interfaces_independent.py": "b172d74408e54af415d625b5d1f7b8a3af5b2a0455e1186495e9ce79e0d96b99",
+  "transistordatabase/thermal.py": "8c683fa31643c4b4664ac1c05c1b3c72edd415c8f3cf20f45189035f87abc86a",
+  "transistordatabase/gui_web/backend/thermal_routes.py": "400a1a3381e1504c9646434d314fd3e617e635df0265f6ff9e3e09d52d7bdd02",
+  "transistordatabase/gui_web/backend/parameter_routes.py": "28d813957f45059acbcf30c303f6b88f6770e842d17632a1a908b088696d821d"
+}

@@ -272,11 +272,25 @@ def calculate_boost_semiconductor_pareto(
     if not candidates:
         raise ValueError("At least one semiconductor candidate is required.")
 
+    switching = boundary.get("mode") == "switching-loss-balanced"
+    tolerance = boundary.get("voltage_residual_tolerance_v")
+    if tolerance is not None and (not _nonnegative_finite(tolerance) or not switching):
+        raise ValueError("Voltage residual tolerance requires switching-loss mode and a finite nonnegative value")
+    if switching and len(candidates) > 32:
+        raise ValueError("Switching-loss screening is limited to 32 scalar calls")
+    objective_directions = dict(_OBJECTIVE_DIRECTIONS)
+    if switching:
+        objective_directions = {("included_loss_w" if k == "channel_conduction_loss_w" else k): v
+                                for k, v in objective_directions.items()}
+    loss_objective = "included_loss_w" if switching else "channel_conduction_loss_w"
     parameters = {
         **dict(boundary),
-        "mode": "loss-balanced",
+        "mode": "switching-loss-balanced" if switching else "loss-balanced",
         "conduction_regime": "CCM",
     }
+    if switching:
+        from transistordatabase.topologies.boost_grid_bounds import validate_grid_sources
+        validate_grid_sources([c.get(role) for c in candidates for role in ("switch_transistor", "diode_transistor")], catalog)
     candidate_results: list[dict[str, Any]] = []
 
     for candidate in candidates:
@@ -340,6 +354,8 @@ def calculate_boost_semiconductor_pareto(
                 "v_g": candidate.get("v_g"),
                 "diode_v_g": candidate.get("diode_v_g"),
             }
+            if switching:
+                point_parameters.update({key: candidate.get(key) for key in ("v_g_off", "r_g_on", "r_g_off")})
             try:
                 operating_point = calculate_topology_operating_point(
                     "boost",
@@ -350,6 +366,13 @@ def calculate_boost_semiconductor_pareto(
                 )
                 result["operating_point"] = operating_point
                 calculated = operating_point["calculated"]
+                if switching:
+                    result["qualification"] = "power-balanced included-loss estimate"
+                    result["voltage_law_enforced"] = False
+                    result["voltage_law_residual_v"] = calculated["inductor_volt_second_residual_v"]
+                    result["power_balance_residual_w"] = operating_point["performance"]["power_balance_residual_w"]
+                    if tolerance is not None and abs(result["voltage_law_residual_v"]) > tolerance:
+                        result["ineligible_reasons"].append("Signed voltage residual exceeds the explicit eligibility tolerance")
                 ratings = {
                     "switch": _rating_result(
                         switch_device,
@@ -388,7 +411,7 @@ def calculate_boost_semiconductor_pareto(
         ):
             losses = result["operating_point"]["losses"]
             objectives = {
-                "channel_conduction_loss_w": losses["total_w"],
+                loss_objective: losses["total_w"],
                 "package_body_volume_mm3": (
                     switch_count * switch_catalog["volume_mm3"]
                     + diode_count * diode_catalog["volume_mm3"]
@@ -399,7 +422,7 @@ def calculate_boost_semiconductor_pareto(
                 ),
             }
             if (
-                _nonnegative_finite(objectives["channel_conduction_loss_w"])
+                _nonnegative_finite(objectives[loss_objective])
                 and _positive_finite(objectives["package_body_volume_mm3"])
                 and _positive_finite(objectives["component_cost_usd"])
             ):
@@ -424,24 +447,24 @@ def calculate_boost_semiconductor_pareto(
         dominated = any(
             all(
                 other["objectives"][objective] <= value[objective]
-                for objective in _OBJECTIVE_DIRECTIONS
+                for objective in objective_directions
             )
             and any(
                 other["objectives"][objective] < value[objective]
-                for objective in _OBJECTIVE_DIRECTIONS
+                for objective in objective_directions
             )
             for other in eligible
             if other is not candidate
         )
         candidate["pareto"] = not dominated
 
-    return {
+    response = {
         "topology": "boost",
         "boundary": parameters,
-        "mode": "loss-balanced",
+        "mode": parameters["mode"],
         "conduction_regime": "CCM",
-        "loss_scope": "channel_conduction_only",
-        "objective_directions": dict(_OBJECTIVE_DIRECTIONS),
+        "loss_scope": "channel_conduction_and_switch_turn_on_turn_off" if switching else "channel_conduction_only",
+        "objective_directions": objective_directions,
         "dominance_rule": (
             "All objectives are minimized. A candidate is dominated when another "
             "eligible candidate is no worse in all objectives and strictly better "
@@ -455,3 +478,50 @@ def calculate_boost_semiconductor_pareto(
         "model_limitations": list(_MODEL_LIMITATIONS),
         "candidates": candidate_results,
     }
+
+    if switching:
+        response["model_limitations"][:2] = [
+            "Included losses are switch and diode channel conduction and switch Eon/Eoff. Recovery, gate-drive, passive and magnetic losses are excluded.",
+            "The CCM estimate closes included-loss power balance; averaged voltage closure is not enforced or proved.",
+        ]
+        response.update(qualification="power-balanced included-loss estimate",
+                        voltage_law_enforced=False,
+                        voltage_residual_tolerance_v=tolerance,
+                        scalar_call_count=len(candidates), scalar_call_limit=32)
+        response["model_limitations"].append("Voltage closure is not enforced or proved. Residual eligibility filtering does not prove physical closure.")
+    if switching:
+        from transistordatabase.topologies.boost_grid_bounds import bounded_grid_result
+        return bounded_grid_result(response)
+    return response
+
+
+def calculate_boost_frequency_grid(boundary, candidates, catalog, frequencies_hz, *, voltage_residual_tolerance_v=None):
+    """Evaluate the complete same-frequency population without cross-grid ranking."""
+    if voltage_residual_tolerance_v is None:
+        voltage_residual_tolerance_v = boundary.get("voltage_residual_tolerance_v")
+    elif (boundary.get("voltage_residual_tolerance_v") is not None
+          and boundary["voltage_residual_tolerance_v"] != voltage_residual_tolerance_v):
+        raise ValueError("Conflicting voltage residual tolerances")
+    if (not isinstance(frequencies_hz, Sequence) or isinstance(frequencies_hz, (str, bytes))
+            or not 2 <= len(frequencies_hz) <= 32
+            or not isinstance(candidates, Sequence) or not candidates
+            or len(frequencies_hz) * len(candidates) > 32):
+        raise ValueError("Frequency screening requires bounded sequences and at most 32 total scalar calls")
+    frequencies = list(frequencies_hz)
+    if (not candidates or not 2 <= len(frequencies) <= 32
+            or len(frequencies) * len(candidates) > 32):
+        raise ValueError("Frequency screening requires 2 to 32 frequencies and at most 32 total scalar calls")
+    if (any(not _positive_finite(f) for f in frequencies)
+            or any(a >= b for a, b in zip(frequencies, frequencies[1:], strict=False))):
+        raise ValueError("Frequencies must be finite, positive and strictly increasing")
+    rows = []
+    for frequency in frequencies:
+        population = calculate_boost_semiconductor_pareto(
+            {**boundary, "f_sw": frequency, "mode": "switching-loss-balanced",
+             "voltage_residual_tolerance_v": voltage_residual_tolerance_v}, candidates, catalog)
+        rows.append({"frequency_hz": frequency, "population": population})
+    from transistordatabase.topologies.boost_grid_bounds import bounded_grid_result
+    return bounded_grid_result({"mode": "switching-loss-balanced", "qualification": "power-balanced included-loss estimate",
+            "voltage_law_enforced": False, "frequencies_hz": frequencies, "rows": rows,
+            "ranking_basis": "Independent same-frequency complete candidate populations; no cross-frequency aggregate",
+            "scalar_call_count": len(frequencies) * len(candidates), "scalar_call_limit": 32})

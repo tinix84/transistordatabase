@@ -1,0 +1,81 @@
+{
+  "captured_source_files": 375,
+  "unchanged_files": 374,
+  "only_changed_file": "transistordatabase/gui_web/src/tests/e2e/thermal-contacts-acceptance.spec.js",
+  "change_reason": "Only the new metadata test title was adjusted before the final test to match existing config and CLI filters. No application implementation changed after the final build.",
+  "final_test_sha256": "7ad2180d90a0dee12856885105c14a1053ba44cc0c06fb3a3a0e623b09b996f5",
+  "final_config_sha256": "b29b318811ea8732c76b589967573fd3ecd1e24f404dfb205c6a57a707ad4d87",
+  "thermal_workbench_sha256": "3112d30f261f1cd5d1339ec8e1b62c0d5aece64b20f302aa981bdf4131f1e668",
+  "database_records_verified": 24,
+  "database_bytes": 28903083,
+  "all_original_and_copied_record_hashes_unchanged": true,
+  "old_hashed_assets_preserved": [
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-Cd-9xTOa.js",
+      "sha256": "73bf8a357296e40d3ca9917bf2958c48cfc3dbd89ae7f585846379ca06348fa2"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-DwhnJuQe.css",
+      "sha256": "514a79c300ac1d74150d4244492f27ad569cf9676cb8220241f8ba9762a4bedb"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-B-uDa43d.js",
+      "sha256": "46acfa0c7e0fac6f6a28365be49ada296064e2274556709b1c54990df093c59a"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-BiqYnh0l.css",
+      "sha256": "850cdb88d50563901946a80c89d4a215066e84f196c129f2040262179f4d8749"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-BsmDSL5R.css",
+      "sha256": "cf7b5160ca6c0a303b90d80d21e3f4feda53fc353437ff69792c5ae39fa74528"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-11is31Q7.js",
+      "sha256": "42ddb9c1b8d94352f2e92a2f97f9cb95fae41725979651d0952955c4aaff58cb"
+    }
+  ],
+  "final_index_sha256": "703075d510a6bd3a9e8a9c246251c9645b7fa2b894a552b6d8145553ba511eb9",
+  "final_assets": [
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-Cd-9xTOa.js",
+      "bytes": 1104645,
+      "sha256": "73bf8a357296e40d3ca9917bf2958c48cfc3dbd89ae7f585846379ca06348fa2"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-DERh4duk.css",
+      "bytes": 144314,
+      "sha256": "d62c6d57e7d86482d870545f6fc5f237ffc257f3c288a1de359adf6ab5e2ac7a"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-DwhnJuQe.css",
+      "bytes": 143660,
+      "sha256": "514a79c300ac1d74150d4244492f27ad569cf9676cb8220241f8ba9762a4bedb"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-CfzCuJjG.js",
+      "bytes": 1104662,
+      "sha256": "5b0baced0cd98d25fa6d97510a3fe6e4749a9c4fab88e149be15688897221cad"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-B-uDa43d.js",
+      "bytes": 1088039,
+      "sha256": "46acfa0c7e0fac6f6a28365be49ada296064e2274556709b1c54990df093c59a"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-BiqYnh0l.css",
+      "bytes": 142590,
+      "sha256": "850cdb88d50563901946a80c89d4a215066e84f196c129f2040262179f4d8749"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-BsmDSL5R.css",
+      "bytes": 144314,
+      "sha256": "cf7b5160ca6c0a303b90d80d21e3f4feda53fc353437ff69792c5ae39fa74528"
+    },
+    {
+      "path": "transistordatabase/gui_web/dist/assets/index-11is31Q7.js",
+      "bytes": 1098554,
+      "sha256": "42ddb9c1b8d94352f2e92a2f97f9cb95fae41725979651d0952955c4aaff58cb"
+    }
+  ]
+}

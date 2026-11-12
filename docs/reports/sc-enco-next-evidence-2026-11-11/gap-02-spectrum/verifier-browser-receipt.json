@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "/usr/bin/node",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/node_modules/@playwright/test/cli.js",
+    "test",
+    "--config",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/playwright.spectrum.acceptance.config.js"
+  ],
+  "returncode": 0,
+  "wall_s": 45.70595121500082,
+  "output": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/spectrum-browser-9c9ad3dd9ad242c2921b04f78c080a7e/browser-final-d0c640c03eb14ddfbf5d363e49b5f919",
+  "spec_sha256": "386e137042fa9c0218e17e8a7a3b91766d03668fb277d42ceef9ec1a0de2c279",
+  "config_sha256": "1920b4f3a0fb24e4cf8fe2dc6e89af039b591550e809e32b72d8f22d0f078b68",
+  "selector_adjustment": "Narrow only the status-heading locator to observed exact accessible name Declared mask: uncovered. Scientific/API/export assertions unchanged. First run retained."
+}

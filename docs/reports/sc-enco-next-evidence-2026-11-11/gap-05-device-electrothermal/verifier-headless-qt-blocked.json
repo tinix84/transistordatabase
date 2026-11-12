@@ -1,0 +1,64 @@
+{
+  "modules": [
+    {
+      "name": "transistordatabase.core",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/core/__init__.py",
+      "sha256": "b2112fb9d9600bebfe74be09c1a496171621dec2f4a5364194123e52f1989cfd"
+    },
+    {
+      "name": "transistordatabase.core.repository",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/core/repository.py",
+      "sha256": "41688b3913b5a99349a9402c2ddf4859eec2abd2fc62ba51b4a6ac304921be50"
+    },
+    {
+      "name": "transistordatabase.device_electrothermal",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/device_electrothermal.py",
+      "sha256": "1f7d76556d2f386c376298d885898806d1f714a10569c9e0cacaea6fecd05794"
+    },
+    {
+      "name": "transistordatabase.thermal",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/thermal.py",
+      "sha256": "8c683fa31643c4b4664ac1c05c1b3c72edd415c8f3cf20f45189035f87abc86a"
+    },
+    {
+      "name": "transistordatabase.rg_energy_access",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/rg_energy_access.py",
+      "sha256": "1d0db9b6f3e035eac0a78a33ebd8c4858e83d07cb8e5df39b66d6c4002b8ae8f"
+    },
+    {
+      "name": "transistordatabase.gate_states",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gate_states.py",
+      "sha256": "9fcf91737e41acee502c625a5fd8d16bb36ce1654f266e04acb6bb32c85b3ed4"
+    },
+    {
+      "name": "transistordatabase.spectrum_analysis",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/spectrum_analysis.py",
+      "sha256": "8bf6c2c98b8f92554573f6d72e764f3a5ecd2a741a1f61ce30d0b568c77c4ca8"
+    },
+    {
+      "name": "transistordatabase.analytical_models",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/analytical_models.py",
+      "sha256": "8b9540f2cf9b034e780c82a1483b8e6ac7f9031a57775a224134486fca2c6582"
+    },
+    {
+      "name": "transistordatabase.gui_web.backend.finite_json_route",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/backend/finite_json_route.py",
+      "sha256": "527b7d959357f680e75d5f479b5b6b157915e1045d5922c96bacb9f49eafbfc7"
+    },
+    {
+      "name": "transistordatabase.gui_web.backend.device_electrothermal_routes",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/backend/device_electrothermal_routes.py",
+      "sha256": "cdc85e3bcdf9481b7301b6e320ccb3e1f59758431a3694f7eac65afaa0615b9b"
+    },
+    {
+      "name": "transistordatabase.gui_web.backend.main",
+      "path": "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/backend/main.py",
+      "sha256": "c723df8538e996f79f1b4f0296b6f8ac7611558febf30b63927c013073532227"
+    }
+  ],
+  "qt_attempts": [],
+  "qt_loaded": false,
+  "wall_s": 4.4158827909996035,
+  "max_rss_kib": 243288,
+  "python": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:13:31) [GCC 14.3.0]"
+}

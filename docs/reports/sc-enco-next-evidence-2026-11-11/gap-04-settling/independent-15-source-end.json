@@ -1,0 +1,6 @@
+{
+  "tests/test_gate_settling_independent.py": "a6bc301c251d980b9e414bf381bbaefb70387adea866504c0dee7331cb041606",
+  "transistordatabase/analytical_models.py": "32003d2791fc9a62abba6b0fc8fc33042336f3f12a5fef7a18216bf471d9da23",
+  "transistordatabase/gui_web/backend/main.py": "93c177ccd223d05debb2b09cc9a9bad430199396171d6c1c09b3c279bab38aa6",
+  "transistordatabase/gui_web/backend/schemas.py": "203bb3feaca74bc26230c15b524e6b59f4586ddc390b4e7b0d29008382e19b56"
+}

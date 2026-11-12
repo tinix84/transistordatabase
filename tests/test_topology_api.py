@@ -233,7 +233,7 @@ def test_switching_loss_balanced_boost_api_closes_power_and_exports_scope(
     assert result["model"]["curve_conditions"]["e_on"]["v_supply"] == 200
 
 
-def test_switching_loss_balanced_api_rejects_bad_gates_sweeps_and_comparison(
+def test_switching_loss_balanced_api_rejects_bad_gates_and_comparison(
     gate_conditioned_client: TestClient,
 ) -> None:
     """Keep the exact-condition scalar workflow outside unsupported endpoints."""
@@ -253,8 +253,15 @@ def test_switching_loss_balanced_api_rejects_bad_gates_sweeps_and_comparison(
         "x_points": 2, "metric": "i_l_ripple_pp_a",
     }
     response = gate_conditioned_client.post("/api/topology/calculate", json=request)
-    assert response.status_code == 400
-    assert "scalar Boost CCM only; sweeps are unsupported" in response.json()["detail"]
+    assert response.status_code == 422
+    assert "/api/topology/switching-frequency-grid" in response.json()["detail"]
+    response = gate_conditioned_client.post("/api/topology/switching-frequency-grid", json=request)
+    assert response.status_code == 200, response.text
+    grid = response.json()["sweep"]
+    assert grid["scalar_call_count"] == 2
+    assert grid["voltage_law_enforced"] is False
+    assert all(row["status"] == "qualified" for row in grid["rows"])
+    assert all(row["power_balance_residual_w"] is not None for row in grid["rows"])
 
     response = gate_conditioned_client.post(
         "/api/topology/compare", json={**request, "sweep": None}

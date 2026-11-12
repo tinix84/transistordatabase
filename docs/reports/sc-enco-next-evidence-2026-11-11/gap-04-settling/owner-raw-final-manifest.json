@@ -1,0 +1,35 @@
+{
+  "artifacts": [
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-raw-final-selection.json",
+      "bytes": 118,
+      "sha256": "a4e61f6aa4a8767f0876bb8b913d866da96305ebc3261d46813d6d6fd7a8e00b"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-raw-final-source-start.json",
+      "bytes": 582,
+      "sha256": "bdf041aa8bf33f124732195d804c6645189c3bdb130e4f9bccb684e3c6dea279"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-raw-final-source-end.json",
+      "bytes": 582,
+      "sha256": "bdf041aa8bf33f124732195d804c6645189c3bdb130e4f9bccb684e3c6dea279"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-raw-final-junit.xml",
+      "bytes": 6410,
+      "sha256": "44971f097703c417fda14a7229a0c2d3b595031c0594f9653c8bc727e721c1e1"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-raw-final-pytest.log",
+      "bytes": 621,
+      "sha256": "f95a97037cd32d70d263e796f18e361dc734cdff5725d6bc4a87bd349d297497"
+    },
+    {
+      "path": "docs/reports/sc-enco-next-evidence-2026-11-11/gap-04-settling/owner-raw-final-resource.log",
+      "bytes": 1332,
+      "sha256": "73e612a1bfe7f79efa882474e48d7d7539324293b421ae85ab55558f22320444"
+    }
+  ],
+  "scope": "Final45 cases after direct and original-HTTP precision guards. Includes15 prior independent cases; final21 independent cases have separate frozen proof. Snapshots cover five implementation/owner files; the independent agent owns its evolving test file."
+}

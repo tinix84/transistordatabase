@@ -1,0 +1,172 @@
+{
+  "case": "threshold-waveform",
+  "baseline_commit": "e41cc8a56e3caa254a124672a16eef4a7b4c5863",
+  "recaptured_at_utc": "2026-11-11T17:12:31.497171+00:00",
+  "method": "POST",
+  "path": "/api/waveform/analyze",
+  "expected_status": 200,
+  "request": {
+    "waveform": {
+      "time_s": [
+        0,
+        1,
+        2
+      ],
+      "current_a": [
+        1,
+        1,
+        1
+      ],
+      "gate_v": [
+        0,
+        5,
+        6
+      ]
+    },
+    "conduction": {
+      "omit": true,
+      "omission_reason": "switching only"
+    },
+    "events": {
+      "mode": "gate",
+      "threshold_v": 5
+    },
+    "switching": {
+      "turn_on": {
+        "omit": true,
+        "omission_reason": "energy unavailable"
+      },
+      "turn_off": {
+        "omit": true,
+        "omission_reason": "energy unavailable"
+      }
+    }
+  },
+  "response": {
+    "duration_s": 2.0,
+    "components": {
+      "conduction": {
+        "status": "omitted",
+        "reason": "switching only",
+        "energy_j": null,
+        "power_w": null
+      },
+      "turn_on": {
+        "status": "omitted",
+        "reason": "energy unavailable",
+        "energy_j": null,
+        "power_w": null
+      },
+      "turn_off": {
+        "status": "omitted",
+        "reason": "energy unavailable",
+        "energy_j": null,
+        "power_w": null
+      }
+    },
+    "known_component_energy_j": 0,
+    "known_component_power_w": 0.0,
+    "total_energy_j": null,
+    "total_power_w": null,
+    "total_status": "partial-explicit-omissions",
+    "power_segments": [],
+    "conduction_plot": [],
+    "events": [],
+    "switching_cumulative_plot": [],
+    "signals": {
+      "time_s": [
+        0.0,
+        1.0,
+        2.0
+      ],
+      "current_a": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "gate_v": [
+        0.0,
+        5.0,
+        6.0
+      ]
+    },
+    "current_statistics": {
+      "mean": 1.0,
+      "rms": 1.0,
+      "minimum": 1.0,
+      "maximum": 1.0,
+      "interval_derivative": [
+        0.0,
+        0.0
+      ],
+      "interval_start_s": [
+        0.0,
+        1.0
+      ],
+      "interval_end_s": [
+        1.0,
+        2.0
+      ],
+      "method": "Exact time-weighted piecewise-linear integrals"
+    },
+    "event_policy": {
+      "mode": "gate",
+      "threshold_v": 5.0,
+      "omission_reason": ""
+    },
+    "request": {
+      "waveform": {
+        "time_s": [
+          0.0,
+          1.0,
+          2.0
+        ],
+        "current_a": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "gate_v": [
+          0.0,
+          5.0,
+          6.0
+        ]
+      },
+      "conduction": {
+        "omit": true,
+        "omission_reason": "switching only",
+        "duty": 1.0
+      },
+      "events": {
+        "mode": "gate",
+        "threshold_v": 5.0,
+        "omission_reason": ""
+      },
+      "switching": {
+        "turn_on": {
+          "omit": true,
+          "omission_reason": "energy unavailable"
+        },
+        "turn_off": {
+          "omit": true,
+          "omission_reason": "energy unavailable"
+        }
+      }
+    },
+    "waveform_provenance": {
+      "source": null,
+      "calibration_notes": null,
+      "imported_filename": null
+    },
+    "assumptions": [
+      "Piecewise-linear current, voltage-drop curves and duty",
+      "Exact cubic conduction integration; gate does not mask conduction",
+      "Pre-edge event sample i for bracket [i,i+1]; no initial or wrapped event",
+      "Switching energies are event impulses, not finite power pulses",
+      "Power averages use the complete supplied time interval",
+      "Measured device voltage is distinct from switching bus voltage"
+    ]
+  },
+  "response_bytes_sha256": "143dbd908720da2455ac660396ffa7020188faaadc833748e4a527166d818507",
+  "response_canonical_json_sha256": "b1edf8641807a0ef50e4ca0258f4d498b618bc01acc3aa70812eda755914d6ba"
+}

@@ -2,6 +2,10 @@
 import { onBeforeUnmount, reactive, ref, watch } from 'vue'
 import WaveformAnalysisView from './WaveformAnalysisView.vue'
 import GateAllocationPanel from './GateAllocationPanel.vue'
+import HysteresisGateControls from './HysteresisGateControls.vue'
+import { defaultHysteresis, hysteresisRequest } from './gateHysteresis.js'
+import SpectrumAnalysisControls from './SpectrumAnalysisControls.vue'
+import { defaultSpectrumAnalysis, spectrumAnalysisRequest } from './spectrumAnalysis.js'
 import { binaryDecimal, finiteDecimal } from './analysisFiles.js'
 import WaveformModelEditor from './WaveformModelEditor.vue'
 import { model, finite, branch } from './waveformModels.js'
@@ -10,10 +14,10 @@ import { waveformApi } from '../services/api.js'
 const input = reactive({
   csv: 'time_s,current_a,gate_v,device_voltage_v\n0,0,0,400\n0.000001,2,0,400\n0.000002,9,1,2\n0.000003,3,1,2\n0.000004,0,0,400',
   conductionOmit: false, conductionReason: '', positive: model(), negative: model(false, false), duty: 1,
-  eventMode: 'gate', threshold: .5, eventReason: '', bus: '',
+  eventMode: 'gate', threshold: .5, hysteresis: defaultHysteresis(), eventReason: '', bus: '',
   onOmit: true, offOmit: true, onReason: 'Explicit conduction-only evaluation', offReason: 'Explicit conduction-only evaluation',
   onPositive: model(true), onNegative: model(true, false), offPositive: model(true), offNegative: model(true, false),
-  fft: false, window: 'rectangular', detrend: 'none', harmonicThreshold: .1, advanced: false, json: '',
+  fft: false, window: 'rectangular', detrend: 'none', harmonicThreshold: .1, spectralAnalysis: defaultSpectrumAnalysis(), advanced: false, json: '',
   waveformSource: '', calibrationNotes: '', importedFilename: '', importedEdited: false,
 })
 const result = ref(null), error = ref(''), busy = ref(false), stale = ref(false)
@@ -49,12 +53,16 @@ function parseCsv(strictNumbers = false, binaryGate = false) {
   return columns
 }
 function request() {
-  if (input.advanced) return JSON.parse(input.json)
+  if (input.advanced) {
+    JSON.parse(input.json)
+    return input.json
+  }
   const columns = parseCsv()
   const { duty, turn_on, turn_off, ...waveform } = columns
   if (input.bus !== '' && !waveform.bus_voltage_v) waveform.bus_voltage_v = finite(input.bus, 'Bus voltage')
   const omitted = reason => ({ omit: true, omission_reason: reason })
   const eventPolicy = input.eventMode === 'gate' ? { mode: 'gate', threshold_v: finite(input.threshold, 'Gate threshold') }
+    : input.eventMode === 'hysteresis' ? { mode: 'hysteresis', digitizer: hysteresisRequest(input.hysteresis) }
     : input.eventMode === 'masks' ? { mode: 'masks', turn_on, turn_off }
     : { mode: 'omitted', omission_reason: input.eventReason }
   return { waveform,
@@ -64,7 +72,7 @@ function request() {
     events: eventPolicy,
     switching: { turn_on: input.onOmit ? omitted(input.onReason) : { positive: branch(input.onPositive, true), negative: branch(input.onNegative, true) },
       turn_off: input.offOmit ? omitted(input.offReason) : { positive: branch(input.offPositive, true), negative: branch(input.offNegative, true) } },
-    ...(input.fft ? { spectrum: { window: input.window, detrend: input.detrend, ...harmonicThreshold(input.harmonicThreshold) } } : {}) }
+    ...(input.fft ? { spectrum: { window: input.window, detrend: input.detrend, ...harmonicThreshold(input.harmonicThreshold), ...spectrumAnalysisRequest(input.spectralAnalysis) } } : {}) }
 }
 function harmonicThreshold(value) {
   const threshold = finiteDecimal(value, 'Harmonic threshold')
@@ -110,7 +118,7 @@ function loadSwitchingFixture() {
   input.calibrationNotes = 'Supplied SI values; no digitization or sensor calibration applied'
 }
 function showRequest() {
-  try { input.json = JSON.stringify(request(), null, 2) } catch (failure) { error.value = failure.message }
+  try { const payload = request(); input.json = typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2) } catch (failure) { error.value = failure.message }
 }
 </script>
 
@@ -138,8 +146,9 @@ function showRequest() {
       </section>
       <section class="panel">
         <h3>3. Switching evidence and independent energy models</h3>
-        <label>Event policy<select v-model="input.eventMode" aria-label="Event policy"><option value="gate">Gate &gt; threshold (equality is low)</option><option value="masks">Explicit interval masks from CSV</option><option value="omitted">Explicitly omit event detection</option></select></label>
+        <label>Event policy<select v-model="input.eventMode" aria-label="Event policy"><option value="gate">Gate &gt; threshold (equality is low)</option><option value="hysteresis">Hysteresis: strict crossings and deadband hold</option><option value="masks">Explicit interval masks from CSV</option><option value="omitted">Explicitly omit event detection</option></select></label>
         <label v-if="input.eventMode === 'gate'">Gate threshold (V)<input v-model.number="input.threshold" type="number" step="any"></label>
+        <HysteresisGateControls v-if="input.eventMode === 'hysteresis'" v-model="input.hysteresis" label="Switching event"/>
         <label v-if="input.eventMode === 'omitted'">Reason for omitting event detection<input v-model="input.eventReason"></label>
         <p>Every event uses sample i before the transition bracket [i, i+1]. No initial or wrapped event is invented. E(0) remains finite when recorded. No nearest-temperature lookup, clamping or automatic ZVS energy reduction is applied.</p>
         <template v-for="side in ['on', 'off']" :key="side">
@@ -154,6 +163,7 @@ function showRequest() {
         <label class="check"><input v-model="input.fft" type="checkbox"> Compute uniform-sample FFT (reject irregular sampling)</label>
         <div v-if="input.fft" class="columns"><label>FFT window<select v-model="input.window"><option value="rectangular">Rectangular</option><option value="hann">Hann</option></select></label><label>Detrending<select v-model="input.detrend"><option value="none">None</option><option value="mean">Subtract sample mean</option></select></label></div>
         <label v-if="input.fft">Current harmonic threshold (fraction of maximum amplitude)<input v-model="input.harmonicThreshold" type="number" min="0" max="1" step="any" aria-label="Current harmonic threshold"></label>
+        <SpectrumAnalysisControls v-if="input.fft" v-model="input.spectralAnalysis"/>
         <details><summary>Advanced: inspect or supply the canonical JSON request</summary><button type="button" @click="showRequest">Copy form into request editor</button><label class="check"><input v-model="input.advanced" type="checkbox"> Use JSON editor as calculation input</label><label>Canonical request<textarea v-model="input.json" rows="12" spellcheck="false"></textarea></label></details>
       </section>
       <button type="submit" class="primary" :disabled="busy">{{ busy ? 'Calculating…' : 'Calculate waveform losses' }}</button>

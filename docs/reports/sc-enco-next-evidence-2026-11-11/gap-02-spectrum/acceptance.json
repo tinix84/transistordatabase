@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "record_type": "Point-in-time acceptance evidence for one capability",
+  "date": "2026-11-11",
+  "capability": "All-bin coordinate spectrum masks and raw-windowed band RMS",
+  "queue_scope": "Gap 2 only. Gap 1 was accepted separately. Other SC/ENCO gaps remain separate.",
+  "source_reference_ids": [
+    "enco-e4a3722b969ba6c9",
+    "enco-b1f5ac73901175b7",
+    "enco-c1e1bfaaf2f90136"
+  ],
+  "reference_handling": "Read-only inspection. Independent implementation. No source implementation was copied.",
+  "contract": {
+    "mask_basis": "The existing canonical coherent-gain-corrected one-sided peak vector. No recomputation or comparison tolerance.",
+    "coordinates": "Exact accepted binary64 FFT coordinates; optional explicit linear-frequency or log-frequency interpolation between adjacent finite limits only. Null gaps never bridge. No extrapolation.",
+    "comparison": "Measured peak > limit fails. Equality passes. margin_peak=limit-peak; excess_peak=max(peak-limit,0). Uncovered bins remain unknown.",
+    "scope": "All observed bins, including DC, zeros, even Nyquist and odd final bins. Mask profile coverage beyond observed bins is not established.",
+    "units": "Waveform API A_peak; reusable engine A_peak or V_peak matching the declared signal. No dB, RMS, detector, or compliance conversion.",
+    "bands": "Named frequency bounds inside physical Nyquist; explicit endpoints. Empty bands return unavailable. Overlapping bands are independent and not additive.",
+    "rms_basis": "Raw windowed, detrended discrete Parseval RMS without coherent-gain or power-gain correction. Stable scaled weighted phasors retain representable tiny RMS.",
+    "precision": "Unsupported nonzero SI underflow rejects explicitly. Exact returned peaks reused as limits pass. Advanced JSON reaches backend unchanged for original-lexeme validation.",
+    "limits": {
+      "samples": 10000,
+      "mask_points": 5001,
+      "bands": 32
+    }
+  },
+  "oracles": {
+    "rectangular_8_samples_8_hz": "x=1+2*cos(2*pi*n/8)+cos(4*pi*n/8); full RMS=sqrt(3.5), band[1,2] RMS=sqrt(2.5); 1Hz peak2A exceeds1.5A by0.5A.",
+    "hann_5_constant_1a": "No detrend: corrected DC peak1A; raw DC-only RMS0.4A; all-bin RMS=sqrt(0.3)A. Mean detrend produces zero.",
+    "subnormal_policy": "A nonzero raw FFT coefficient with an underflowed zero canonical peak rejects optional analysis rather than passing a zero limit."
+  },
+  "validation": {
+    "adjacent_python": {
+      "passed": 226,
+      "skipped": 0,
+      "seconds": 5.01,
+      "wall_seconds": 6.4,
+      "maximum_rss_kib": 292732,
+      "scope": "Includes all 20 independent spectrum cases, verified from JUnit names."
+    },
+    "independent_final_python": {
+      "passed": 20,
+      "scope": "Frozen sources; canonical equality, subnormal rejection, raw Hann Parseval, all-bin coverage and both old response hashes."
+    },
+    "vue": {
+      "passed": 53,
+      "files": 6,
+      "seconds": 7.34,
+      "wall_seconds": 8.25,
+      "maximum_rss_kib": 246992
+    },
+    "compiled_browser": {
+      "passed": 10,
+      "mocked": 0,
+      "seconds": 42.7,
+      "wall_seconds": 45.7,
+      "maximum_rss_kib": 356376,
+      "scope": "Eight spectrum desktop/mobile cases and two unchanged noisy-gate cases. Includes exact advanced JSON network bodies, CSV/JSON downloads and stale-result invalidation."
+    },
+    "build": {
+      "modules": 212,
+      "seconds": 6.22,
+      "maximum_rss_kib": 557056
+    },
+    "ruff": {
+      "findings": 0,
+      "seconds": 0.14
+    },
+    "headless": {
+      "qt_imports": "blocked",
+      "module_imports": 6,
+      "wall_seconds": 3.13,
+      "maximum_rss_kib": 243768
+    }
+  },
+  "main_runtime": "Main e41cc8a remains unchanged on port8003; feature verification uses separate port8004.",
+  "history": "Previous dated evidence remains unchanged. No push is part of this local acceptance.",
+  "receipts": {
+    "source-manifest.json": "09b10466de09e754d6ce0f4bfdc7d284c875b018af381373c8260dc533100939",
+    "owner-manifest.json": "260bc23a336146fe43433a12e8be98c7194bbc9c1c363fec27282bdfccd5993c",
+    "independent-manifest.json": "03f0ab0352a09e62993e03eee2815c8463b8ba3d0b3e48c816e9200bed236412",
+    "verifier-manifest.json": "264c39532057b79951bac6d0068d80aca0f93909e7a554dd31de1361a5d096ad"
+  }
+}

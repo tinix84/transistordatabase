@@ -6,6 +6,7 @@ No data lookup, device defaults or desktop dependencies live in this module.
 from __future__ import annotations
 
 from copy import deepcopy
+from fractions import Fraction
 import math
 
 import numpy as np
@@ -123,6 +124,64 @@ def thermal_impedance(model, time_s):
     return float(result[0]) if scalar else result
 
 
+def _steady_interfaces(request, ts, pf, pr, rc, rf, rr):
+    """Resolve explicit series contacts without merging their physical identities."""
+    interfaces = request["interfaces"]
+    if request.get("interface") is not None:
+        raise ValueError("Select either one interface or the interfaces list")
+    if not isinstance(interfaces, (list, tuple)) or not 1 <= len(interfaces) <= 32:
+        raise ValueError("Supply 1 to 32 physical interfaces")
+    paths = {"common": [], "forward": [], "reverse": []}
+    rows, identifiers = [], set()
+
+    def finite_ratio(value, label):
+        try:
+            result = float(value)
+        except OverflowError as error:
+            raise ValueError(f"{label} exceeds the finite SI range") from error
+        if not math.isfinite(result) or (result == 0 and value != 0):
+            raise ValueError(f"{label} exceeds the nonzero finite SI range")
+        return result
+
+    for interface in interfaces:
+        if not isinstance(interface, dict) or set(interface) - {
+                "interface_id", "path", "resistivity_k_m2_w", "area_m2", "source", "conditions"}:
+            raise ValueError("Supply only the declared physical interface fields")
+        identifier = _source(interface["interface_id"])
+        if len(identifier) > 200 or identifier in identifiers:
+            raise ValueError("Physical interface IDs must be unique and at most 200 characters")
+        identifiers.add(identifier)
+        path = interface["path"]
+        if path not in paths:
+            raise ValueError("Interface path must be common, forward or reverse")
+        _source(interface["source"])
+        conditions = interface["conditions"]
+        if not isinstance(conditions, dict) or any(not isinstance(key, str) for key in conditions):
+            raise ValueError("Interface conditions require named numbers or explicit unknowns")
+        for value in conditions.values():
+            if value is not None:
+                _number(value, "interface condition")
+        rho = _number(interface["resistivity_k_m2_w"], "interface resistivity", minimum=0)
+        area = _number(interface["area_m2"], "interface area", positive=True)
+        if rho == 0 and interface["resistivity_k_m2_w"] != 0:
+            raise ValueError("Nonzero interface resistivity exceeds the supported SI range")
+        resistance = Fraction.from_float(rho) / Fraction.from_float(area)
+        resolved = finite_ratio(resistance, "Interface resistance")
+        paths[path].append(resistance)
+        rows.append({**deepcopy(interface), "resistance_k_w": resolved})
+    added = {path: sum(values, Fraction()) for path, values in paths.items()}
+    effective = {path: finite_ratio(Fraction.from_float(base) + added[path], "Effective path resistance")
+                 for path, base in (("common", rc), ("forward", rf), ("reverse", rr))}
+    shared = _steady_temperature(np.longdouble(pf) + pr, effective["common"], ts)
+    return {"shared_temperature_c": _finite(shared, "shared temperature"),
+            "forward_temperature_c": _finite(_steady_temperature(pf, effective["forward"], shared), "forward temperature"),
+            "reverse_temperature_c": _finite(_steady_temperature(pr, effective["reverse"], shared), "reverse temperature"),
+            "interface_contributions": rows,
+            "added_path_resistances_k_w": {path: finite_ratio(value, "Added path resistance") for path, value in added.items()},
+            "path_resistances_k_w": effective,
+            "boundary": "steady fixed sink; explicit series contacts on common and independent branch paths; ideal zero paths allowed"}
+
+
 def steady_paths(request):
     """Two independent branch paths sharing one explicitly supplied sink path."""
     ts = _number(request["sink_temperature_c"], "sink temperature")
@@ -131,6 +190,8 @@ def steady_paths(request):
     rc = _number(request["common_resistance_k_w"], "common resistance", minimum=0)
     rf = _number(request["forward_resistance_k_w"], "forward resistance", minimum=0)
     rr = _number(request["reverse_resistance_k_w"], "reverse resistance", minimum=0)
+    if request.get("interfaces") is not None:
+        return _steady_interfaces(request, ts, pf, pr, rc, rf, rr)
     interface = request.get("interface")
     added = 0.0
     if interface is not None:

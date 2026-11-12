@@ -1,0 +1,10 @@
+{
+  "tests/test_device_electrothermal_independent.py": "74d6c63435c4096ce0b7bb37848ada3b4788ce548198296e26ad6bc3a0487e94",
+  "transistordatabase/device_electrothermal.py": "9819e4b953b4bbbe2f8315ece6bab78a9d6b77ead3e4536f7447cf366c8982f5",
+  "transistordatabase/condition_tables.py": "5c08322fa87d0d08fa4ebfa6d143228c07e4a8a53bfa50ac9bf9db9400fb5d40",
+  "transistordatabase/thermal.py": "8c683fa31643c4b4664ac1c05c1b3c72edd415c8f3cf20f45189035f87abc86a",
+  "transistordatabase/gui_web/backend/device_electrothermal_routes.py": "120c3a025e490f6f9895167cd347390f641fd061c6fa7a9ce8dbb3ddee297d01",
+  "transistordatabase/gui_web/backend/finite_json_route.py": "527b7d959357f680e75d5f479b5b6b157915e1045d5922c96bacb9f49eafbfc7",
+  "transistordatabase/gui_web/backend/main.py": "c723df8538e996f79f1b4f0296b6f8ac7611558febf30b63927c013073532227",
+  "transistordatabase/core/repository.py": "41688b3913b5a99349a9402c2ddf4859eec2abd2fc62ba51b4a6ac304921be50"
+}

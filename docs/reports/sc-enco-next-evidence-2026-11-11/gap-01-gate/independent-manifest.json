@@ -1,0 +1,59 @@
+{
+  "receipt_type": "Independent headless gate verification and merged-baseline HTTP evidence",
+  "frozen_files": 8,
+  "passed": 9,
+  "pytest_seconds": 1.929,
+  "peak_rss_kib": 246424,
+  "red_predecessor": "Derived 1e-400 V crossing had changed the first-sample decision. The final suite rejects the unrepresentable threshold.",
+  "legacy_capture": "These three pure synthetic requests reproduced their original pre-fix baseline hashes. The JSON receipts record the recapture timestamps.",
+  "files": [
+    {
+      "name": "independent-pytest.log",
+      "bytes": 620,
+      "sha256": "3a640149d6261d7540da90fc9b5dc354419afc05c5d8150415d2f974058147ac",
+      "source": "/tmp/tdb-gate-independent-7292e4d5-a59d-4b21-b1b1-f77a8c9238f6/pytest.log"
+    },
+    {
+      "name": "independent-resource.txt",
+      "bytes": 1082,
+      "sha256": "29c583609656a85a3576f20c8d6eafa72495b36ed4d5cc8c2d435ecdb284a315",
+      "source": "/tmp/tdb-gate-independent-7292e4d5-a59d-4b21-b1b1-f77a8c9238f6/resource.txt"
+    },
+    {
+      "name": "independent-junit.xml",
+      "bytes": 1848,
+      "sha256": "58a9f3232ffc6b2c2e745098d5440e1745060bc994af170d07008c85619d2bfd",
+      "source": "/tmp/tdb-gate-independent-7292e4d5-a59d-4b21-b1b1-f77a8c9238f6/junit.xml"
+    },
+    {
+      "name": "independent-source-start.json",
+      "bytes": 965,
+      "sha256": "726aad5742414062822acb13cd5e5982ee3e3656fee4aa09992627b13791e7b4",
+      "source": "/tmp/tdb-gate-independent-7292e4d5-a59d-4b21-b1b1-f77a8c9238f6/source-start.json"
+    },
+    {
+      "name": "independent-source-end.json",
+      "bytes": 965,
+      "sha256": "726aad5742414062822acb13cd5e5982ee3e3656fee4aa09992627b13791e7b4",
+      "source": "/tmp/tdb-gate-independent-7292e4d5-a59d-4b21-b1b1-f77a8c9238f6/source-end.json"
+    },
+    {
+      "name": "independent-legacy-allocation-binary.json",
+      "bytes": 2503,
+      "sha256": "738123738eb5710308b1d7f069581a8ab43cbdfab224d0f02d6c8f6515609e7b",
+      "source": "HTTP 200 from merged baseline on port 8003"
+    },
+    {
+      "name": "independent-legacy-allocation-threshold.json",
+      "bytes": 2550,
+      "sha256": "3be7abaa1d0b8593b990411623fa364db8132f15219fb885438b47db92557d03",
+      "source": "HTTP 200 from merged baseline on port 8003"
+    },
+    {
+      "name": "independent-legacy-waveform-threshold.json",
+      "bytes": 3856,
+      "sha256": "22a3a07c66c5dd112087022422ffbf920e59862d6376e7c166e20004e5570d5b",
+      "source": "HTTP 200 from merged baseline on port 8003"
+    }
+  ]
+}

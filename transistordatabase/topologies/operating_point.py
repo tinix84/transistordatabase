@@ -2068,8 +2068,8 @@ def calculate_topology_sweep(
 ) -> dict[str, Any]:
     """Generate a Python-side line or contour sweep of one supported metric."""
     if parameters.get("mode") == "switching-loss-balanced":
-        raise ValueError(
-            "switching-loss-balanced supports scalar Boost CCM only; sweeps are unsupported"
+        return _switching_frequency_sweep(
+            topology, parameters, sweep, switch_transistor, diode_transistor
         )
     loss_balanced = parameters.get("mode") == "loss-balanced"
     conduction_regime = parameters.get("conduction_regime", "CCM")
@@ -2222,3 +2222,66 @@ def calculate_topology_sweep(
         if power_residual_values is not None:
             result["power_balance_residual_values_w"] = power_residual_values
     return result
+
+
+def validate_switching_frequency_sweep(topology, parameters, sweep):
+    """Validate a frequency line before any source loading or scalar work."""
+    if topology.lower() != "boost" or parameters.get("conduction_regime", "CCM") != "CCM":
+        raise ValueError("Switching-loss frequency grids require Boost CCM")
+    if sweep.get("x_axis") != "f_sw" or sweep.get("y_axis") is not None:
+        raise ValueError("Switching-loss grids support only a frequency line")
+    count = sweep.get("x_points", 0)
+    if not _valid_sweep_point_count(count) or count > 32:
+        raise ValueError("Switching-loss frequency grids require 2 to 32 points")
+    low = _finite_positive(sweep, "x_min")
+    high = _finite_positive(sweep, "x_max")
+    if low >= high:
+        raise ValueError("Frequency grid requires x_min < x_max")
+    metric = sweep.get("metric")
+    if metric not in _SWEEP_METRICS:
+        raise ValueError("Unsupported frequency-grid metric")
+    # Convex coordinates avoid overflow in high-low for finite endpoints.
+    frequencies = [(1 - i / (count - 1)) * low + (i / (count - 1)) * high
+                   for i in range(count)]
+    if any(a >= b for a, b in zip(frequencies, frequencies[1:], strict=False)):
+        raise ValueError("Frequency grid coordinates collapse at binary64 precision")
+    return frequencies, metric
+
+
+def _switching_frequency_sweep(topology, parameters, sweep, switch, diode):
+    """Retain each qualified scalar result on a bounded Boost frequency line."""
+    frequencies, metric = validate_switching_frequency_sweep(topology, parameters, sweep)
+    count = len(frequencies)
+    from transistordatabase.topologies.boost_grid_bounds import validate_grid_sources
+    validate_grid_sources([switch, diode])
+    rows = []
+    section, key, unit = _SWEEP_METRICS[metric]
+    for frequency in frequencies:
+        row = {"frequency_hz": frequency, "status": "unsupported", "diagnostic": None,
+               "operating_point": None, "value": None,
+               "voltage_law_residual_v": None, "power_balance_residual_w": None}
+        try:
+            point = calculate_topology_operating_point(
+                topology, {**parameters, "f_sw": frequency}, switch, diode,
+                include_waveforms=False,
+            )
+            row.update(status="qualified", operating_point=point,
+                       value=point[section].get(key),
+                       voltage_law_residual_v=point["calculated"]["inductor_volt_second_residual_v"],
+                       power_balance_residual_w=point["performance"]["power_balance_residual_w"])
+            if row["value"] is None:
+                row["diagnostic"] = "Selected metric is unavailable at this qualified point"
+        except (ValueError, OverflowError) as exc:
+            row["diagnostic"] = str(exc)
+        rows.append(row)
+    return {"kind": "line", "x_axis": "f_sw", "x_unit": "Hz", "x_values": frequencies,
+            "y_axis": None, "y_unit": None, "y_values": None,
+            "metric": metric, "metric_unit": unit, "values": [r["value"] for r in rows],
+            "mode": "switching-loss-balanced", "conduction_regime": "CCM",
+            "loss_scope": "channel_conduction_and_switch_turn_on_turn_off",
+            "qualification": "power-balanced included-loss estimate",
+            "voltage_law_enforced": False,
+            "voltage_law_note": "Averaged voltage closure is not enforced or proved; signed residuals remain visible. No DCM inference or extrapolation.",
+            "voltage_law_residual_values_v": [r["voltage_law_residual_v"] for r in rows],
+            "power_balance_residual_values_w": [r["power_balance_residual_w"] for r in rows],
+            "rows": rows, "scalar_call_count": count, "scalar_call_limit": 32}

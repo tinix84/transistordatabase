@@ -1,0 +1,10 @@
+[
+  "tests/test_thermal_workbench.py",
+  "tests/test_thermal_interfaces.py",
+  "tests/test_comparison_thermal_union.py",
+  "tests/test_waveform_workbench.py",
+  "tests/test_waveform_losses.py",
+  "tests/test_public_calculation_exports.py",
+  "tests/test_spectrum_analysis_independent.py",
+  "tests/test_thermal_interfaces_independent.py"
+]

@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "record_type": "Point-in-time acceptance evidence for one capability",
+  "date": "2026-11-11",
+  "capability": "Simultaneous identified physical thermal contacts",
+  "queue_scope": "Gap 3 only. Gates and spectrum were accepted separately. Remaining SC/ENCO gaps remain separate.",
+  "source_reference_ids": [
+    "sc-ae25213abbd6b0bf",
+    "sc-ac4a029737f1d352"
+  ],
+  "reference_handling": "Read-only inspection. Independent implementation. No source implementation copied.",
+  "contract": {
+    "input": "Optional interfaces list of1..32 contacts, each with unique interface_id, path, SI resistivity and positive area, source and conditions. Nonnull singular interface and list cannot be combined.",
+    "physical_paths": "Distinct contacts on one path form a series stack. Common path carries forward+reverse heat. Each branch carries its own heat.",
+    "numerics": "Exact binary64-input resistivity/area ratios and exact per-path sums before finite output conversion. Nonzero SI resistance underflow rejects; sourced zero remains an explicit ideal contact.",
+    "evidence": "Per-contact rows, per-path added and effective resistances, shared temperature and both junction temperatures. No misleading cross-path scalar resistance sum. Unknown conditions remain null.",
+    "old_behavior": "Existing absent and singular interface responses retain complete baseline HTTP hashes.",
+    "body_policy": "Only the thermal route retains its previous uncapped body-size policy; it reuses finite numeric-literal and Unicode validation. Existing guarded routes retain their byte limits.",
+    "browser": "Separate ID/path/source/conditions rows, contact CSV plus exact request/result JSON, stale result invalidation. Null-prototype condition maps preserve reserved names."
+  },
+  "oracle": {
+    "sink_temperature_c": 25,
+    "forward_power_w": 2,
+    "reverse_power_w": 1,
+    "base_path_resistances_k_w": 0,
+    "added_path_resistances_k_w": {
+      "common": 1,
+      "forward": 2,
+      "reverse": 3
+    },
+    "shared_temperature_c": 28,
+    "forward_temperature_c": 32,
+    "reverse_temperature_c": 31
+  },
+  "validation": {
+    "adjacent_python": {
+      "passed": 195,
+      "skipped": 0,
+      "seconds": 47.99,
+      "wall_seconds": 58.96,
+      "maximum_rss_kib": 286796
+    },
+    "independent_final": {
+      "passed": 17,
+      "scope": "Thermal11, both legacy full response hashes, half-ULP order-sensitive sum, raw subnormal contact rejection, other route byte/Unicode/numeric guards."
+    },
+    "owner_vue_before_metadata_correction": {
+      "passed": 48,
+      "files": 5,
+      "seconds": 28.55,
+      "wall_seconds": 31.53,
+      "maximum_rss_kib": 266084
+    },
+    "owner_metadata_api_final": {
+      "passed": 13,
+      "files": 2,
+      "seconds": 5.1,
+      "wall_seconds": 7.16,
+      "maximum_rss_kib": 165180,
+      "scope": "Reserved __proto__, constructor and toString keys plus raw JSON transport after one-line condition map correction."
+    },
+    "legacy_business_body": {
+      "request_bytes": 5188153,
+      "segments": 10000,
+      "network_poles": 1,
+      "main_http_status": 200,
+      "feature_http_status": 200,
+      "complete_responses_equal": true,
+      "final_temperature_c": 26,
+      "maximum_rss_kib": 332468,
+      "scope": "Synthetic one-pole constant1W source, fixed25C case,20k bounded recurrence work. No database access."
+    },
+    "compiled_initial": {
+      "passed": 12,
+      "mocked": 0,
+      "scope": "Eight new thermal desktop/mobile and two each unchanged gate and spectrum cases, before the metadata-only condition-map correction."
+    },
+    "compiled_metadata_postfix": {
+      "passed": 2,
+      "mocked": 0,
+      "seconds": 14.8,
+      "wall_seconds": 17.28,
+      "maximum_rss_kib": 277132,
+      "scope": "Final rebuilt desktop/mobile actual-API tests retain reserved condition keys in exact request/result JSON and contact CSV, with28/32/31C oracle."
+    },
+    "final_build": {
+      "modules": 214,
+      "wall_seconds": 21.13,
+      "maximum_rss_kib": 565708
+    },
+    "ruff": {
+      "findings": 0
+    },
+    "headless": {
+      "module_imports": 6,
+      "qt_imports": "blocked"
+    }
+  },
+  "main_runtime": "Main e41cc8a remains unchanged on port8003. Feature verification uses separate port8004.",
+  "history": "Previous dated proof stays unchanged. This checkpoint is a local commit only.",
+  "receipts": {
+    "source-manifest.json": "5bdb541640c5c08aa6f68a123b58b1ede655956b61d4ebd8afba21ecd9ff9d29",
+    "owner-manifest.json": "1a55be182e44270e7c7759a347ad441f51702933c2f5c672bd9f876f31266e7a",
+    "owner-metadata-manifest.json": "90edc4264e9c98cce1ed54dc4165bf5a374dd731ee4e1eb621d6f55570c44e84",
+    "independent-manifest.json": "c5cac8cf2b9d8549ac2bbcb8e96c0cf7853c7601370e654d99bbc3e33a980376",
+    "verifier-manifest.json": "07758e41346ae07a639827ced306ced03f1acbcf826729a5168fe72291d32b46"
+  }
+}

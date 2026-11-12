@@ -1,0 +1,11 @@
+{
+  "exit": 0,
+  "source": {
+    "transistordatabase/gui_web/src/components/ThermalWorkbench.vue": "3112d30f261f1cd5d1339ec8e1b62c0d5aece64b20f302aa981bdf4131f1e668",
+    "transistordatabase/gui_web/src/tests/unit/ThermalWorkbench.test.js": "aad819e0964b99397e25ab9a05397776db2cf14de9dc2b711f626a202c8284a0",
+    "transistordatabase/gui_web/src/services/api.js": "db797bad6a48ce4f5285a4de03ecb5ef651ab69e20605f3b9d7a31acad56335b",
+    "transistordatabase/gui_web/src/tests/unit/ThermalApi.test.js": "c285940a1c89dfe384e612456ef202e23a1e3de5dbbee4032edebb6c3ba19a3f"
+  },
+  "source_unchanged": true,
+  "scope": "Reserved __proto__, constructor and toString condition keys survive object/JSON transport; raw JSON lexical guard preserved."
+}

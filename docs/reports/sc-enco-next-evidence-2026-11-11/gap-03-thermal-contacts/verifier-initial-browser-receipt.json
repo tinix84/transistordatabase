@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "/usr/bin/node",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/node_modules/@playwright/test/cli.js",
+    "test",
+    "--config",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/playwright.thermal-contacts.acceptance.config.js"
+  ],
+  "returncode": 0,
+  "wall_s": 82.50113661099749,
+  "output": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/thermal-contacts-browser-4c3020cc0398432b90bc4eea05e89606/browser-2128cf400df546fbba850087005368e3",
+  "spec_sha256": "14f24afe8a60b1c23d414806c64b44713b492a2441bf13a5316007dd86579ebf",
+  "config_sha256": "b29b318811ea8732c76b589967573fd3ecd1e24f404dfb205c6a57a707ad4d87"
+}

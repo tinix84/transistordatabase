@@ -1,0 +1,53 @@
+{
+  "receipt_type": "Initial independent spectrum suite and no-policy compatibility checks",
+  "passed": 18,
+  "source_files_frozen": 7,
+  "pytest_seconds": 3.465,
+  "wall_seconds": 5.13,
+  "peak_rss_kib": 246296,
+  "scope": "These cases precede the separate public amplitude-array equality round-trip check.",
+  "files": [
+    {
+      "name": "independent-legacy-main.json",
+      "bytes": 6028,
+      "sha256": "984887177d59a4488107b2707fe570f5d25dfe09f8c6ee3a47037091f87bd38c",
+      "source": "local synthetic HTTP response"
+    },
+    {
+      "name": "independent-legacy-gate.json",
+      "bytes": 7736,
+      "sha256": "11271455e9d23187998f0ffa845d663338df164351c08bb7de7109117456ee2d",
+      "source": "local synthetic HTTP response"
+    },
+    {
+      "name": "independent-18-source-start.json",
+      "bytes": 833,
+      "sha256": "4d8733dbcfbbc583d3fef8483f2aa725aa92213c0d02606d1be43d23d57cbb88",
+      "source": "/tmp/tdb-spectrum-independent-1caa5166-02ed-49c2-969e-da2cfb99f816/source-start.json"
+    },
+    {
+      "name": "independent-18-source-end.json",
+      "bytes": 833,
+      "sha256": "4d8733dbcfbbc583d3fef8483f2aa725aa92213c0d02606d1be43d23d57cbb88",
+      "source": "/tmp/tdb-spectrum-independent-1caa5166-02ed-49c2-969e-da2cfb99f816/source-end.json"
+    },
+    {
+      "name": "independent-18-pytest.log",
+      "bytes": 621,
+      "sha256": "e63c364bb6ea35c13e8980c4a346f762c82ebf8a9d714107d5318187ca38d9f1",
+      "source": "/tmp/tdb-spectrum-independent-1caa5166-02ed-49c2-969e-da2cfb99f816/pytest.log"
+    },
+    {
+      "name": "independent-18-junit.xml",
+      "bytes": 2922,
+      "sha256": "c587093c56075c2769645b8d753398d9392a3f2dac692ad83af9ff4014c1a2bf",
+      "source": "/tmp/tdb-spectrum-independent-1caa5166-02ed-49c2-969e-da2cfb99f816/junit.xml"
+    },
+    {
+      "name": "independent-18-resource.txt",
+      "bytes": 1088,
+      "sha256": "25ab25abb6adada7468a02622b5eface98348e08bc7ac93e079f40ab78779846",
+      "source": "/tmp/tdb-spectrum-independent-1caa5166-02ed-49c2-969e-da2cfb99f816/resource.txt"
+    }
+  ]
+}

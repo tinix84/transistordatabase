@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "/usr/bin/node",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/node_modules/@playwright/test/cli.js",
+    "test",
+    "--config",
+    "/home/tinix/claude_wsl/transistordatabase-sc-enco-next-20261111/transistordatabase/gui_web/playwright.spectrum.acceptance.config.js"
+  ],
+  "returncode": 1,
+  "wall_s": 55.0599754290015,
+  "output": "/home/tinix/claude_wsl/transistordatabase-integration-audit-20261111/spectrum-browser-9c9ad3dd9ad242c2921b04f78c080a7e/browser-27929644d9f34fa091f0a30b660dcf5b",
+  "spec_sha256": "94011fcc6f33775586534e4399754f84151b9a8d53e35f531021392f2f7830cb",
+  "config_sha256": "1920b4f3a0fb24e4cf8fe2dc6e89af039b591550e809e32b72d8f22d0f078b68"
+}

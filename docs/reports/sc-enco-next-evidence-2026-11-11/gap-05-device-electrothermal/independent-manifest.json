@@ -1,0 +1,58 @@
+{
+  "passed": 31,
+  "skipped": 0,
+  "frozen_source_count": 8,
+  "pytest_seconds": 3.618,
+  "wall_seconds": 5.55,
+  "max_rss_kib": 259900,
+  "entries": [
+    {
+      "name": "independent-source-start.json",
+      "bytes": 951,
+      "sha256": "1d540a4497bfead30169ad2fab974e778d270bce80d7dbd2651883f2e45f6ba2",
+      "source": "/tmp/tdb-device-feedback-independent-d21c13aa-8b19-48dc-998f-446b5ed621f1/source-start.json"
+    },
+    {
+      "name": "independent-source-end.json",
+      "bytes": 951,
+      "sha256": "1d540a4497bfead30169ad2fab974e778d270bce80d7dbd2651883f2e45f6ba2",
+      "source": "/tmp/tdb-device-feedback-independent-d21c13aa-8b19-48dc-998f-446b5ed621f1/source-end.json"
+    },
+    {
+      "name": "independent-junit.xml",
+      "bytes": 5681,
+      "sha256": "96f64ba68592423ea2c28776c58b5b1cab6e390d8174b8f5c49cdce83c8aaf26",
+      "source": "/tmp/tdb-device-feedback-independent-d21c13aa-8b19-48dc-998f-446b5ed621f1/junit.xml"
+    },
+    {
+      "name": "independent-pytest.log",
+      "bytes": 621,
+      "sha256": "c1b91bb98b053e8e27372cfc09b49cf6c6e219358e89c049262dff2a846587ee",
+      "source": "/tmp/tdb-device-feedback-independent-d21c13aa-8b19-48dc-998f-446b5ed621f1/pytest.log"
+    },
+    {
+      "name": "independent-resource.txt",
+      "bytes": 1108,
+      "sha256": "def2f2503ab08dbdf269cf5faefb29a0eb113b7ea3e913567c65a52aa96f3fd2",
+      "source": "/tmp/tdb-device-feedback-independent-d21c13aa-8b19-48dc-998f-446b5ed621f1/resource.txt"
+    },
+    {
+      "name": "independent-real-qualification.json",
+      "bytes": 1120,
+      "sha256": "ef8ae4fbfe0c5a9468b0abf129b6571eaa79af22fcdf474dce2c0d9fd1e88981",
+      "source": "/tmp/tdb-device-feedback-independent-d21c13aa-8b19-48dc-998f-446b5ed621f1/real-qualification.json"
+    },
+    {
+      "name": "independent-legacy-manual-recorded.json",
+      "bytes": 4167,
+      "sha256": "e62587efaa2f1fefaa0176967b12bd019c2a66d0673fadb11bd09490b912794e",
+      "source": "/tmp/tdb-electrothermal-main-baseline-cb2a4e25-edf9-4611-9ed2-d65e88650964/recorded.json"
+    },
+    {
+      "name": "independent-legacy-manual-linear.json",
+      "bytes": 4230,
+      "sha256": "9907ff4798d4899da394250684e3e78c3501e5500370208bed308415480d24f8",
+      "source": "/tmp/tdb-electrothermal-main-baseline-cb2a4e25-edf9-4611-9ed2-d65e88650964/linear-temperature-estimate.json"
+    }
+  ]
+}

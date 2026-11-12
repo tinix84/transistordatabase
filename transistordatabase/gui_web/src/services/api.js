@@ -146,9 +146,15 @@ export const matApi = {
   async calculate(request) { return (await api.post('/api/mat/calculate', request)).data },
 }
 
+export const deviceThermalApi = {
+  async inventory(id) { return (await api.get(`/api/thermal/device/inventory/${encodeURIComponent(id)}`)).data },
+  async analyze(request) { return (await api.post('/api/thermal/device/analyze', request)).data },
+}
+
 export const thermalApi = {
   async analyze(request) {
-    return (await api.post('/api/thermal/analyze', request)).data
+    const config = typeof request === 'string' ? { headers: { 'Content-Type': 'application/json' }, transformRequest: [value => value] } : undefined
+    return (await api.post('/api/thermal/analyze', request, config)).data
   }
 }
 
@@ -162,7 +168,8 @@ export const assemblyApi = {
 export const waveformApi = {
   async allocate(request) { return reviewPost('/api/waveform/gate-allocation', request) },
   async analyze(request) {
-    return (await api.post('/api/waveform/analyze', request)).data
+    const config = typeof request === 'string' ? { headers: { 'Content-Type': 'application/json' }, transformRequest: [value => value] } : undefined
+    return (await api.post('/api/waveform/analyze', request, config)).data
   },
 }
 
@@ -430,7 +437,8 @@ export const transistorApi = {
 
   // Topology calculations and Python-generated sweeps
   async calculateTopology(params) {
-    const response = await api.post('/api/topology/calculate', params)
+    const endpoint = params.mode === 'switching-loss-balanced' && params.sweep ? '/api/topology/switching-frequency-grid' : '/api/topology/calculate'
+    const response = await api.post(endpoint, params)
     return response.data
   },
 
@@ -440,7 +448,8 @@ export const transistorApi = {
   },
 
     async calculateTopologyPareto(params) {
-      const response = await api.post('/api/topology/pareto', params)
+      const endpoint = params.boundary?.mode === 'switching-loss-balanced' ? '/api/topology/switching-frequency-pareto' : '/api/topology/pareto'
+      const response = await api.post(endpoint, params)
       return response.data
     },
 
