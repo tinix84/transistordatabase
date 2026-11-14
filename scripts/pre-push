@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Check documentation without changing files in the checkout.
+set -e
+
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
+export PYTHONDONTWRITEBYTECODE=1
+
+log_info() {
+    printf '[PRE-PUSH] %s\n' "$1"
+}
+
+log_warn() {
+    printf '[PRE-PUSH] WARNING: %s\n' "$1"
+}
+
+# Report a version mismatch. Update version text before committing, not pushing.
+if command -v python3 >/dev/null 2>&1; then
+    python3 - <<'PYTHON'
+from pathlib import Path
+import re
+
+setup = Path("setup.py")
+readme = Path("README.md")
+if setup.is_file() and readme.is_file():
+    version = re.search(r"\bversion\s*=\s*['\"]([^'\"]+)['\"]", setup.read_text())
+    documented = re.search(r"<!-- Version: ([^ ]+) -->", readme.read_text())
+    if version and documented and version[1] != documented[1]:
+        print("[PRE-PUSH] WARNING: README version differs from setup.py. "
+              "Update and commit the version text separately.")
+PYTHON
+else
+    log_warn "python3 is unavailable; the README version check was skipped."
+fi
+
+# Use a fresh directory outside the checkout. Retain output for inspection.
+if command -v mkdocs >/dev/null 2>&1; then
+    build_dir=$(mktemp -d /tmp/transistordatabase-docs.XXXXXXXX)
+    log_info "Building MkDocs documentation in $build_dir/site"
+    if XDG_CACHE_HOME="$build_dir/cache" MPLCONFIGDIR="$build_dir/matplotlib" \
+        mkdocs build --quiet --site-dir "$build_dir/site" \
+        >"$build_dir/build.log" 2>&1; then
+        log_info "MkDocs build completed. Output and log remain in $build_dir"
+    else
+        log_warn "MkDocs build failed; push continues. See $build_dir/build.log"
+    fi
+else
+    log_warn "mkdocs is unavailable; the documentation build was skipped."
+fi
+
+log_info "Pre-push checks completed."

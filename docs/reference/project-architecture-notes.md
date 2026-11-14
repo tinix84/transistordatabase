@@ -120,9 +120,11 @@ The repository includes hooks in `.git/hooks/`:
 4. **Prompts for changelog** entry when `transistordatabase/*.py` files are modified
 
 **`pre-push`** — runs automatically before each push:
-1. **Syncs version** from `setup.py` into `README.md` `<!-- Version: X.Y.Z -->` comment
-2. **Updates timestamps** in CLAUDE.md, docs/PRD.md, README.md
-3. **Builds MkDocs** site (non-blocking if mkdocs not installed)
+1. **Checks the version** in `setup.py` against the README version comment without changing either file
+2. **Builds MkDocs** in a fresh directory under `/tmp`, outside the checkout
+3. **Retains build output and logs** for inspection. Build failures remain non-blocking.
+
+The maintained hook is `scripts/pre-push`. See [the installation instructions](../development/docs.md#pre-push-checks).
 
 To bypass hooks (not recommended):
 ```bash
