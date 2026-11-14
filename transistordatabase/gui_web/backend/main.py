@@ -40,6 +40,7 @@ from transistordatabase.gui_web.backend.device_electrothermal_routes import (
 )
 from transistordatabase.gui_web.backend.gate_charge_routes import router as gate_charge_router
 from transistordatabase.gui_web.backend.boost_grid_routes import router as boost_grid_router
+from transistordatabase.gui_web.backend.native_waveform_routes import router as native_waveform_router
 
 from transistordatabase.backend.concrete_services import (
     ConcreteServiceFactory,
@@ -327,6 +328,7 @@ _loader = JsonTransistorLoader()
 app.dependency_overrides[plecs_repository] = lambda: _repo
 app.dependency_overrides[native_thermal_repository] = lambda: _repo
 app.include_router(device_thermal_router)
+app.include_router(native_waveform_router)
 
 # Default switching pairs directory
 _default_pairs_dir = Path(__file__).resolve().parent.parent.parent.parent / "switching_pairs"

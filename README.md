@@ -1,4 +1,4 @@
-<!-- Last modified: 2026-11-12 -->
+<!-- Last modified: 2026-11-14 -->
 <!-- Version: 1.0.1 -->
 
 # Transistor Database
@@ -76,6 +76,20 @@ npm run dev
 
 # Open browser: http://localhost:5174
 ```
+
+### Native device waveform evaluation
+
+Send a supplied per-device waveform to `POST /api/waveform/native/analyze`.
+The JSON envelope contains `device_id`, `selection`, and `case`.
+Use seconds, amperes, and volts for aligned samples. Supply the imposed temperature in kelvin.
+Select native curve indices and their exact conditions for each requested loss term.
+The response contains the same evaluation record as the Python operation, including source snapshots and content hashes.
+
+Python callers can use `prepare_native_waveform_request` and `evaluate_native_waveform`
+from `transistordatabase.native_waveform` with an already loaded core device.
+See [the version 1 contract](https://github.com/tinix84/transistordatabase/issues/27) for all input fields and limits.
+Conduction and switching losses use the complete supplied time interval.
+The result covers the declared device loss terms. It does not calculate converter efficiency or junction temperature.
 
 ### Transistor Database File Exchange
 
