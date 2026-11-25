@@ -124,11 +124,11 @@ function showRequest() {
 
 <template>
   <section class="waveform-workbench">
-    <header><p class="eyebrow">Signed time-domain analysis</p><h2>Waveform workbench</h2>
+    <header><h2>Waveform workbench</h2>
       <p>Integrate arbitrary sampled current with explicit forward/reverse models, then inspect each switching event and its source conditions.</p></header>
     <div class="intro"><strong>All data use SI units.</strong> Current and duty are piecewise linear. Gate signals detect events; they do not mask conduction. Missing direction data rejects the calculation. Estimates require your explicit selection.</div>
     <form @submit.prevent="calculate">
-      <section class="panel">
+      <section class="panel sample-panel">
         <h3>1. Waveform samples</h3>
         <p>Use numeric unquoted CSV/TSV fields. Required columns: <code>time_s,current_a</code>. Optional: <code>gate_v,device_voltage_v,bus_voltage_v,duty,turn_on,turn_off</code>. Device voltage and switching bus voltage are separate quantities. Mask columns contain N−1 boolean intervals (0/1); leave their final row blank.</p>
         <div class="actions"><label>Import numeric CSV<input type="file" accept=".csv,.tsv,.txt" @change="importCsv"></label><button type="button" @click="loadSwitchingFixture">Load independent switching fixture</button></div>
@@ -138,36 +138,40 @@ function showRequest() {
         <div class="columns"><label>Constant switching bus (V), if no bus column<input v-model="input.bus" type="number" step="any" placeholder="Unknown / not supplied"></label>
           <label>Constant conduction duty, if no duty column<input v-model.number="input.duty" type="number" min="0" max="1" step="any"></label></div>
       </section>
-      <section class="panel">
-        <h3>2. Conduction by current direction</h3>
-        <label class="check"><input v-model="input.conductionOmit" type="checkbox"> Explicitly omit conduction</label>
-        <label v-if="input.conductionOmit">Reason for omitting conduction<input v-model="input.conductionReason"></label>
-        <div v-else class="columns"><WaveformModelEditor v-model="input.positive" title="Positive-current conduction"/><WaveformModelEditor v-model="input.negative" title="Negative-current conduction"/></div>
-      </section>
-      <section class="panel">
-        <h3>3. Switching evidence and independent energy models</h3>
-        <label>Event policy<select v-model="input.eventMode" aria-label="Event policy"><option value="gate">Gate &gt; threshold (equality is low)</option><option value="hysteresis">Hysteresis: strict crossings and deadband hold</option><option value="masks">Explicit interval masks from CSV</option><option value="omitted">Explicitly omit event detection</option></select></label>
-        <label v-if="input.eventMode === 'gate'">Gate threshold (V)<input v-model.number="input.threshold" type="number" step="any"></label>
-        <HysteresisGateControls v-if="input.eventMode === 'hysteresis'" v-model="input.hysteresis" label="Switching event"/>
-        <label v-if="input.eventMode === 'omitted'">Reason for omitting event detection<input v-model="input.eventReason"></label>
-        <p>Every event uses sample i before the transition bracket [i, i+1]. No initial or wrapped event is invented. E(0) remains finite when recorded. No nearest-temperature lookup, clamping or automatic ZVS energy reduction is applied.</p>
-        <template v-for="side in ['on', 'off']" :key="side">
-          <h4>{{ side === 'on' ? 'Turn-on energy' : 'Turn-off energy' }}</h4>
-          <label class="check"><input v-model="input[side + 'Omit']" type="checkbox"> Explicitly omit {{ side === 'on' ? 'turn-on' : 'turn-off' }} losses</label>
-          <label v-if="input[side + 'Omit']">Omission reason<input v-model="input[side + 'Reason']"></label>
-          <div v-else class="columns"><WaveformModelEditor v-model="input[side + 'Positive']" :title="`Positive-current turn-${side}`" energy/><WaveformModelEditor v-model="input[side + 'Negative']" :title="`Negative-current turn-${side}`" energy/></div>
-        </template>
-      </section>
-      <section class="panel">
-        <h3>4. Optional spectrum and reproducible request</h3>
-        <label class="check"><input v-model="input.fft" type="checkbox"> Compute uniform-sample FFT (reject irregular sampling)</label>
-        <div v-if="input.fft" class="columns"><label>FFT window<select v-model="input.window"><option value="rectangular">Rectangular</option><option value="hann">Hann</option></select></label><label>Detrending<select v-model="input.detrend"><option value="none">None</option><option value="mean">Subtract sample mean</option></select></label></div>
-        <label v-if="input.fft">Current harmonic threshold (fraction of maximum amplitude)<input v-model="input.harmonicThreshold" type="number" min="0" max="1" step="any" aria-label="Current harmonic threshold"></label>
-        <SpectrumAnalysisControls v-if="input.fft" v-model="input.spectralAnalysis"/>
-        <details><summary>Advanced: inspect or supply the canonical JSON request</summary><button type="button" @click="showRequest">Copy form into request editor</button><label class="check"><input v-model="input.advanced" type="checkbox"> Use JSON editor as calculation input</label><label>Canonical request<textarea v-model="input.json" rows="12" spellcheck="false"></textarea></label></details>
-      </section>
-      <button type="submit" class="primary" :disabled="busy">{{ busy ? 'Calculating…' : 'Calculate waveform losses' }}</button>
-      <p v-if="error" role="alert" class="error">{{ error }}</p><p v-if="stale && !result" role="status">Inputs changed. Calculate again to show current results.</p>
+      <div class="analysis-settings">
+        <section class="panel">
+          <h3>2. Conduction by current direction</h3>
+          <label class="check"><input v-model="input.conductionOmit" type="checkbox"> Explicitly omit conduction</label>
+          <label v-if="input.conductionOmit">Reason for omitting conduction<input v-model="input.conductionReason"></label>
+          <div v-else class="columns"><WaveformModelEditor v-model="input.positive" title="Positive-current conduction"/><WaveformModelEditor v-model="input.negative" title="Negative-current conduction"/></div>
+        </section>
+        <section class="panel">
+          <h3>3. Switching evidence and independent energy models</h3>
+          <label>Event policy<select v-model="input.eventMode" aria-label="Event policy"><option value="gate">Gate &gt; threshold (equality is low)</option><option value="hysteresis">Hysteresis: strict crossings and deadband hold</option><option value="masks">Explicit interval masks from CSV</option><option value="omitted">Explicitly omit event detection</option></select></label>
+          <label v-if="input.eventMode === 'gate'">Gate threshold (V)<input v-model.number="input.threshold" type="number" step="any"></label>
+          <HysteresisGateControls v-if="input.eventMode === 'hysteresis'" v-model="input.hysteresis" label="Switching event"/>
+          <label v-if="input.eventMode === 'omitted'">Reason for omitting event detection<input v-model="input.eventReason"></label>
+          <p>Every event uses sample i before the transition bracket [i, i+1]. No initial or wrapped event is invented. E(0) remains finite when recorded. No nearest-temperature lookup, clamping or automatic ZVS energy reduction is applied.</p>
+          <template v-for="side in ['on', 'off']" :key="side">
+            <h4>{{ side === 'on' ? 'Turn-on energy' : 'Turn-off energy' }}</h4>
+            <label class="check"><input v-model="input[side + 'Omit']" type="checkbox"> Explicitly omit {{ side === 'on' ? 'turn-on' : 'turn-off' }} losses</label>
+            <label v-if="input[side + 'Omit']">Omission reason<input v-model="input[side + 'Reason']"></label>
+            <div v-else class="columns"><WaveformModelEditor v-model="input[side + 'Positive']" :title="`Positive-current turn-${side}`" energy/><WaveformModelEditor v-model="input[side + 'Negative']" :title="`Negative-current turn-${side}`" energy/></div>
+          </template>
+        </section>
+        <section class="panel">
+          <h3>4. Optional spectrum and reproducible request</h3>
+          <label class="check"><input v-model="input.fft" type="checkbox"> Compute uniform-sample FFT (reject irregular sampling)</label>
+          <div v-if="input.fft" class="columns"><label>FFT window<select v-model="input.window"><option value="rectangular">Rectangular</option><option value="hann">Hann</option></select></label><label>Detrending<select v-model="input.detrend"><option value="none">None</option><option value="mean">Subtract sample mean</option></select></label></div>
+          <label v-if="input.fft">Current harmonic threshold (fraction of maximum amplitude)<input v-model="input.harmonicThreshold" type="number" min="0" max="1" step="any" aria-label="Current harmonic threshold"></label>
+          <SpectrumAnalysisControls v-if="input.fft" v-model="input.spectralAnalysis"/>
+          <details><summary>Advanced: inspect or supply the canonical JSON request</summary><button type="button" @click="showRequest">Copy form into request editor</button><label class="check"><input v-model="input.advanced" type="checkbox"> Use JSON editor as calculation input</label><label>Canonical request<textarea v-model="input.json" rows="12" spellcheck="false"></textarea></label></details>
+        </section>
+      </div>
+      <div class="run-controls">
+        <button type="submit" class="primary" :disabled="busy">{{ busy ? 'Calculating…' : 'Calculate waveform losses' }}</button>
+        <p v-if="error" role="alert" class="error">{{ error }}</p><p v-if="stale && !result" role="status">Inputs changed. Calculate again to show current results.</p>
+      </div>
     </form>
     <GateAllocationPanel :parse-samples="parseCsv" :sample-revision="input.csv" :provenance="{ source: input.waveformSource || null, calibration_notes: input.calibrationNotes || null, imported_filename: input.importedFilename || null, edited_after_import: input.importedEdited }"/>
     <WaveformAnalysisView v-if="result" :result="result" @thermal-handoff="emit('thermal-handoff', $event)"/>
@@ -175,16 +179,82 @@ function showRequest() {
 </template>
 
 <style scoped>
-.waveform-workbench { max-width: 1440px; margin: auto; padding: 1.25rem; color: #1e293b; }
-h2 { font-size: 2rem; margin: .3rem 0; } .eyebrow { color: #0369a1; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
-p { line-height: 1.6; } .intro { background: #e0f2fe; border-left: 4px solid #0284c7; padding: 1rem; border-radius: 5px; }
-.panel { background: #f8fafc; border: 1px solid #cbd5e1; padding: 1.2rem; border-radius: 12px; margin: 1rem 0; min-width: 0; }
-label { display: grid; gap: .4rem; margin: .6rem 0; } label.check { display: flex; align-items: baseline; gap: .5rem; }
-input:not([type=checkbox]), select, textarea { width: 100%; box-sizing: border-box; min-width: 0; border: 1px solid #94a3b8; padding: .6rem; border-radius: 6px; font: inherit; }
-textarea { font-family: ui-monospace, monospace; } .columns, .plots { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
-button { border: 1px solid #94a3b8; border-radius: 6px; padding: .65rem .9rem; background: #fff; color: #0f172a; cursor: pointer; font: inherit; } button:disabled { opacity: .5; cursor: default; }
-.primary { background: #0369a1; color: white; border-color: #0369a1; font-weight: 700; }.actions { display: flex; flex-wrap: wrap; align-items: center; gap: .7rem; }
-.error { color: #991b1b; background: #fee2e2; padding: 1rem; overflow-wrap: anywhere; } .table-scroll { overflow-x: auto; max-width: 100%; }
-table { width: 100%; border-collapse: collapse; background: white; } th, td { text-align: left; padding: .7rem; border-bottom: 1px solid #cbd5e1; vertical-align: top; } pre { white-space: pre-wrap; overflow-wrap: anywhere; } code { overflow-wrap: anywhere; } summary { cursor: pointer; padding: .5rem 0; }
-@media(max-width: 780px) { .columns, .plots { grid-template-columns: 1fr; } .waveform-workbench { padding: .5rem; } .panel { padding: .8rem; } h2 { font-size: 1.6rem; } }
+.waveform-workbench {
+  max-width: 1600px;
+  margin: auto;
+  padding: .85rem;
+  color: var(--text-primary);
+  font-size: .85rem;
+}
+
+h2 { font-size: 1.25rem; }
+header p { color: var(--text-secondary); }
+.intro {
+  margin: .6rem 0;
+  padding: .5rem .65rem;
+  border-left: 3px solid var(--accent-blue);
+  background: var(--accent-blue-light);
+}
+
+form { display: grid; gap: .65rem; align-items: start; }
+.analysis-settings { display: grid; gap: .65rem; min-width: 0; }
+.panel {
+  min-width: 0;
+  padding: .65rem .75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background: var(--bg-secondary);
+}
+
+.panel h3 {
+  margin: -.65rem -.75rem .55rem;
+  padding: .38rem .75rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  font-size: .88rem;
+}
+
+.panel p { color: var(--text-secondary); overflow-wrap: anywhere; }
+.panel code { padding: 0 .12rem; }
+label { display: grid; gap: .24rem; margin: .42rem 0; min-width: 0; }
+label.check { display: flex; align-items: baseline; gap: .35rem; }
+input:not([type=checkbox]), select, textarea {
+  width: 100%;
+  min-width: 0;
+  padding: .36rem .45rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+textarea { resize: vertical; font-family: ui-monospace, monospace; }
+.columns { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .5rem; }
+.actions, .run-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem; }
+button {
+  padding: .33rem .55rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  font: inherit;
+}
+
+button:hover:not(:disabled) { border-color: var(--accent-blue); }
+button:disabled { opacity: .5; cursor: default; }
+.primary { background: var(--action-bg); color: white; border-color: var(--action-bg); font-weight: 600; }
+.primary:hover:not(:disabled) { background: var(--action-hover); }
+.error { color: #991b1b; background: #fee2e2; padding: .45rem .65rem; overflow-wrap: anywhere; }
+summary { cursor: pointer; padding: .35rem 0; }
+
+@media (min-width: 1050px) {
+  form { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+  .run-controls { grid-column: 1 / -1; }
+}
+
+@media (max-width: 580px) {
+  .columns { grid-template-columns: minmax(0, 1fr); }
+}
 </style>

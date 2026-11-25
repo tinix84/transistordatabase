@@ -97,14 +97,14 @@ onBeforeUnmount(() => {
 
 onMounted(async () => {
   console.log('[App.vue] Component mounted, loading transistors...')
-  await loadTransistors()
-  console.log('[App.vue] Transistors loaded, count:', transistors.value.length)
   // Load theme preference
   const savedTheme = localStorage.getItem('darkTheme')
   if (savedTheme !== null) {
     isDarkTheme.value = JSON.parse(savedTheme)
   }
   applyTheme()
+  await loadTransistors()
+  console.log('[App.vue] Transistors loaded, count:', transistors.value.length)
   console.log('[App.vue] Initialization complete')
 })
 
@@ -275,138 +275,149 @@ function handleOpenDatabaseSearch() {
 </script>
 
 <template>
-  <div id="app" :class="{ 'dark-theme': isDarkTheme }">
-    <!-- Contact Links Header -->
-    <div class="contact-header">
-      <div class="contact-links">
-        <a href="https://linkedin.com/in/your-profile" target="_blank" title="LinkedIn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+  <div class="app-shell" :class="{ 'dark-theme': isDarkTheme }">
+    <div class="app-toolbar">
+      <header class="app-header">
+        <h1>Transistor Database</h1>
+        <div class="stats">
+          <span>Total Transistors: {{ transistors.length }}</span>
+          <span v-if="selectedTransistor" class="selected-device" :title="selectedTransistor.metadata.name">
+            Selected: {{ selectedTransistor.metadata.name }}
+          </span>
+        </div>
+      </header>
+      <div class="contact-header">
+        <div class="contact-links">
+          <a href="https://linkedin.com/in/your-profile" target="_blank" title="LinkedIn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+            LinkedIn
+          </a>
+          <a href="https://discord.gg/your-server" target="_blank" title="Discord">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.010c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+            </svg>
+            Discord
+          </a>
+          <a href="https://github.com/tinix84/transistordatabase" target="_blank" title="GitHub">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            GitHub
+          </a>
+        </div>
+        <button @click="toggleTheme" class="theme-toggle" :title="isDarkTheme ? 'Switch to Light Theme' : 'Switch to Dark Theme'">
+          <svg v-if="isDarkTheme" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/>
           </svg>
-          LinkedIn
-        </a>
-        <a href="https://discord.gg/your-server" target="_blank" title="Discord">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.010c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+          <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/>
           </svg>
-          Discord
-        </a>
-        <a href="https://github.com/tinix84/transistordatabase" target="_blank" title="GitHub">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-          </svg>
-          GitHub
-        </a>
+        </button>
       </div>
-      <button @click="toggleTheme" class="theme-toggle" :title="isDarkTheme ? 'Switch to Light Theme' : 'Switch to Dark Theme'">
-        <svg v-if="isDarkTheme" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/>
-        </svg>
-        <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/>
-        </svg>
-      </button>
-    </div>
 
-    <header class="app-header">
-      <h1>🔌 Transistor Database - Web Interface</h1>
-      <div class="stats">
-        <span>📊 Total Transistors: {{ transistors.length }}</span>
-        <span v-if="selectedTransistor">| 🎯 Selected: {{ selectedTransistor.metadata.name }}</span>
-      </div>
-    </header>
-
-    <nav class="main-nav sticky-nav">
-      <button
-        @click="showSearch"
-        :class="{ active: currentView === 'search' }"
-        class="nav-btn"
-      >
-        Search Database
-      </button>
-      <button
-        @click="showCreate"
-        :class="{ active: currentView === 'create' }"
-        class="nav-btn"
-      >
-        Create/Edit
-      </button>
-      <button
-        @click="showExport"
-        :class="{ active: currentView === 'export' }"
-        class="nav-btn"
-      >
-        Export
-      </button>
-      <button
-        @click="showComparison"
-        :class="{ active: currentView === 'compare' }"
-        class="nav-btn"
-      >
-        Compare
-      </button>
-      <button
-        @click="showAdvancedComparison"
-        :class="{ active: currentView === 'compare-advanced' }"
-        class="nav-btn"
-      >
-        Advanced Compare
-      </button>
-      <button
-        @click="showTopology"
-        :class="{ active: currentView === 'topology' }"
-        class="nav-btn"
-      >
-        Topology
-      </button>
-      <button
-        @click="showDatabaseBackup"
-        :class="{ active: currentView === 'database-backup' }"
-        class="nav-btn"
-      >
-        Database Backup
-      </button>
-      <button @click="currentView = 'catalog-fom'" :class="{ active: currentView === 'catalog-fom' }" class="nav-btn">
-        FOM &amp; Pareto
-      </button>
-      <button @click="currentView = 'catalog-sources'" :class="{ active: currentView === 'catalog-sources' }" class="nav-btn">Catalog source import</button>
-      <button @click="currentView = 'legacy-mat'" :class="{ active: currentView === 'legacy-mat' }" class="nav-btn">Legacy MAT</button>
-      <button @click="currentView = 'measurements'" :class="{ active: currentView === 'measurements' }" class="nav-btn">Measurement import</button>
-      <div class="nav-dropdown">
+      <nav class="main-nav" aria-label="Workspaces">
         <button
-          ref="moreMenuTrigger"
-          @click="toggleMoreMenu"
-          :aria-expanded="showMoreMenu" aria-controls="more-tools-popup" aria-haspopup="true"
-          :class="{ active: ['plecs-import', 'plecs-data', 'analytical', 'dpt', 'batch-export', 'waveform', 'thermal', 'analysis-grid', 'energy-map', 'assemblies', 'converter', 'digitizer', 'stress-indices'].includes(currentView) }"
+          @click="showSearch"
+          :class="{ active: currentView === 'search' }"
           class="nav-btn"
         >
-          More Tools ▾
+          Search Database
         </button>
-        <Teleport to="body"><div v-if="showMoreMenu" ref="moreMenuPopup" id="more-tools-popup" class="dropdown-menu" :style="moreMenuStyle" aria-label="More tools">
-          <button @click="currentView = 'waveform'; showMoreMenu = false" class="dropdown-item">Waveform workbench</button>
-          <button @click="currentView = 'stress-indices'; showMoreMenu = false" class="dropdown-item">Semiconductor stress indices</button>
-          <button @click="currentView = 'analysis-grid'; showMoreMenu = false" class="dropdown-item">Analysis grid</button>
-          <button @click="currentView = 'energy-map'; showMoreMenu = false" class="dropdown-item">Energy map</button>
-          <button @click="currentView = 'digitizer'; showMoreMenu = false" class="dropdown-item">Image digitizer</button>
-          <button @click="currentView = 'thermal'; showMoreMenu = false" class="dropdown-item">Thermal workbench</button>
-          <button @click="currentView = 'assemblies'; showMoreMenu = false" class="dropdown-item">Semiconductor assemblies</button>
-          <button @click="currentView = 'converter'; showMoreMenu = false" class="dropdown-item">Converter loss workbench</button>
-          <button @click="currentView = 'plecs-data'; showMoreMenu = false" class="dropdown-item">PLECS data workbench</button>
-          <button @click="showPLECSImport(); showMoreMenu = false" class="dropdown-item">
-            PLECS Import
+        <button
+          @click="showCreate"
+          :class="{ active: currentView === 'create' }"
+          class="nav-btn"
+        >
+          Create/Edit
+        </button>
+        <button
+          @click="showExport"
+          :class="{ active: currentView === 'export' }"
+          class="nav-btn"
+        >
+          Export
+        </button>
+        <button
+          @click="showComparison"
+          :class="{ active: currentView === 'compare' }"
+          class="nav-btn"
+        >
+          Compare
+        </button>
+        <button
+          @click="showAdvancedComparison"
+          :class="{ active: currentView === 'compare-advanced' }"
+          class="nav-btn"
+        >
+          Advanced Compare
+        </button>
+        <button
+          @click="showTopology"
+          :class="{ active: currentView === 'topology' }"
+          class="nav-btn"
+        >
+          Topology
+        </button>
+        <button
+          @click="showDatabaseBackup"
+          :class="{ active: currentView === 'database-backup' }"
+          class="nav-btn"
+        >
+          Database Backup
+        </button>
+        <button @click="currentView = 'catalog-fom'" :class="{ active: currentView === 'catalog-fom' }" class="nav-btn">
+          FOM &amp; Pareto
+        </button>
+        <button @click="currentView = 'catalog-sources'" :class="{ active: currentView === 'catalog-sources' }" class="nav-btn">Catalog source import</button>
+        <button @click="currentView = 'legacy-mat'" :class="{ active: currentView === 'legacy-mat' }" class="nav-btn">Legacy MAT</button>
+        <button @click="currentView = 'measurements'" :class="{ active: currentView === 'measurements' }" class="nav-btn">Measurement import</button>
+        <div class="nav-dropdown">
+          <button
+            ref="moreMenuTrigger"
+            @click="toggleMoreMenu"
+            :aria-expanded="showMoreMenu" aria-controls="more-tools-popup" aria-haspopup="true"
+            :class="{ active: ['plecs-import', 'plecs-data', 'analytical', 'dpt', 'batch-export', 'waveform', 'thermal', 'analysis-grid', 'energy-map', 'assemblies', 'converter', 'digitizer', 'stress-indices'].includes(currentView) }"
+            class="nav-btn"
+          >
+            More Tools <span aria-hidden="true">▾</span>
           </button>
-          <button @click="showAnalytical(); showMoreMenu = false" class="dropdown-item">
-            Analytical Models
-          </button>
-          <button @click="showDPT(); showMoreMenu = false" class="dropdown-item">
-            DPT Manager
-          </button>
-          <button @click="showBatchExport(); showMoreMenu = false" class="dropdown-item">
-            Batch Export
-          </button>
-        </div></Teleport>
-      </div>
-    </nav>
+          <Teleport to="body"><div v-if="showMoreMenu" ref="moreMenuPopup" id="more-tools-popup" class="dropdown-menu" :style="moreMenuStyle" aria-label="More tools">
+            <div class="dropdown-group" role="group" aria-label="Analysis">
+              <p class="dropdown-heading" aria-hidden="true">Analysis</p>
+              <button @click="currentView = 'waveform'; showMoreMenu = false" class="dropdown-item">Waveform workbench</button>
+              <button @click="currentView = 'stress-indices'; showMoreMenu = false" class="dropdown-item">Semiconductor stress indices</button>
+              <button @click="currentView = 'analysis-grid'; showMoreMenu = false" class="dropdown-item">Analysis grid</button>
+              <button @click="currentView = 'energy-map'; showMoreMenu = false" class="dropdown-item">Energy map</button>
+              <button @click="currentView = 'thermal'; showMoreMenu = false" class="dropdown-item">Thermal workbench</button>
+              <button @click="currentView = 'assemblies'; showMoreMenu = false" class="dropdown-item">Semiconductor assemblies</button>
+              <button @click="currentView = 'converter'; showMoreMenu = false" class="dropdown-item">Converter loss workbench</button>
+              <button @click="showAnalytical(); showMoreMenu = false" class="dropdown-item">
+                Analytical Models
+              </button>
+            </div>
+            <div class="dropdown-group" role="group" aria-label="Data and models">
+              <p class="dropdown-heading" aria-hidden="true">Data and models</p>
+              <button @click="currentView = 'digitizer'; showMoreMenu = false" class="dropdown-item">Image digitizer</button>
+              <button @click="currentView = 'plecs-data'; showMoreMenu = false" class="dropdown-item">PLECS data workbench</button>
+              <button @click="showDPT(); showMoreMenu = false" class="dropdown-item">
+                DPT Manager
+              </button>
+            </div>
+            <div class="dropdown-group" role="group" aria-label="Import and export">
+              <p class="dropdown-heading" aria-hidden="true">Import and export</p>
+              <button @click="showPLECSImport(); showMoreMenu = false" class="dropdown-item">
+                PLECS Import
+              </button>
+              <button @click="showBatchExport(); showMoreMenu = false" class="dropdown-item">
+                Batch Export
+              </button>
+            </div>
+          </div></Teleport>
+        </div>
+      </nav>
+    </div>
 
     <div
       v-if="operationMessage"
@@ -523,54 +534,7 @@ function handleOpenDatabaseSearch() {
 </template>
 
 <style>
-/* Global styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background: #f5f5f5;
-  transition: all 0.3s ease;
-}
-
-/* Dark Theme Variables */
-:root {
-  --bg-primary: #f5f5f5;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f8f9fa;
-  --text-primary: #333;
-  --text-secondary: #666;
-  --text-muted: #999;
-  --border-color: #e1e5e9;
-  --shadow: rgba(0,0,0,0.1);
-  --accent-blue: #007bff;
-  --accent-blue-light: #f8f9ff;
-}
-
-.dark-theme {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2d2d2d;
-  --bg-tertiary: #3a3a3a;
-  --text-primary: #e0e0e0;
-  --text-secondary: #b0b0b0;
-  --text-muted: #888;
-  --border-color: #404040;
-  --shadow: rgba(0,0,0,0.3);
-  --accent-blue: #4a9eff;
-  --accent-blue-light: #1a2332;
-}
-
-.dark-theme body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-}
-
-#app {
+.app-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -580,122 +544,127 @@ body {
 </style>
 
 <style scoped>
-.contact-header {
-  background: var(--bg-tertiary);
-  border-bottom: 1px solid var(--border-color);
-  padding: 0.5rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.app-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   position: sticky;
   top: 0;
   z-index: 200;
-}
-
-.contact-links {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.contact-links a {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 0.85rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-
-.contact-links a:hover {
-  color: var(--accent-blue);
-  background: var(--accent-blue-light);
-}
-
-.theme-toggle {
-  background: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  padding: 0.5rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.theme-toggle:hover {
-  background: var(--accent-blue-light);
-  color: var(--accent-blue);
-  border-color: var(--accent-blue);
-}
-
-.app-header {
-  background: linear-gradient(135deg, var(--accent-blue) 0%, #0056b3 100%);
-  color: white;
-  padding: 1rem 2rem;
-  box-shadow: 0 4px 6px var(--shadow);
-}
-
-.app-header h1 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.8rem;
-  font-weight: 600;
-}
-
-.stats {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.9rem;
-  opacity: 0.9;
-}
-
-.sticky-nav {
-  position: sticky;
-  top: 50px; /* Adjust based on contact header height */
-  z-index: 150;
-}
-
-.main-nav {
   background: var(--bg-secondary);
-  padding: 0 2rem;
-  box-shadow: 0 2px 4px var(--shadow);
-  display: flex;
-  gap: 0;
-  overflow-x: auto;
   border-bottom: 1px solid var(--border-color);
 }
 
-.nav-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  padding: 1rem 1.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  font-size: 0.9rem;
-  border-bottom: 3px solid transparent;
+.app-header,
+.contact-header,
+.contact-links,
+.stats {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  min-width: 0;
+}
+
+.app-header,
+.contact-header {
+  padding: .4rem .85rem;
+}
+
+.app-header h1 {
+  font-size: 1rem;
+  font-weight: 700;
   white-space: nowrap;
-  min-width: fit-content;
+}
+
+.stats {
+  padding-left: .75rem;
+  border-left: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: .75rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.selected-device {
+  max-width: 15rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: ui-monospace, monospace;
+}
+
+.contact-links a,
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: .22rem .35rem;
+  font-size: .75rem;
+  text-decoration: none;
+}
+
+.theme-toggle {
+  border-color: var(--border-color);
+  cursor: pointer;
+}
+
+.contact-links svg,
+.theme-toggle svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.contact-links a:hover,
+.theme-toggle:hover {
+  background: var(--accent-blue-light);
+  color: var(--accent-blue);
+}
+
+.main-nav {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: .18rem;
+  min-width: 0;
+  overflow-x: auto;
+  padding: .25rem .7rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+}
+
+.nav-btn {
+  padding: .32rem .57rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: .8rem;
+  font-weight: 550;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .nav-btn:hover {
-  background: var(--bg-tertiary);
+  background: var(--bg-secondary);
   color: var(--text-primary);
 }
 
 .nav-btn.active {
   color: var(--accent-blue);
-  border-bottom-color: var(--accent-blue);
+  border-color: var(--border-color);
   background: var(--accent-blue-light);
 }
 
 .nav-dropdown {
   position: relative;
+  flex: none;
+  margin-left: .25rem;
+  padding-left: .4rem;
+  border-left: 1px solid var(--border-color);
 }
 
 .dropdown-menu {
@@ -705,27 +674,43 @@ body {
   color: var(--text-primary);
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 0 0 8px 8px;
+  border-radius: 5px;
   box-shadow: 0 4px 12px var(--shadow);
-  min-width: 180px;
   z-index: 500;
+}
+
+.dropdown-group {
+  padding: .3rem;
+}
+
+.dropdown-group + .dropdown-group {
+  border-top: 1px solid var(--border-color);
+}
+
+.dropdown-heading {
+  padding: .35rem .5rem .2rem;
+  color: var(--text-secondary);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
 }
 
 .dropdown-item {
   display: block;
   width: 100%;
-  padding: 0.75rem 1.25rem;
-  border: none;
+  padding: .36rem .5rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   text-align: left;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s;
+  font-size: .8rem;
 }
 
 .dropdown-item:hover {
-  background: var(--bg-tertiary);
+  background: var(--accent-blue-light);
   color: var(--accent-blue);
 }
 
@@ -785,99 +770,28 @@ body {
   max-width: 400px;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .contact-header {
-    padding: 0.5rem 1rem;
-  }
-  
-  .contact-links {
-    gap: 1rem;
-  }
-  
-  .contact-links a {
-    font-size: 0.75rem;
-    padding: 0.25rem;
-  }
-  
-  .contact-links a span {
-    display: none; /* Hide text on mobile, show only icons */
-  }
-  
-  .app-header {
-    padding: 1rem;
-  }
-  
-  .app-header h1 {
-    font-size: 1.4rem;
-  }
-  
-  .stats {
-    flex-direction: column;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-  }
-  
-  .main-nav {
-    padding: 0 1rem;
-  }
-  
-  .nav-btn {
-    padding: 0.75rem 1rem;
-    font-size: 0.8rem;
-  }
-  
-  .sticky-nav {
-    top: 40px;
-  }
+@media (max-width: 700px) {
+  .app-header { flex-wrap: wrap; gap: .15rem .6rem; }
+  .contact-header, .contact-links { gap: .25rem; }
+  .contact-links a { font-size: 0; gap: 0; }
+  .stats { border: 0; padding-left: 0; }
+  .selected-device { display: none; }
 }
 
-@media (max-width: 480px) {
-  .contact-header {
-    padding: 0.25rem 0.75rem;
-  }
-  
-  .app-header {
-    padding: 0.75rem;
-  }
-  
-  .app-header h1 {
-    font-size: 1.2rem;
-  }
-  
-  .main-nav {
-    padding: 0 0.5rem;
-  }
-  
-  .nav-btn {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
-  }
-  
-  .sticky-nav {
-    top: 35px;
-  }
+@media (pointer: coarse) {
+  .nav-btn, .theme-toggle, .contact-links a, .dropdown-item { min-height: 36px; }
 }
 
-/* Accessibility improvements */
-.nav-btn:focus,
-.theme-toggle:focus,
-.contact-links a:focus {
+.nav-btn:focus-visible,
+.dropdown-item:focus-visible,
+.theme-toggle:focus-visible,
+.contact-links a:focus-visible {
   outline: 2px solid var(--accent-blue);
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
-/* Print styles */
 @media print {
-  .contact-header,
-  .app-header,
-  .main-nav {
-    display: none;
-  }
-  
-  .app-main {
-    padding: 0;
-  }
+  .app-toolbar { display: none; }
 }
 </style>
 

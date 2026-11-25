@@ -5,16 +5,18 @@
   font-weight: 400;
   
   /* Light Theme Variables */
-  --bg-primary: #f5f5f5;
+  --bg-primary: #e9eef3;
   --bg-secondary: #ffffff;
-  --bg-tertiary: #f8f9fa;
-  --text-primary: #333;
-  --text-secondary: #666;
-  --text-muted: #999;
-  --border-color: #e1e5e9;
+  --bg-tertiary: #f4f7fa;
+  --text-primary: #182637;
+  --text-secondary: #526174;
+  --text-muted: #657489;
+  --border-color: #cdd7e2;
   --shadow: rgba(0,0,0,0.1);
-  --accent-blue: #007bff;
-  --accent-blue-light: #f8f9ff;
+  --accent-blue: #165e9b;
+  --accent-blue-light: #e5f0fa;
+  --action-bg: #165e9b;
+  --action-hover: #114d81;
   --success-color: #28a745;
   --warning-color: #ffc107;
   --danger-color: #dc3545;
@@ -31,16 +33,16 @@
 
 /* Dark Theme Variables */
 .dark-theme {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2d2d2d;
-  --bg-tertiary: #3a3a3a;
+  --bg-primary: #141b24;
+  --bg-secondary: #1d2733;
+  --bg-tertiary: #253241;
   --text-primary: #e0e0e0;
   --text-secondary: #b0b0b0;
-  --text-muted: #888;
-  --border-color: #404040;
+  --text-muted: #a2afbe;
+  --border-color: #3a4a5c;
   --shadow: rgba(0,0,0,0.3);
-  --accent-blue: #4a9eff;
-  --accent-blue-light: #1a2332;
+  --accent-blue: #86c7fa;
+  --accent-blue-light: #213a52;
   --success-color: #4caf50;
   --warning-color: #ff9800;
   --danger-color: #f44336;
@@ -201,8 +203,6 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -219,12 +219,13 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--accent-blue);
 }
 button:focus,
 button:focus-visible {
@@ -235,30 +236,8 @@ button:focus-visible {
   padding: 2em;
 }
 
-#app {
-  width: 100%;
-  min-width: 0;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-@media (max-width: 600px) {
-  #app {
-    padding: 0.5rem;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
