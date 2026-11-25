@@ -372,7 +372,7 @@ test('keeps the edited route when a selector changes and resets edit state for A
   await expect(editor).toBeVisible()
   await expect(editor.locator('input').nth(0)).toHaveValue('125')
   await editor.getByRole('button', { name: 'Update Curve' }).click()
-  expect(requests.filter(request => request.method === 'PUT')).toEqual([{
+  await expect.poll(() => requests.filter(request => request.method === 'PUT')).toEqual([{
     method: 'PUT',
     path: expectedUpdatePath,
     body: {
@@ -381,6 +381,7 @@ test('keeps the edited route when a selector changes and resets edit state for A
       curve: { graph_v_i: [[0, 10, 20], [0, 2, 4]] }
     }
   }])
+  await expect(editor).toHaveCount(0)
 
   await page.getByRole('button', { name: 'Switch', exact: true }).click()
   await page.locator('.curve-tab-content:visible .curve-card [title="Edit"]').click()
