@@ -784,7 +784,7 @@ watch(filters, () => {
 }
 
 .table-view { overflow-x: auto; }
-.results-table { width: 100%; font-variant-numeric: tabular-nums; }
+.results-table { width: 100%; min-width: 52rem; font-variant-numeric: tabular-nums; }
 
 .results-table th, .results-table td {
   border: 0;
@@ -802,7 +802,7 @@ watch(filters, () => {
 .transistor-name {
   color: var(--accent-blue);
   font: 600 .8rem ui-monospace, monospace;
-  overflow-wrap: anywhere;
+  min-width: 12rem;
 }
 
 .type-badge {

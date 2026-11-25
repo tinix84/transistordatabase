@@ -3,14 +3,14 @@
     <div class="plotter-header">
       <h4>{{ title }}</h4>
       <div class="plotter-actions">
-        <button v-if="allowZoom" @click="toggleZoom" class="btn-icon" title="Toggle Zoom">
-          🔍
+        <button v-if="allowZoom" @click="toggleZoom" class="btn-icon" title="Toggle Zoom" :aria-pressed="zoomEnabled">
+          Zoom
         </button>
         <button v-if="allowZoom" @click="resetZoom" class="btn-icon" title="Reset Zoom">
-          🔄
+          Reset zoom
         </button>
         <button @click="downloadImage" class="btn-icon" title="Download PNG">
-          💾
+          Download PNG
         </button>
       </div>
     </div>
@@ -343,8 +343,9 @@ export default {
 <style scoped>
 .curve-plotter {
   border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 5px;
+  padding: .65rem;
+  min-width: 0;
   background: white;
 }
 
@@ -352,31 +353,35 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: .55rem;
 }
 
 .plotter-header h4 {
   margin: 0;
-  font-size: 16px;
-  color: #333;
+  font-size: .9rem;
+  color: #182637;
 }
 
 .plotter-actions {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: .3rem;
 }
 
 .btn-icon {
   background: none;
   border: 1px solid #ddd;
   border-radius: 4px;
-  padding: 6px 10px;
+  padding: .25rem .45rem;
   cursor: pointer;
-  font-size: 16px;
+  font-size: .78rem;
+  color: #182637;
   transition: all 0.2s;
 }
 
-.btn-icon:hover {
+.btn-icon:hover, .btn-icon[aria-pressed="true"] {
   background: #f0f0f0;
   border-color: #999;
 }

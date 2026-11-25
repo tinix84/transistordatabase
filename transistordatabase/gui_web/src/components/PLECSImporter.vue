@@ -3,7 +3,6 @@
     <h2>PLECS XML Library Importer</h2>
     <p class="description">
       Import transistor data from PLECS XML semiconductor library files.
-      Supports 372+ devices from major manufacturers.
     </p>
 
     <!-- Upload Zone -->
@@ -13,13 +12,12 @@
       @dragover.prevent="isDragging = true"
       @dragleave.prevent="isDragging = false"
       @drop.prevent="handleDrop"
-      @click="triggerFileInput"
     >
-      <div class="upload-icon">📁</div>
       <p class="upload-text">
-        <strong>Drop PLECS XML files here</strong> or click to browse
+        <strong>Drop PLECS XML files here</strong>
       </p>
       <p class="upload-subtext">Supports .xml files up to 10MB each</p>
+      <button type="button" class="btn btn-secondary" @click="triggerFileInput">Browse for XML files</button>
       <input
         ref="fileInput"
         type="file"
@@ -39,19 +37,19 @@
           <span class="file-size">{{ formatBytes(file.size) }}</span>
         </div>
         <div class="file-status">
-          <span v-if="file.status === 'pending'" class="status-pending">⏳ Pending</span>
+          <span v-if="file.status === 'pending'" class="status-pending">Pending</span>
           <span v-else-if="file.status === 'uploading'" class="status-uploading">
-            ⏫ Uploading...
+            Uploading...
           </span>
           <span v-else-if="file.status === 'success'" class="status-success">
-            ✅ {{ file.imported }} transistor(s)
+            Imported {{ file.imported }} device(s)
           </span>
           <span v-else-if="file.status === 'error'" class="status-error">
-            ❌ {{ file.error }}
+            Import failed: {{ file.error }}
           </span>
         </div>
         <button v-if="file.status === 'pending'" @click="removeFile(index)" class="btn-remove">
-          🗑️
+          Remove
         </button>
       </div>
     </div>
@@ -61,11 +59,11 @@
       <button
         @click="startImport"
         :disabled="importing || files.every(f => f.status !== 'pending')"
-        class="btn-primary btn-import"
+        class="btn btn-primary btn-import"
       >
         {{ importing ? 'Importing...' : `Import ${pendingCount} file(s)` }}
       </button>
-      <button @click="clearAll" :disabled="importing" class="btn-secondary">
+      <button @click="clearAll" :disabled="importing" class="btn btn-secondary">
         Clear All
       </button>
     </div>
@@ -297,45 +295,40 @@ export default {
 }
 
 h2 {
-  font-size: 24px;
+  font-size: 1.25rem;
   margin-bottom: 10px;
 }
 
 .description {
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 30px;
 }
 
 /* Upload Zone */
 .upload-zone {
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  padding: 60px 20px;
-  text-align: center;
-  cursor: pointer;
+  border: 1px dashed var(--border-color);
+  border-radius: 5px;
+  padding: 1.25rem;
+  text-align: left;
   transition: all 0.3s;
-  background: #f9f9f9;
+  background: var(--bg-secondary);
 }
 
 .upload-zone:hover,
 .upload-zone.drag-over {
-  border-color: #4CAF50;
-  background: #f0fff0;
+  border-color: var(--accent-blue);
+  background: var(--accent-blue-light);
 }
 
-.upload-icon {
-  font-size: 48px;
-  margin-bottom: 15px;
-}
 
 .upload-text {
-  font-size: 16px;
+  font-size: .875rem;
   margin: 0 0 5px 0;
 }
 
 .upload-subtext {
   font-size: 14px;
-  color: #999;
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -357,7 +350,7 @@ h2 {
   border: 1px solid #e0e0e0;
   border-radius: 6px;
   margin-bottom: 10px;
-  background: white;
+  background: var(--bg-secondary);
 }
 
 .file-info {
@@ -370,7 +363,7 @@ h2 {
 }
 
 .file-size {
-  color: #999;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -382,7 +375,7 @@ h2 {
 }
 
 .status-pending {
-  background: #f0f0f0;
+  background: var(--bg-tertiary);
 }
 
 .status-uploading {
@@ -420,21 +413,21 @@ h2 {
 
 .btn-primary,
 .btn-secondary {
-  padding: 12px 24px;
+  padding: .4rem .7rem;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: .875rem;
   cursor: pointer;
   border: none;
   transition: all 0.2s;
 }
 
 .btn-primary {
-  background: #4CAF50;
+  background: var(--action-bg);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #45a049;
+  background: var(--action-hover);
 }
 
 .btn-primary:disabled {
@@ -443,11 +436,11 @@ h2 {
 }
 
 .btn-secondary {
-  background: #f0f0f0;
+  background: var(--bg-tertiary);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #e0e0e0;
+  background: var(--accent-blue-light);
 }
 
 /* Import Results */
@@ -470,16 +463,16 @@ h2 {
 
 .summary-card {
   flex: 1;
-  background: #f9f9f9;
+  background: var(--bg-secondary);
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 5px;
   text-align: center;
 }
 
 .summary-number {
   font-size: 36px;
   font-weight: bold;
-  color: #4CAF50;
+  color: var(--text-primary);
 }
 
 .summary-number.error {
@@ -488,7 +481,7 @@ h2 {
 
 .summary-label {
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
   margin-top: 5px;
 }
 
@@ -497,7 +490,7 @@ h2 {
 }
 
 .transistor-list h4 {
-  font-size: 16px;
+  font-size: .875rem;
   margin-bottom: 15px;
 }
 
@@ -542,7 +535,7 @@ h2 {
 
 .error-list h4,
 .warning-list h4 {
-  font-size: 16px;
+  font-size: .875rem;
   margin-bottom: 10px;
 }
 
@@ -557,4 +550,11 @@ h2 {
 .warning-item:last-child {
   border-bottom: none;
 }
+.upload-zone { max-width: 44rem; }
+.upload-zone button { margin-top: .75rem; }
+.file-item { flex-wrap: wrap; gap: .45rem; }
+.file-info { min-width: 0; overflow-wrap: anywhere; }
+.file-status span { overflow-wrap: anywhere; }
+.btn-remove { font-size: .8rem; color: var(--text-primary); }
+.results-summary { flex-wrap: wrap; }
 </style>

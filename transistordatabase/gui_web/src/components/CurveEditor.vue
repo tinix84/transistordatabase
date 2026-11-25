@@ -2,7 +2,7 @@
   <div class="curve-editor">
     <div class="editor-header">
       <h3>{{ editMode ? 'Edit' : 'Add' }} {{ curveTypeLabel }}</h3>
-      <button @click="$emit('cancel')" class="btn-close" aria-label="Close curve editor">✕</button>
+      <button @click="$emit('cancel')" class="btn-close" aria-label="Close curve editor">Close</button>
     </div>
 
     <div class="editor-content">
@@ -605,12 +605,11 @@ export default {
 .btn-close {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: .78rem;
   cursor: pointer;
   color: var(--text-secondary);
-  padding: 0;
-  width: 32px;
-  height: 32px;
+  padding: .25rem .5rem;
+  min-height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;

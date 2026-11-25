@@ -717,11 +717,11 @@ onBeforeUnmount(destroyCharts)
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: .85rem;
   padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: var(--bg-secondary);
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
 }
 
 .header-actions {
@@ -731,8 +731,8 @@ onBeforeUnmount(destroyCharts)
 
 .calc-content {
   display: grid;
-  grid-template-columns: 350px 400px minmax(0, 1fr);
-  gap: 2rem;
+  grid-template-columns: minmax(13rem, 21%) minmax(21rem, 32%) minmax(0, 1fr);
+  gap: .85rem;
 }
 
 .topology-panel,
@@ -740,10 +740,10 @@ onBeforeUnmount(destroyCharts)
 .results-panel {
   min-width: 0;
   overflow-wrap: anywhere;
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: var(--bg-secondary);
+  padding: .85rem;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
   height: fit-content;
 }
 
@@ -751,8 +751,8 @@ onBeforeUnmount(destroyCharts)
 .parameters-panel h3,
 .results-panel h3 {
   margin: 0 0 1rem 0;
-  color: #2c3e50;
-  border-bottom: 2px solid #3498db;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
 }
 
@@ -797,54 +797,48 @@ onBeforeUnmount(destroyCharts)
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: .85rem;
 }
 
 .topology-card {
   padding: 1rem;
-  border: 2px solid #ddd;
-  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s;
   text-align: center;
 }
 
 .topology-card:hover {
-  border-color: #007bff;
-  transform: translateY(-2px);
+  border-color: var(--accent-blue);
 }
 
 .topology-card.active {
-  border-color: #007bff;
-  background: #f8f9ff;
-}
-
-.topology-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+  border-color: var(--accent-blue);
+  background: var(--accent-blue-light);
 }
 
 .topology-name {
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
 .topology-desc {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .topology-info {
   margin-top: 1rem;
   padding: 1rem;
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   border-radius: 4px;
 }
 
 .topology-info h4 {
   margin: 0 0 1rem 0;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .circuit-svg {
@@ -855,25 +849,25 @@ onBeforeUnmount(destroyCharts)
   width: 100%;
   max-width: 300px;
   height: auto;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  background: white;
+  background: var(--bg-secondary);
 }
 
 .parameter-sections {
-  margin-bottom: 2rem;
+  margin-bottom: .85rem;
 }
 
 .param-section {
-  margin-bottom: 2rem;
+  margin-bottom: .85rem;
   padding: 1rem;
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   border-radius: 4px;
 }
 
 .param-section h4 {
   margin: 0 0 1rem 0;
-  color: #2c3e50;
+  color: var(--text-primary);
   font-size: 1rem;
 }
 
@@ -892,7 +886,7 @@ onBeforeUnmount(destroyCharts)
 .param-item label {
   min-width: 140px;
   font-size: 0.9rem;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .param-item input,
@@ -902,7 +896,7 @@ onBeforeUnmount(destroyCharts)
   max-width: 100%;
   flex: 1;
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 0.9rem;
 }
@@ -910,7 +904,7 @@ onBeforeUnmount(destroyCharts)
 .param-item .unit {
   min-width: 30px;
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -934,18 +928,18 @@ onBeforeUnmount(destroyCharts)
 .results-content {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: .85rem;
 }
 
 .results-section {
   padding: 1rem;
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   border-radius: 4px;
 }
 
 .results-section h4 {
   margin: 0 0 1rem 0;
-  color: #2c3e50;
+  color: var(--text-primary);
   font-size: 1rem;
 }
 
@@ -964,9 +958,9 @@ onBeforeUnmount(destroyCharts)
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem;
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 4px;
-  border-left: 3px solid #007bff;
+  border-left: 3px solid var(--accent-blue);
 }
 
 .loss-item.total {
@@ -979,18 +973,18 @@ onBeforeUnmount(destroyCharts)
 .req-item label,
 .loss-item label {
   font-size: 0.9rem;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .value {
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .note,
 .percent {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-secondary);
   margin-left: 0.5rem;
 }
 
@@ -1009,7 +1003,7 @@ onBeforeUnmount(destroyCharts)
 
 .recommendation-item {
   padding: 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   transition: all 0.3s;
 }
@@ -1020,7 +1014,7 @@ onBeforeUnmount(destroyCharts)
 }
 
 .recommendation-item:hover {
-  border-color: #007bff;
+  border-color: var(--accent-blue);
   transform: translateY(-1px);
 }
 
@@ -1038,7 +1032,7 @@ onBeforeUnmount(destroyCharts)
 .rec-score {
   margin-left: auto;
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-secondary);
   background: #e9ecef;
   padding: 0.25rem 0.5rem;
   border-radius: 12px;
@@ -1049,7 +1043,7 @@ onBeforeUnmount(destroyCharts)
   gap: 1rem;
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .rec-actions {
@@ -1059,18 +1053,18 @@ onBeforeUnmount(destroyCharts)
 
 .charts-section {
   padding: 1rem;
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   border-radius: 4px;
 }
 
 .charts-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  gap: .85rem;
 }
 
 .chart-container {
-  background: white;
+  background: var(--bg-secondary);
   padding: 1rem;
   border-radius: 4px;
   height: 300px;
@@ -1119,7 +1113,7 @@ onBeforeUnmount(destroyCharts)
 }
 
 .sweep-data-scroll:focus-visible {
-  outline: 2px solid #007bff;
+  outline: 2px solid var(--accent-blue);
   outline-offset: 2px;
 }
 
@@ -1145,7 +1139,7 @@ onBeforeUnmount(destroyCharts)
 .sweep-data-table th {
   position: sticky;
   top: 0;
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
 }
 
 .btn {
@@ -1166,21 +1160,22 @@ onBeforeUnmount(destroyCharts)
 }
 
 .btn-primary {
-  background: #007bff;
+  background: var(--accent-blue);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #0056b3;
+  background: var(--action-hover);
 }
 
 .btn-secondary {
-  background: #6c757d;
-  color: white;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #545b62;
+  border-color: var(--accent-blue);
 }
 
 .btn-info {
@@ -1206,7 +1201,7 @@ onBeforeUnmount(destroyCharts)
   font-size: 0.8rem;
 }
 
-@media (max-width: 1400px) {
+@media (max-width: 1080px) {
   .calc-content {
     grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
@@ -1246,5 +1241,17 @@ onBeforeUnmount(destroyCharts)
   .calculation-actions {
     flex-direction: column;
   }
+}
+.calc-header { padding: .65rem .85rem; }
+.calc-header h2 { font-size: 1.25rem; }
+.topology-panel h3, .parameters-panel h3, .results-panel h3 { font-size: 1rem; }
+.topology-grid { gap: .45rem; margin-bottom: 0; }
+.topology-card { padding: .6rem; border-width: 1px; text-align: left; }
+.topology-name, .topology-desc { display: block; }
+.topology-name { margin-bottom: .2rem; }
+.topology-desc { line-height: 1.35; }
+.btn-primary { background: var(--action-bg); border: 1px solid var(--action-bg); }
+@media (min-width: 769px) and (max-width: 1080px) {
+  .topology-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 </style>

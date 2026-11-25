@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 
 const {
-  getAll,
   getDPTData,
   generateDPTNetlist,
   validateDPTData,
@@ -12,7 +11,6 @@ const {
   previewDPTEnergy,
   saveDPTEnergy
 } = vi.hoisted(() => ({
-  getAll: vi.fn(),
   getDPTData: vi.fn(),
   generateDPTNetlist: vi.fn(),
   validateDPTData: vi.fn(),
@@ -25,7 +23,6 @@ const {
 
 vi.mock('../../services/api.js', () => ({
   transistorApi: {
-    getAll,
     getDPTData,
     generateDPTNetlist,
     validateDPTData,
@@ -156,10 +153,6 @@ describe('DPTManager raw waveform viewing', () => {
   let wrapper
 
   beforeEach(async () => {
-    getAll.mockReset().mockResolvedValue([
-      { metadata: { name: 'Waveform Device' } },
-      { metadata: { name: 'Second Device' } }
-    ])
     getDPTData.mockReset().mockResolvedValue(structuredClone(dptResponse))
     generateDPTNetlist.mockReset().mockResolvedValue({
       netlist: 'test netlist', transistor_name: 'Waveform Device'
@@ -221,6 +214,12 @@ describe('DPTManager raw waveform viewing', () => {
       action: 'added', loss_type: 'e_on', curve_index: 0, point_count: 2
     })
     wrapper = mount(DPTManager, {
+      props: {
+        transistors: [
+          { metadata: { name: 'Waveform Device' } },
+          { metadata: { name: 'Second Device' } }
+        ]
+      },
       global: { stubs: { CurvePlotter: CurvePlotterStub } }
     })
     await flushPromises()

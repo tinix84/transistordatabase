@@ -1,13 +1,13 @@
 <template>
   <div class="transistor-comparison">
     <div class="comparison-header">
-      <h2>🔍 Transistor Comparison</h2>
+      <h2>Transistor Comparison</h2>
       <div class="header-actions">
         <button @click="clearSelection" class="btn btn-secondary">
-          🗑️ Clear Selection
+          Clear Selection
         </button>
         <button @click="exportComparison" :disabled="selectedTransistors.length < 2" class="btn btn-primary">
-          💾 Export Comparison
+          Export Comparison
         </button>
       </div>
     </div>
@@ -19,14 +19,15 @@
           <input 
             v-model="searchQuery" 
             type="text" 
-            placeholder="🔍 Search transistors..." 
+            placeholder="Search transistors..."
+            aria-label="Search transistors"
             class="search-input"
           />
-          <select v-model="typeFilter" class="filter-select">
+          <select v-model="typeFilter" class="filter-select" aria-label="Filter by transistor type">
             <option value="">All Types</option>
             <option v-for="type in availableTypes" :key="type" :value="type">{{ type }}</option>
           </select>
-          <select v-model="manufacturerFilter" class="filter-select">
+          <select v-model="manufacturerFilter" class="filter-select" aria-label="Filter by manufacturer">
             <option value="">All Manufacturers</option>
             <option v-for="mfg in availableManufacturers" :key="mfg" :value="mfg">{{ mfg }}</option>
           </select>
@@ -36,7 +37,14 @@
           <div 
             v-for="(transistor, index) in filteredTransistors" 
             :key="index"
+            role="button"
+            :tabindex="!isSelected(transistor) && selectedTransistors.length >= maxComparisons ? -1 : 0"
+            :aria-label="transistor.metadata.name"
+            :aria-pressed="isSelected(transistor)"
+            :aria-disabled="!isSelected(transistor) && selectedTransistors.length >= maxComparisons"
             @click="toggleTransistorSelection(transistor)"
+            @keydown.enter.prevent="toggleTransistorSelection(transistor)"
+            @keydown.space.prevent="toggleTransistorSelection(transistor)"
             :class="['transistor-card', { 
               selected: isSelected(transistor),
               disabled: !isSelected(transistor) && selectedTransistors.length >= maxComparisons
@@ -45,7 +53,7 @@
             <div class="card-header">
               <h4>{{ transistor.metadata.name }}</h4>
               <div class="selection-indicator">
-                {{ isSelected(transistor) ? '✅' : '⭕' }}
+                {{ isSelected(transistor) ? 'Selected' : 'Select' }}
               </div>
             </div>
             <div class="card-content">
@@ -60,12 +68,12 @@
     </div>
 
     <div v-if="selectedTransistors.length >= 2" class="comparison-results">
-      <h3>📊 Comparison Results</h3>
+      <h3>Comparison Results</h3>
       
       <!-- Summary Statistics -->
       <div class="comparison-summary">
         <div class="summary-card">
-          <h4>⚡ Electrical Ratings</h4>
+          <h4>Electrical Ratings</h4>
           <div class="stat-row">
             <span>Voltage Range:</span>
             <span>{{ Math.min(...selectedTransistors.map(t => t.electrical.v_abs_max)) }}V - {{ Math.max(...selectedTransistors.map(t => t.electrical.v_abs_max)) }}V</span>
@@ -81,7 +89,7 @@
         </div>
 
         <div class="summary-card">
-          <h4>🌡️ Thermal Properties</h4>
+          <h4>Thermal Properties</h4>
           <div class="stat-row">
             <span>Thermal Resistance Range:</span>
             <span>{{ thermalRange }}</span>
@@ -108,7 +116,7 @@
 
       <!-- Detailed Comparison Table -->
       <div class="comparison-table">
-        <h4>📋 Detailed Comparison</h4>
+        <h4>Detailed Comparison</h4>
         <table>
           <thead>
             <tr>
@@ -121,7 +129,7 @@
           <tbody>
             <!-- Metadata -->
             <tr class="section-header">
-              <td colspan="100%"><strong>📋 Metadata</strong></td>
+              <td colspan="100%"><strong>Metadata</strong></td>
             </tr>
             <tr>
               <td>Type</td>
@@ -146,7 +154,7 @@
 
             <!-- Electrical -->
             <tr class="section-header">
-              <td colspan="100%"><strong>⚡ Electrical Ratings</strong></td>
+              <td colspan="100%"><strong>Electrical Ratings</strong></td>
             </tr>
             <tr>
               <td>Max Voltage (V)</td>
@@ -183,7 +191,7 @@
 
             <!-- Thermal -->
             <tr class="section-header">
-              <td colspan="100%"><strong>🌡️ Thermal Properties</strong></td>
+              <td colspan="100%"><strong>Thermal Properties</strong></td>
             </tr>
             <tr>
               <td>Thermal Resistance (K/W)</td>
@@ -210,7 +218,7 @@
 
       <!-- Visual Comparison Charts -->
       <div class="comparison-charts">
-        <h4>📊 Visual Comparison</h4>
+        <h4>Visual Comparison</h4>
         <div class="charts-grid">
           <div class="chart-container">
             <canvas id="voltageCurrentChart" width="400" height="300"></canvas>
@@ -419,7 +427,7 @@ async function exportComparison() {
     link.remove()
     window.URL.revokeObjectURL(url)
   } catch (error) {
-    alert('❌ Export failed: ' + error.message)
+    alert('Export failed: ' + error.message)
   }
 }
 
@@ -429,69 +437,69 @@ async function exportComparison() {
 .transistor-comparison {
   max-width: 1400px;
   margin: 0 auto;
+  padding: .85rem;
 }
 
 .comparison-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: .65rem;
   padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: var(--bg-secondary);
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
 }
 
 .header-actions {
   display: flex;
-  gap: 1rem;
+  gap: .55rem;
 }
 
 .selection-section {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  margin-bottom: 2rem;
+  background: var(--bg-secondary);
+  padding: .75rem;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  margin-bottom: .65rem;
 }
 
 .selector-filters {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: .55rem;
+  margin-bottom: .65rem;
 }
 
 .search-input, .filter-select {
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
 }
 
 .transistor-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: .55rem;
   max-height: 400px;
   overflow-y: auto;
 }
 
 .transistor-card {
-  border: 2px solid #ddd;
-  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  border-radius: 5px;
   padding: 1rem;
   cursor: pointer;
   transition: all 0.3s;
 }
 
 .transistor-card:hover {
-  border-color: #007bff;
-  transform: translateY(-2px);
+  border-color: var(--accent-blue);
 }
 
 .transistor-card.selected {
-  border-color: #28a745;
-  background: #f8fff9;
+  border-color: var(--accent-blue);
+  background: var(--accent-blue-light);
 }
 
 .transistor-card.disabled {
@@ -509,43 +517,43 @@ async function exportComparison() {
 .card-header h4 {
   margin: 0;
   font-size: 1rem;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .selection-indicator {
-  font-size: 1.2rem;
+  font-size: .85rem;
 }
 
 .card-content p {
   margin: 0.25rem 0;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .comparison-results {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: var(--bg-secondary);
+  padding: .75rem;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
 }
 
 .comparison-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: .55rem;
+  margin-bottom: .65rem;
 }
 
 .summary-card {
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   padding: 1.5rem;
-  border-radius: 8px;
-  border-left: 4px solid #007bff;
+  border-radius: 5px;
+  border-left: 4px solid var(--accent-blue);
 }
 
 .summary-card h4 {
   margin: 0 0 1rem 0;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .stat-row {
@@ -553,7 +561,7 @@ async function exportComparison() {
   justify-content: space-between;
   margin-bottom: 0.5rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .stat-row:last-child {
@@ -568,21 +576,21 @@ async function exportComparison() {
 .comparison-table table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
-  border-radius: 8px;
+  background: var(--bg-secondary);
+  border-radius: 5px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid var(--border-color);
 }
 
 .comparison-table th,
 .comparison-table td {
   padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .comparison-table th {
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   font-weight: 600;
   position: sticky;
   top: 0;
@@ -602,7 +610,7 @@ async function exportComparison() {
 
 .type-badge {
   padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  border-radius: 3px;
   font-size: 0.8rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -646,25 +654,25 @@ async function exportComparison() {
 .chart-container p {
   margin-top: 0.5rem;
   font-weight: 500;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .similar-suggestions {
   margin-top: 2rem;
   padding: 1.5rem;
-  background: #f8f9fa;
-  border-radius: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 5px;
 }
 
 .similar-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
+  gap: .55rem;
   margin-top: 1rem;
 }
 
 .similar-card {
-  background: white;
+  background: var(--bg-secondary);
   padding: 1rem;
   border-radius: 4px;
   border-left: 4px solid #ffc107;
@@ -672,32 +680,32 @@ async function exportComparison() {
 
 .similar-card h5 {
   margin: 0 0 0.5rem 0;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .similar-card p {
   margin: 0.25rem 0;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
 .similarity-score {
   font-weight: 600;
-  color: #ffc107 !important;
+  color: var(--text-primary);
 }
 
 .no-selection, .single-selection {
   text-align: center;
-  padding: 4rem;
-  color: #666;
-  font-size: 1.2rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: .85rem;
+  color: var(--text-secondary);
+  font-size: .85rem;
+  background: var(--bg-secondary);
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
 }
 
 .btn {
-  padding: 0.75rem 1.5rem;
+  padding: .3rem .6rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -713,27 +721,28 @@ async function exportComparison() {
 }
 
 .btn-primary {
-  background: #007bff;
+  background: var(--accent-blue);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #0056b3;
+  background: var(--action-hover);
 }
 
 .btn-secondary {
-  background: #6c757d;
-  color: white;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #545b62;
+  border-color: var(--accent-blue);
 }
 
 @media (max-width: 768px) {
   .comparison-header {
     flex-direction: column;
-    gap: 1rem;
+    gap: .55rem;
   }
 
   .selector-filters {
@@ -752,4 +761,15 @@ async function exportComparison() {
     grid-template-columns: 1fr;
   }
 }
+.comparison-header h2 { font-size: 1.25rem; }
+.selection-section h3, .comparison-results h3 { font-size: 1rem; }
+.card-header { flex-wrap: wrap; gap: .3rem .55rem; }
+.card-header h4 { font: 600 .82rem ui-monospace, monospace; overflow-wrap: anywhere; }
+.transistor-card { padding: .55rem; border-width: 1px; }
+.transistor-card:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: -2px; }
+.card-content { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: .45rem; }
+.card-content p { font-size: .8rem; }
+.comparison-table { overflow-x: auto; }
+.comparison-table table { min-width: 32rem; }
+.btn-primary { background: var(--action-bg); border: 1px solid var(--action-bg); }
 </style>

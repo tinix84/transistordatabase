@@ -1,10 +1,8 @@
 <script setup>
 import { ref, shallowRef, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import TransistorList from './components/TransistorList.vue'
 import TransistorForm from './components/TransistorForm.vue'
 import TransistorComparison from './components/TransistorComparison.vue'
 import TransistorComparisonEnhanced from './components/TransistorComparisonEnhanced.vue'
-import TransistorPlotter from './components/TransistorPlotter.vue'
 import SearchDatabase from './components/SearchDatabase.vue'
 import ExportingTools from './components/ExportingTools.vue'
 import BatchExportPanel from './components/BatchExportPanel.vue'
@@ -76,7 +74,7 @@ function outsideMenu(event) {
 function menuKey(event) { if (event.key === 'Escape' && showMoreMenu.value) { event.preventDefault(); closeMoreMenu(true) } }
 function menuScroll(event) {
   if (!showMoreMenu.value || moreMenuPopup.value?.contains(event.target)) return
-  if (event.target === moreMenuTrigger.value?.closest('nav')) {
+  if (event.target === moreMenuTrigger.value?.closest('nav')?.querySelector('.workspace-tabs')) {
     const box = moreMenuTrigger.value.getBoundingClientRect()
     if (moreMenuAnchor && Math.abs(box.left - moreMenuAnchor.left) < .5 && Math.abs(box.top - moreMenuAnchor.top) < .5) return
   }
@@ -288,91 +286,73 @@ function handleOpenDatabaseSearch() {
       </header>
       <div class="contact-header">
         <div class="contact-links">
-          <a href="https://linkedin.com/in/your-profile" target="_blank" title="LinkedIn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-            </svg>
-            LinkedIn
-          </a>
-          <a href="https://discord.gg/your-server" target="_blank" title="Discord">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.010c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-            </svg>
-            Discord
-          </a>
           <a href="https://github.com/tinix84/transistordatabase" target="_blank" title="GitHub">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>
             GitHub
           </a>
         </div>
         <button @click="toggleTheme" class="theme-toggle" :title="isDarkTheme ? 'Switch to Light Theme' : 'Switch to Dark Theme'">
-          <svg v-if="isDarkTheme" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/>
-          </svg>
-          <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/>
-          </svg>
+          {{ isDarkTheme ? 'Light mode' : 'Dark mode' }}
         </button>
       </div>
 
       <nav class="main-nav" aria-label="Workspaces">
-        <button
-          @click="showSearch"
-          :class="{ active: currentView === 'search' }"
-          class="nav-btn"
-        >
-          Search Database
-        </button>
-        <button
-          @click="showCreate"
-          :class="{ active: currentView === 'create' }"
-          class="nav-btn"
-        >
-          Create/Edit
-        </button>
-        <button
-          @click="showExport"
-          :class="{ active: currentView === 'export' }"
-          class="nav-btn"
-        >
-          Export
-        </button>
-        <button
-          @click="showComparison"
-          :class="{ active: currentView === 'compare' }"
-          class="nav-btn"
-        >
-          Compare
-        </button>
-        <button
-          @click="showAdvancedComparison"
-          :class="{ active: currentView === 'compare-advanced' }"
-          class="nav-btn"
-        >
-          Advanced Compare
-        </button>
-        <button
-          @click="showTopology"
-          :class="{ active: currentView === 'topology' }"
-          class="nav-btn"
-        >
-          Topology
-        </button>
-        <button
-          @click="showDatabaseBackup"
-          :class="{ active: currentView === 'database-backup' }"
-          class="nav-btn"
-        >
-          Database Backup
-        </button>
-        <button @click="currentView = 'catalog-fom'" :class="{ active: currentView === 'catalog-fom' }" class="nav-btn">
-          FOM &amp; Pareto
-        </button>
-        <button @click="currentView = 'catalog-sources'" :class="{ active: currentView === 'catalog-sources' }" class="nav-btn">Catalog source import</button>
-        <button @click="currentView = 'legacy-mat'" :class="{ active: currentView === 'legacy-mat' }" class="nav-btn">Legacy MAT</button>
-        <button @click="currentView = 'measurements'" :class="{ active: currentView === 'measurements' }" class="nav-btn">Measurement import</button>
+        <div class="workspace-tabs">
+          <button
+            @click="showSearch"
+            :class="{ active: currentView === 'search' }"
+            class="nav-btn"
+          >
+            Search Database
+          </button>
+          <button
+            @click="showCreate"
+            :class="{ active: currentView === 'create' }"
+            class="nav-btn"
+          >
+            Create/Edit
+          </button>
+          <button
+            @click="showExport"
+            :class="{ active: currentView === 'export' }"
+            class="nav-btn"
+          >
+            Export
+          </button>
+          <button
+            @click="showComparison"
+            :class="{ active: currentView === 'compare' }"
+            class="nav-btn"
+          >
+            Compare
+          </button>
+          <button
+            @click="showAdvancedComparison"
+            :class="{ active: currentView === 'compare-advanced' }"
+            class="nav-btn"
+          >
+            Advanced Compare
+          </button>
+          <button
+            @click="showTopology"
+            :class="{ active: currentView === 'topology' }"
+            class="nav-btn"
+          >
+            Topology
+          </button>
+          <button
+            @click="showDatabaseBackup"
+            :class="{ active: currentView === 'database-backup' }"
+            class="nav-btn"
+          >
+            Database Backup
+          </button>
+          <button @click="currentView = 'catalog-fom'" :class="{ active: currentView === 'catalog-fom' }" class="nav-btn">
+            FOM &amp; Pareto
+          </button>
+          <button @click="currentView = 'catalog-sources'" :class="{ active: currentView === 'catalog-sources' }" class="nav-btn">Catalog source import</button>
+          <button @click="currentView = 'legacy-mat'" :class="{ active: currentView === 'legacy-mat' }" class="nav-btn">Legacy MAT</button>
+          <button @click="currentView = 'measurements'" :class="{ active: currentView === 'measurements' }" class="nav-btn">Measurement import</button>
+        </div>
         <div class="nav-dropdown">
           <button
             ref="moreMenuTrigger"
@@ -515,6 +495,7 @@ function handleOpenDatabaseSearch() {
       <!-- DPT Manager -->
       <DPTManager
         v-if="currentView === 'dpt'"
+        :transistors="transistors"
       />
 
       <!-- Batch Export -->
@@ -609,13 +590,7 @@ function handleOpenDatabaseSearch() {
 .theme-toggle {
   border-color: var(--border-color);
   cursor: pointer;
-}
-
-.contact-links svg,
-.theme-toggle svg {
-  width: 16px;
-  height: 16px;
-  flex: none;
+  white-space: nowrap;
 }
 
 .contact-links a:hover,
@@ -630,10 +605,17 @@ function handleOpenDatabaseSearch() {
   align-items: center;
   gap: .18rem;
   min-width: 0;
-  overflow-x: auto;
   padding: .25rem .7rem;
   border-top: 1px solid var(--border-color);
   background: var(--bg-tertiary);
+}
+
+.workspace-tabs {
+  display: flex;
+  align-items: center;
+  gap: .18rem;
+  min-width: 0;
+  overflow-x: auto;
 }
 
 .nav-btn {
@@ -773,7 +755,6 @@ function handleOpenDatabaseSearch() {
 @media (max-width: 700px) {
   .app-header { flex-wrap: wrap; gap: .15rem .6rem; }
   .contact-header, .contact-links { gap: .25rem; }
-  .contact-links a { font-size: 0; gap: 0; }
   .stats { border: 0; padding-left: 0; }
   .selected-device { display: none; }
 }
@@ -789,6 +770,8 @@ function handleOpenDatabaseSearch() {
   outline: 2px solid var(--accent-blue);
   outline-offset: -2px;
 }
+
+.app-toolbar button:focus:not(:focus-visible) { outline: none; }
 
 @media print {
   .app-toolbar { display: none; }
