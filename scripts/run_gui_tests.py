@@ -30,7 +30,7 @@ def run_command(cmd, description=""):
             print("STDERR:", result.stderr)
         return result.returncode, result.stdout, result.stderr
     except subprocess.TimeoutExpired:
-        print(f"ERROR: Command timed out after 120 seconds")
+        print("ERROR: Command timed out after 120 seconds")
         return 1, "", "Timeout"
     except Exception as e:
         print(f"ERROR: {e}")
@@ -186,6 +186,7 @@ print('✅ All 8 mixins import successfully')
     print("\n✅ Report saved to: PYQT_GUI_TEST_REPORT.txt")
 
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(main())

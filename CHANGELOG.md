@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Advanced web thermal comparison**: Displays stored switch and diode transient measurements separately and overlays Foster-model curves only when valid paired parameters are available. Missing parameters no longer produce a constant total-resistance fallback.
 
 
+### Fixed
+- Repair documentation navigation and source links. Align Python lint configuration and formatting with the project's local checks.
+
+
 ## [1.0.1] - 2026-02-17
 
 ### Fixed

@@ -129,7 +129,7 @@ def test_body_diode_tail_uses_bus_voltage_after_fall_with_nonzero_drain_inductan
 def test_old_paper_like_fixture_is_not_a_verified_paper_prediction():
     """Old paper like fixture is not a verified paper prediction."""
     old = ChristenBielaModel(1080e-12, 130e-12, 14.5e-12, 86.56e-9,
-                            TransconductanceParams(.1319, -.076, 3.8, 4.5))
+                             TransconductanceParams(.1319, -.076, 3.8, 4.5))
     with pytest.raises(BielaConvergenceError, match='negative discriminant'):
         old.calc_switching_energy(HalfBridgeParams(600, 20, 20, -5, 7.1, 4e-9, 10e-9))
 
@@ -140,6 +140,7 @@ def test_negative_iteration_discriminant_does_not_claim_absence_of_nonlinear_roo
     gm = TransconductanceParams(10, 0, .1, 3)
     m = ChristenBielaModel(1e-9, 1e-9, 1e-9, 200e-9, gm)
     p = HalfBridgeParams(100, 10, 15, 0, 10, 200e-9, 0)
+
     def implicit(current):
         secant = gm.calc_gm(p.i_0 - 2 * current)
         return 2 * p.l_s / (m.q_oss * p.r_g) * current ** 2 + (
@@ -183,6 +184,7 @@ def test_nonlinear_nonzero_offset_fixture_against_direct_root_and_phase_quadratu
     p = HalfBridgeParams(100, 10, 15, -1, 10, .1e-9, .1e-9)
     m = ChristenBielaModel(1e-9, 1e-9, 1e-9, 200e-9, gm)
     r = m.calc_switching_energy(p)
+
     def polynomial(current, gate):
         secant = (p.i_0 - 2 * current) / np.sqrt((p.i_0 - 2 * current - .1) / 2)
         return (2 * p.l_s / (m.q_oss * p.r_g) * current ** 2
@@ -321,6 +323,7 @@ def test_api_sweep_keeps_successes_and_explicit_zero_current_failure():
 def test_api_retains_numerical_failure_separately_from_unsupported_domain(monkeypatch):
     """Transport a solver failure without declaring the configuration invalid."""
     original = ChristenBielaModel.calc_switching_energy
+
     def selectively_fail(self, params):
         if params.i_0 == 5:
             raise BielaConvergenceError('Iteration did not converge; existence of a solution is unknown')
@@ -360,7 +363,7 @@ def test_api_actionable_domain_failures(changes, message):
 def test_api_nonfinite_raw_json_does_not_crash_error_serialization(key, value):
     """Api nonfinite raw json does not crash error serialization."""
     response = TestClient(app).post('/api/analytical/biela', content=json.dumps(PAYLOAD | {key: value}),
-                                     headers={'content-type': 'application/json'})
+                                    headers={'content-type': 'application/json'})
     assert response.status_code == 422
 
 

@@ -156,15 +156,25 @@ def solve_reverse_current_sharing(*, selected, current_a, junction_temperature_c
                          "current_residual_a", "voltage_v", "channel_static_power_w",
                          "diode_static_power_w", "total_static_power_w", "blocking_margin_v")),
         "feasible_channel_current_magnitude_a": bounds,
-        "root_evidence": {"isolated_root_count": len(isolated),
-                          "flat_intervals_a": flat_coordinates,
-                          "candidate_channel_current_magnitude_a": root_coordinates,
-                          "evaluated_knot_count": len(knots), "voltage_residual_v": None},
-        "equations": ["J = -I_device", "I_channel_magnitude + I_diode_magnitude = J",
-                      "Recorded root: V_channel(I_channel_magnitude) = V_diode(I_diode_magnitude)",
-                      "Selected ideal-diode blocking: I_diode = 0 and 0 <= V_channel(J) <= V_diode(0)",
-                      "Vds = -voltage_drop", "P_static_branch = Vds * I_branch"],
-        "scope": "Calculated static operating point only. Independent isolated branches and compatible operating states are declared inputs. No dynamic loss or accuracy claim.",
+        "root_evidence": {
+            "isolated_root_count": len(isolated),
+            "flat_intervals_a": flat_coordinates,
+            "candidate_channel_current_magnitude_a": root_coordinates,
+            "evaluated_knot_count": len(knots),
+            "voltage_residual_v": None,
+        },
+        "equations": [
+            "J = -I_device",
+            "I_channel_magnitude + I_diode_magnitude = J",
+            "Recorded root: V_channel(I_channel_magnitude) = V_diode(I_diode_magnitude)",
+            "Selected ideal-diode blocking: I_diode = 0 and 0 <= V_channel(J) <= V_diode(0)",
+            "Vds = -voltage_drop",
+            "P_static_branch = Vds * I_branch",
+        ],
+        "scope": (
+            "Calculated static operating point only. Independent isolated branches and compatible operating states are declared "
+            "inputs. No dynamic loss or accuracy claim."
+        ),
         "units": {"current": "A", "voltage": "V", "static_power": "W", "junction_temperature": "degC"},
     }
     if coordinate_error:
@@ -186,11 +196,20 @@ def solve_reverse_current_sharing(*, selected, current_a, junction_temperature_c
             power = _float(Fraction(pc) + Fraction(pd))
             margin = _float(vd(Fraction(0)) - drop) if is_blocking else None
             voltage_residual = None if is_blocking else _float(vc(-_rational(ic)) - vd(-_rational(id_)))
-            result.update(status="supported", support="estimate" if is_blocking else "recorded",
-                          diagnostic=("Explicit ideal-diode blocking estimate" if is_blocking else "Unique isolated common-voltage root within recorded domains"),
-                          channel_current_a=ic, diode_current_a=id_, current_sum_a=current_sum,
-                          current_residual_a=residual, voltage_v=voltage, channel_static_power_w=pc,
-                          diode_static_power_w=pd, total_static_power_w=power, blocking_margin_v=margin)
+            result.update(
+                status="supported",
+                support="estimate" if is_blocking else "recorded",
+                diagnostic=("Explicit ideal-diode blocking estimate" if is_blocking else "Unique isolated common-voltage root within recorded domains"),
+                channel_current_a=ic,
+                diode_current_a=id_,
+                current_sum_a=current_sum,
+                current_residual_a=residual,
+                voltage_v=voltage,
+                channel_static_power_w=pc,
+                diode_static_power_w=pd,
+                total_static_power_w=power,
+                blocking_margin_v=margin,
+            )
             result["root_evidence"]["voltage_residual_v"] = voltage_residual
         except ValueError as exc:
             result["diagnostic"] = str(exc)

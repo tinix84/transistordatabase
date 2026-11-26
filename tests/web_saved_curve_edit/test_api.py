@@ -123,7 +123,7 @@ def _top_level_value_bytes(document: bytes, key: bytes) -> bytes:
             if not stack or stack.pop() != char:
                 raise AssertionError("Mismatched JSON container while extracting raw bytes")
             if not stack:
-                return document[value_start : position + 1]
+                return document[value_start: position + 1]
     raise AssertionError(f"Unterminated top-level {key.decode()} value")
 
 

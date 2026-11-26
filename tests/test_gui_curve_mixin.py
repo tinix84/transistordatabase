@@ -1,11 +1,12 @@
 """Test curve management mixin."""
 import os
+# Configure the platform before the desktop imports.
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
-import pytest
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QPushButton, QDialog, QListWidget, QTableWidget
-from transistordatabase.gui.gui import MainWindow
+import pytest  # noqa: E402
+from PyQt5.QtCore import Qt  # noqa: E402
+from PyQt5.QtWidgets import QPushButton, QDialog, QListWidget, QTableWidget  # noqa: E402
+from transistordatabase.gui.gui import MainWindow  # noqa: E402
 
 
 @pytest.fixture
@@ -95,7 +96,7 @@ def test_add_channel_curve_functionality(main_window):
     """Test add channel curve functionality."""
     # Check if method exists
     has_add_method = hasattr(main_window, 'on_add_channel_curve') or \
-                     hasattr(main_window, 'add_channel_curve')
+        hasattr(main_window, 'add_channel_curve')
 
     # Method may or may not exist, depending on implementation
     assert True  # Basic existence check passed

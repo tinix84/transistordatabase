@@ -9,6 +9,7 @@ try:
     
     @app.get("/")
     def read_root():
+        """Return a minimal response for the smoke request."""
         return {"Hello": "World"}
     
     client = TestClient(app)

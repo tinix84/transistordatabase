@@ -13,7 +13,7 @@ This guide will help you make the most of the Transistor Database application fo
 5. [Exporting Tools](#exporting-tools)
 6. [Comparison Tools](#comparison-tools)
 7. [Topology Calculator](#topology-calculator)
-8. [Tips & Best Practices](#tips--best-practices)
+8. [Tips & Best Practices](#tips-best-practices)
 
 ---
 

@@ -129,6 +129,7 @@ def check_dependencies():
     print("✅ All required packages are installed")
     return True
 
+
 if __name__ == "__main__":
     print("🚀 Transistor Database Test Suite")
     print("=" * 60)

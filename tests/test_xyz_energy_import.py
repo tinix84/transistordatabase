@@ -95,8 +95,8 @@ def test_declared_header_permutation_and_exact_prefixes(delimiter, raw):
     """Apply only the declared columns and decimal unit powers."""
     config = options()
     config["options"].update(delimiter=delimiter, has_header=True,
-                              columns=dict(current=2, voltage=1, energy=0),
-                              units=dict(current="mA", voltage="kV", energy="uJ"))
+                             columns=dict(current=2, voltage=1, energy=0),
+                             units=dict(current="mA", voltage="kV", energy="uJ"))
     result = import_xyz_energy_map(raw, config)
     assert result["currents_a"] == [9]
     assert result["voltages_v"] == [600]
@@ -185,8 +185,8 @@ def test_axis_grid_row_and_raw_bounds(monkeypatch):
     with pytest.raises(XyzEnergyLimitError, match="axis"):
         import_xyz_energy_map("\n".join(f"1,{i},1" for i in range(129)).encode(), options())
     # A sparse diagonal exceeds the Cartesian grid budget before matrix allocation.
-    raw = "\n".join([f"{i},0,1" for i in range(256)] +
-                    [f"0,{i},1" for i in range(65)]).encode()
+    raw = "\n".join([f"{i},0,1" for i in range(256)]
+                    + [f"0,{i},1" for i in range(65)]).encode()
     with pytest.raises(XyzEnergyLimitError, match="grid product"):
         import_xyz_energy_map(raw, options())
     monkeypatch.setattr("transistordatabase.xyz_energy_import.MAX_ROWS", 2)

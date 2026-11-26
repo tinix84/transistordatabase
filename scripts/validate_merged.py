@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Validate all merged transistor files using TDB's validation framework.
-"""
+"""Validate all merged transistor files using TDB's validation framework."""
 
 import json
 import sys
@@ -138,7 +136,7 @@ def validate_all_merged():
     total_warnings = sum(len(r['warnings']) for r in results)
 
     print(f"\n{'='*60}")
-    print(f"VALIDATION SUMMARY")
+    print("VALIDATION SUMMARY")
     print(f"{'='*60}")
     print(f"Total files: {total}")
     print(f"Valid: {valid_count} ({valid_count/total*100:.1f}%)")
@@ -169,6 +167,7 @@ def validate_all_merged():
     print(f"✅ Detailed validation report saved to: {output_path}\n")
 
     return report
+
 
 if __name__ == "__main__":
     validate_all_merged()

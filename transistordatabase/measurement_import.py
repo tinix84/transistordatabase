@@ -173,6 +173,7 @@ def _raw(data, companion, request):
     encoding = "utf-16-le" if data[:2] in (b"T\x00", b"\xff\xfe") else "utf-8-sig"
     header = data[:min(len(data), 100_000)].decode(encoding, errors="replace")
     header = re.split(r"(?im)^(?:Binary|Values):", header, maxsplit=1)[0]
+
     def declared(label):
         match = re.search(r"(?im)^" + label + r":\s*(\d+)\s*$", header)
         if match is None:
@@ -295,6 +296,7 @@ def _log(data, request):
                 raise ValueError(f"Log measurement step ordinals must be unique and sequential: {name}")
         if count * sum(mapping["energy_" + event] is not None for event in ("on", "off")) > MAX_RECORDS:
             raise MeasurementLimitError("Log output event count exceeds 10000 records")
+
         def value(name, index, dimension, unit):
             if name is None:
                 return None
@@ -347,15 +349,15 @@ def preview_measurement(request):
     except PackageNotFoundError as exc:
         raise ValueError("Install the declared spicelib dependency to import RAW or log files") from exc
     source = MeasurementEvidence(source_kind=request["source_kind"], filename=request["filename"],
-        sha256=hashlib.sha256(data).hexdigest(), parser="python.csv" if fmt == "csv" else "spicelib",
-        parser_version=parser_version,
-        original_base64=request["content_base64"], companion_log_base64=request["companion_log_base64"],
-        companion_log_filename=request.get("companion_log_filename"),
-        companion_log_sha256=hashlib.sha256(companion).hexdigest() if companion else None,
-        step_index=request["step_index"], trace_mapping={"signals": request["mappings"],
-            "csv": request["csv"] if fmt == "csv" else None,
-            "log": request["log"] if fmt == "log" else None},
-        disclosure=request["disclosure"])
+                                 sha256=hashlib.sha256(data).hexdigest(), parser="python.csv" if fmt == "csv" else "spicelib",
+                                 parser_version=parser_version,
+                                 original_base64=request["content_base64"], companion_log_base64=request["companion_log_base64"],
+                                 companion_log_filename=request.get("companion_log_filename"),
+                                 companion_log_sha256=hashlib.sha256(companion).hexdigest() if companion else None,
+                                 step_index=request["step_index"], trace_mapping={"signals": request["mappings"],
+                                                                                  "csv": request["csv"] if fmt == "csv" else None,
+                                                                                  "log": request["log"] if fmt == "log" else None},
+                                 disclosure=request["disclosure"])
     wave, records = None, []
     if fmt == "csv":
         available, wave, source.step_values = _csv(data, request)
@@ -409,8 +411,8 @@ def extract_measurement(request, conditions, device_document=None):
         if wave is None or wave["gate_v"] is None:
             raise ValueError("DPT extraction requires explicitly mapped time, voltage, current, and gate traces")
         cfg = DPTConfig(v_dc=conditions["bus_voltage_v"],
-                       v_g_on=conditions["v_g_on"], v_g_off=conditions["v_g_off"],
-                       r_g_on=conditions["r_g_on"], r_g_off=conditions["r_g_off"])
+                        v_g_on=conditions["v_g_on"], v_g_off=conditions["v_g_off"],
+                        r_g_on=conditions["r_g_on"], r_g_off=conditions["r_g_off"])
         dpt = LTspiceDPT(cfg)
         result = dpt.analyze_waveforms(wave["time_s"], wave["voltage_v"],
                                        wave["current_a"], wave["gate_v"])
@@ -419,15 +421,15 @@ def extract_measurement(request, conditions, device_document=None):
         on, off = dpt.extract_switching_loss_data(result, t_j=conditions["t_j"], evidence=source)
         points = {"turn_on": [on], "turn_off": [off]}
         raw = RawMeasurementData(dataset_type="dpt-waveform", t_j=source.t_j,
-            v_supply=source.bus_voltage_v, v_g=source.v_g_on, v_g_off=source.v_g_off,
-            r_g=[source.r_g_on] if source.r_g_on is not None else None,
-            r_g_off=[source.r_g_off] if source.r_g_off is not None else None,
-            commutation_device=source.commutation_device,
-            time_s=np.array(wave["time_s"]), voltage_v=np.array(wave["voltage_v"]),
-            current_a=np.array(wave["current_a"]), gate_v=np.array(wave["gate_v"]),
-            evidence=replace(source, method="waveform-local-edge",
-                             event="paired-dpt-events", thresholds=result.event_evidence,
-                             convention=result.energy_window_convention))
+                                 v_supply=source.bus_voltage_v, v_g=source.v_g_on, v_g_off=source.v_g_off,
+                                 r_g=[source.r_g_on] if source.r_g_on is not None else None,
+                                 r_g_off=[source.r_g_off] if source.r_g_off is not None else None,
+                                 commutation_device=source.commutation_device,
+                                 time_s=np.array(wave["time_s"]), voltage_v=np.array(wave["voltage_v"]),
+                                 current_a=np.array(wave["current_a"]), gate_v=np.array(wave["gate_v"]),
+                                 evidence=replace(source, method="waveform-local-edge",
+                                                  event="paired-dpt-events", thresholds=result.event_evidence,
+                                                  convention=result.energy_window_convention))
     else:
         source.method = "supplied-log-integral"
         if request["step_index"] is None:
@@ -437,15 +439,15 @@ def extract_measurement(request, conditions, device_document=None):
                 continue
             event = record["event"]
             evidence = replace(source, step_values=record["step_values"], event=event,
-                method="supplied-log-integral", window_s=tuple(record["window_s"]) if record["window_s"] else None,
-                convention="Original simulator-supplied integral; no waveform local-edge extraction",
-                expression=record["expression"], local_current_a=record["current_a"],
-                bus_voltage_v=record["bus_voltage_v"])
+                               method="supplied-log-integral", window_s=tuple(record["window_s"]) if record["window_s"] else None,
+                               convention="Original simulator-supplied integral; no waveform local-edge extraction",
+                               expression=record["expression"], local_current_a=record["current_a"],
+                               bus_voltage_v=record["bus_voltage_v"])
             point = SwitchingLossData(dataset_type="single", t_j=source.t_j,
-                v_supply=record["bus_voltage_v"], v_g=source.v_g_on, v_g_off=source.v_g_off,
-                r_g=source.r_g_on if event == "turn_on" else source.r_g_off,
-                i_x=record["current_a"], e_x=record["energy_j"], evidence=evidence,
-                commutation_device=source.commutation_device)
+                                      v_supply=record["bus_voltage_v"], v_g=source.v_g_on, v_g_off=source.v_g_off,
+                                      r_g=source.r_g_on if event == "turn_on" else source.r_g_off,
+                                      i_x=record["current_a"], e_x=record["energy_j"], evidence=evidence,
+                                      commutation_device=source.commutation_device)
             points[event].append(point)
         if not any(points.values()):
             raise ValueError("Selected log step has no valid mapped supplied integrals")
@@ -458,10 +460,10 @@ def extract_measurement(request, conditions, device_document=None):
         transistor.switch.e_off_data.extend(points["turn_off"])
         native = core_to_json_document(transistor)
     response = {**preview, "source": asdict(source), "status": "review-not-persisted",
-            "analysis": analysis, "raw_record": _plain(asdict(raw)) if raw else None,
-            "points": {key: [_plain(asdict(point)) for point in values] for key, values in points.items()},
-            "core_json_document": native,
-            "core_json_text": json.dumps(native, ensure_ascii=False, allow_nan=False) if native else None}
+                "analysis": analysis, "raw_record": _plain(asdict(raw)) if raw else None,
+                "points": {key: [_plain(asdict(point)) for point in values] for key, values in points.items()},
+                "core_json_document": native,
+                "core_json_text": json.dumps(native, ensure_ascii=False, allow_nan=False) if native else None}
     review_text = json.dumps(response, ensure_ascii=False, allow_nan=False)
     if len(review_text.encode("utf-8")) * 3 > MAX_OUTPUT_BYTES:
         raise MeasurementLimitError("Expanded review JSON exceeds the 64 MB output budget")

@@ -509,7 +509,7 @@ class ComparisonService(IComparisonService):
             if (graph.ndim != 2 or graph.shape[0] != 2 or graph.shape[1] < 2
                     or not np.isfinite(graph).all()):
                 result[key]["diagnostics"].append({"name": transistor.metadata.name,
-                    "record_index": index, "status": "invalid-data", "reason": "Need finite paired recorded samples"})
+                                                   "record_index": index, "status": "invalid-data", "reason": "Need finite paired recorded samples"})
                 return
             try:
                 for name, value in conditions.items():
@@ -517,13 +517,13 @@ class ComparisonService(IComparisonService):
                         finite(value, name)
             except ValueError as exc:
                 result[key]["diagnostics"].append({"name": transistor.metadata.name,
-                    "record_index": index, "status": "invalid-data", "reason": str(exc)})
+                                                   "record_index": index, "status": "invalid-data", "reason": str(exc)})
                 return
             label = ", ".join(f"{k}={v if v is not None else 'unknown'}" for k, v in conditions.items())
             result[key]["curves"].append({"name": f"{transistor.metadata.name}{suffix} [{index}] ({label})",
-                "device": transistor.metadata.name, "record_index": index,
-                x_name: graph[0].tolist(), y_name: graph[1].tolist(),
-                "conditions": conditions, **conditions})
+                                          "device": transistor.metadata.name, "record_index": index,
+                                          x_name: graph[0].tolist(), y_name: graph[1].tolist(),
+                                          "conditions": conditions, **conditions})
 
         result["thermal_impedance"].update(self._plot_thermal_comparison(transistors))
 
@@ -536,12 +536,12 @@ class ComparisonService(IComparisonService):
                                  ("switching_losses_eoff", transistor.switch.e_off_data)):
                 for j, record in enumerate(records):
                     if record.dataset_type != "graph_i_e":
-                        result[key]["diagnostics"].append({"name": transistor.metadata.name,
-                            "record_index": j, "status": "unsupported-plot", "reason": f"{record.dataset_type} is not a current-energy curve"})
+                        result[key]["diagnostics"].append({"name": transistor.metadata.name, "record_index": j,
+                                                          "status": "unsupported-plot", "reason": f"{record.dataset_type} is not a current-energy curve"})
                         continue
                     observation(key, transistor, j, record.graph_i_e, "i_data", "e_data",
-                        {"t_j": record.t_j, "v_supply": record.v_supply, "v_g": record.v_g,
-                         "r_g": record.r_g, "v_g_off": record.v_g_off})
+                                {"t_j": record.t_j, "v_supply": record.v_supply, "v_g": record.v_g,
+                                 "r_g": record.r_g, "v_g_off": record.v_g_off})
             for j, record in enumerate(transistor.switch.gate_charge_curves):
                 observation("gate_charge", transistor, j, record.graph_q_v, "q_data", "v_data",
                             {"t_j": record.t_j, "v_supply": record.v_supply,
@@ -599,10 +599,10 @@ class ComparisonService(IComparisonService):
                 value["status"] = "missing-data"
                 value["reason"] = "No supported recorded curves; missing data is not zero"
         result["loss_breakdown"] = {"title": "Explicit held-current PWM loss estimate", "rows": breakdown,
-            "status": "computed" if all(row["status"] == "computed" for row in breakdown) else "partial-or-unsupported"}
+                                    "status": "computed" if all(row["status"] == "computed" for row in breakdown) else "partial-or-unsupported"}
         result["efficiency"] = {"title": "Semiconductor-only efficiency estimate", "rows": efficiency,
-            "status": "computed" if all(row["status"] == "computed" for row in efficiency) else "partial-or-unsupported",
-            "scope": "Pout / (Pout + semiconductor loss). Excludes magnetics, gate drive, auxiliaries and other converter losses."}
+                                "status": "computed" if all(row["status"] == "computed" for row in efficiency) else "partial-or-unsupported",
+                                "scope": "Pout / (Pout + semiconductor loss). Excludes magnetics, gate drive, auxiliaries and other converter losses."}
         result["config"] = json.loads(json.dumps(config, allow_nan=False))
         result["observation_policy"] = "All recorded slices shown at their actual conditions, independent of requested estimate settings"
         return result

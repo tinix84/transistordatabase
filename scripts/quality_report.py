@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Generate comprehensive quality report for merged transistor database.
-"""
+"""Generate comprehensive quality report for merged transistor database."""
 
 import json
 from pathlib import Path
@@ -10,7 +8,6 @@ from collections import defaultdict
 
 def generate_quality_report():
     """Generate comprehensive quality report."""
-
     # Load reports
     migration_path = Path('/home/tinix/claude_wsl/transistordatabase/MIGRATION_REPORT.json')
     validation_path = Path('/home/tinix/claude_wsl/transistordatabase/VALIDATION_REPORT.json')
@@ -115,7 +112,7 @@ def generate_quality_report():
                 'priority': 'high',
                 'issue': 'Low channel curve coverage',
                 'message': f"Only {completeness_pct:.1f}% of transistors have channel curves. "
-                          "Consider enriching data from additional sources."
+                "Consider enriching data from additional sources."
             })
 
         if completeness_pct > 90:
@@ -130,7 +127,7 @@ def generate_quality_report():
                 'priority': 'high',
                 'issue': 'High conflict rate',
                 'message': f"{report['summary']['conflicts']} conflicts detected ({report['summary']['conflicts']/total*100:.1f}%). "
-                          "Review CONFLICT_REVIEW.html to resolve duplicates."
+                "Review CONFLICT_REVIEW.html to resolve duplicates."
             })
         else:
             report['recommendations'].append({
@@ -145,7 +142,7 @@ def generate_quality_report():
                 'priority': 'medium',
                 'issue': 'Limited gate charge data',
                 'message': f"Only {gate_charge_pct:.1f}% have gate charge curves. "
-                          "Consider importing from PLECS or datasheet extraction."
+                "Consider importing from PLECS or datasheet extraction."
             })
 
         soa_pct = report['data_completeness']['has_soa'] / total * 100
@@ -154,7 +151,7 @@ def generate_quality_report():
                 'priority': 'medium',
                 'issue': 'Limited SOA data',
                 'message': f"Only {soa_pct:.1f}% have SOA curves. "
-                          "Add Safe Operating Area data for simulation accuracy."
+                "Add Safe Operating Area data for simulation accuracy."
             })
 
     # Save report
@@ -164,7 +161,7 @@ def generate_quality_report():
 
     # Print summary
     print(f"\n{'='*60}")
-    print(f"QUALITY REPORT GENERATED")
+    print("QUALITY REPORT GENERATED")
     print(f"{'='*60}")
     print(f"Total Transistors: {report['summary']['total_transistors']}")
     print(f"Migration Success: {report['summary']['migration_success_rate']}")
@@ -172,24 +169,24 @@ def generate_quality_report():
     print(f"Median Quality: {report['summary']['median_quality_score']:.1f}%")
     print(f"Conflicts: {report['summary']['conflicts']}")
 
-    print(f"\nBy Type:")
+    print("\nBy Type:")
     type_sorted = sorted(report['by_type'].items(), key=lambda x: x[1], reverse=True)
     for t, count in type_sorted:
         pct = count / total * 100 if total > 0 else 0
         print(f"  {t}: {count} ({pct:.1f}%)")
 
-    print(f"\nBy Manufacturer (top 10):")
+    print("\nBy Manufacturer (top 10):")
     top_mfr = sorted(report['by_manufacturer'].items(), key=lambda x: x[1], reverse=True)[:10]
     for mfr, count in top_mfr:
         pct = count / total * 100 if total > 0 else 0
         print(f"  {mfr}: {count} ({pct:.1f}%)")
 
-    print(f"\nData Completeness:")
+    print("\nData Completeness:")
     for key, value in report['data_completeness'].items():
         pct = value / total * 100 if total > 0 else 0
         print(f"  {key}: {value} ({pct:.1f}%)")
 
-    print(f"\nRecommendations:")
+    print("\nRecommendations:")
     for rec in report['recommendations']:
         priority_emoji = {
             'high': 'CRITICAL',
@@ -203,6 +200,7 @@ def generate_quality_report():
     print(f"{'='*60}\n")
 
     return report
+
 
 if __name__ == "__main__":
     generate_quality_report()

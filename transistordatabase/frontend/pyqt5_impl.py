@@ -481,8 +481,8 @@ class PyQt5DialogFactory(IDialogFactory):
             raise ImportError("PyQt5 is required for PyQt5DialogFactory")
     
     def create_file_dialog(self, dialog_type: str, 
-                          file_filter: str = "",
-                          title: str = "") -> Optional[Path]:
+                           file_filter: str = "",
+                           title: str = "") -> Optional[Path]:
         """Create file dialog."""
         if dialog_type == "open":
             filename, _ = QFileDialog.getOpenFileName(
@@ -506,8 +506,8 @@ class PyQt5DialogFactory(IDialogFactory):
             raise ValueError(f"Unknown dialog type: {dialog_type}")
     
     def create_input_dialog(self, title: str, 
-                           label: str,
-                           default_value: str = "") -> Optional[str]:
+                            label: str,
+                            default_value: str = "") -> Optional[str]:
         """Create input dialog."""
         text, ok = QInputDialog.getText(
             self.parent, title, label, text=default_value
@@ -515,7 +515,7 @@ class PyQt5DialogFactory(IDialogFactory):
         return text if ok else None
     
     def create_confirmation_dialog(self, title: str, 
-                                 message: str) -> bool:
+                                   message: str) -> bool:
         """Create confirmation dialog."""
         reply = QMessageBox.question(
             self.parent, title, message,

@@ -1,6 +1,6 @@
 # Semiconductor function gap analysis
 
-Phase 1 of [the execution plan](sprint-semiconductor-function-parity.md#1-complete-the-function-ledger). Static discovery baseline; no new parity is claimed.
+Phase 1 of the original parity plan. See the [later verification report](../reports/semiconductor-parity-verification-2026-11-10.md). Static discovery baseline; no new parity is claimed.
 
 Reference roots (read-only):
 
@@ -356,7 +356,7 @@ Every SC/ENCO definition is listed below. Repeated files are retained so source 
 
 ### Gate charge, drive and interval waveforms
 
-Execution: step 2 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 2 of the original parity plan
 
 **sc: `matlab_func/mosfet_switching_losses_refactor.py`**
 
@@ -402,7 +402,7 @@ Execution: step 2 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Double pulse, raw/log extraction and energy maps
 
-Execution: step 3 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 3 of the original parity plan
 
 **enco: `enco/packages/enco-simulation/src/enco_simulation/ltspice/adapter.py`**
 
@@ -538,7 +538,7 @@ Execution: step 3 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Device fitting, capacitances and signed slew
 
-Execution: step 4 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 4 of the original parity plan
 
 **sc: `matlab_func/extract_linear_model_IGBT.m`**
 
@@ -606,7 +606,7 @@ Execution: step 4 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Analytical switching model
 
-Execution: step 4 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 4 of the original parity plan
 
 **sc: `semiconductors/biela_swlosses.py`**
 
@@ -655,7 +655,7 @@ Execution: step 4 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Signed waveform conduction and event energies
 
-Execution: step 5 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 5 of the original parity plan
 
 **enco: `enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py`**
 
@@ -772,7 +772,7 @@ Execution: step 5 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Conditioned regression and lookup tables
 
-Execution: step 5 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 5 of the original parity plan
 
 **enco: `enco-core/src/enco_core/lut/__init__.py`**
 
@@ -902,7 +902,7 @@ Execution: step 5 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Time and frequency series operations
 
-Execution: step 5 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 5 of the original parity plan
 
 **enco: `enco-analysis/tests/series/test_frequency_series.py`**
 
@@ -1401,7 +1401,7 @@ Execution: step 5 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Parallel/composite devices and thermal paths
 
-Execution: step 6 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 6 of the original parity plan
 
 **enco: `enco-circuits/enco_circuits/library/converter/pfc_boost_dab.py`**
 
@@ -1475,7 +1475,7 @@ Execution: step 6 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Converter branch loss aggregation
 
-Execution: step 7 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 7 of the original parity plan
 
 **enco: `enco-circuits/enco_circuits/library/converter/boost.py`**
 
@@ -1696,7 +1696,7 @@ Execution: step 7 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Circuit indicators and aggregation
 
-Execution: step 7 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 7 of the original parity plan
 
 **enco: `enco-analysis/src/enco_analysis/circuit/circuit.py`**
 
@@ -1817,7 +1817,7 @@ Execution: step 7 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Catalog, FOM and Pareto exploration
 
-Execution: step 8 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 8 of the original parity plan
 
 **enco: `enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py`**
 
@@ -1846,7 +1846,7 @@ Execution: step 8 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Linked plots, maps and surfaces
 
-Execution: step 8 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 8 of the original parity plan
 
 **enco: `enco-analysis/src/enco_analysis/circuit/circuit_group.py`**
 
@@ -2009,7 +2009,7 @@ Execution: step 8 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Import/export and database conversion
 
-Execution: step 8 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 8 of the original parity plan
 
 **enco: `enco/packages/enco-components/src/enco_components/components/mosfet/__init__.py`**
 
@@ -2204,7 +2204,7 @@ Execution: step 8 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Image calibration and curve digitization
 
-Execution: step 8 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 8 of the original parity plan
 
 **sc: `mfiles/DataPicker.m`**
 
@@ -2221,7 +2221,7 @@ Execution: step 8 of [sprint-semiconductor-function-parity.md](sprint-semiconduc
 
 ### Device and condition data contracts
 
-Execution: step 8 of [sprint-semiconductor-function-parity.md](sprint-semiconductor-function-parity.md)
+Execution: step 8 of the original parity plan
 
 **enco: `enco-analysis/src/enco_analysis/circuit/analysis.py`**
 

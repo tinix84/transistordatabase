@@ -1,12 +1,13 @@
 """Test GUI performance and responsiveness."""
 import os
+# Configure the platform before the desktop imports.
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
-import pytest
-import time
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLineEdit, QPushButton
-from transistordatabase.gui.gui import MainWindow
+import pytest  # noqa: E402
+import time  # noqa: E402
+from PyQt5.QtCore import Qt  # noqa: E402
+from PyQt5.QtWidgets import QLineEdit, QPushButton  # noqa: E402
+from transistordatabase.gui.gui import MainWindow  # noqa: E402
 
 
 @pytest.fixture
@@ -66,7 +67,7 @@ def test_window_shows_without_crash(qtbot, main_window):
 def test_multiple_window_launches(qtbot):
     """Test that multiple windows can be created."""
     windows = []
-    for i in range(3):
+    for _ in range(3):
         window = MainWindow()
         qtbot.addWidget(window)
         windows.append(window)

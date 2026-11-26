@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-"""
-Generate interactive HTML interface for reviewing merge conflicts.
-"""
+"""Generate interactive HTML interface for reviewing merge conflicts."""
 
 import json
 from pathlib import Path
 from datetime import datetime
 
 def load_conflict_data():
-    """Load conflict data from CONFLICTS_FOR_REVIEW.json"""
+    """Load conflict data from CONFLICTS_FOR_REVIEW.json."""
     conflicts_path = Path('/home/tinix/claude_wsl/transistordatabase/CONFLICTS_FOR_REVIEW.json')
 
     if not conflicts_path.exists():
@@ -492,11 +490,12 @@ def generate_conflict_review_html():
     with open(output_path, 'w') as f:
         f.write(html)
 
-    print(f"\nConflict review interface generated!")
+    print("\nConflict review interface generated!")
     print(f"   Open in browser: file://{output_path.absolute()}")
     print(f"   Total conflicts: {len(conflicts)}")
     print(f"   Recommend keeping new: {sum(1 for c in conflicts if c.get('recommendation') == 'keep_new')}")
     print(f"   Recommend keeping existing: {sum(1 for c in conflicts if c.get('recommendation') == 'keep_existing')}\n")
+
 
 if __name__ == "__main__":
     generate_conflict_review_html()

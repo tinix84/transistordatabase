@@ -33,15 +33,21 @@ def mat(values, compressed=True):
 
 def source(version="0.2"):
     """Keep a signed-current gap and independent original branch samples."""
-    trace = {"xValues": np.array([[1., 2.]]), "yValues": np.array([[10., 20.]]),
-             "xLabel": "Voltage (V)", "yLabel": "Current (A)"}
-    return {"scData": {"name": np.empty((0, 0)), "fileFormatVersion": version,
-            "onStateCurrent": np.array([[-20., -10., 10., 20.]]),
-            "onStateVoltage": np.array([[-2., -1., 1., 2.]]),
-            "turnOnCurrent": np.array([[-1e100, 0., 1e100]]),
-            "turnOnEnergy": np.zeros((1, 3)), "turnOnVoltage": 1.,
-            "forwardConductionTrace": trace, "reverseConductionTrace": trace,
-            "unknownExtra": np.array([[0]], dtype=np.int16)}}
+    trace = {"xValues": np.array([[1.0, 2.0]]), "yValues": np.array([[10.0, 20.0]]), "xLabel": "Voltage (V)", "yLabel": "Current (A)"}
+    return {
+        "scData": {
+            "name": np.empty((0, 0)),
+            "fileFormatVersion": version,
+            "onStateCurrent": np.array([[-20.0, -10.0, 10.0, 20.0]]),
+            "onStateVoltage": np.array([[-2.0, -1.0, 1.0, 2.0]]),
+            "turnOnCurrent": np.array([[-1e100, 0.0, 1e100]]),
+            "turnOnEnergy": np.zeros((1, 3)),
+            "turnOnVoltage": 1.0,
+            "forwardConductionTrace": trace,
+            "reverseConductionTrace": trace,
+            "unknownExtra": np.array([[0]], dtype=np.int16),
+        }
+    }
 
 
 def choices():
@@ -160,7 +166,9 @@ def test_real_zero_curve_and_declared_ideal_scope_differ_from_placeholder():
                                      for k in ("ConductionTrace", "TurnOnTrace", "TurnOffTrace") if b + k != "forwardTurnOnTrace"}
     with pytest.raises(ValueError, match="All-zero combined"):
         finalize_mat(raw, **arguments)
-    curve.update(data_status="source-zero-unverified", source_zero_acknowledgement="Source values are zero over 1 to 2 A. Measurement evidence is not established")
+    curve.update(
+        data_status="source-zero-unverified", source_zero_acknowledgement="Source values are zero over 1 to 2 A. Measurement evidence is not established"
+    )
     unverified = finalize_mat(raw, **arguments)
     assert unverified.switch.metadata["legacy_mat_archive"]["declarations"]["curves"][0]["data_status"] == "source-zero-unverified"
     curve.pop("source_zero_acknowledgement")
@@ -176,10 +184,12 @@ def test_real_zero_curve_and_declared_ideal_scope_differ_from_placeholder():
 def test_mat5_shapes_images_nonfinite_and_no_execution(compressed):
     """Images remain descriptors. Source strings are literal data."""
     values = source()
-    values["scData"].update(column=np.array([[1], [2]], dtype=np.int32),
-                             expression="__import__('os').system('THIS_MUST_NOT_RUN')",
-                             bad=np.array([[float("nan"), float("inf")]]),
-                             image=np.arange(9000, dtype=np.uint8).reshape(30, 100, 3))
+    values["scData"].update(
+        column=np.array([[1], [2]], dtype=np.int32),
+        expression="__import__('os').system('THIS_MUST_NOT_RUN')",
+        bad=np.array([[float("nan"), float("inf")]]),
+        image=np.arange(9000, dtype=np.uint8).reshape(30, 100, 3),
+    )
     doc = preview_mat(mat(values, compressed))
     fields = doc["variables"]["scData"]["fields"]
     assert fields["column"]["shape"] == [2, 1]
@@ -236,17 +246,22 @@ def test_invalid_preflight_rejects_before_scipy_materialization(monkeypatch):
     """Reject array, object, duplicate-variable and compressed corruption before loadmat."""
     import transistordatabase.legacy_mat as module
     monkeypatch.setattr(module, "loadmat", lambda *a, **k: pytest.fail("SciPy must not materialize invalid data"))
-    header = mat({"x": 1.})[:128]
-    cases = [header + independent_matrix("<", shape=(100_000_000, 2)),
-             header + independent_matrix("<", shape=(8000, 8000, 0)),
-             header + independent_matrix("<", shape=(1,) * 9),
-             header + independent_matrix("<", class_id=3),
-             header + independent_matrix("<") * 2,
-             header + struct.pack("<II", 15, 8) + b"not-zlib"]
+    header = mat({"x": 1.0})[:128]
+    cases = [
+        header + independent_matrix("<", shape=(100_000_000, 2)),
+        header + independent_matrix("<", shape=(8000, 8000, 0)),
+        header + independent_matrix("<", shape=(1,) * 9),
+        header + independent_matrix("<", class_id=3),
+        header + independent_matrix("<") * 2,
+        header + struct.pack("<II", 15, 8) + b"not-zlib",
+    ]
+
     def tag(kind, payload):
         return struct.pack("<II", kind, len(payload)) + payload + bytes(-len(payload) % 8)
-    duplicate_fields = (tag(6, struct.pack("<II", 2, 0)) + tag(5, struct.pack("<ii", 1, 1)) +
-                        tag(1, b"scData") + tag(5, struct.pack("<i", 2)) + tag(1, b"a\0a\0"))
+
+    duplicate_fields = (
+        tag(6, struct.pack("<II", 2, 0)) + tag(5, struct.pack("<ii", 1, 1)) + tag(1, b"scData") + tag(5, struct.pack("<i", 2)) + tag(1, b"a\0a\0")
+    )
     cases.append(header + tag(14, duplicate_fields))
     for raw in cases:
         with pytest.raises(MatFormatError):
@@ -271,7 +286,12 @@ def test_duplicate_fields_nesting_and_octave_incomplete_payload():
 
 def octave_scalar_struct(fields):
     """Create the reviewed literal Octave text subset independently."""
-    return b"# Created by Octave fixture\n# name: scData\n# type: scalar struct\n# ndims: 2\n 1 1\n# length: " + str(len(fields)).encode() + b"\n" + b"".join(fields)
+    return (
+        b"# Created by Octave fixture\n# name: scData\n# type: scalar struct\n# ndims: 2\n 1 1\n# length: "
+        + str(len(fields)).encode()
+        + b"\n"
+        + b"".join(fields)
+    )
 
 
 def test_octave_utf8_multiline_metadata_literal_and_pixel_column_major():

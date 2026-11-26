@@ -1,5 +1,5 @@
 """
-TDB to ntbee2 CSV Converter Prototype
+TDB to ntbee2 CSV Converter Prototype.
 
 This module converts TDB JSON format to ntbee2 CSV format.
 Supports both:
@@ -33,6 +33,7 @@ import numpy as np
 @dataclass
 class PLECSDeviceRecord:
     """Single record for plecs_devices.csv export."""
+
     part_number: str
     vendor: str
     type: str  # "mosfet", "igbt", "diode"
@@ -62,6 +63,7 @@ class PLECSDeviceRecord:
 @dataclass
 class RagglComboRecord:
     """Single record for raggl_combos.csv export."""
+
     combo_id: str
     transistor_pn: str
     diode_pn: str

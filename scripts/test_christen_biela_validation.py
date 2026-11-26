@@ -156,7 +156,7 @@ def test_implementation_correctness():
     )
     result_zvs = model.calc_turn_off_energy(params_zvs)
     print(f"  E_off at I_0 = {params_zvs.i_0:.2f}A (< I_0,zvs): {result_zvs['e_off']*1e6:.2f} uJ")
-    print(f"  ✓ ZVS boundary calculated (PASS)")
+    print("  ✓ ZVS boundary calculated (PASS)")
 
     # Test 6: Iteration convergence
     print("\n[TEST 6] Iteration Convergence")
@@ -166,7 +166,7 @@ def test_implementation_correctness():
     print(f"  I_oss = {i_oss_iter:.2f} A (converged)")
     print(f"  g_m   = {gm_iter:.3f} S (converged)")
     print(f"  V_mil = {v_mil_iter:.2f} V (converged)")
-    print(f"  ✓ Iteration converged (PASS)")
+    print("  ✓ Iteration converged (PASS)")
 
     # Summary
     print("\n" + "=" * 70)

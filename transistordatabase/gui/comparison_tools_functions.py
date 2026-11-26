@@ -1,4 +1,5 @@
 """GUI comparison tools."""
+
 import numpy as np
 from math import floor
 from scipy.interpolate import interpn
@@ -9,6 +10,7 @@ from decimal import Decimal
 def _get_main_window():
     """Deferred import to avoid circular dependency with gui.py."""
     from transistordatabase.gui.gui import MainWindow
+
     return MainWindow
 
 
@@ -19,9 +21,14 @@ def new_annotation(axis):
     :param axis: matplotlibwidget axis to put the annotation on
     :return: annotation object
     """
-    annotation = axis.annotate("", xy=(0, 0), xytext=(-100, 30), textcoords="offset pixels",
-                               bbox=dict(boxstyle="square", fc="linen", ec="k", lw="1"),
-                               arrowprops=dict(arrowstyle="-|>"))
+    annotation = axis.annotate(
+        "",
+        xy=(0, 0),
+        xytext=(-100, 30),
+        textcoords="offset pixels",
+        bbox=dict(boxstyle="square", fc="linen", ec="k", lw="1"),
+        arrowprops=dict(arrowstyle="-|>"),
+    )
     return annotation
 
 
@@ -82,11 +89,13 @@ def plot_all_energy_data(transistor, matplotlibwidget, switch_diode):
                 if transistor.switch.e_on[i_energy_data].dataset_type == 'graph_i_e':
                     labelplot = "$e_{{on}}$: $V_{{supply}}$ = {0} V, $V_{{g}}$ = {1} V, $T_{{J}}$ = {2} °C, $R_{{g}}$ = {3} Ohm".format(
                         transistor.switch.e_on[i_energy_data].v_supply,
-                        transistor.switch.e_on[i_energy_data].v_g, transistor.switch.e_on[i_energy_data].t_j,
-                        transistor.switch.e_on[i_energy_data].r_g)
-                    matplotlibwidget.axis.plot(transistor.switch.e_on[i_energy_data].graph_i_e[0],
-                                               transistor.switch.e_on[i_energy_data].graph_i_e[1],
-                                               label=labelplot)
+                        transistor.switch.e_on[i_energy_data].v_g,
+                        transistor.switch.e_on[i_energy_data].t_j,
+                        transistor.switch.e_on[i_energy_data].r_g,
+                    )
+                    matplotlibwidget.axis.plot(
+                        transistor.switch.e_on[i_energy_data].graph_i_e[0], transistor.switch.e_on[i_energy_data].graph_i_e[1], label=labelplot
+                    )
                     matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
             # look for e_off losses
             for i_energy_data in np.array(range(0, len(transistor.switch.e_off))):
@@ -95,20 +104,19 @@ def plot_all_energy_data(transistor, matplotlibwidget, switch_diode):
                         transistor.switch.e_off[i_energy_data].v_supply,
                         transistor.switch.e_off[i_energy_data].v_g,
                         transistor.switch.e_off[i_energy_data].t_j,
-                        transistor.switch.e_off[i_energy_data].r_g)
-                    matplotlibwidget.axis.plot(transistor.switch.e_off[i_energy_data].graph_i_e[0],
-                                               transistor.switch.e_off[i_energy_data].graph_i_e[1],
-                                               label=labelplot)
+                        transistor.switch.e_off[i_energy_data].r_g,
+                    )
+                    matplotlibwidget.axis.plot(
+                        transistor.switch.e_off[i_energy_data].graph_i_e[0], transistor.switch.e_off[i_energy_data].graph_i_e[1], label=labelplot
+                    )
                     matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
             matplotlibwidget.axis.legend(fontsize=5)
-            matplotlibwidget.axis.set(xlabel="Current in A",
-                                      ylabel="Loss Energy in J")
+            matplotlibwidget.axis.set(xlabel="Current in A", ylabel="Loss Energy in J")
             matplotlibwidget.axis.grid()
             matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
             matplotlibwidget.figure.canvas.draw_idle()
 
-            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                             color="Green", linewidth=1)
+            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
 
             matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
 
@@ -129,33 +137,33 @@ def plot_all_energy_data(transistor, matplotlibwidget, switch_diode):
                 if transistor.diode.e_rr[i_energy_data].dataset_type == 'graph_i_e':
                     # add label plot
                     labelplot = "$e_{{rr}}$: $v_{{supply}}$ = {0} V, $T_{{J}}$ = {1} °C, $R_{{g}}$ = {2} Ohm".format(
-                        transistor.diode.e_rr[i_energy_data].v_supply, transistor.diode.e_rr[i_energy_data].t_j,
-                        transistor.diode.e_rr[i_energy_data].r_g)
+                        transistor.diode.e_rr[i_energy_data].v_supply, transistor.diode.e_rr[i_energy_data].t_j, transistor.diode.e_rr[i_energy_data].r_g
+                    )
                     # check if gate voltage is given (GaN Transistor, SiC-MOSFET)
                     # if ture, add gate-voltage to label
                     if isinstance(transistor.diode.e_rr[i_energy_data].v_g, (int, float)):
-                        labelplot = labelplot + ", $v_{{g}}$ = {0} V".format(
-                            transistor.diode.e_rr[i_energy_data].v_g)
+                        labelplot = labelplot + ", $v_{{g}}$ = {0} V".format(transistor.diode.e_rr[i_energy_data].v_g)
                     # plot
-                    matplotlibwidget.axis.plot(transistor.diode.e_rr[i_energy_data].graph_i_e[0],
-                                               transistor.diode.e_rr[i_energy_data].graph_i_e[1],
-                                               label=labelplot)
+                    matplotlibwidget.axis.plot(
+                        transistor.diode.e_rr[i_energy_data].graph_i_e[0], transistor.diode.e_rr[i_energy_data].graph_i_e[1], label=labelplot
+                    )
                     matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
             matplotlibwidget.axis.legend(fontsize=5)
-            matplotlibwidget.axis.set(xlabel="Current in A",
-                                      ylabel="Loss Energy in J")
+            matplotlibwidget.axis.set(xlabel="Current in A", ylabel="Loss Energy in J")
             matplotlibwidget.axis.grid()
             matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
             matplotlibwidget.figure.canvas.draw_idle()
-            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                             color="Green", linewidth=1)
+            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
 
             matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
 
         else:
             matplotlibwidget.axis.clear()
             matplotlibwidget.figure.canvas.draw_idle()
-            _get_main_window().show_popup_message(_get_main_window(), f"Diode reverse recovery energy i_e curves are not available for <b>{transistor.name}</b>!")
+            _get_main_window().show_popup_message(
+                _get_main_window(), f"Diode reverse recovery energy i_e curves are not available for <b>{transistor.name}</b>!"
+            )
+
 
 def plot_all_energy_data_r_g(transistor, matplotlibwidget, switch_diode):
     """
@@ -188,11 +196,13 @@ def plot_all_energy_data_r_g(transistor, matplotlibwidget, switch_diode):
                 if transistor.switch.e_on[i_energy_data].dataset_type == 'graph_r_e':
                     labelplot = "$e_{{on}}$: $V_{{supply}}$ = {0} V, $V_{{g}}$ = {1} V, $T_{{J}}$ = {2} °C, $i_{{ch}}$ = {3} A".format(
                         transistor.switch.e_on[i_energy_data].v_supply,
-                        transistor.switch.e_on[i_energy_data].v_g, transistor.switch.e_on[i_energy_data].t_j,
-                        transistor.switch.e_on[i_energy_data].i_x)
-                    matplotlibwidget.axis.plot(transistor.switch.e_on[i_energy_data].graph_r_e[0],
-                                               transistor.switch.e_on[i_energy_data].graph_r_e[1],
-                                               label=labelplot)
+                        transistor.switch.e_on[i_energy_data].v_g,
+                        transistor.switch.e_on[i_energy_data].t_j,
+                        transistor.switch.e_on[i_energy_data].i_x,
+                    )
+                    matplotlibwidget.axis.plot(
+                        transistor.switch.e_on[i_energy_data].graph_r_e[0], transistor.switch.e_on[i_energy_data].graph_r_e[1], label=labelplot
+                    )
                     matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
             # look for e_off losses
             for i_energy_data in np.array(range(0, len(transistor.switch.e_off))):
@@ -201,19 +211,18 @@ def plot_all_energy_data_r_g(transistor, matplotlibwidget, switch_diode):
                         transistor.switch.e_off[i_energy_data].v_supply,
                         transistor.switch.e_off[i_energy_data].v_g,
                         transistor.switch.e_off[i_energy_data].t_j,
-                        transistor.switch.e_off[i_energy_data].i_x)
-                    matplotlibwidget.axis.plot(transistor.switch.e_off[i_energy_data].graph_r_e[0],
-                                               transistor.switch.e_off[i_energy_data].graph_r_e[1],
-                                               label=labelplot)
+                        transistor.switch.e_off[i_energy_data].i_x,
+                    )
+                    matplotlibwidget.axis.plot(
+                        transistor.switch.e_off[i_energy_data].graph_r_e[0], transistor.switch.e_off[i_energy_data].graph_r_e[1], label=labelplot
+                    )
                     matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
             matplotlibwidget.axis.legend(fontsize=5)
-            matplotlibwidget.axis.set(xlabel="Gate Resistor in Ω",
-                                      ylabel="Loss Energy in J")
+            matplotlibwidget.axis.set(xlabel="Gate Resistor in Ω", ylabel="Loss Energy in J")
             matplotlibwidget.axis.grid()
             matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
             matplotlibwidget.figure.canvas.draw_idle()
-            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                             color="Green", linewidth=1)
+            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
 
             matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
 
@@ -234,34 +243,33 @@ def plot_all_energy_data_r_g(transistor, matplotlibwidget, switch_diode):
                 if transistor.diode.e_rr[i_energy_data].dataset_type == 'graph_r_e':
                     # add label plot
                     labelplot = "$e_{{rr}}$: $v_{{supply}}$ = {0} V, $T_{{J}}$ = {1} °C, $I_{{ch}}$ = {2} A".format(
-                        transistor.diode.e_rr[i_energy_data].v_supply, transistor.diode.e_rr[i_energy_data].t_j,
-                        transistor.diode.e_rr[i_energy_data].i_x)
+                        transistor.diode.e_rr[i_energy_data].v_supply, transistor.diode.e_rr[i_energy_data].t_j, transistor.diode.e_rr[i_energy_data].i_x
+                    )
                     # check if gate voltage is given (GaN Transistor, SiC-MOSFET)
                     # if ture, add gate-voltage to label
                     if isinstance(transistor.diode.e_rr[i_energy_data].v_g, (int, float)):
-                        labelplot = labelplot + ", $v_{{g}}$ = {0} V".format(
-                            transistor.diode.e_rr[i_energy_data].v_g)
+                        labelplot = labelplot + ", $v_{{g}}$ = {0} V".format(transistor.diode.e_rr[i_energy_data].v_g)
 
                     # plot
-                    matplotlibwidget.axis.plot(transistor.diode.e_rr[i_energy_data].graph_r_e[0],
-                                               transistor.diode.e_rr[i_energy_data].graph_r_e[1],
-                                               label=labelplot)
+                    matplotlibwidget.axis.plot(
+                        transistor.diode.e_rr[i_energy_data].graph_r_e[0], transistor.diode.e_rr[i_energy_data].graph_r_e[1], label=labelplot
+                    )
                     matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
             matplotlibwidget.axis.legend(fontsize=5)
-            matplotlibwidget.axis.set(xlabel="Gate Resistor in Ω",
-                                      ylabel="Loss Energy in J")
+            matplotlibwidget.axis.set(xlabel="Gate Resistor in Ω", ylabel="Loss Energy in J")
             matplotlibwidget.axis.grid()
             matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
             matplotlibwidget.figure.canvas.draw_idle()
-            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                             color="Green", linewidth=1)
+            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
 
             matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
 
         else:
             matplotlibwidget.axis.clear()
             matplotlibwidget.figure.canvas.draw_idle()
-            _get_main_window().show_popup_message(_get_main_window(), f"Diode reverse recovery energy r_e curves are not available for <b>{transistor.name}</b>!")
+            _get_main_window().show_popup_message(
+                _get_main_window(), f"Diode reverse recovery energy r_e curves are not available for <b>{transistor.name}</b>!"
+            )
 
 
 def plot_all_channel_data(transistor, matplotlibwidget, switch_diode):
@@ -304,8 +312,7 @@ def plot_all_channel_data(transistor, matplotlibwidget, switch_diode):
                     matplotlibwidget.axis.grid()
                     matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
                     matplotlibwidget.figure.canvas.draw_idle()
-                    matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                                     color="Green", linewidth=1)
+                    matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
 
                     matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
 
@@ -319,22 +326,21 @@ def plot_all_channel_data(transistor, matplotlibwidget, switch_diode):
                     matplotlibwidget.axis.grid()
                     matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
                     matplotlibwidget.figure.canvas.draw_idle()
-                    matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                                     color="Green", linewidth=1)
+                    matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
 
                     matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
         else:
             for i_channel in np.array(range(0, len(transistor.switch.channel))):
                 plot_label = "$V_{{g}}$ = {0} V, $T_{{J}}$ = {1} °C".format(transistor.switch.channel[i_channel].v_g, transistor.switch.channel[i_channel].t_j)
-                matplotlibwidget.axis.plot(transistor.switch.channel[i_channel].graph_v_i[0], transistor.switch.channel[i_channel].graph_v_i[1],
-                                           label=plot_label)
+                matplotlibwidget.axis.plot(
+                    transistor.switch.channel[i_channel].graph_v_i[0], transistor.switch.channel[i_channel].graph_v_i[1], label=plot_label
+                )
             matplotlibwidget.axis.legend(fontsize=5)
             matplotlibwidget.axis.set(xlabel="Voltage in V", ylabel="Current in A")
             matplotlibwidget.axis.grid()
             matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
             matplotlibwidget.figure.canvas.draw_idle()
-            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                             color="Green", linewidth=1)
+            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
 
             matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
 
@@ -363,8 +369,7 @@ def plot_all_channel_data(transistor, matplotlibwidget, switch_diode):
                     matplotlibwidget.axis.grid()
                     matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
                     matplotlibwidget.figure.canvas.draw_idle()
-                    matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                                     color="Green", linewidth=1)
+                    matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
 
                     matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
 
@@ -378,25 +383,22 @@ def plot_all_channel_data(transistor, matplotlibwidget, switch_diode):
                     matplotlibwidget.axis.grid()
                     matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
                     matplotlibwidget.figure.canvas.draw_idle()
-                    matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                                     color="Green", linewidth=1)
+                    matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
 
                     matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
         else:
             for i_channel in np.array(range(0, len(transistor.diode.channel))):
-                plot_label = "$V_{{g}}$ = {0} V, $T_{{J}}$ = {1} °C".format(transistor.diode.channel[i_channel].v_g,
-                                                                            transistor.diode.channel[i_channel].t_j)
-                matplotlibwidget.axis.plot(transistor.diode.channel[i_channel].graph_v_i[0],
-                                           transistor.diode.channel[i_channel].graph_v_i[1], label=plot_label)
+                plot_label = "$V_{{g}}$ = {0} V, $T_{{J}}$ = {1} °C".format(transistor.diode.channel[i_channel].v_g, transistor.diode.channel[i_channel].t_j)
+                matplotlibwidget.axis.plot(transistor.diode.channel[i_channel].graph_v_i[0], transistor.diode.channel[i_channel].graph_v_i[1], label=plot_label)
             matplotlibwidget.axis.legend(fontsize=5)
             matplotlibwidget.axis.set(xlabel="Voltage in V", ylabel="Current in A")
             matplotlibwidget.axis.grid()
             matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
             matplotlibwidget.figure.canvas.draw_idle()
-            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                             color="Green", linewidth=1)
+            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
 
             matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
+
 
 def plot_e_on(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j2, t_j3, r_g_on1, r_g_on2, r_g_on3, v_supply1, v_supply2, v_supply3):
     """
@@ -446,26 +448,28 @@ def plot_e_on(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
 
             if len(t_j_available) == 1:
                 try:
-                    transistor_list[m].wp.e_on = transistor_list[m].calc_object_i_e(e_on_off_rr="e_on",
-                                                                                    t_j=t_j_available[0],
-                                                                                    v_supply=v_supply_chosen,
-                                                                                    r_g=r_g_on_list[m],
-                                                                                    normalize_t_to_v=10)
+                    transistor_list[m].wp.e_on = transistor_list[m].calc_object_i_e(
+                        e_on_off_rr="e_on", t_j=t_j_available[0], v_supply=v_supply_chosen, r_g=r_g_on_list[m], normalize_t_to_v=10
+                    )
                     vec_e_on = transistor_list[m].wp.e_on.graph_i_e[1] * v_supply_list[m] / v_supply_chosen
                     vec_i = transistor_list[m].wp.e_on.graph_i_e[0]
                 except:
                     transistor_list[m].wp.e_on = transistor_list[m].get_object_i_e(
                         e_on_off_rr="e_on",
-                        t_j=t_j_available[0], v_supply=v_supply_chosen, r_g=r_g_on_list[m],
-                        v_g=max([i for i in [e_on.v_g for e_on in transistor_list[m].switch.e_on] if i is not None]))
+                        t_j=t_j_available[0],
+                        v_supply=v_supply_chosen,
+                        r_g=r_g_on_list[m],
+                        v_g=max([i for i in [e_on.v_g for e_on in transistor_list[m].switch.e_on] if i is not None]),
+                    )
                     vec_e_on = transistor_list[m].wp.e_on.graph_i_e[1] * v_supply_list[m] / v_supply_chosen
                     vec_i = transistor_list[m].wp.e_on.graph_i_e[0]
 
                 label = f"{transistor_list[m].name}, T_j = {t_j_available[0]}°C"
 
-                _get_main_window().show_popup_message(_get_main_window(),
-                                              f"Switch energy i_e curve for <b>{transistor_list[m].name}</b> only available for T_j = "
-                                              f"{t_j_available[0]}°C due to missing data!")
+                _get_main_window().show_popup_message(
+                    _get_main_window(),
+                    f"Switch energy i_e curve for <b>{transistor_list[m].name}</b> only available for T_j = {t_j_available[0]}°C due to missing data!",
+                )
 
             else:
                 r_g_on_max_list = np.zeros_like(t_j_available)
@@ -473,9 +477,11 @@ def plot_e_on(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
                 for i in range(len(t_j_available)):
                     r_e_object_on = transistor_list[m].get_object_r_e_simplified(
                         e_on_off_rr="e_on",
-                        t_j=t_j_available[i], v_g=max([i for i in [e_on.v_g for e_on in transistor_list[m].switch.e_on] if i is not None]),
+                        t_j=t_j_available[i],
+                        v_g=max([i for i in [e_on.v_g for e_on in transistor_list[m].switch.e_on] if i is not None]),
                         v_supply=max([i for i in [e_on.v_supply for e_on in transistor_list[m].switch.e_on] if i is not None]),
-                        normalize_t_to_v=10)
+                        normalize_t_to_v=10,
+                    )
                     r_g_on_max_list[i] = np.amax(r_e_object_on.graph_r_e[0]) * 10000
 
                 r_g_on_max = floor(10 * min(r_g_on_max_list) / 10000) / 10
@@ -484,24 +490,23 @@ def plot_e_on(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
 
                 vec_i = np.linspace(0, transistor_list[m].i_abs_max, 10)
 
-                m_t_j_available, m_r_g_on_available, m_i = np.meshgrid(t_j_available, r_g_on_available, vec_i,
-                                                                       indexing='ij')
+                m_t_j_available, m_r_g_on_available, m_i = np.meshgrid(t_j_available, r_g_on_available, vec_i, indexing='ij')
 
                 m_e_on = np.zeros_like(m_t_j_available)
 
                 for i in range(len(t_j_available)):
                     for j in range(len(r_g_on_available)):
                         for k in range(len(vec_i)):
-                            transistor_list[m].wp.e_on = transistor_list[m].calc_object_i_e(e_on_off_rr="e_on",
-                                                                                            t_j=m_t_j_available[
-                                                                                                i, j, k],
-                                                                                            v_supply=v_supply_chosen,
-                                                                                            r_g=m_r_g_on_available[
-                                                                                                i, j, k],
-                                                                                            normalize_t_to_v=10)
+                            transistor_list[m].wp.e_on = transistor_list[m].calc_object_i_e(
+                                e_on_off_rr="e_on", t_j=m_t_j_available[i, j, k], v_supply=v_supply_chosen, r_g=m_r_g_on_available[i, j, k], normalize_t_to_v=10
+                            )
 
-                            m_e_on[i, j, k] = np.interp(m_i[i, j, k], transistor_list[m].wp.e_on.graph_i_e[0],
-                                                        transistor_list[m].wp.e_on.graph_i_e[1]) * v_supply_list[m] / v_supply_chosen * 1000000000
+                            m_e_on[i, j, k] = (
+                                np.interp(m_i[i, j, k], transistor_list[m].wp.e_on.graph_i_e[0], transistor_list[m].wp.e_on.graph_i_e[1])
+                                * v_supply_list[m]
+                                / v_supply_chosen
+                                * 1000000000
+                            )
 
                 points = (t_j_available, r_g_on_available, vec_i)
                 values = m_e_on
@@ -509,7 +514,7 @@ def plot_e_on(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
                 vec_e_on = np.zeros_like(vec_i)
 
                 for n in range(len(vec_i)):
-                    point = ([t_j_list[m], r_g_on_list[m], vec_i[n]])
+                    point = [t_j_list[m], r_g_on_list[m], vec_i[n]]
                     vec_e_on[n] = interpn(points, values, point, bounds_error=False, fill_value=None) / 1000000000
 
                 if t_j_list[m] < min(t_j_available) or t_j_list[m] > max(t_j_available):
@@ -524,19 +529,18 @@ def plot_e_on(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
 
         try:
             matplotlibwidget.axis.legend(fontsize=5)
-            matplotlibwidget.axis.set(xlabel="Current in A",
-                                      ylabel="Loss energy in J")
+            matplotlibwidget.axis.set(xlabel="Current in A", ylabel="Loss energy in J")
             matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
             matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
             matplotlibwidget.axis.grid()
             matplotlibwidget.figure.canvas.draw_idle()
 
-            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                             color="Green", linewidth=1)
+            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
             matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
         except:
             matplotlibwidget.axis.clear()
             matplotlibwidget.figure.canvas.draw_idle()
+
 
 def plot_e_off(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j2, t_j3, r_g_off1, r_g_off2, r_g_off3, v_supply1, v_supply2, v_supply3):
     """
@@ -586,45 +590,40 @@ def plot_e_off(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_
 
             if len(t_j_available) == 1:
                 try:
-                    transistor_list[m].wp.e_off = transistor_list[m].calc_object_i_e(e_on_off_rr="e_off",
-                                                                                     t_j=t_j_available[0],
-                                                                                     v_supply=v_supply_chosen,
-                                                                                     r_g=r_g_off_list[m],
-                                                                                     normalize_t_to_v=10)
+                    transistor_list[m].wp.e_off = transistor_list[m].calc_object_i_e(
+                        e_on_off_rr="e_off", t_j=t_j_available[0], v_supply=v_supply_chosen, r_g=r_g_off_list[m], normalize_t_to_v=10
+                    )
                     vec_e_off = transistor_list[m].wp.e_off.graph_i_e[1] * v_supply_list[m] / v_supply_chosen
                     vec_i = transistor_list[m].wp.e_off.graph_i_e[0]
                 except:
                     transistor_list[m].wp.e_off = transistor_list[m].get_object_i_e(
                         e_on_off_rr="e_off",
-                        t_j=t_j_available[0], v_supply=v_supply_chosen, r_g=r_g_off_list[m],
-                        v_g=min([i for i in [e_off.v_g for e_off in transistor_list[m].switch.e_off] if i is not None]))
+                        t_j=t_j_available[0],
+                        v_supply=v_supply_chosen,
+                        r_g=r_g_off_list[m],
+                        v_g=min([i for i in [e_off.v_g for e_off in transistor_list[m].switch.e_off] if i is not None]),
+                    )
                     vec_e_off = transistor_list[m].wp.e_off.graph_i_e[1] * v_supply_list[m] / v_supply_chosen
                     vec_i = transistor_list[m].wp.e_off.graph_i_e[0]
 
                 label = f"{transistor_list[m].name}, T_j = {t_j_available[0]}°C"
 
-                _get_main_window().show_popup_message(_get_main_window(), f"Switch energy i_e curve for <b>{transistor_list[m].name}</b> "
-                                                          f"only available for T_j = {t_j_available[0]}°C due to missing data!")
+                _get_main_window().show_popup_message(
+                    _get_main_window(),
+                    f"Switch energy i_e curve for <b>{transistor_list[m].name}</b> only available for T_j = {t_j_available[0]}°C due to missing data!",
+                )
 
             else:
                 r_g_off_max_list = np.zeros_like(t_j_available)
 
                 for i in range(len(t_j_available)):
-                    r_e_object_off = transistor_list[m].get_object_r_e_simplified(e_on_off_rr="e_off",
-                                                                                  t_j=t_j_available[i],
-                                                                                  v_g=max([i for i in
-                                                                                           [e_off.v_g for e_off in
-                                                                                            transistor_list[
-                                                                                                m].switch.e_off]
-                                                                                           if
-                                                                                           i is not None]),
-                                                                                  v_supply=max(
-                                                                                      [i for i in
-                                                                                       [e_off.v_supply for e_off in
-                                                                                        transistor_list[
-                                                                                            m].switch.e_off] if
-                                                                                       i is not None]),
-                                                                                  normalize_t_to_v=10)
+                    r_e_object_off = transistor_list[m].get_object_r_e_simplified(
+                        e_on_off_rr="e_off",
+                        t_j=t_j_available[i],
+                        v_g=max([i for i in [e_off.v_g for e_off in transistor_list[m].switch.e_off] if i is not None]),
+                        v_supply=max([i for i in [e_off.v_supply for e_off in transistor_list[m].switch.e_off] if i is not None]),
+                        normalize_t_to_v=10,
+                    )
                     r_g_off_max_list[i] = np.amax(r_e_object_off.graph_r_e[0]) * 10000
 
                 r_g_off_max = floor(10 * min(r_g_off_max_list) / 10000) / 10
@@ -641,10 +640,18 @@ def plot_e_off(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_
                     for j in range(len(r_g_off_available)):
                         for k in range(len(vec_i)):
                             transistor_list[m].wp.e_off = transistor_list[m].calc_object_i_e(
-                                e_on_off_rr="e_off", t_j=m_t_j_available[i, j, k], v_supply=v_supply_chosen,
-                                r_g=m_r_g_off_available[i, j, k], normalize_t_to_v=10)
-                            m_e_off[i, j, k] = np.interp(m_i[i, j, k], transistor_list[m].wp.e_off.graph_i_e[0],
-                                                         transistor_list[m].wp.e_off.graph_i_e[1]) * v_supply_list[m] / v_supply_chosen * 1000000000
+                                e_on_off_rr="e_off",
+                                t_j=m_t_j_available[i, j, k],
+                                v_supply=v_supply_chosen,
+                                r_g=m_r_g_off_available[i, j, k],
+                                normalize_t_to_v=10,
+                            )
+                            m_e_off[i, j, k] = (
+                                np.interp(m_i[i, j, k], transistor_list[m].wp.e_off.graph_i_e[0], transistor_list[m].wp.e_off.graph_i_e[1])
+                                * v_supply_list[m]
+                                / v_supply_chosen
+                                * 1000000000
+                            )
 
                 points = (t_j_available, r_g_off_available, vec_i)
                 values = m_e_off
@@ -652,7 +659,7 @@ def plot_e_off(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_
                 vec_e_off = np.zeros_like(vec_i)
 
                 for n in range(len(vec_i)):
-                    point = ([t_j_list[m], r_g_off_list[m], vec_i[n]])
+                    point = [t_j_list[m], r_g_off_list[m], vec_i[n]]
                     vec_e_off[n] = interpn(points, values, point, bounds_error=False, fill_value=None) / 1000000000
 
                 if t_j_list[m] < min(t_j_available) or t_j_list[m] > max(t_j_available):
@@ -667,19 +674,18 @@ def plot_e_off(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_
 
         try:
             matplotlibwidget.axis.legend(fontsize=5)
-            matplotlibwidget.axis.set(xlabel="Current in A",
-                                      ylabel="Loss energy in J")
+            matplotlibwidget.axis.set(xlabel="Current in A", ylabel="Loss energy in J")
             matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
             matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
             matplotlibwidget.axis.grid()
             matplotlibwidget.figure.canvas.draw_idle()
 
-            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                             color="Green", linewidth=1)
+            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
             matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
         except:
             matplotlibwidget.axis.clear()
             matplotlibwidget.figure.canvas.draw_idle()
+
 
 def plot_e_rr(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j2, t_j3, r_g_off1, r_g_off2, r_g_off3, v_supply1, v_supply2, v_supply3):
     """
@@ -729,33 +735,40 @@ def plot_e_rr(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
 
             if len(t_j_available) == 1:
                 try:
-                    transistor_list[m].wp.e_rr = transistor_list[m].calc_object_i_e(e_on_off_rr="e_rr",
-                                                                                    t_j=t_j_available[0],
-                                                                                    v_supply=v_supply_chosen,
-                                                                                    r_g=r_g_off_list[m],
-                                                                                    normalize_t_to_v=10)
+                    transistor_list[m].wp.e_rr = transistor_list[m].calc_object_i_e(
+                        e_on_off_rr="e_rr", t_j=t_j_available[0], v_supply=v_supply_chosen, r_g=r_g_off_list[m], normalize_t_to_v=10
+                    )
                     vec_e_rr = transistor_list[m].wp.e_rr.graph_i_e[1] * v_supply_list[m] / v_supply_chosen
                     vec_i = transistor_list[m].wp.e_rr.graph_i_e[0]
                 except:
                     transistor_list[m].wp.e_rr = transistor_list[m].get_object_i_e(
-                        e_on_off_rr="e_rr", t_j=t_j_available[0], v_supply=v_supply_chosen, r_g=r_g_off_list[m],
-                        v_g=min([i for i in [e_rr.v_g for e_rr in transistor_list[m].diode.e_rr] if i is not None]))
+                        e_on_off_rr="e_rr",
+                        t_j=t_j_available[0],
+                        v_supply=v_supply_chosen,
+                        r_g=r_g_off_list[m],
+                        v_g=min([i for i in [e_rr.v_g for e_rr in transistor_list[m].diode.e_rr] if i is not None]),
+                    )
 
                     vec_e_rr = transistor_list[m].wp.e_rr.graph_i_e[1] * v_supply_list[m] / v_supply_chosen
                     vec_i = transistor_list[m].wp.e_rr.graph_i_e[0]
 
                 label = f"{transistor_list[m].name}, T_j = {t_j_available[0]}°C"
-                _get_main_window().show_popup_message(_get_main_window(), f"Diode energy i_e curve for <b>{transistor_list[m].name}</b> only available for "
-                                                          f"T_j = {t_j_available[0]}°C due to missing data!")
+                _get_main_window().show_popup_message(
+                    _get_main_window(),
+                    f"Diode energy i_e curve for <b>{transistor_list[m].name}</b> only available for T_j = {t_j_available[0]}°C due to missing data!",
+                )
 
             else:
                 r_g_rr_max_list = np.zeros_like(t_j_available)
 
                 for i in range(len(t_j_available)):
                     r_e_object_rr = transistor_list[m].get_object_r_e_simplified(
-                        e_on_off_rr="e_rr", t_j=t_j_available[i], v_g=max([i for i in [e_rr.v_g for e_rr in transistor_list[m].diode.e_rr] if i is not None]),
+                        e_on_off_rr="e_rr",
+                        t_j=t_j_available[i],
+                        v_g=max([i for i in [e_rr.v_g for e_rr in transistor_list[m].diode.e_rr] if i is not None]),
                         v_supply=max([i for i in [e_rr.v_supply for e_rr in transistor_list[m].diode.e_rr] if i is not None]),
-                        normalize_t_to_v=10)
+                        normalize_t_to_v=10,
+                    )
                     r_g_rr_max_list[i] = np.amax(r_e_object_rr.graph_r_e[0]) * 10000
 
                 r_g_rr_max = floor(10 * min(r_g_rr_max_list) / 10000) / 10
@@ -764,8 +777,7 @@ def plot_e_rr(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
 
                 vec_i = np.linspace(0, transistor_list[m].i_abs_max, 10)
 
-                m_t_j_available, m_r_g_rr_available, m_i = np.meshgrid(t_j_available, r_g_rr_available, vec_i,
-                                                                       indexing='ij')
+                m_t_j_available, m_r_g_rr_available, m_i = np.meshgrid(t_j_available, r_g_rr_available, vec_i, indexing='ij')
 
                 m_e_rr = np.zeros_like(m_t_j_available)
 
@@ -773,10 +785,14 @@ def plot_e_rr(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
                     for j in range(len(r_g_rr_available)):
                         for k in range(len(vec_i)):
                             transistor_list[m].wp.e_rr = transistor_list[m].calc_object_i_e(
-                                e_on_off_rr="e_rr", t_j=m_t_j_available[i, j, k], v_supply=v_supply_chosen,
-                                r_g=m_r_g_rr_available[i, j, k], normalize_t_to_v=10)
-                            m_e_rr[i, j, k] = np.interp(m_i[i, j, k], transistor_list[m].wp.e_rr.graph_i_e[0],
-                                                        transistor_list[m].wp.e_rr.graph_i_e[1]) * v_supply_list[m] / v_supply_chosen * 1000000000
+                                e_on_off_rr="e_rr", t_j=m_t_j_available[i, j, k], v_supply=v_supply_chosen, r_g=m_r_g_rr_available[i, j, k], normalize_t_to_v=10
+                            )
+                            m_e_rr[i, j, k] = (
+                                np.interp(m_i[i, j, k], transistor_list[m].wp.e_rr.graph_i_e[0], transistor_list[m].wp.e_rr.graph_i_e[1])
+                                * v_supply_list[m]
+                                / v_supply_chosen
+                                * 1000000000
+                            )
 
                 points = (t_j_available, r_g_rr_available, vec_i)
                 values = m_e_rr
@@ -784,7 +800,7 @@ def plot_e_rr(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
                 vec_e_rr = np.zeros_like(vec_i)
 
                 for n in range(len(vec_i)):
-                    point = ([t_j_list[m], r_g_off_list[m], vec_i[n]])
+                    point = [t_j_list[m], r_g_off_list[m], vec_i[n]]
                     vec_e_rr[n] = interpn(points, values, point, bounds_error=False, fill_value=None) / 1000000000
 
                 if t_j_list[m] < min(t_j_available) or t_j_list[m] > max(t_j_available):
@@ -799,23 +815,22 @@ def plot_e_rr(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j
 
         try:
             matplotlibwidget.axis.legend(fontsize=5)
-            matplotlibwidget.axis.set(xlabel="Current in A",
-                                      ylabel="Loss energy in J")
+            matplotlibwidget.axis.set(xlabel="Current in A", ylabel="Loss energy in J")
             matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
             matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
             matplotlibwidget.axis.grid()
             matplotlibwidget.figure.canvas.draw_idle()
 
-            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                             color="Green", linewidth=1)
+            matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
             matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
         except:
             matplotlibwidget.axis.clear()
             matplotlibwidget.figure.canvas.draw_idle()
 
 
-def plot_channel(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j2, t_j3, v_g_on1, v_g_on2, v_g_on3,
-                 v_g_off1, v_g_off2, v_g_off3, switch_diode):
+def plot_channel(
+    transistor1, transistor2, transistor3, matplotlibwidget, t_j1, t_j2, t_j3, v_g_on1, v_g_on2, v_g_on3, v_g_off1, v_g_off2, v_g_off3, switch_diode
+):
     """
     Calculate and plot switch or diode channel v_i characteristic curves for all three transistors.
 
@@ -866,16 +881,15 @@ def plot_channel(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, 
                 t_j_available.sort()
 
                 if len(t_j_available) == 1:
-                    transistor_list[m].wp.switch_channel = transistor_list[m].get_object_v_i(
-                        switch_or_diode="switch",
-                        t_j=t_j_available[0],
-                        v_g=v_g_on_list[m])
+                    transistor_list[m].wp.switch_channel = transistor_list[m].get_object_v_i(switch_or_diode="switch", t_j=t_j_available[0], v_g=v_g_on_list[m])
 
                     vec_v = transistor_list[m].wp.switch_channel.graph_v_i[0]
                     vec_i = transistor_list[m].wp.switch_channel.graph_v_i[1]
                     label = f"{transistor_list[m]}, T_j = {t_j_available[0]}"
-                    _get_main_window().show_popup_message(_get_main_window(), f"Switch channel v_i curve for <b>{transistor_list[m].name}</b> only available for T_j = "
-                                                              f"{t_j_available[0]}°C due to missing data!")
+                    _get_main_window().show_popup_message(
+                        _get_main_window(),
+                        f"Switch channel v_i curve for <b>{transistor_list[m].name}</b> only available for T_j = {t_j_available[0]}°C due to missing data!",
+                    )
 
                 else:
                     vec_i = np.linspace(0, transistor_list[m].i_abs_max, 50)
@@ -887,12 +901,12 @@ def plot_channel(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, 
                     for i in range(len(t_j_available)):
                         for j in range(len(vec_i)):
                             transistor_list[m].wp.switch_channel = transistor_list[m].get_object_v_i(
-                                switch_or_diode="switch",
-                                t_j=m_t_j_available[i, j],
-                                v_g=v_g_on_list[m])
+                                switch_or_diode="switch", t_j=m_t_j_available[i, j], v_g=v_g_on_list[m]
+                            )
 
-                            m_v[i, j] = np.interp(m_i[i, j], transistor_list[m].wp.switch_channel.graph_v_i[1],
-                                                  transistor_list[m].wp.switch_channel.graph_v_i[0] * 1000000)
+                            m_v[i, j] = np.interp(
+                                m_i[i, j], transistor_list[m].wp.switch_channel.graph_v_i[1], transistor_list[m].wp.switch_channel.graph_v_i[0] * 1000000
+                            )
 
                     points = (t_j_available, vec_i)
                     values = m_v
@@ -900,7 +914,7 @@ def plot_channel(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, 
                     vec_v = np.zeros_like(vec_i)
 
                     for n in range(len(vec_i)):
-                        point = ([t_j_list[m], vec_i[n]])
+                        point = [t_j_list[m], vec_i[n]]
                         vec_v[n] = interpn(points, values, point, bounds_error=False, fill_value=None) / 1000000
 
                     if t_j_list[m] < min(t_j_available) or t_j_list[m] > max(t_j_available):
@@ -930,17 +944,15 @@ def plot_channel(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, 
                 t_j_available.sort()
 
                 if len(t_j_available) == 1:
-                    transistor_list[m].wp.switch_channel = transistor_list[m].get_object_v_i(
-                        switch_or_diode="diode",
-                        t_j=t_j_available[0],
-                        v_g=v_g_off_list[m])
+                    transistor_list[m].wp.switch_channel = transistor_list[m].get_object_v_i(switch_or_diode="diode", t_j=t_j_available[0], v_g=v_g_off_list[m])
 
                     vec_v = transistor_list[m].wp.switch_channel.graph_v_i[0]
                     vec_i = transistor_list[m].wp.switch_channel.graph_v_i[1]
                     label = f"{transistor_list[m]}, T_j = {t_j_available[0]}"
-                    _get_main_window().show_popup_message(_get_main_window(),
-                                                  f"Diode channel v_i curve for <b>{transistor_list[m].name}</b> only available for T_j = "
-                                                  f"{t_j_available[0]}°C due to missing data!")
+                    _get_main_window().show_popup_message(
+                        _get_main_window(),
+                        f"Diode channel v_i curve for <b>{transistor_list[m].name}</b> only available for T_j = {t_j_available[0]}°C due to missing data!",
+                    )
 
                 else:
                     vec_i = np.linspace(0, transistor_list[m].i_abs_max, 50)
@@ -952,12 +964,12 @@ def plot_channel(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, 
                     for i in range(len(t_j_available)):
                         for j in range(len(vec_i)):
                             transistor_list[m].wp.switch_channel = transistor_list[m].get_object_v_i(
-                                switch_or_diode="diode",
-                                t_j=m_t_j_available[i, j],
-                                v_g=v_g_off_list[m])
+                                switch_or_diode="diode", t_j=m_t_j_available[i, j], v_g=v_g_off_list[m]
+                            )
 
-                            m_v[i, j] = np.interp(m_i[i, j], transistor_list[m].wp.switch_channel.graph_v_i[1],
-                                                  transistor_list[m].wp.switch_channel.graph_v_i[0] * 1000000)
+                            m_v[i, j] = np.interp(
+                                m_i[i, j], transistor_list[m].wp.switch_channel.graph_v_i[1], transistor_list[m].wp.switch_channel.graph_v_i[0] * 1000000
+                            )
 
                     points = (t_j_available, vec_i)
                     values = m_v
@@ -965,7 +977,7 @@ def plot_channel(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, 
                     vec_v = np.zeros_like(vec_i)
 
                     for n in range(len(vec_v)):
-                        point = ([t_j_list[m], vec_i[n]])
+                        point = [t_j_list[m], vec_i[n]]
                         vec_v[n] = interpn(points, values, point, bounds_error=False, fill_value=None) / 1000000
 
                     if t_j_list[m] < min(t_j_available) or t_j_list[m] > max(t_j_available):
@@ -980,18 +992,17 @@ def plot_channel(transistor1, transistor2, transistor3, matplotlibwidget, t_j1, 
 
     try:
         matplotlibwidget.axis.legend(fontsize=5)
-        matplotlibwidget.axis.set(xlabel="Voltage in V",
-                                  ylabel="Current in A")
+        matplotlibwidget.axis.set(xlabel="Voltage in V", ylabel="Current in A")
         matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
         matplotlibwidget.axis.grid()
         matplotlibwidget.figure.canvas.draw_idle()
 
-        matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                         color="Green", linewidth=1)
+        matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
         matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
     except:
         matplotlibwidget.axis.clear()
         matplotlibwidget.figure.canvas.draw_idle()
+
 
 def plot_v_eoss(transistor1, transistor2, transistor3, matplotlibwidget):
     """
@@ -1018,24 +1029,25 @@ def plot_v_eoss(transistor1, transistor2, transistor3, matplotlibwidget):
             matplotlibwidget.axis.plot(v_eoss[0], v_eoss[1], label=transistor_list[m].name, color=color_list[m])
         except:
             pass
-            _get_main_window().show_popup_message(_get_main_window(), f"Output capacitance energy curves are not available for <b>{transistor_list[m].name}</b>!")
+            _get_main_window().show_popup_message(
+                _get_main_window(), f"Output capacitance energy curves are not available for <b>{transistor_list[m].name}</b>!"
+            )
 
     try:
         matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
         matplotlibwidget.axis.legend(fontsize=5)
-        matplotlibwidget.axis.set(xlabel="Voltage in V",
-                                  ylabel="Energy in J")
+        matplotlibwidget.axis.set(xlabel="Voltage in V", ylabel="Energy in J")
         matplotlibwidget.axis.grid()
         matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
         matplotlibwidget.figure.canvas.draw_idle()
 
-        matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                         color="Green", linewidth=1)
+        matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
 
         matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
     except:
         matplotlibwidget.axis.clear()
         matplotlibwidget.figure.canvas.draw_idle()
+
 
 def plot_v_qoss(transistor1, transistor2, transistor3, matplotlibwidget):
     """
@@ -1063,18 +1075,18 @@ def plot_v_qoss(transistor1, transistor2, transistor3, matplotlibwidget):
             matplotlibwidget.axis.plot(v_qoss[0], v_qoss[1], label=transistor_list[m].name, color=color_list[m])
 
         except:
-            _get_main_window().show_popup_message(_get_main_window(), f"Output capacitance charge curves are not available for <b>{transistor_list[m].name}</b>!")
+            _get_main_window().show_popup_message(
+                _get_main_window(), f"Output capacitance charge curves are not available for <b>{transistor_list[m].name}</b>!"
+            )
 
     try:
         matplotlibwidget.axis.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
         matplotlibwidget.axis.legend(fontsize=5)
-        matplotlibwidget.axis.set(xlabel="Voltage in V",
-                                  ylabel="Charge in C")
+        matplotlibwidget.axis.set(xlabel="Voltage in V", ylabel="Charge in C")
         matplotlibwidget.axis.grid()
         matplotlibwidget.axis.set_position([0.12, 0.2, 0.9, 0.7])
         matplotlibwidget.figure.canvas.draw_idle()
-        matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True,
-                                         color="Green", linewidth=1)
+        matplotlibwidget.cursor = Cursor(matplotlibwidget.axis, horizOn=True, vertOn=True, useblit=True, color="Green", linewidth=1)
 
         matplotlibwidget.figure.canvas.mpl_connect("button_press_event", clicked)
 

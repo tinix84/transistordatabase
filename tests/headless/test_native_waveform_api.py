@@ -272,5 +272,3 @@ def test_real_source_byte_cap_rejects_before_decode(transport):
     assert response.status_code == 413
     assert response.json()["detail"]["code"] == "resource-limit"
     assert repository.reads == []
-
-

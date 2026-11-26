@@ -1,11 +1,12 @@
 """Test topology calculator mixin."""
 import os
+# Configure the platform before the desktop imports.
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
-import pytest
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QPushButton, QComboBox, QLineEdit, QSpinBox, QDoubleSpinBox
-from transistordatabase.gui.gui import MainWindow
+import pytest  # noqa: E402
+from PyQt5.QtCore import Qt  # noqa: E402
+from PyQt5.QtWidgets import QPushButton, QComboBox, QLineEdit, QSpinBox, QDoubleSpinBox  # noqa: E402
+from transistordatabase.gui.gui import MainWindow  # noqa: E402
 
 
 @pytest.fixture
@@ -20,7 +21,7 @@ def test_topology_mixin_methods_exist(main_window):
     """Test that topology mixin methods are available."""
     methods = dir(main_window)
     topology_methods = [m for m in methods if 'topology' in m.lower() or \
-                                               'calculator' in m.lower()]
+                        'calculator' in m.lower()]
     # Should have topology-related functionality
     assert len(methods) > 0
 
@@ -72,7 +73,7 @@ def test_topology_results_attributes(main_window):
     """Test that topology results attributes exist."""
     # Check for result-related attributes
     has_results = hasattr(main_window, 'topology_results') or \
-                  hasattr(main_window, 'calculation_results')
+        hasattr(main_window, 'calculation_results')
 
     # Results may or may not be stored as attributes
     assert True

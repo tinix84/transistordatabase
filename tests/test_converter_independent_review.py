@@ -243,7 +243,7 @@ def test_rectifier_members_count_with_unneeded_models_absent(name, expected):
 def test_neutral_three_times_current_is_not_device_multiplicity():
     """Square the actual neutral current before applying physical count."""
     data = preset("sc-six-switch", signals={"ia": 10, "dna": 0, "dpa": 0, "dpn": 1,
-                                           "fs": 1e5, "fl": 50, "vdc": 200})
+                                            "fs": 1e5, "fl": 50, "vdc": 200})
     data["role_models"]["neutral_igbts"] = model(0, .1)
     result = analyze_converter(data)
     neutral = result["branches"][2]

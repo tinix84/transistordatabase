@@ -89,7 +89,7 @@ def diagnostic_test():
     # Check energy breakdown
     e_1a = 0.5 * result['t_rv'] * params.v_0 * i_ch
     e_2a = 0.5 * result['t_fi'] * (params.v_0 + result['v_ld']) * i_ch
-    print(f"\nEnergy breakdown:")
+    print("\nEnergy breakdown:")
     print(f"  E_1a (voltage rise):  {e_1a*1e6:.2f} uJ")
     print(f"  E_2a (current fall):  {e_2a*1e6:.2f} uJ")
     print(f"  Total:                {result['e_off']*1e6:.2f} uJ")
@@ -132,7 +132,7 @@ def diagnostic_test():
         print(f"Iter {iteration}: I_oss={i_oss:.2f}A, I_ch={i_ch:.2f}A, g_m={gm_new:.3f}S, V_mil={v_mil:.2f}V")
 
         if abs(gm_new - gm) / max(gm_new, 1e-6) < 0.01:
-            print(f"  Converged (|Δg_m|/g_m < 1%)")
+            print("  Converged (|Δg_m|/g_m < 1%)")
             break
 
         gm = gm_new

@@ -1760,52 +1760,54 @@ def calculate_topology_operating_point(
         p_in = p_out + p_total
 
         if mode == "loss-balanced":
-            result["model"]["assumptions"].extend(
-                [
-                    (
-                        f"{topology.title()} DCM integrates current-dependent "
-                        "switch and "
-                        "diode channel curves over both ramps and solves output "
-                        "charge with separate input/output power and volt-second "
-                        "residuals."
-                        if conduction_regime == "DCM"
-                        else "Loss-balanced mode solves CCM duty/current so input "
-                        "power balances output power plus included channel losses."
-                    ),
-                    (
-                        f"{topology.title()} DCM reports the zero-current idle "
-                        "fraction after "
-                        "switch and diode demagnetization intervals."
-                        if conduction_regime == "DCM"
-                        else "Inductor ripple is triangular and refined using "
-                        "measured switch-channel voltage at the selected exact "
-                        "curve conditions."
-                    ),
-                    (
-                        "CCM power and averaged volt-second residuals can differ "
-                        "because the CCM solver uses a triangular-ripple "
-                        "approximation with nonlinear channel curves."
-                        if conduction_regime == "CCM"
-                        else "The DCM residuals describe the measured-curve "
-                        "averaged ramp model; parasitic and switching effects "
-                        "are not modeled."
-                    ),
-                    "Only switch and diode channel conduction losses are included; switching, reverse recovery, gate drive, passive, and magnetic losses remain excluded.",
-                    "Thermal output is a one-pass estimate at the selected curve temperature, not an electrothermal iteration.",
-                    "Parallel devices are identical and share current evenly; each branch uses the original per-device TDB curves without modifying curve data.",
-                ]
-            )
+            result["model"]["assumptions"].extend([
+                (
+                    f"{topology.title()} DCM integrates current-dependent "
+                    "switch and "
+                    "diode channel curves over both ramps and solves output "
+                    "charge with separate input/output power and volt-second "
+                    "residuals."
+                    if conduction_regime == "DCM"
+                    else "Loss-balanced mode solves CCM duty/current so input power balances output power plus included channel losses."
+                ),
+                (
+                    f"{topology.title()} DCM reports the zero-current idle fraction after switch and diode demagnetization intervals."
+                    if conduction_regime == "DCM"
+                    else "Inductor ripple is triangular and refined using measured switch-channel voltage at the selected exact curve conditions."
+                ),
+                (
+                    "CCM power and averaged volt-second residuals can differ "
+                    "because the CCM solver uses a triangular-ripple "
+                    "approximation with nonlinear channel curves."
+                    if conduction_regime == "CCM"
+                    else "The DCM residuals describe the measured-curve averaged ramp model; parasitic and switching effects are not modeled."
+                ),
+                (
+                    "Only switch and diode channel conduction losses are included; switching, reverse recovery, gate drive, passive, and "
+                    "magnetic losses remain excluded."
+                ),
+                "Thermal output is a one-pass estimate at the selected curve temperature, not an electrothermal iteration.",
+                "Parallel devices are identical and share current evenly; each branch uses the original per-device TDB curves without modifying curve data.",
+            ])
         elif mode == "switching-loss-balanced":
-            result["model"]["assumptions"].extend(
-                [
-                    "Scalar Boost CCM duty/current solve balances output power with switch and diode channel conduction plus exact-condition TDB Eon/Eoff losses.",
-                    "Eon is evaluated at switch valley current and Eoff at peak current; all curve lookups interpolate only within measured current ranges.",
-                    "Exact junction temperature, blocking voltage (Boost output), turn-on/off gate voltages, and the corresponding gate resistances are required; ambiguous curve matches are rejected.",
-                    "Reverse recovery is excluded because Eon provenance does not establish whether recovery is already included; adding it could double count the measured energy.",
-                    "Thermal output is a one-pass estimate from the solved per-device losses when positive junction-to-case and case-to-sink thermal data plus case temperature are available; temperature-dependent curve iteration is not performed.",
-                    "Parallel devices are identical and share current evenly; passive, magnetic, gate-drive, dead-time, and parasitic losses remain excluded.",
-                ]
-            )
+            result["model"]["assumptions"].extend([
+                "Scalar Boost CCM duty/current solve balances output power with switch and diode channel conduction plus exact-condition TDB Eon/Eoff losses.",
+                "Eon is evaluated at switch valley current and Eoff at peak current; all curve lookups interpolate only within measured current ranges.",
+                (
+                    "Exact junction temperature, blocking voltage (Boost output), turn-on/off gate voltages, and the corresponding gate "
+                    "resistances are required; ambiguous curve matches are rejected."
+                ),
+                (
+                    "Reverse recovery is excluded because Eon provenance does not establish whether recovery is already included; adding "
+                    "it could double count the measured energy."
+                ),
+                (
+                    "Thermal output is a one-pass estimate from the solved per-device losses when positive junction-to-case and "
+                    "case-to-sink thermal data plus case temperature are available; temperature-dependent curve iteration is not "
+                    "performed."
+                ),
+                "Parallel devices are identical and share current evenly; passive, magnetic, gate-drive, dead-time, and parasitic losses remain excluded.",
+            ])
         else:
             result["model"]["assumptions"].extend(
                 [

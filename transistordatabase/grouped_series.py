@@ -92,8 +92,8 @@ def project_grouped_series(rows, grid_input_sha256, available_bytes, limit_error
             if projected_bytes > available_bytes:
                 raise limit_error("Grouped series metadata exceeds the complete response byte budget")
             descriptors.append((row, waveform, settings, series, metadata))
-    if (len(descriptors) > MAX_TIME_ROWS or
-            len(descriptors) * 10 > MAX_FREQUENCY_ROWS):
+    if (len(descriptors) > MAX_TIME_ROWS
+            or len(descriptors) * 10 > MAX_FREQUENCY_ROWS):
         raise limit_error("Grouped series exceeds 1024 time rows or 10240 frequency rows")
 
     time_rows, frequency_rows = [], []
@@ -130,9 +130,9 @@ def project_grouped_series(rows, grid_input_sha256, available_bytes, limit_error
             frequency_base["retained_bin_count"] = len(spectrum["selected_bin_indices"])
             for index in spectrum["selected_bin_indices"]:
                 frequency_rows.append({**frequency_base, "bin_index": index,
-                    "frequency_hz": spectrum["frequency_hz"][index],
-                    "magnitude": spectrum[keys[0]][index], "real": spectrum[keys[1]][index],
-                    "imaginary": spectrum[keys[2]][index], "phase_rad": spectrum["phase_rad"][index]})
+                                       "frequency_hz": spectrum["frequency_hz"][index],
+                                       "magnitude": spectrum[keys[0]][index], "real": spectrum[keys[1]][index],
+                                       "imaginary": spectrum[keys[2]][index], "phase_rad": spectrum["phase_rad"][index]})
             if not spectrum["selected_bin_indices"]:
                 frequency_rows.append(frequency_base)
         except (ValueError, OverflowError, FloatingPointError) as exc:

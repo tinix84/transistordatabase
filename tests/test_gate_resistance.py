@@ -54,8 +54,8 @@ def test_forward_authority_roundtrip_and_worst_case(plateau, turn_on):
 
 @pytest.mark.parametrize("key", [key for key in BASE if key != "selected"])
 @pytest.mark.parametrize("invalid", [True, np.bool_(False), 1j, np.complex128(1),
-                                      "1", None, [1], np.array(1),
-                                      math.nan, math.inf, -math.inf])
+                                     "1", None, [1], np.array(1),
+                                     math.nan, math.inf, -math.inf])
 def test_reject_nonreal_nonfinite_or_nonscalar_inputs(key, invalid):
     """Direct Python calls enforce the same physical scalar contract as HTTP."""
     with pytest.raises(ValueError, match="finite real numeric scalar"):
@@ -78,7 +78,7 @@ def test_reject_invalid_domains_and_unrepresentable_outputs(changes):
 def test_numpy_scalars_collapsed_plateau_and_si_scaling():
     """A single plateau collapses bounds and capacitance remains in farads."""
     result = gate_resistance_for_slew(**{**BASE, "v_plateau_high_v": np.float64(5),
-                                       "v_drive_high_v": np.int64(15)})
+                                         "v_drive_high_v": np.int64(15)})
     assert result["r_on_min_ohm"] == result["r_on_max_ohm"]
     assert result["r_off_min_ohm"] == result["r_off_max_ohm"]
     scaled = gate_resistance_for_slew(**{**BASE, "c_rss_min_f": 200e-12})
@@ -88,10 +88,10 @@ def test_numpy_scalars_collapsed_plateau_and_si_scaling():
 def test_finite_extreme_difference_and_adjacent_float_precision():
     """A finite resistance can survive an overflowing float voltage difference."""
     result = gate_resistance_for_slew(1, 1e308, 1.6e308, -1.6e308,
-                                     -8e307, 8e307, selected=True)
+                                      -8e307, 8e307, selected=True)
     assert result["r_on_ohm"] == pytest.approx(2.4)
     assert result["r_off_ohm"] == pytest.approx(2.4)
     near = math.nextafter(15.0, -math.inf)
     result = gate_resistance_for_slew(**{**BASE, "v_plateau_low_v": near,
-                                       "v_plateau_high_v": near})
+                                         "v_plateau_high_v": near})
     assert result["r_on_ohm"] == pytest.approx((15 - near) / 2, rel=1e-15, abs=0)

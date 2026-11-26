@@ -57,10 +57,14 @@ def waveform(preset="sc-dab"):
     signals.update(itp=[0, 2, 9, 3, 0], its=[0, -2, -9, -3, 0], vp=200, vs=200)
     for name in ("vgs1", "vgs2", "vgs4", "vgs6", "vgs8"):
         signals[name] = [0, 0, 1, 1, 0]
-    return {"preset": preset, "operation": "waveform", "time_s": [0, 1e-6, 2e-6, 3e-6, 4e-6],
-            "signals": signals, "role_models": {r["role"]: model() for r in bindings
-                                                  if not r.get("source_switching_omission")},
-            "assumptions": {"symmetry_selected": True}}
+    return {
+        "preset": preset,
+        "operation": "waveform",
+        "time_s": [0, 1e-6, 2e-6, 3e-6, 4e-6],
+        "signals": signals,
+        "role_models": {r["role"]: model() for r in bindings if not r.get("source_switching_omission")},
+        "assumptions": {"symmetry_selected": True},
+    }
 
 
 @pytest.mark.parametrize("operation", ["waveform", "held-envelope-estimate"])
@@ -340,7 +344,11 @@ def test_typed_api_canonical_equality_safe_nonfinite_and_resource_limit():
     result = response.json()
     assert result == analyze_converter(result["request"])
     assert len(client.get("/api/converters/presets").json()["presets"]) == 12
-    response = client.post("/api/converters/analyze", content='{"preset":"custom","operation":"waveform","time_s":[0,NaN],"signals":{},"role_models":{},"assumptions":{}}', headers={"content-type": "application/json"})
+    response = client.post(
+        "/api/converters/analyze",
+        content='{"preset":"custom","operation":"waveform","time_s":[0,NaN],"signals":{},"role_models":{},"assumptions":{}}',
+        headers={"content-type": "application/json"},
+    )
     assert response.status_code == 422
     request = envelope()
     request["bindings"] *= 2

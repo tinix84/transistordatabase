@@ -303,7 +303,8 @@ def _member(member, branch, allocation, duration, boundary, acknowledged):
             missing.append("A sourced thermal resistance is missing")
         usable = junction["rtheta_k_w"] is not None and junction["source"] is not None
         tj = steady_junction(heat, junction["rtheta_k_w"], boundary["temperature_c"], junction["source"]) if heat is not None and usable else None
-        known_tj = steady_junction(known, junction["rtheta_k_w"], boundary["temperature_c"], junction["source"]) if acknowledged and known is not None and usable else None
+        known_tj = steady_junction(known, junction["rtheta_k_w"], boundary["temperature_c"], junction["source"]
+                                   ) if acknowledged and known is not None and usable else None
         rows.append({**junction, "heat_w": heat, "known_heat_w": known,
                      "tj_c": tj, "known_heat_tj_c": known_tj,
                      "status": "complete" if tj is not None else "incomplete"})
@@ -390,8 +391,8 @@ def analyze_circuit_summary(request: dict) -> dict:
               "duration_s": duration, "boundary": request["boundary"], "members": members,
               "electrical": electrical, "maximum": _maximum(junctions, complete, acknowledged),
               "evidence_by_role": {role: {"evidence": b["evidence"], "binding": b["binding"],
-                                           "allocation_residuals": allocation[role][1],
-                                           "model_bindings": b["model_bindings"], "broadcasts": b["broadcasts"]}
+                                          "allocation_residuals": allocation[role][1],
+                                          "model_bindings": b["model_bindings"], "broadcasts": b["broadcasts"]}
                                    for role, b in branches.items()},
               "coverage": {"member_count": len(members),
                            "layout_complete_members": sum(m["layout_complete"] for m in members),

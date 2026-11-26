@@ -21,8 +21,14 @@ _OBJECTIVE_DIRECTIONS = {
 
 _MODEL_LIMITATIONS = [
     "Loss includes switch and diode channel conduction only; switching, recovery, gate-drive, passive, and magnetic losses are excluded.",
-    "The averaged CCM solve power-balances included channel losses and reports a separate inductor volt-second residual; nonlinear curves may not close both balances exactly.",
-    "The rating screen checks only absolute blocking-voltage and peak-current ratings; it does not establish SOA, thermal safety, cooling, reliability, or margin.",
+    (
+        "The averaged CCM solve power-balances included channel losses and reports a separate inductor volt-second residual; "
+        "nonlinear curves may not close both balances exactly."
+    ),
+    (
+        "The rating screen checks only absolute blocking-voltage and peak-current ratings; it does not establish SOA, thermal"
+        " safety, cooling, reliability, or margin."
+    ),
     "Parallel devices are treated as identical and share current equally; mismatch and layout effects are not modeled.",
     "Temperature is a one-pass fixed-temperature estimate and remains unavailable when required TDB thermal resistances are missing or nonpositive.",
     "Package volume is the body bounding-box product and excludes leads, board spacing, heatsinks, and assembly.",
@@ -521,7 +527,14 @@ def calculate_boost_frequency_grid(boundary, candidates, catalog, frequencies_hz
              "voltage_residual_tolerance_v": voltage_residual_tolerance_v}, candidates, catalog)
         rows.append({"frequency_hz": frequency, "population": population})
     from transistordatabase.topologies.boost_grid_bounds import bounded_grid_result
-    return bounded_grid_result({"mode": "switching-loss-balanced", "qualification": "power-balanced included-loss estimate",
-            "voltage_law_enforced": False, "frequencies_hz": frequencies, "rows": rows,
-            "ranking_basis": "Independent same-frequency complete candidate populations; no cross-frequency aggregate",
-            "scalar_call_count": len(frequencies) * len(candidates), "scalar_call_limit": 32})
+
+    return bounded_grid_result({
+        "mode": "switching-loss-balanced",
+        "qualification": "power-balanced included-loss estimate",
+        "voltage_law_enforced": False,
+        "frequencies_hz": frequencies,
+        "rows": rows,
+        "ranking_basis": "Independent same-frequency complete candidate populations; no cross-frequency aggregate",
+        "scalar_call_count": len(frequencies) * len(candidates),
+        "scalar_call_limit": 32,
+    })

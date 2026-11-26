@@ -180,6 +180,7 @@ def extract_reverse_recovery_params(
     tau_rr = q_rf / i_rr
     t_1 = (i_forward_test + i_rr) / di_dt
     # Dimensionless solve avoids a seconds-scale xtol masking a failed root.
+
     def residual(ratio):
         return di_dt * tau_rr * (ratio - 1) * (-np.expm1(-t_1 / (tau_rr * ratio))) - i_rr
     upper = 2.0
@@ -189,7 +190,7 @@ def extract_reverse_recovery_params(
         raise ValueError('Recovery extraction has no bounded physical root')
     ratio = brentq(residual, 1, upper, xtol=1e-12, rtol=1e-12)
     result = ReverseRecoveryParams(tau_rr, tau_rr * ratio,
-                                  tau_rr * ratio / (ratio - 1), q_star)
+                                   tau_rr * ratio / (ratio - 1), q_star)
     result.validate()
     return result
 
@@ -235,6 +236,7 @@ def fit_transconductance(
         raise ValueError('Transfer current must increase strictly with gate voltage')
     scale = float(max(current))
     overdrive = gate - v_th
+
     def residual(p):
         return (np.exp(p[0]) * overdrive ** p[2] + p[1] - current) / scale
     fit = least_squares(residual, [np.log(scale / max(overdrive) ** 2), 0, 2],
@@ -252,8 +254,8 @@ def fit_transconductance(
                    'v_g_min_v': float(min(gate)), 'v_g_max_v': float(max(gate)),
                    'scope': 'Nonlinear transfer fit; accuracy outside current coverage is unsupported'}
     return TransconductanceParams(float(np.exp(fit.x[0])), float(fit.x[1]),
-                                 float(fit.x[2]), v_th,
-                                 float(min(current)), float(max(current)), diagnostics)
+                                  float(fit.x[2]), v_th,
+                                  float(min(current)), float(max(current)), diagnostics)
 
 
 class ChristenBielaModel:
@@ -325,8 +327,8 @@ class ChristenBielaModel:
                     'no converged estimate solution was established: ' + str(exc)) from exc
             gm_residual = abs(updated - gm) / updated
             polynomial = a * i_oss ** 2 + (2 / (updated * p.r_g)
-                         + self.c_gd / self.c_oss) * i_oss + (
-                             gate - self.gm_params.v_th - p.i_0 / updated) / p.r_g
+                                           + self.c_gd / self.c_oss) * i_oss + (
+                gate - self.gm_params.v_th - p.i_0 / updated) / p.r_g
             if gm_residual < tol and abs(polynomial) < tol * max(1, abs(c)):
                 return {'i_oss': float(i_oss), 'gm': updated,
                         'v_mil': self.gm_params.v_th + i_ch / updated,
@@ -371,9 +373,9 @@ class ChristenBielaModel:
         first = 0.5 * t_rv * params.v_0 * i_ch
         second = 0.5 * t_fi * (params.v_0 + v_ld) * i_ch
         return _checked_result({'e_off': first + second, 'i_oss': m['i_oss'], 'gm': m['gm'],
-                'v_mil': m['v_mil'], 't_rv': float(t_rv), 't_fi': float(t_fi),
-                'v_ld': float(v_ld), 'diagnostics': m['diagnostics'],
-                'energy_partitions_j': {'voltage_rise': first, 'current_fall': second}})
+                                'v_mil': m['v_mil'], 't_rv': float(t_rv), 't_fi': float(t_fi),
+                                'v_ld': float(v_ld), 'diagnostics': m['diagnostics'],
+                                'energy_partitions_j': {'voltage_rise': first, 'current_fall': second}})
 
     def _calc_reverse_recovery(self, params, i_oss_on, gm_1b, t_ri, v_ds0=None, t_fv=None):
         names = ('e_rr_s2', 'e_rs', 'e_rf', 'i_rr_calc', 't_rs', 'q_rs',
@@ -383,8 +385,10 @@ class ChristenBielaModel:
         rr = self.rr_params
         slope = params.i_0 / t_ri
         t0 = t_ri
+
         def charge(t):
             return slope * rr.tau_c * (t0 - t - rr.tau_c * np.expm1(-t / rr.tau_c))
+
         def residual(dt):
             t = t0 + dt * rr.tau_c
             return (charge(t) + rr.t_m * (params.i_0 - slope * t)) / (slope * rr.tau_c ** 2)
@@ -442,13 +446,13 @@ class ChristenBielaModel:
         first = 0.5 * tri * v_ds0 * params.i_0
         third = 0.5 * tfv * ich * v_ds0
         return _checked_result({'e_on': first + third + rr['storage_load_energy_j'] + rr['e_rr_s2'],
-                'i_oss_on': m['i_oss'], 'v_mil_on': m['v_mil'],
-                't_ri': float(tri), 't_fv': float(tfv), 'v_ld_on': float(v_ld),
-                'gm_1b': gm1, 'gm_3b': m['gm'], **rr,
-                'diagnostics': m['diagnostics'],
-                'energy_partitions_j': {'current_rise': float(first), 'voltage_fall': float(third),
-                                        'storage_load': rr['storage_load_energy_j'],
-                                        'recovery_storage': rr['e_rs'], 'recovery_fall': rr['e_rf']}})
+                                'i_oss_on': m['i_oss'], 'v_mil_on': m['v_mil'],
+                                't_ri': float(tri), 't_fv': float(tfv), 'v_ld_on': float(v_ld),
+                                'gm_1b': gm1, 'gm_3b': m['gm'], **rr,
+                                'diagnostics': m['diagnostics'],
+                                'energy_partitions_j': {'current_rise': float(first), 'voltage_fall': float(third),
+                                                        'storage_load': rr['storage_load_energy_j'],
+                                                        'recovery_storage': rr['e_rs'], 'recovery_fall': rr['e_rf']}})
 
     def calc_switching_energy(self, params):
         """Return finite SI energies, phase values and solver evidence."""
@@ -482,7 +486,7 @@ class ChristenBielaModel:
         })
 
     def calc_switching_loss_curve(self, v_0, currents, v_g_on=15, v_g_off=-5,
-                                 r_g=10, l_s=4e-9, l_d=10e-9):
+                                  r_g=10, l_s=4e-9, l_d=10e-9):
         """Compatibility arrays; fail rather than silently replacing unsupported points."""
         results = [self.calc_switching_energy(HalfBridgeParams(
             v_0, float(i), v_g_on, v_g_off, r_g, l_s, l_d)) for i in currents]

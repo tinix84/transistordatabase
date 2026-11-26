@@ -1,18 +1,19 @@
 """Test for memory leaks in GUI."""
 import os
+# Configure the platform before the desktop imports.
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
-import pytest
-import gc
-import sys
-from PyQt5.QtWidgets import QWidget
-from transistordatabase.gui.gui import MainWindow
+import pytest  # noqa: E402
+import gc  # noqa: E402
+import sys  # noqa: E402
+from PyQt5.QtWidgets import QWidget  # noqa: E402
+from transistordatabase.gui.gui import MainWindow  # noqa: E402
 
 
 def test_repeated_window_creation_no_crash(qtbot):
     """Test that creating/destroying windows doesn't crash."""
     try:
-        for i in range(5):
+        for _ in range(5):
             window = MainWindow()
             qtbot.addWidget(window)
             window.show()
@@ -37,7 +38,7 @@ def test_window_memory_tracking(qtbot):
 
         # Create windows
         windows = []
-        for i in range(3):
+        for _ in range(3):
             window = MainWindow()
             qtbot.addWidget(window)
             windows.append(window)
@@ -87,7 +88,7 @@ def test_garbage_collection(qtbot):
     """Test that garbage collection works properly."""
     try:
         windows = []
-        for i in range(5):
+        for _ in range(5):
             window = MainWindow()
             qtbot.addWidget(window)
             windows.append(window)
@@ -112,7 +113,7 @@ def test_long_running_stability(qtbot):
     qtbot.addWidget(window)
 
     try:
-        for i in range(20):
+        for _ in range(20):
             window.show()
             qtbot.wait(10)
             window.hide()

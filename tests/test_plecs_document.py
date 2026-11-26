@@ -80,7 +80,7 @@ def test_finalize_core_roundtrip_keeps_declarations_distinct():
     assert len(t.switch.e_on_data) == 4
     assert t.switch.e_on_data[0].v_g == 15
     assert t.switch.e_on_data[0].r_g is None
-    np.testing.assert_array_equal(t.switch.e_on_data[0].graph_i_e[1], [0,.0001,.0003,.0006,.001,.0015])
+    np.testing.assert_array_equal(t.switch.e_on_data[0].graph_i_e[1], [0, .0001, .0003, .0006, .001, .0015])
     after = parse_plecs_document(render_core_plecs(t))
     assert after.packages == doc.packages
     assert after.packages[0].ratings is None
@@ -93,11 +93,11 @@ def test_finalize_core_roundtrip_keeps_declarations_distinct():
 
 
 @pytest.mark.parametrize("change,message", [
-    (lambda s:s.replace("0 10 20 30 40 50", "0 10 10 30 40 50"), "unique"),
-    (lambda s:s.replace("0.00 0.10 0.30", "0.00 0.10"), "row length"),
-    (lambda s:s.replace("0.00 0.10 0.30", "0.00 NaN 0.30"), "nonfinite"),
-    (lambda s:s.replace("<TemperatureAxis>25 150</TemperatureAxis>", ""), "missing"),
-    (lambda s:s.replace('scale="0.001"', 'scale="-1"'), "positive"),
+    (lambda s: s.replace("0 10 20 30 40 50", "0 10 10 30 40 50"), "unique"),
+    (lambda s: s.replace("0.00 0.10 0.30", "0.00 0.10"), "row length"),
+    (lambda s: s.replace("0.00 0.10 0.30", "0.00 NaN 0.30"), "nonfinite"),
+    (lambda s: s.replace("<TemperatureAxis>25 150</TemperatureAxis>", ""), "missing"),
+    (lambda s: s.replace('scale="0.001"', 'scale="-1"'), "positive"),
 ])
 def test_malformed_data_fails_instead_of_skipping(change, message):
     """Malformed data fails instead of skipping."""
@@ -207,10 +207,10 @@ def test_http_preview_archive_errors_and_finalize():
     response = client.post("/api/plecs/preview", json=source)
     assert response.status_code == 200, response.text
     assert response.json()["source"]["sha256"] == sha256(SAMPLE.read_bytes()).hexdigest()
-    response = client.post("/api/plecs/export", json={**source, "mode":"source-preserved"})
+    response = client.post("/api/plecs/export", json={**source, "mode": "source-preserved"})
     assert response.content == SAMPLE.read_bytes()
-    assert client.post("/api/plecs/preview", json={**source,"xml_text":"bad"}).status_code == 422
-    assert client.post("/api/plecs/preview", json={"xml_base64":"!!"}).status_code == 422
+    assert client.post("/api/plecs/preview", json={**source, "xml_text": "bad"}).status_code == 422
+    assert client.post("/api/plecs/preview", json={"xml_base64": "!!"}).status_code == 422
     doc = parse_plecs_document(SAMPLE.read_bytes())
     response = client.post("/api/plecs/finalize", json={**source, **declarations(doc)})
     assert response.status_code == 200, response.text

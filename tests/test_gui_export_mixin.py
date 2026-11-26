@@ -1,12 +1,13 @@
 """Test export mixin functionality."""
 import os
+# Configure the platform before the desktop imports.
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
-import pytest
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QPushButton, QComboBox
-from transistordatabase.gui.gui import MainWindow
-from unittest.mock import patch, MagicMock
+import pytest  # noqa: E402
+from PyQt5.QtCore import Qt  # noqa: E402
+from PyQt5.QtWidgets import QPushButton, QComboBox  # noqa: E402
+from transistordatabase.gui.gui import MainWindow  # noqa: E402
+from unittest.mock import patch, MagicMock  # noqa: E402
 
 
 @pytest.fixture
@@ -92,7 +93,7 @@ def test_export_dialog_mock(mock_dialog, qtbot, main_window):
 def test_export_functionality_basic(main_window):
     """Test basic export functionality exists."""
     has_export = hasattr(main_window, 'on_export') or \
-                 any('export' in m.lower() for m in dir(main_window))
+        any('export' in m.lower() for m in dir(main_window))
 
     # Export functionality should exist
     assert len(dir(main_window)) > 0

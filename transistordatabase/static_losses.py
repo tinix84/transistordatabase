@@ -124,8 +124,8 @@ def static_duty_losses(transistor, operating_point):
         table = MeasuredTable("channel", record.graph_v_i[1], record.graph_v_i[0],
                               recorded, "Core channel record")
         models["conduction"]["positive"] = {"mode": "recorded", "source": table.source,
-            "current_a": table.x, "drop_v": table.y,
-            "recorded_conditions": recorded, "requested_conditions": requested}
+                                            "current_a": table.x, "drop_v": table.y,
+                                            "recorded_conditions": recorded, "requested_conditions": requested}
     elif op["i_channel"] == 0:
         models["conduction"]["positive"] = {
             "mode": "linear-drop-estimate", "selected": True,
@@ -138,11 +138,11 @@ def static_duty_losses(transistor, operating_point):
                                   ("turn_off", transistor.switch.e_off_data, "r_g_off")):
             models["switching"][name] = {"positive": _energy_model(records, dict(conditions, r_g=op[rg]))}
     binding = {"role": "device", "members": ["device"], "multiplicity": 1,
-        "conduction_current": {"value": op["i_channel"]},
-        "duty": {"value": op["duty"]}, "frequency_hz": {"value": op["f_sw"]}}
+               "conduction_current": {"value": op["i_channel"]},
+               "duty": {"value": op["duty"]}, "frequency_hz": {"value": op["f_sw"]}}
     result = analyze_converter({"preset": "custom", "operation": "held-envelope-estimate",
-        "time_s": [0, 1], "signals": {}, "bindings": [binding],
-        "role_models": {"device": models}, "assumptions": {"envelope_selected": True}})
+                                "time_s": [0, 1], "signals": {}, "bindings": [binding],
+                                "role_models": {"device": models}, "assumptions": {"envelope_selected": True}})
     components = result["branches"][0]["components"]
     return {"conduction_losses": components["conduction"]["power_w"],
             "switching_losses_on": components["turn_on"]["power_w"],

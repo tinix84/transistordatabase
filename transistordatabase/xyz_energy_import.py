@@ -179,7 +179,7 @@ def import_xyz_energy_map(raw_bytes, options):
         converted = {}
         for name in ("current", "voltage"):
             decimal, key, value = _number(fields[syntax["columns"][name]],
-                                         POWERS[name][syntax["units"][name]], name, line)
+                                          POWERS[name][syntax["units"][name]], name, line)
             if value in float_keys[name] and float_keys[name][value] != decimal:
                 raise ValueError(f"Line {line}: distinct {name} coordinates collapse to one float")
             if decimal not in axes[name]:

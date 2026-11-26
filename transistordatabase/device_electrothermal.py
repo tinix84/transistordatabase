@@ -292,15 +292,23 @@ def build_device_loss_table(transistor, request, *, repository_source=None):
                 bracket = [int(np.flatnonzero(x == table.x[i])[0]) for i in sorted_bracket]
                 dependency = {'representation': 'graph_v_i' if family == 'channel' else 'graph_i_e', 'graph': graph}
             power = _product((current, duty, value), 'Conduction power') if family == 'channel' else _product((frequency, value), 'Switching power')
-            dependencies.append({'family': family, 'index': index, 'temperature_c': temperature,
-                                 'conditions': recorded, **dependency})
-            proof.append({'record_key': key, 'family': family, 'index': index, 'temperature_c': temperature,
-                          'recorded_conditions': recorded, 'current_domain_a': domain,
-                          'current_sample_bracket': bracket, 'current_sorted_bracket': sorted_bracket,
-                          'current_bracket_a': bracket_current, 'current_bracket_values': bracket_values,
-                          'current_bracket_basis': 'Original source graph indices; explicit coordinates use validated binary64 samples; single records use point0',
-                          'evaluated_drop_v' if family == 'channel' else 'evaluated_energy_j': value,
-                          'power_w': power, **_comment(record)})
+            dependencies.append({'family': family, 'index': index, 'temperature_c': temperature, 'conditions': recorded, **dependency})
+            proof.append({
+                'record_key': key,
+                'family': family,
+                'index': index,
+                'temperature_c': temperature,
+                'recorded_conditions': recorded,
+                'current_domain_a': domain,
+                'current_sample_bracket': bracket,
+                'current_sorted_bracket': sorted_bracket,
+                'current_bracket_a': bracket_current,
+                'current_bracket_values': bracket_values,
+                'current_bracket_basis': 'Original source graph indices; explicit coordinates use validated binary64 samples; single records use point0',
+                'evaluated_drop_v' if family == 'channel' else 'evaluated_energy_j': value,
+                'power_w': power,
+                **_comment(record),
+            })
             current_bounds.append(domain)
             temperatures.append(temperature)
             powers.append(power)
@@ -314,29 +322,49 @@ def build_device_loss_table(transistor, request, *, repository_source=None):
     total = [_sum(values[family][i] for family in _FAMILIES) for i in range(len(knots))]
     encoded = _encode({'method': 'native-fixed-current-temperature-table-v1', 'records': dependencies})
     digest = sha256(json.dumps(encoded, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
-    return _bounded_output({'method': 'native-fixed-current-temperature-table-v1',
-            'device_name': device_name, 'scope': 'One switch junction only; no diode, package or shared-junction heat inferred',
-            'temperature_c': knots, 'component_power_w': values, 'total_power_w': total,
-            'temperature_domain_c': [lower, upper],
-            'current_domain_a': [max(row[0] for row in current_bounds), min(row[1] for row in current_bounds)],
-            'active_contributions': active, 'record_evidence': proof,
-            'source_identity': {'selected_dependency_sha256': digest,
-                'selected_dependency_scope': 'Selected representation, indices, graphs and recorded physics conditions only; no load-time metadata',
-                'repository_source': deepcopy(repository_source)},
-            'loss_model': {'mode': 'recorded', 'source': source, 'conditions': {},
-                'temperature_min_c': lower, 'temperature_max_c': upper, 'temperature_c': knots, 'power_w': total},
-            'assumptions': ['Held nonnegative per-switch current; conduction duty is explicitly supplied',
-                'Selected held-current PWM model has one on/off pair per period only for0<duty<1; endpoint duty has no events',
-                'Zero frequency disables switching; active zero-current switching still evaluates E(0)',
-                'Bounded current interpolation precedes independent bounded temperature interpolation; no nearest record or extrapolation'],
-            'resource_use': {'selected_records': len(proof), 'selected_points': total_points, 'temperature_knots': len(knots)}})
+    return _bounded_output({
+        'method': 'native-fixed-current-temperature-table-v1',
+        'device_name': device_name,
+        'scope': 'One switch junction only; no diode, package or shared-junction heat inferred',
+        'temperature_c': knots,
+        'component_power_w': values,
+        'total_power_w': total,
+        'temperature_domain_c': [lower, upper],
+        'current_domain_a': [max(row[0] for row in current_bounds), min(row[1] for row in current_bounds)],
+        'active_contributions': active,
+        'record_evidence': proof,
+        'source_identity': {
+            'selected_dependency_sha256': digest,
+            'selected_dependency_scope': 'Selected representation, indices, graphs and recorded physics conditions only; no load-time metadata',
+            'repository_source': deepcopy(repository_source),
+        },
+        'loss_model': {
+            'mode': 'recorded',
+            'source': source,
+            'conditions': {},
+            'temperature_min_c': lower,
+            'temperature_max_c': upper,
+            'temperature_c': knots,
+            'power_w': total,
+        },
+        'assumptions': [
+            'Held nonnegative per-switch current; conduction duty is explicitly supplied',
+            'Selected held-current PWM model has one on/off pair per period only for0<duty<1; endpoint duty has no events',
+            'Zero frequency disables switching; active zero-current switching still evaluates E(0)',
+            'Bounded current interpolation precedes independent bounded temperature interpolation; no nearest record or extrapolation',
+        ],
+        'resource_use': {'selected_records': len(proof), 'selected_points': total_points, 'temperature_knots': len(knots)},
+    })
 
 
 def analyze_device_electrothermal(transistor, request, *, repository_source=None):
     """Feed one derived recorded table into the existing bounded thermal solver."""
     table = build_device_loss_table(transistor, request, repository_source=repository_source)
-    solver_request = {'source': request['source'], 'sink_temperature_c': _number(request['sink_temperature_c'], 'Fixed sink temperature'),
-        'common_resistance_k_w': 0, 'branch_resistances_k_w': [_number(request['resistance_k_w'], 'Junction-to-fixed-sink path', minimum=0)],
+    solver_request = {
+        'source': request['source'],
+        'sink_temperature_c': _number(request['sink_temperature_c'], 'Fixed sink temperature'),
+        'common_resistance_k_w': 0,
+        'branch_resistances_k_w': [_number(request['resistance_k_w'], 'Junction-to-fixed-sink path', minimum=0)],
         'initial_temperatures_c': [_number(request['initial_temperature_c'], 'Initial junction temperature')],
         'loss_models': [table['loss_model']], 'tolerance_k': request.get('tolerance_k', 1e-8),
         'max_iterations': request.get('max_iterations', 200), 'relaxation': request.get('relaxation', 1)}
@@ -353,7 +381,12 @@ def analyze_device_electrothermal(transistor, request, *, repository_source=None
                      for family, values in table['component_power_w'].items()}
         breakdown['sum_component_power_w'] = _sum(breakdown.values())
         breakdown['solver_power_w'] = accepted['power_w'][0]
-    return _bounded_output({'operation': 'native-device-electrothermal', 'request': deepcopy(request),
-            'table': table, 'solver_request': solver_request, 'result': solution,
-            'accepted_component_power_w': breakdown,
-            'units': 'A, V, Hz, W, K/W; temperatures C and temperature differences K'})
+    return _bounded_output({
+        'operation': 'native-device-electrothermal',
+        'request': deepcopy(request),
+        'table': table,
+        'solver_request': solver_request,
+        'result': solution,
+        'accepted_component_power_w': breakdown,
+        'units': 'A, V, Hz, W, K/W; temperatures C and temperature differences K',
+    })

@@ -120,14 +120,14 @@ def test_diode_separate_slices_and_unmatched_holdout_not_silently_dropped():
     """Retain unknown gates and explicitly reject untrained temperatures."""
     inputs = diode()
     inputs["observations"] += [row("warm" + str(i),
-        dict(current_a=i, t_j_c=75, v_g_v=None), v)
-        for i, v in ((1, .4), (3, .5), (5, .6))]
+                                   dict(current_a=i, t_j_c=75, v_g_v=None), v)
+                               for i, v in ((1, .4), (3, .5), (5, .6))]
     inputs["observations"].append(row("unknownslice", dict(
         current_a=2, t_j_c=50, v_g_v=0), .6, "holdout"))
     result = train_device_model(inputs)
     assert len(result["model"]["slices"]) == 2
     assert query(result["model"], "voltage", dict(current_a=2, t_j_c=75,
-                                               v_g_v=None))["value"] == pytest.approx(.45)
+                                                  v_g_v=None))["value"] == pytest.approx(.45)
     unmatched = [item for item in result["diagnostics"] if item["slice"] == "unmatched"]
     assert len(unmatched) == 2
     assert all(item["holdout"]["rows"][0]["status"] == "rejected" for item in unmatched)
@@ -195,7 +195,7 @@ def test_physical_domain_checks_interior_extrema_without_forcing_ron_monotone():
                               for x in (-1, 0, 1)]
     model = train_device_model(inputs)["model"]
     assert query(model, "resistance", dict(t_j_c=0, v_g_v=12,
-                                          current_a=None))["value"] == pytest.approx(.01)
+                                           current_a=None))["value"] == pytest.approx(.01)
     for item in inputs["observations"]:
         x = item["coordinates"]["t_j_c"]
         item["value"] = (x - .5) ** 2 - .1
@@ -208,7 +208,7 @@ def test_diode_interior_slope_check_and_signed_magnitudes():
     """Reject hidden negative slopes and signed directional currents."""
     inputs = diode() | {"degree": 3}
     inputs["observations"] = [row(str(x), dict(current_a=x + 1,
-        t_j_c=25, v_g_v=0), 3 + x ** 3 - .1*x) for x in (-1, -.5, .5, 1)]
+                                               t_j_c=25, v_g_v=0), 3 + x ** 3 - .1*x) for x in (-1, -.5, .5, 1)]
     with pytest.raises(ValueError, match="slope"):
         train_device_model(inputs)
     invalid = diode()
@@ -281,7 +281,7 @@ def test_no_mutation_model_json_roundtrip_and_fingerprints():
     model = json.loads(json.dumps(trained["model"]))
     assert validate_device_model(model) == trained["model"]
     expected = hashlib.sha256(json.dumps(model, sort_keys=True,
-        separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+                                         separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
     assert trained["evidence"]["model_sha256"] == expected
     assert "held" not in [item["id"] for item in model["training_observations"]]
     assert hashlib.sha256(trained["model_json"].encode()).hexdigest() == expected
@@ -290,6 +290,7 @@ def test_no_mutation_model_json_roundtrip_and_fingerprints():
 def test_headless_integral_json_numbers_and_response_isolation():
     """Accept equivalent JSON numbers and isolate all public response data."""
     trained = train_device_model(ron())
+
     def integral_numbers(value):
         if isinstance(value, dict):
             return {key: integral_numbers(item) for key, item in value.items()}
@@ -326,7 +327,7 @@ def test_adjacent_float_temperature_support_uses_actual_transformed_domain():
                               row("hi", {"t_j_c": hi}, .004)]
     model = train_device_model(inputs)["model"]
     assert query(model, "resistance", dict(t_j_c=hi, v_g_v=12,
-                                          current_a=None))["value"] == pytest.approx(.004)
+                                           current_a=None))["value"] == pytest.approx(.004)
 
 
 def test_constant_outputs_r2_and_absent_holdout():
@@ -350,8 +351,8 @@ def test_api_train_evaluate_raw_bytes_and_invalid_model():
     trained = response.json()
     assert trained["evidence"]["request_sha256"] == hashlib.sha256(raw).hexdigest()
     request = dict(model=trained["model"], queries=[dict(id="q", output="energy",
-        coordinates=dict(current_a=15, voltage_v=500, t_j_c=75,
-                         r_g_ohm=6, v_g_v=12))])
+                                                         coordinates=dict(current_a=15, voltage_v=500, t_j_c=75,
+                                                                          r_g_ohm=6, v_g_v=12))])
     evaluated = app.post("/api/models/evaluate", json=request)
     assert evaluated.status_code == 200, evaluated.text
     assert evaluated.json()["result"]["predictions"][0]["value"] == pytest.approx(.002578125)
@@ -382,9 +383,9 @@ def test_api_ron_unknown_current_and_gate_condition_zero():
     trained = app.post("/api/models/train", json=ron())
     assert trained.status_code == 200, trained.text
     response = app.post("/api/models/evaluate", json=dict(model=trained.json()["model"],
-        queries=[dict(id="unknown", output="resistance", coordinates=dict(
-            t_j_c=50, current_a=None, v_g_v=12)),
-            dict(id="zero", output="resistance", coordinates=dict(
+                                                          queries=[dict(id="unknown", output="resistance", coordinates=dict(
+                                                              t_j_c=50, current_a=None, v_g_v=12)),
+        dict(id="zero", output="resistance", coordinates=dict(
                 t_j_c=50, current_a=0, v_g_v=12))]))
     assert response.status_code == 200, response.text
     assert [r["status"] for r in response.json()["result"]["predictions"]] == [

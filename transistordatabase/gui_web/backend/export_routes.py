@@ -92,6 +92,7 @@ def _files(device, format, selection=None):
         stream = StringIO(newline="")
         writer = csv.writer(stream)
         writer.writerow(["name", "type", "manufacturer", "v_abs_max", "i_abs_max", "i_cont", "housing_type"])
+
         def text(value):
             return "'" + value if isinstance(value, str) and value.lstrip().startswith(("=", "+", "-", "@")) else value
         writer.writerow([text(name), text(device.metadata.type), text(device.metadata.manufacturer),

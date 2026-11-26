@@ -148,9 +148,11 @@ def test_simulation_waits_and_uses_actual_runner_output(monkeypatch, tmp_path):
     actual = tmp_path / "actual.raw"
     actual.write_text("test fixture")
     calls = []
+
     class Runner:
         def __init__(self, **kwargs):
             calls.append(kwargs)
+
         def run_now(self, netlist):
             calls.append(netlist)
             return actual, tmp_path / "actual.log"

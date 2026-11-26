@@ -399,7 +399,7 @@ def calculate(request: Request) -> dict:
             if table.kind == "energy-condition":
                 raise ValueError("Condition sweeps are evaluated within the separable estimate")
             result = {"value": table.evaluate(request.query, request.conditions,
-                                               request.r_nom_ohm),
+                                              request.r_nom_ohm),
                       "mode": "bounded-measured-slice", "kind": table.kind,
                       "source": table.source, "recorded_conditions": dict(table.conditions),
                       "coverage": [float(table.x[0]), float(table.x[-1])]}
@@ -430,9 +430,9 @@ def calculate(request: Request) -> dict:
                 {name: table.measured() for name, table in request.slices.items()},
                 selected=request.selected)
         output = {"operation": operation, "inputs": request.model_dump(),
-                "context": context, "result": result, "plots": plots,
-                "units": "SI; temperature in degrees Celsius",
-                "condition_policy": "Exact recorded conditions; null means unknown, not wildcard"}
+                  "context": context, "result": result, "plots": plots,
+                  "units": "SI; temperature in degrees Celsius",
+                  "condition_policy": "Exact recorded conditions; null means unknown, not wildcard"}
         if isinstance(request, (TransferExtraction, RecoveryExtraction)):
             output["csv"] = _extraction_csv(request, result)
         return output

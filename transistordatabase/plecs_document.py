@@ -191,9 +191,9 @@ def _table(element: ET.Element, path: str, diagnostics: list[Diagnostic]) -> Tab
     formula = _text(element, "Formula")
     supported = method.lower() == "table only" and not formula
     if not supported:
-        diagnostics.append(Diagnostic("unsupported-formula", path,
-            "Formula computation is preserved as source and is never evaluated; "
-            "base tables are not a complete model."))
+        diagnostics.append(
+            Diagnostic("unsupported-formula", path, "Formula computation is preserved as source and is never evaluated; base tables are not a complete model.")
+        )
     # Even formula placeholder tables are validated, but never plotted/evaluated.
     value_name = "VoltageDrop" if kind == "conduction" else "Energy"
     container = _one(element, value_name)
@@ -240,11 +240,23 @@ def _table(element: ET.Element, path: str, diagnostics: list[Diagnostic]) -> Tab
     known = {"ComputationMethod", "Formula", "CurrentAxis", "TemperatureAxis",
              "VoltageAxis", value_name}
     if any(_local(child.tag) not in known for child in element):
-        diagnostics.append(Diagnostic("unsupported-table-metadata", path,
-            "Unknown table content is preserved and requires explicit interpretation."))
-    return Table(kind, method, "supported-table" if supported else "unsupported-formula",
-                 current, temperatures, voltage, scale, values, gate, resistance,
-                 formula, path, slices, dict(element.attrib))
+        diagnostics.append(Diagnostic("unsupported-table-metadata", path, "Unknown table content is preserved and requires explicit interpretation."))
+    return Table(
+        kind,
+        method,
+        "supported-table" if supported else "unsupported-formula",
+        current,
+        temperatures,
+        voltage,
+        scale,
+        values,
+        gate,
+        resistance,
+        formula,
+        path,
+        slices,
+        dict(element.attrib),
+    )
 
 
 def _thermal(element: ET.Element, path: str, diagnostics: list[Diagnostic]) -> list[Thermal]:
@@ -269,11 +281,16 @@ def _thermal(element: ET.Element, path: str, diagnostics: list[Diagnostic]) -> l
         if not elements:
             supported = False
         if not supported:
-            diagnostics.append(Diagnostic("unsupported-thermal", network_path,
-                f"{kind} source retained; only explicit Foster R/Tau elements are evaluated. "
-                "Cauer R/C elements are not Foster poles."))
-        result.append(Thermal(kind, "supported-foster" if supported else "unsupported-content",
-                              elements, network_path, ET.tostring(network, encoding="unicode")))
+            diagnostics.append(
+                Diagnostic(
+                    "unsupported-thermal",
+                    network_path,
+                    f"{kind} source retained; only explicit Foster R/Tau elements are evaluated. Cauer R/C elements are not Foster poles.",
+                )
+            )
+        result.append(
+            Thermal(kind, "supported-foster" if supported else "unsupported-content", elements, network_path, ET.tostring(network, encoding="unicode"))
+        )
     return result
 
 
@@ -284,8 +301,9 @@ def parse_plecs_document(content: str | bytes, source_name: str | None = None) -
         raise ValueError(f"PLECS source exceeds {MAX_XML_BYTES} bytes")
     declaration = re.search(br'encoding=[\"\']([^\"\']+)', raw[:200], re.I)
     encoding = declaration.group(1).decode("ascii") if declaration else "utf-8-sig"
-    if b"\x00" in raw or (not isinstance(content, str) and encoding.lower().replace("_", "-") not in (
-        "utf-8", "utf-8-sig", "iso-8859-1", "latin-1", "latin1", "windows-1252")):
+    if b"\x00" in raw or (
+        not isinstance(content, str) and encoding.lower().replace("_", "-") not in ("utf-8", "utf-8-sig", "iso-8859-1", "latin-1", "latin1", "windows-1252")
+    ):
         raise ValueError("Only UTF-8, Latin-1 and Windows-1252 XML byte encodings are supported")
     if re.search(br"<!\s*(?:DOCTYPE|ENTITY)", raw, re.IGNORECASE):
         raise ValueError("DTD and entity declarations are unsupported")
@@ -361,11 +379,8 @@ def parse_plecs_document(content: str | bytes, source_name: str | None = None) -
                 thermal.extend(_thermal(child, path, diagnostics))
             elif name != "SemiconductorData":
                 metadata.append(_metadata(child))
-                if name not in ("Comment", "Variables", "Constants") or (
-                    name in ("Variables", "Constants") and len(child)
-                ):
-                    diagnostics.append(Diagnostic("unsupported-package-content", path,
-                        f"{name} is retained without evaluation or default substitution."))
+                if name not in ("Comment", "Variables", "Constants") or (name in ("Variables", "Constants") and len(child)):
+                    diagnostics.append(Diagnostic("unsupported-package-content", path, f"{name} is retained without evaluation or default substitution."))
         if not any(block.tables for block in blocks):
             diagnostics.append(Diagnostic("missing-table", path, "No semiconductor tables are available."))
         fixed_conditions = None
@@ -376,8 +391,9 @@ def parse_plecs_document(content: str | bytes, source_name: str | None = None) -
                     if fixed_conditions is not None:
                         raise ValueError("Duplicate explicit TDB fixed-condition metadata")
                     try:
-                        fixed_conditions = json.loads(text.split("=", 1)[1],
-                            parse_constant=lambda value: (_ for _ in ()).throw(ValueError("Nonfinite condition metadata")))
+                        fixed_conditions = json.loads(
+                            text.split("=", 1)[1], parse_constant=lambda value: (_ for _ in ()).throw(ValueError("Nonfinite condition metadata"))
+                        )
                     except (ValueError, TypeError, RecursionError) as exc:
                         raise ValueError("Malformed explicit TDB fixed-condition metadata") from exc
                     if not isinstance(fixed_conditions, dict):
@@ -470,7 +486,12 @@ def finalize_plecs_package(document: PlecsDocument, *, package_id: str,
     if ratings["i_cont"] > ratings["i_abs_max"]:
         raise ValueError("Continuous current cannot exceed absolute current")
     for key in ("housing_area", "cooling_area"):
-        if key not in thermal_properties or isinstance(thermal_properties[key], bool) or not math.isfinite(thermal_properties[key]) or thermal_properties[key] <= 0:
+        if (
+            key not in thermal_properties
+            or isinstance(thermal_properties[key], bool)
+            or not math.isfinite(thermal_properties[key])
+            or thermal_properties[key] <= 0
+        ):
             raise ValueError(f"Declare positive {key} in m²")
     if set(block_targets) != {b.id for b in package.blocks}:
         raise ValueError("Map every semiconductor block explicitly")
@@ -546,14 +567,21 @@ def finalize_plecs_package(document: PlecsDocument, *, package_id: str,
                             if voltage > 0:
                                 raise ValueError("Negative-to-positive recovery mapping requires nonpositive source voltages")
                             supply = -voltage
-                        destination.append(SwitchingLossData(
-                            "graph_i_e", temperature, supply, gate,
-                            r_g=table.gate_resistance_ohm,
-                            graph_i_e=np.array([table.current_a,
-                                [v * table.scale for v in table.values[tindex][vindex]]]),
-                            comment=json.dumps({"source_path": table.source_path,
-                                "source_voltage_v": voltage,
-                                "recovery_voltage_convention": recovery_voltage_convention})))
+                        destination.append(
+                            SwitchingLossData(
+                                "graph_i_e",
+                                temperature,
+                                supply,
+                                gate,
+                                r_g=table.gate_resistance_ohm,
+                                graph_i_e=np.array([table.current_a, [v * table.scale for v in table.values[tindex][vindex]]]),
+                                comment=json.dumps({
+                                    "source_path": table.source_path,
+                                    "source_voltage_v": voltage,
+                                    "recovery_voltage_convention": recovery_voltage_convention,
+                                }),
+                            )
+                        )
         apply_thermal(block.thermal, target)
     if package.thermal:
         if package_thermal_target is None:

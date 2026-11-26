@@ -393,10 +393,3 @@ def test_float32_source_distinguishes_its_smallest_positive_energy_from_underflo
             assert row["evaluated_energy_j"] == smallest
         else:
             assert response.status_code == 422, response.text
-
-
-
-
-
-
-

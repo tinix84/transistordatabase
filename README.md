@@ -1,4 +1,4 @@
-<!-- Last modified: 2026-11-14 -->
+<!-- Last modified: 2026-11-26 -->
 <!-- Version: 1.0.1 -->
 
 # Transistor Database

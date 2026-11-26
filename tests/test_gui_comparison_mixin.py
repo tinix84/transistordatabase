@@ -1,11 +1,12 @@
 """Test comparison mixin functionality."""
 import os
+# Configure the platform before the desktop imports.
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
-import pytest
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QPushButton, QComboBox, QTabWidget, QRadioButton
-from transistordatabase.gui.gui import MainWindow
+import pytest  # noqa: E402
+from PyQt5.QtCore import Qt  # noqa: E402
+from PyQt5.QtWidgets import QPushButton, QComboBox, QTabWidget, QRadioButton  # noqa: E402
+from transistordatabase.gui.gui import MainWindow  # noqa: E402
 
 
 @pytest.fixture
@@ -54,8 +55,8 @@ def test_find_transistor_selection_combos(main_window):
 def test_comparison_plot_methods_exist(main_window):
     """Test that comparison plot methods exist."""
     has_plot_method = hasattr(main_window, 'on_compare') or \
-                      hasattr(main_window, 'compare_transistors') or \
-                      any('compar' in m.lower() for m in dir(main_window))
+        hasattr(main_window, 'compare_transistors') or \
+        any('compar' in m.lower() for m in dir(main_window))
 
     # May or may not have explicit comparison method
     assert True
@@ -86,8 +87,8 @@ def test_comparison_data_structures(main_window):
     """Test that comparison data structures are accessible."""
     # Check if comparison attributes exist
     has_comparison = hasattr(main_window, 'comparison_data') or \
-                     hasattr(main_window, 'selected_transistors') or \
-                     any('transistor' in m.lower() for m in dir(main_window))
+        hasattr(main_window, 'selected_transistors') or \
+        any('transistor' in m.lower() for m in dir(main_window))
 
     # Should have some transistor tracking
     assert True

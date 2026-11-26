@@ -15,14 +15,14 @@ def validate_objectives(objectives, metric_names):
         raise ValueError("Declare one to four unique merit objectives")
     names, weights = [], []
     for objective in objectives:
-        if (not isinstance(objective, dict) or
-                set(objective) != {"name", "unit", "direction", "weight"} or
-                objective["name"] not in metric_names or objective["unit"] != "W" or
-                objective["direction"] not in {"minimize", "maximize"}):
+        if (not isinstance(objective, dict)
+                or set(objective) != {"name", "unit", "direction", "weight"}
+                or objective["name"] not in metric_names or objective["unit"] != "W"
+                or objective["direction"] not in {"minimize", "maximize"}):
             raise ValueError("Select named merit power metrics in W and their ranking directions")
         weight = objective["weight"]
-        if (isinstance(weight, bool) or not isinstance(weight, (float, int)) or
-                not math.isfinite(weight) or weight < 0):
+        if (isinstance(weight, bool) or not isinstance(weight, (float, int))
+                or not math.isfinite(weight) or weight < 0):
             raise ValueError("Merit objective weights must be finite and nonnegative")
         names.append(objective["name"])
         weights.append(weight)
@@ -54,7 +54,7 @@ def _export_preflight(config_ids, point_ids, objectives, available_bytes, limit_
              "reserved_fields": "x" * 4096}
     json_text = json.dumps(trial, allow_nan=False)
     csv_text = _csv_rows([{key: json.dumps(value, allow_nan=False) if isinstance(value, (list, dict))
-                            else value for key, value in trial.items()}], list(trial))
+                           else value for key, value in trial.items()}], list(trial))
     per_row = _encoded_size(trial) + _encoded_size(json_text) + _encoded_size(csv_text)
     # Nested table evidence and top-level population/objective records also repeat.
     bound = per_row * len(config_ids) * len(objectives) * 2 + 8192
@@ -73,8 +73,8 @@ def build_merit(rows, summaries, points, objectives, grid_input_sha256,
     by_config = {summary["configuration_id"]: summary["metrics"] for summary in summaries}
     active = [objective for objective in objectives if objective["active"]]
     eligible = [identity for identity in config_ids if all(
-        by_config[identity][objective["name"]]["complete"] and
-        by_config[identity][objective["name"]]["full_mean"] is not None
+        by_config[identity][objective["name"]]["complete"]
+        and by_config[identity][objective["name"]]["full_mean"] is not None
         for objective in active)]
     ranges = []
     for objective in objectives:
@@ -83,20 +83,20 @@ def build_merit(rows, summaries, points, objectives, grid_input_sha256,
         values = [by_config[identity][name]["full_mean"] for identity in population]
         minimum, maximum = (min(values), max(values)) if values else (None, None)
         ranges.append({**objective, "minimum": minimum, "maximum": maximum,
-            "minimum_configuration_ids": [identity for identity in population
-                if by_config[identity][name]["full_mean"] == minimum],
-            "maximum_configuration_ids": [identity for identity in population
-                if by_config[identity][name]["full_mean"] == maximum]})
+                       "minimum_configuration_ids": [identity for identity in population
+                                                     if by_config[identity][name]["full_mean"] == minimum],
+                       "maximum_configuration_ids": [identity for identity in population
+                                                     if by_config[identity][name]["full_mean"] == maximum]})
     population = {"configuration_ids": eligible, "operating_point_ids": positive_points,
                   "zero_weight_operating_point_ids": zero_points,
                   "configuration_count": len(config_ids), "eligible_configuration_count": len(eligible),
                   "configuration_coverage": len(eligible) / len(config_ids)}
     population_evidence = {"grid_input_sha256": grid_input_sha256,
-        "population": population, "objectives": objectives,
-        "raw_means": [{"configuration_id": identity,
-                       "means": {objective["name"]: by_config[identity][objective["name"]]["full_mean"]
-                                 for objective in objectives}}
-                      for identity in config_ids]}
+                           "population": population, "objectives": objectives,
+                           "raw_means": [{"configuration_id": identity,
+                                          "means": {objective["name"]: by_config[identity][objective["name"]]["full_mean"]
+                                                    for objective in objectives}}
+                                         for identity in config_ids]}
     population_sha256 = hash_value(population_evidence)
     merit_rows = []
     for identity in config_ids:
@@ -122,9 +122,9 @@ def build_merit(rows, summaries, points, objectives, grid_input_sha256,
             if objective["active"] and missing:
                 reasons.append({"name": name, "missing_operating_point_ids": missing})
             objective_rows.append({**objective, "full_mean": summary["full_mean"],
-                "complete": summary["complete"], "retained_weight": summary["retained_weight"],
-                "total_weight": summary["total_weight"], "coverage": summary["coverage"],
-                "missing_operating_point_ids": missing, "penalty": penalty, "contribution": contribution})
+                                   "complete": summary["complete"], "retained_weight": summary["retained_weight"],
+                                   "total_weight": summary["total_weight"], "coverage": summary["coverage"],
+                                   "missing_operating_point_ids": missing, "penalty": penalty, "contribution": contribution})
         score = (weighted_mean(score_rows, "penalty", math.fsum(objective["weight"] for objective in active))
                  if identity in eligible else None)
         if score is not None:
@@ -133,8 +133,8 @@ def build_merit(rows, summaries, points, objectives, grid_input_sha256,
             # summation drift, including the all-zero and all-one endpoints.
             score = min(max(score, min(penalties)), max(penalties))
         merit_rows.append({"configuration_id": identity,
-            "status": "computed" if identity in eligible else "excluded", "score": score,
-            "rank": None, "objectives": objective_rows, "exclusion_reasons": reasons})
+                           "status": "computed" if identity in eligible else "excluded", "score": score,
+                           "rank": None, "objectives": objective_rows, "exclusion_reasons": reasons})
     ranked = sorted((row for row in merit_rows if row["score"] is not None),
                     key=lambda row: (row["score"], row["configuration_id"]))
     previous_score, rank = None, None
@@ -148,22 +148,22 @@ def build_merit(rows, summaries, points, objectives, grid_input_sha256,
     for row in merit_rows:
         for objective, result in zip(ranges, row["objectives"], strict=True):
             export_rows.append({"method_version": METHOD_VERSION,
-                "grid_input_sha256": grid_input_sha256, "population_sha256": population_sha256,
-                "configuration_id": row["configuration_id"], "status": row["status"],
-                "score": row["score"], "rank": row["rank"],
-                "population_configuration_ids": eligible,
-                "population_operating_point_ids": positive_points,
-                "zero_weight_operating_point_ids": zero_points,
-                **objective, **result})
+                                "grid_input_sha256": grid_input_sha256, "population_sha256": population_sha256,
+                                "configuration_id": row["configuration_id"], "status": row["status"],
+                                "score": row["score"], "rank": row["rank"],
+                                "population_configuration_ids": eligible,
+                                "population_operating_point_ids": positive_points,
+                                "zero_weight_operating_point_ids": zero_points,
+                                **objective, **result})
     csv_rows = [{key: json.dumps(value, allow_nan=False, separators=(",", ":"))
                 if isinstance(value, (list, dict)) else value for key, value in row.items()}
                 for row in export_rows]
     output = {"method_version": METHOD_VERSION, "grid_input_sha256": grid_input_sha256,
-        "population_sha256": population_sha256,
-        "status": "computed" if eligible else "unavailable", "population": population,
-        "objectives": ranges, "rows": merit_rows, "ranking": ranking, "export_rows": export_rows,
-        "rows_json": json.dumps(export_rows, allow_nan=False, separators=(",", ":")),
-        "rows_csv": _csv_rows(csv_rows, list(csv_rows[0])), "null_csv": "NULL"}
+              "population_sha256": population_sha256,
+              "status": "computed" if eligible else "unavailable", "population": population,
+              "objectives": ranges, "rows": merit_rows, "ranking": ranking, "export_rows": export_rows,
+              "rows_json": json.dumps(export_rows, allow_nan=False, separators=(",", ":")),
+              "rows_csv": _csv_rows(csv_rows, list(csv_rows[0])), "null_csv": "NULL"}
     if _encoded_size(output) > available_bytes:
         raise limit_error("Merit exceeds the complete response byte budget")
     return output

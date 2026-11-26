@@ -10,12 +10,11 @@ os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 sys.path.insert(0, '/home/tinix/claude_wsl/transistordatabase')
 os.chdir('/home/tinix/claude_wsl/transistordatabase')
 
-import pytest
-from datetime import datetime
+import pytest  # noqa: E402
+from datetime import datetime  # noqa: E402
 
 def main():
     """Run tests directly using pytest API."""
-
     print("\n" + "="*70)
     print("PYQT5 GUI TEST EXECUTION")
     print("="*70)
@@ -107,6 +106,7 @@ def main():
     print(f"Exit Code: {exit_code}")
 
     return exit_code
+
 
 if __name__ == '__main__':
     sys.exit(main())

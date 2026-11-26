@@ -380,14 +380,14 @@ def waveform_scalar_statistics(time_s, values, *, include_samples=True):
     if not np.isfinite([mean, rms]).all():
         raise ValueError("Statistics overflow")
     result = {"mean": float(mean), "rms": float(rms),
-            "minimum": float(np.min(values)), "maximum": float(np.max(values)),
-            "sample_count": len(values)}
+              "minimum": float(np.min(values)), "maximum": float(np.max(values)),
+              "sample_count": len(values)}
     if include_samples:
         sample_mean = float(np.mean(normalized))
         result.update(arithmetic_mean=float(scale * sample_mean),
-            sample_standard_deviation=float(scale * np.sqrt(
-                np.sum((normalized - sample_mean) ** 2) / (len(values) - 1))),
-            discrete_rms=float(scale * np.sqrt(np.mean(normalized ** 2))))
+                      sample_standard_deviation=float(scale * np.sqrt(
+                          np.sum((normalized - sample_mean) ** 2) / (len(values) - 1))),
+                      discrete_rms=float(scale * np.sqrt(np.mean(normalized ** 2))))
     _assert_finite_tree(result)
     return result
 
@@ -397,10 +397,10 @@ def waveform_statistics(time_s, values):
     time, values = _vector(time_s, "time_s"), _vector(values, "values")
     scalar = waveform_scalar_statistics(time, values, include_samples=False)
     result = {"mean": scalar["mean"], "rms": scalar["rms"],
-            "minimum": scalar["minimum"], "maximum": scalar["maximum"],
-            "interval_derivative": ((values[1:] - values[:-1]) / np.diff(time)).tolist(),
-            "interval_start_s": time[:-1].tolist(), "interval_end_s": time[1:].tolist(),
-            "method": "Exact time-weighted piecewise-linear integrals"}
+              "minimum": scalar["minimum"], "maximum": scalar["maximum"],
+              "interval_derivative": ((values[1:] - values[:-1]) / np.diff(time)).tolist(),
+              "interval_start_s": time[:-1].tolist(), "interval_end_s": time[1:].tolist(),
+              "method": "Exact time-weighted piecewise-linear integrals"}
     _assert_finite_tree(result)
     return result
 
@@ -413,9 +413,9 @@ def series_spectrum(time_s, values, *, window="rectangular", detrend="none",
     Amplitude uses coherent-gain correction; Parseval uses raw windowed samples.
     No resampling or continuous-time RMS equivalence is implied.
     """
-    if (isinstance(relative_threshold, (bool, np.bool_)) or
-            not isinstance(relative_threshold, (int, float, np.integer, np.floating)) or
-            not np.isfinite(relative_threshold) or not 0 <= relative_threshold <= 1):
+    if (isinstance(relative_threshold, (bool, np.bool_))
+            or not isinstance(relative_threshold, (int, float, np.integer, np.floating))
+            or not np.isfinite(relative_threshold) or not 0 <= relative_threshold <= 1):
         raise ValueError("FFT relative_threshold must be finite and within [0, 1]")
     time, values = _vector(time_s, "time_s"), _vector(values, "values")
     if len(time) != len(values) or np.any(np.diff(time) <= 0):
@@ -454,28 +454,28 @@ def series_spectrum(time_s, values, *, window="rectangular", detrend="none",
                 if peak else [])
     bin_square = abs(transformed) ** 2 * multiplicity / len(values) ** 2
     result = {"frequency_hz": np.fft.rfftfreq(len(values), dt).tolist(),
-            "magnitude": amplitude.tolist(),
-            "real": phasor.real.tolist(), "imaginary": phasor.imag.tolist(),
-            "phase_rad": phase, "phase_reference": "first supplied sample",
-            "relative_threshold": float(relative_threshold),
-            "selected_bin_indices": selected,
-            "windowed_bin_mean_square_normalized": bin_square.tolist(),
-            "mean_square_amplitude_scale": scale,
-            "mean_square_normalization": "Multiply normalized bins by amplitude scale squared; RMS is evaluated before squaring that scale",
-            "discrete_input_rms": float(np.sqrt(np.mean(values ** 2)) * scale),
-            "discrete_input_rms_definition": "Discrete samples after selected detrending, before windowing; separate from continuous time-weighted RMS",
-            "windowed_discrete_rms": float(np.sqrt(np.mean((values * weights) ** 2)) * scale),
-            "parseval_rms": float(np.sqrt(np.sum(bin_square)) * scale),
-            "n": len(values), "sample_interval_s": dt, "sequence_period_s": len(values) * dt,
-            "window": window, "detrend": detrend, "coherent_gain": gain,
-            "normalization": "One-sided peak amplitude; double interior bins only",
-            "resampling": "none"}
+              "magnitude": amplitude.tolist(),
+              "real": phasor.real.tolist(), "imaginary": phasor.imag.tolist(),
+              "phase_rad": phase, "phase_reference": "first supplied sample",
+              "relative_threshold": float(relative_threshold),
+              "selected_bin_indices": selected,
+              "windowed_bin_mean_square_normalized": bin_square.tolist(),
+              "mean_square_amplitude_scale": scale,
+              "mean_square_normalization": "Multiply normalized bins by amplitude scale squared; RMS is evaluated before squaring that scale",
+              "discrete_input_rms": float(np.sqrt(np.mean(values ** 2)) * scale),
+              "discrete_input_rms_definition": "Discrete samples after selected detrending, before windowing; separate from continuous time-weighted RMS",
+              "windowed_discrete_rms": float(np.sqrt(np.mean((values * weights) ** 2)) * scale),
+              "parseval_rms": float(np.sqrt(np.sum(bin_square)) * scale),
+              "n": len(values), "sample_interval_s": dt, "sequence_period_s": len(values) * dt,
+              "window": window, "detrend": detrend, "coherent_gain": gain,
+              "normalization": "One-sided peak amplitude; double interior bins only",
+              "resampling": "none"}
     if analysis_requested:
         result.update(analyze_spectrum_bins(result["frequency_hz"], transformed.tolist(),
-            sample_count=len(values), sample_interval_s=dt, amplitude_scale=scale,
-            peak_amplitudes=result["magnitude"],
-            coherent_gain=gain, window_power_gain=float(np.mean(weights ** 2)),
-            signal_unit=signal_unit, window=window, detrend=detrend, mask=mask, bands=bands))
+                                            sample_count=len(values), sample_interval_s=dt, amplitude_scale=scale,
+                                            peak_amplitudes=result["magnitude"],
+                                            coherent_gain=gain, window_power_gain=float(np.mean(weights ** 2)),
+                                            signal_unit=signal_unit, window=window, detrend=detrend, mask=mask, bands=bands))
     _assert_finite_tree(result)
     return result
 
@@ -653,8 +653,8 @@ def calc_switching_loss(waveform: WaveformData, e_on_data: list[SwitchingLossDat
 
 
 def calc_total_loss(waveform: WaveformData, linearized: LinearizedModel,
-                   e_on_data: list[SwitchingLossData], e_off_data: list[SwitchingLossData],
-                   t_j: float = 25.0) -> LossResult:
+                    e_on_data: list[SwitchingLossData], e_off_data: list[SwitchingLossData],
+                    t_j: float = 25.0) -> LossResult:
     """Compatibility total: missing gate/data reject instead of fabricating zero."""
     conduction = calc_conduction_loss(waveform, linearized)
     on, off = calc_switching_loss(waveform, e_on_data, e_off_data, t_j)

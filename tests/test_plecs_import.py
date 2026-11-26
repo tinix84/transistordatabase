@@ -19,7 +19,7 @@ def _explicit_mapping(path):
              "thermal_properties": {"housing_area": .0001, "cooling_area": .0002},
              "block_targets": {"0": "switch"},
              "gate_voltage_by_table": {table.source_path: 15.
-                 for table in document.packages[0].blocks[0].tables}}]
+                                       for table in document.packages[0].blocks[0].tables}}]
 
 
 @pytest.fixture

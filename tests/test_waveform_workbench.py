@@ -65,15 +65,22 @@ def test_exact_polynomial_fixtures(time, current, positive, negative, duty, expe
     assert sum(s["energy_j"] for s in result["power_segments"]) == pytest.approx(expected * (time[-1] - time[0]))
     for segment in result["power_segments"]:
         assert len(segment["power_coefficients_w"]) == 4
-        assert segment["energy_j"] == pytest.approx((segment["end_s"] - segment["start_s"]) * sum(c / (i + 1) for i, c in enumerate(segment["power_coefficients_w"])))
+        assert segment["energy_j"] == pytest.approx(
+            (segment["end_s"] - segment["start_s"]) * sum(c / (i + 1) for i, c in enumerate(segment["power_coefficients_w"]))
+        )
 
 
 def test_crossed_table_knot_and_cumulative_evidence():
     """Verify crossed table knot and cumulative evidence."""
     data = request()
-    data["conduction"]["positive"] = {"mode": "recorded", "source": "Measured hand curve",
-        "current_a": [0, 5, 10], "drop_v": [0, .5, 2],
-        "recorded_conditions": {"t_j_c": 25}, "requested_conditions": {"t_j_c": 25}}
+    data["conduction"]["positive"] = {
+        "mode": "recorded",
+        "source": "Measured hand curve",
+        "current_a": [0, 5, 10],
+        "drop_v": [0, 0.5, 2],
+        "recorded_conditions": {"t_j_c": 25},
+        "requested_conditions": {"t_j_c": 25},
+    }
     result = analyze_waveform(data)
     assert result["components"]["conduction"]["power_w"] == pytest.approx(65 / 12)
     assert [s["end_s"] for s in result["power_segments"]] == [.5, 1]
@@ -240,7 +247,14 @@ def test_tiny_signed_current_and_rms_do_not_underflow_to_zero():
 def test_resource_budget_rejects_before_interval_expansion(client):
     """Verify resource budget rejects before interval expansion."""
     data = request([0, 1, 2], [0, 9999, 0])
-    data["conduction"]["positive"] = {"mode": "recorded", "source": "Dense measured fixture", "current_a": list(range(10000)), "drop_v": [1] * 10000, "recorded_conditions": {}, "requested_conditions": {}}
+    data["conduction"]["positive"] = {
+        "mode": "recorded",
+        "source": "Dense measured fixture",
+        "current_a": list(range(10000)),
+        "drop_v": [1] * 10000,
+        "recorded_conditions": {},
+        "requested_conditions": {},
+    }
     response = client.post("/api/waveform/analyze", json=data)
     assert response.status_code == 413
     assert "Resource limit" in response.json()["detail"]
@@ -265,7 +279,12 @@ def test_typed_transport_equals_science_and_rejects_nonfinite_extra_and_missing(
     assert result["events"] == direct["events"]
     data["surprise"] = True
     assert client.post("/api/waveform/analyze", json=data).status_code == 422
-    assert client.post("/api/waveform/analyze", content='{"waveform":{"time_s":[0,NaN],"current_a":[0,1]}}', headers={"Content-Type": "application/json"}).status_code == 422
+    assert (
+        client.post(
+            "/api/waveform/analyze", content='{"waveform":{"time_s":[0,NaN],"current_a":[0,1]}}', headers={"Content-Type": "application/json"}
+        ).status_code
+        == 422
+    )
     data = switching_request()
     data["waveform"].pop("gate_v")
     assert client.post("/api/waveform/analyze", json=data).status_code == 422
@@ -275,7 +294,12 @@ def test_waveform_provenance_is_unknown_or_an_independent_user_snapshot(client):
     """Preserve declared source/calibration without fabricating measured identity."""
     data = request()
     assert analyze_waveform(data)["waveform_provenance"]["source"] is None
-    data["provenance"] = {"source": "User supplied SI record", "calibration_notes": "Probe gain already applied", "imported_filename": "scope.csv", "edited_after_import": True}
+    data["provenance"] = {
+        "source": "User supplied SI record",
+        "calibration_notes": "Probe gain already applied",
+        "imported_filename": "scope.csv",
+        "edited_after_import": True,
+    }
     response = client.post("/api/waveform/analyze", json=data)
     assert response.status_code == 200
     assert response.json()["waveform_provenance"] == data["provenance"]

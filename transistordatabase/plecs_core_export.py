@@ -89,7 +89,7 @@ def core_selection_document(transistor, selection: dict):
         raise ValueError("Export requires actual device identity")
     root = ET.Element(f"{{{NAMESPACE}}}SemiconductorLibrary", {"version": "1.1"})
     package = _element(root, "Package", {"class": transistor.metadata.type if component_name == "switch" else "Diode",
-        "vendor": transistor.metadata.manufacturer, "partnumber": transistor.metadata.name})
+                                         "vendor": transistor.metadata.manufacturer, "partnumber": transistor.metadata.name})
     block = _element(package, "SemiconductorData", {"type": transistor.metadata.type if component_name == "switch" else "Diode"})
     evidence = []
     cell_count = 0
@@ -104,6 +104,7 @@ def core_selection_document(transistor, selection: dict):
         resistance = None if key == "conduction" else _finite(context["gate_resistance_ohm"], f"{key} Rg", nullable=True)
         if resistance is not None and resistance < 0:
             raise ValueError("Gate resistance must be nonnegative")
+
         def matches(record, kind=key, selected_gate=gate, selected_resistance=resistance):
             actual_gate = _finite(record.v_g, f"{kind} recorded gate", nullable=True)
             if kind == "conduction":
@@ -210,9 +211,9 @@ def core_selection_document(transistor, selection: dict):
     document = parse_plecs_document(ET.tostring(root, encoding="utf-8", xml_declaration=True),
                                     "core:" + transistor.metadata.name)
     return document, {"status": "selected-subset", "selection": selected,
-                       "omitted_mechanisms": omitted, "evidence": evidence,
-                       "simulator_validation": "not-performed",
-                       "fixed_conditions_storage": "TDB_FIXED_CONDITIONS_JSON Comment metadata; not an additional PLECS table axis"}
+                      "omitted_mechanisms": omitted, "evidence": evidence,
+                      "simulator_validation": "not-performed",
+                      "fixed_conditions_storage": "TDB_FIXED_CONDITIONS_JSON Comment metadata; not an additional PLECS table axis"}
 
 
 def render_core_selection(transistor, selection: dict) -> bytes:

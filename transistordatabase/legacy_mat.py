@@ -165,6 +165,7 @@ def _mat_preflight(raw):
         return name
 
     variable_names = set()
+
     def elements(data, depth=0):
         if depth > 1:
             raise MatFormatError("Nested MAT compression is unsupported")
@@ -378,8 +379,7 @@ def _descriptor(value, path, inline_budget, segments):
     for dimension in value.shape[:-1]:
         prefix *= dimension
         json_values += prefix
-    safe_integers = not (value.size and value.dtype.kind in "iu" and
-                         (int(value.min()) < -MAX_JSON_INTEGER or int(value.max()) > MAX_JSON_INTEGER))
+    safe_integers = not (value.size and value.dtype.kind in "iu" and (int(value.min()) < -MAX_JSON_INTEGER or int(value.max()) > MAX_JSON_INTEGER))
     inline = json_values <= 4096 and json_values <= inline_budget[0] and safe_integers
     if inline and (value.dtype.kind == "U" or np.all(np.isfinite(value))):
         descriptor["values"] = value.tolist()
@@ -428,7 +428,11 @@ def _diagnostics(values):
             if placeholder:
                 add("scData." + stem, "synthetic-placeholder", "The ±1e100 zero-energy signature has no original branch samples. It is not measured zero loss")
             elif x.size and np.all(y == 0) and empty:
-                add("scData." + stem, "source-zero-unverified", "Original branch traces are absent. The stored zero curve has no established measurement evidence")
+                add(
+                    "scData." + stem,
+                    "source-zero-unverified",
+                    "Original branch traces are absent. The stored zero curve has no established measurement evidence",
+                )
             if np.any(y < 0):
                 add("scData." + stem, "negative-energy", "Negative source energy is preserved. Passive heat finalization is unsupported")
             refs = [_number(t.get("testVoltage")) for t in traces if isinstance(t, dict)]
@@ -439,7 +443,11 @@ def _diagnostics(values):
     for stem in ("onState", "turnOn", "turnOff"):
         x = sc.get(stem + "Current")
         if isinstance(x, np.ndarray) and x.dtype.kind in "iuf" and np.any(np.abs(x) == 1e-6):
-            add("scData." + stem, "synthetic-near-zero-candidate", "Combined ±1e-6 A points match an editor extrapolation location. Prefer original branch traces")
+            add(
+                "scData." + stem,
+                "synthetic-near-zero-candidate",
+                "Combined ±1e-6 A points match an editor extrapolation location. Prefer original branch traces",
+            )
     for key in ("name", "blockingVoltage", "cost", "weight"):
         item = sc.get(key)
         if isinstance(item, np.ndarray) and not item.size:
@@ -507,6 +515,7 @@ def preview_mat(raw: bytes, source_name: str | None = None) -> dict:
             history.append({"from": "0.1", "to": "0.2", "operation": "Change the format version and binary save format only"})
     calibrations = {}
     calibration_points = [0]
+
     def collect(item, path):
         if isinstance(item, dict):
             if "xLocations" in item or "yLocations" in item:
@@ -518,26 +527,43 @@ def preview_mat(raw: bytes, source_name: str | None = None) -> dict:
     for key, item in values.items():
         collect(item, key)
     inline_budget = [MAX_INLINE_ELEMENTS]
-    workspace_schema = ("scData" if isinstance(sc, dict) else "hsData" if "hsData" in values else
-                        "digitizer-traces" if any(k.endswith("Trace") for k in values) else "numeric-workspace")
-    proposed_units = (UNIT_MAP if isinstance(sc, dict) else
-                      {key: "K·m²/W" for key in values.get("hsData", {})} if isinstance(values.get("hsData"), dict) else {})
-    return {"schema": SCHEMA, "version": VERSION, "parser_version": 1, "workspace_schema": workspace_schema,
-            "source": {"name": source_name, "sha256": sha256(raw).hexdigest(), "byte_length": len(raw), "format": format_name},
-            "source_base64": base64.b64encode(raw).decode("ascii"),
-            "source_version": original_version, "conversion_history": history,
-            "variables": {k: _descriptor(v, k, inline_budget, [k]) for k, v in values.items()},
-            "known_fields": [k for k in KNOWN_FIELDS if isinstance(sc, dict) and k in sc],
-            "unknown_fields": [k for k in sc if k not in KNOWN_FIELDS] if isinstance(sc, dict) else [],
-            "proposed_units": {"values": proposed_units, "provenance": "Legacy SC editor labels and thermal-area use. Explicit finalization must confirm units"},
-            "legacy_coordinates": "x/image-height,y/image-width",
-            "calibrations": calibrations,
-            "diagnostics": _diagnostics(values), "status": "preview-only-requires-explicit-finalization"}
+    workspace_schema = (
+        "scData"
+        if isinstance(sc, dict)
+        else "hsData"
+        if "hsData" in values
+        else "digitizer-traces"
+        if any(k.endswith("Trace") for k in values)
+        else "numeric-workspace"
+    )
+    proposed_units = UNIT_MAP if isinstance(sc, dict) else {key: "K·m²/W" for key in values.get("hsData", {})} if isinstance(values.get("hsData"), dict) else {}
+    return {
+        "schema": SCHEMA,
+        "version": VERSION,
+        "parser_version": 1,
+        "workspace_schema": workspace_schema,
+        "source": {"name": source_name, "sha256": sha256(raw).hexdigest(), "byte_length": len(raw), "format": format_name},
+        "source_base64": base64.b64encode(raw).decode("ascii"),
+        "source_version": original_version,
+        "conversion_history": history,
+        "variables": {k: _descriptor(v, k, inline_budget, [k]) for k, v in values.items()},
+        "known_fields": [k for k in KNOWN_FIELDS if isinstance(sc, dict) and k in sc],
+        "unknown_fields": [k for k in sc if k not in KNOWN_FIELDS] if isinstance(sc, dict) else [],
+        "proposed_units": {"values": proposed_units, "provenance": "Legacy SC editor labels and thermal-area use. Explicit finalization must confirm units"},
+        "legacy_coordinates": "x/image-height,y/image-width",
+        "calibrations": calibrations,
+        "diagnostics": _diagnostics(values),
+        "status": "preview-only-requires-explicit-finalization",
+    }
 
 
 def mat_array_blob(raw: bytes, array_path: list[str]) -> dict:
     """Resolve a bounded source-array reference without opening a local path."""
-    if not isinstance(array_path, list) or not 1 <= len(array_path) <= MAX_DEPTH + 1 or any(not isinstance(k, str) or not k or len(k) > 1024 for k in array_path):
+    if (
+        not isinstance(array_path, list)
+        or not 1 <= len(array_path) <= MAX_DEPTH + 1
+        or any(not isinstance(k, str) or not k or len(k) > 1024 for k in array_path)
+    ):
         raise ValueError("Declare a bounded source array field path")
     value, _ = _read(raw)
     for key in array_path:
@@ -591,9 +617,13 @@ def _verify_mat_values(left, right, path="$"):
             raise MatFormatError(f"MAT5 export changes source fields at {path}. Use the original source archive")
         for key in left:
             _verify_mat_values(left[key], right[key], path + "." + key)
-    elif (not isinstance(right, np.ndarray) or left.shape != right.shape or
-          left.dtype.kind != right.dtype.kind or left.dtype.itemsize != right.dtype.itemsize or
-          not np.array_equal(left, right, equal_nan=left.dtype.kind in "f")):
+    elif (
+        not isinstance(right, np.ndarray)
+        or left.shape != right.shape
+        or left.dtype.kind != right.dtype.kind
+        or left.dtype.itemsize != right.dtype.itemsize
+        or not np.array_equal(left, right, equal_nan=left.dtype.kind in "f")
+    ):
         raise MatFormatError(f"MAT5 export changes source shape, dtype or values at {path}. Use the original source archive")
 
 
@@ -706,7 +736,12 @@ def _curve_source(sc, choice, diagnostics):
     if indices is None and x.size > 20000:
         raise ValueError("Select at most 20000 recorded curve samples explicitly")
     if indices is not None:
-        if not isinstance(indices, list) or not 2 <= len(indices) <= 20000 or any(type(i) is not int or i < 0 or i >= len(x) for i in indices) or len(set(indices)) != len(indices):
+        if (
+            not isinstance(indices, list)
+            or not 2 <= len(indices) <= 20000
+            or any(type(i) is not int or i < 0 or i >= len(x) for i in indices)
+            or len(set(indices)) != len(indices)
+        ):
             raise ValueError("Sample indices must select at least two distinct recorded points")
         x, y = x[indices], y[indices]
     selected_indices = set(range(x.size)) if indices is None else set(indices)
@@ -749,7 +784,9 @@ def _curve_source(sc, choice, diagnostics):
     elif choice.get("source_zero_acknowledgement") is not None:
         raise ValueError("A source zero acknowledgement requires source-zero-unverified status")
     if kind != "conduction" and source == "combined" and np.all(y == 0) and data_status not in ("source-zero-unverified", "declared-ideal-model"):
-        raise ValueError("All-zero combined energy requires explicit source-zero-unverified acknowledgement, an original trace, or a scoped ideal model declaration")
+        raise ValueError(
+            "All-zero combined energy requires explicit source-zero-unverified acknowledgement, an original trace, or a scoped ideal model declaration"
+        )
     if np.any(x == 0) and choice["zero_policy"] != "recorded-branch-value":
         raise ValueError("Select the recorded branch zero convention explicitly")
     if choice["sample_order"] == "sort-distinct-current":
@@ -807,8 +844,24 @@ def finalize_mat(raw: bytes, *, identity: dict, ratings: dict, thermal_propertie
     checked = []
     diagnostics = _diagnostics(values)
     for choice in curves:
-        required_choice = {"kind", "branch", "target", "source", "coordinate_convention", "sample_indices", "sample_order", "zero_policy", "conditions", "evidence_reference"}
-        if not isinstance(choice, dict) or not required_choice <= set(choice) <= required_choice | {"data_status", "ideal_model_scope", "source_zero_acknowledgement", "extrapolation_policy"}:
+        required_choice = {
+            "kind",
+            "branch",
+            "target",
+            "source",
+            "coordinate_convention",
+            "sample_indices",
+            "sample_order",
+            "zero_policy",
+            "conditions",
+            "evidence_reference",
+        }
+        if not isinstance(choice, dict) or not required_choice <= set(choice) <= required_choice | {
+            "data_status",
+            "ideal_model_scope",
+            "source_zero_acknowledgement",
+            "extrapolation_policy",
+        }:
             raise ValueError("Declare the exact supported curve mapping fields")
         if not isinstance(choice["evidence_reference"], str) or not choice["evidence_reference"].strip() or len(choice["evidence_reference"]) > 2000:
             raise ValueError("Declare a nonblank evidence reference for each selected curve")

@@ -198,7 +198,7 @@ def _inventory(device, source):
             rows.append(row)
         families[family] = rows
     return _bounded_output({'transistor_id': device.metadata.name, 'repository_source': source, 'families': families,
-        'scope': 'Source summaries only; select explicit temperature families with fixed conditions. No graphs are repeated here.'})
+                            'scope': 'Source summaries only; select explicit temperature families with fixed conditions. No graphs are repeated here.'})
 
 
 @router.get('/inventory/{transistor_id}')

@@ -102,4 +102,3 @@ def direct_request():
             "requested_conditions": deepcopy(cond),
         }}
     return request
-

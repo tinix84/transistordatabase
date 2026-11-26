@@ -93,6 +93,7 @@ def test_zero_weight_failure_and_worst_policy():
     assert summary(result)["worst_value"] == 10
     request["include_zero_weight_in_worst"] = True
     assert summary(evaluate_grid(request, _evaluator=evaluator))["worst_value"] == 30
+
     def fail_zero(data):
         if data["waveform"]["current_a"][0] == 2:
             raise ValueError("Zero-weight failure")
@@ -139,6 +140,7 @@ def test_programmer_errors_propagate_and_evaluator_cannot_mutate_sources():
     """Isolate scientific inputs without suppressing programmer errors."""
     request = fixture()
     before = deepcopy(request)
+
     def mutates(data):
         result = evaluator(data)
         data["waveform"]["current_a"][0] = 999
@@ -146,6 +148,7 @@ def test_programmer_errors_propagate_and_evaluator_cannot_mutate_sources():
     result = evaluate_grid(request, _evaluator=mutates)
     assert request == before
     assert result["rows"][0]["inputs"]["waveform_request"]["waveform"]["current_a"][0] == 1
+
     def broken(data):
         raise TypeError("Programmer bug")
     with pytest.raises(TypeError, match="Programmer"):
@@ -181,19 +184,29 @@ def test_http_rejects_custom_operations_extra_fields_and_nonfinite():
     request = fixture()
     request["operating_points"] = [dict(request["operating_points"][0], id=str(n)) for n in range(65)]
     assert client().post("/api/analysis/grid", json=request).status_code == 413
-    response = client().post("/api/analysis/grid", content='{"configurations":[],"operating_points":[],"metric":{"name":"total_power_w","unit":"W","direction":"minimize"},"bad":NaN}', headers={"content-type": "application/json"})
+    response = client().post(
+        "/api/analysis/grid",
+        content='{"configurations":[],"operating_points":[],"metric":{"name":"total_power_w","unit":"W","direction":"minimize"},"bad":NaN}',
+        headers={"content-type": "application/json"},
+    )
     assert response.status_code == 422
 
 
 def handoff_request():
     """Declare exact conduction heat and explicit physical ownership."""
     data = fixture()
-    return {"waveform_request": {"waveform": data["operating_points"][0]["waveform"],
-                                "events": data["operating_points"][0]["events"],
-                                "conduction": data["configurations"][0]["conduction"],
-                                "switching": data["configurations"][0]["switching"]},
-            "direction_owners": {"positive": "forward", "negative": "reverse", "zero": "forward"},
-            "network_heat_owner": "forward", "event_mode": "impulse", "allow_partial": True}
+    return {
+        "waveform_request": {
+            "waveform": data["operating_points"][0]["waveform"],
+            "events": data["operating_points"][0]["events"],
+            "conduction": data["configurations"][0]["conduction"],
+            "switching": data["configurations"][0]["switching"],
+        },
+        "direction_owners": {"positive": "forward", "negative": "reverse", "zero": "forward"},
+        "network_heat_owner": "forward",
+        "event_mode": "impulse",
+        "allow_partial": True,
+    }
 
 
 def test_handoff_exact_coefficients_partial_scope_and_thermal_identity():
@@ -235,6 +248,7 @@ def test_weighted_mean_preserves_representable_small_contribution():
     request = fixture()
     request["operating_points"][0]["weight"] = 1e-300
     request["operating_points"][1]["weight"] = 1e100
+
     def extreme(data):
         result = evaluator(data)
         value = 1e300 if data["waveform"]["current_a"][0] == 1 else 0
@@ -281,8 +295,8 @@ def test_tiny_summands_only_scale_after_the_complete_sum():
     """Keep representable totals when individual normalized terms would underflow."""
     request = fixture()
     request["configurations"] = request["configurations"][:1]
-    request["operating_points"] = [dict(request["operating_points"][0], id=str(n), weight=1)
-                                   for n in range(64)]
+    request["operating_points"] = [dict(request["operating_points"][0], id=str(n), weight=1) for n in range(64)]
+
     def tiny(data):
         result = evaluator(data)
         result["total_power_w"] = 5e-324
@@ -367,9 +381,8 @@ def test_handoff_metadata_budget_precedes_full_waveform_construction(monkeypatch
     """Reject repeated switching metadata before constructing the waveform result."""
     request = handoff_request()
     waveform = request["waveform_request"]
-    waveform["waveform"] = {"time_s": list(range(100)), "current_a": [1] * 100,
-                             "gate_v": [k % 2 for k in range(100)]}
-    waveform["events"] = {"mode": "gate", "threshold_v": .5}
+    waveform["waveform"] = {"time_s": list(range(100)), "current_a": [1] * 100, "gate_v": [k % 2 for k in range(100)]}
+    waveform["events"] = {"mode": "gate", "threshold_v": 0.5}
     conditions = {"Large declared source " + "x" * 1000: 1}
     for name in ("turn_on", "turn_off"):
         waveform["switching"][name] = {"positive": {
@@ -377,6 +390,7 @@ def test_handoff_metadata_budget_precedes_full_waveform_construction(monkeypatch
             "current_a": [0, 10], "energy_j": [.001, .002],
             "recorded_conditions": conditions, "requested_conditions": conditions}}
     monkeypatch.setattr("transistordatabase.grid_analysis.MAX_RESPONSE_BYTES", 80000)
+
     def unexpected(data):
         pytest.fail("The full waveform evaluator must not start")
     monkeypatch.setattr("transistordatabase.grid_analysis.analyze_waveform", unexpected)

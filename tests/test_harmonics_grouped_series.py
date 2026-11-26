@@ -21,15 +21,15 @@ def grid_fixture():
     omission = {"omit": True, "omission_reason": "Independent harmonic fixture"}
     return {
         "configurations": [{"id": "config", "source": "=independent source",
-            "conduction": deepcopy(omission),
-            "switching": {"turn_on": deepcopy(omission), "turn_off": deepcopy(omission)}}],
+                            "conduction": deepcopy(omission),
+                            "switching": {"turn_on": deepcopy(omission), "turn_off": deepcopy(omission)}}],
         "operating_points": [{"id": "point", "source": "Independent physical samples",
-            "weight": 1, "waveform": {"time_s": [0, 1, 2, 3],
-                "current_a": [2, 2, 2, -2], "gate_v": [0, 2, 0, 2],
-                "device_voltage_v": [-2, -2, -2, -2], "bus_voltage_v": 400},
-            "events": {"mode": "omitted", "omission_reason": "No switching heat"},
-            "spectrum": {"window": "rectangular", "detrend": "none",
-                         "relative_threshold": .5}}],
+                              "weight": 1, "waveform": {"time_s": [0, 1, 2, 3],
+                                                        "current_a": [2, 2, 2, -2], "gate_v": [0, 2, 0, 2],
+                                                        "device_voltage_v": [-2, -2, -2, -2], "bus_voltage_v": 400},
+                              "events": {"mode": "omitted", "omission_reason": "No switching heat"},
+                              "spectrum": {"window": "rectangular", "detrend": "none",
+                                           "relative_threshold": .5}}],
         "metric": {"name": "total_power_w", "unit": "W", "direction": "minimize"},
         "grouped_series_exports": True}
 
@@ -167,6 +167,7 @@ def test_repeated_multibyte_metadata_budget_precedes_projection(monkeypatch):
     request["operating_points"] *= 8
     request["operating_points"] = [dict(point, id=str(index)) for index, point in enumerate(request["operating_points"])]
     monkeypatch.setattr("transistordatabase.grid_analysis.MAX_RESPONSE_BYTES", 200000)
+
     def must_not_compute(*args, **kwargs):
         raise AssertionError("Projection allocated before its metadata budget")
     monkeypatch.setattr(grouped_series, "waveform_scalar_statistics", must_not_compute)

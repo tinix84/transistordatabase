@@ -12,7 +12,6 @@ os.chdir('/home/tinix/claude_wsl/transistordatabase')
 
 def main():
     """Generate final report."""
-
     report = []
 
     # Header
@@ -83,14 +82,14 @@ def main():
         from transistordatabase.gui.gui import MainWindow
         bases = MainWindow.__bases__
         report.append(f"MainWindow inherits from {len(bases)} base classes:")
-        report.append(f"  - Primary: QMainWindow (PyQt5)")
+        report.append("  - Primary: QMainWindow (PyQt5)")
         mixin_count = 0
         for base in bases[1:]:  # Skip QMainWindow
             mixin_count += 1
             class_name = base.__name__
             report.append(f"  - Mixin {mixin_count}: {class_name}")
 
-        report.append(f"✅ All 8 mixins successfully integrated into MainWindow (via multiple inheritance)")
+        report.append("✅ All 8 mixins successfully integrated into MainWindow (via multiple inheritance)")
     except Exception as e:
         report.append(f"❌ Mixin integration check failed: {e}")
 
@@ -335,6 +334,7 @@ def main():
     print("\n✅ Report saved to: PYQT_GUI_TEST_REPORT.txt")
 
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(main())
