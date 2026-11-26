@@ -134,6 +134,7 @@ def test_candidate_metadata_budget_rejects_before_interpolation(monkeypatch):
     request = fixture()
     request["currents_a"] = list(range(256))
     request["slices"] = [dict(request["slices"][0], id=str(n), source="x" * 2000) for n in range(128)]
+
     def unexpected(*args):
         raise AssertionError("Interpolation must not start")
     monkeypatch.setattr("transistordatabase.energy_maps.MeasuredTable.evaluate", unexpected)

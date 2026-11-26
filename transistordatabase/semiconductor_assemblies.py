@@ -201,7 +201,7 @@ def reverse_envelope(channel: dict, diode: dict) -> dict:
     if not low < high:
         raise ValueError("Reverse envelope needs a nonempty overlapping current interval")
     knots = sorted({low, high, *(x for table in (channel, diode)
-                                for x in table["x"] if low < x < high)})
+                                 for x in table["x"] if low < x < high)})
     cx, cy, dx, dy = channel["x"], channel["y"], diode["x"], diode["y"]
     crossings = []
     for left, right in zip(knots, knots[1:], strict=False):

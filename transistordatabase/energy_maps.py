@@ -20,8 +20,8 @@ def _conditions(value):
         raise ValueError("Declare every fixed condition, with null for unknown values")
     numeric = {name: value[name] for name in NUMERIC_CONDITIONS}
     for name, item in numeric.items():
-        if item is not None and (isinstance(item, bool) or
-                                 not isinstance(item, (int, float)) or not math.isfinite(item)):
+        if item is not None and (isinstance(item, bool)
+                                 or not isinstance(item, (int, float)) or not math.isfinite(item)):
             raise ValueError(f"{name} must be finite or explicitly unknown")
         if item is not None and name.startswith("r_g") and item < 0:
             raise ValueError("Gate resistance must be nonnegative")
@@ -44,8 +44,8 @@ def _matching(left, right):
 
 
 def _axis(values, label, *, positive=False):
-    if not values or any(isinstance(v, bool) or not isinstance(v, (float, int)) or
-                         not math.isfinite(v) or (v <= 0 if positive else v < 0)
+    if not values or any(isinstance(v, bool) or not isinstance(v, (float, int))
+                         or not math.isfinite(v) or (v <= 0 if positive else v < 0)
                          for v in values):
         raise ValueError(f"{label} must contain finite {'positive' if positive else 'nonnegative'} values")
     if len(values) != len(set(values)):
@@ -64,10 +64,10 @@ def build_energy_map(request):
     input_bytes = len(json.dumps(request, allow_nan=False).encode())
     if input_bytes > 4_000_000:
         raise AnalysisResourceLimitError("Energy-map input exceeds 4 MB")
-    if (len(slices) > 128 or len(request["currents_a"]) > 256 or
-            len(request["voltages_v"]) > 128 or
-            len(request["currents_a"]) * len(request["voltages_v"]) > 16384 or
-            sum(len(s["current_a"]) for s in slices) > 100000):
+    if (len(slices) > 128 or len(request["currents_a"]) > 256
+            or len(request["voltages_v"]) > 128
+            or len(request["currents_a"]) * len(request["voltages_v"]) > 16384
+            or sum(len(s["current_a"]) for s in slices) > 100000):
         raise AnalysisResourceLimitError("Energy-map source or displayed grid exceeds its size limit")
     if not slices:
         raise ValueError("Declare at least one energy slice")
@@ -90,8 +90,8 @@ def build_energy_map(request):
         energies = source["energy_j"]
         if len(axis) < 2 or len(axis) != len(energies):
             raise ValueError("Each energy slice needs at least two aligned current-energy pairs")
-        if any(isinstance(e, bool) or not isinstance(e, (float, int)) or
-               not math.isfinite(e) or e < 0 for e in energies):
+        if any(isinstance(e, bool) or not isinstance(e, (float, int))
+               or not math.isfinite(e) or e < 0 for e in energies):
             raise ValueError("Source energies must be finite and nonnegative")
         _axis([source["voltage_v"]], "Source voltage", positive=True)
         if source["source_kind"] not in {"measured", "datasheet", "simulated", "manual", "unknown"}:
@@ -110,8 +110,8 @@ def build_energy_map(request):
                 "energy", source["current_a"], source["energy_j"],
                 {name: source["conditions"][name] for name in NUMERIC_CONDITIONS}, source["source"])
 
-    projected_bytes = (2 * input_bytes + len(currents) * len(voltages) * 600 +
-                       sum((len(currents) + 4) * (len(json.dumps({
+    projected_bytes = (2 * input_bytes + len(currents) * len(voltages) * 600
+                       + sum((len(currents) + 4) * (len(json.dumps({
                            "slice_id": s["id"], "source": s["source"],
                            "source_kind": s["source_kind"]}).encode()) + 600)
                            for s in selected if s["voltage_v"] in voltages))
@@ -169,14 +169,14 @@ def build_energy_map(request):
         except ValueError as exc:
             estimate["error"] = str(exc)
     result = {"method_version": METHOD_VERSION, "energy_kind": kind,
-            "conditions": request["conditions"], "currents_a": currents, "voltages_v": voltages,
-            "units": {"current": "A", "voltage": "V", "energy": "J"},
-            "cells": cells, "estimate": estimate, "source_slices": slices,
-            "slice_diagnostics": diagnostics, "input_sha256": input_hash(request),
-            "assumptions": ["Exact fixed conditions, including unknown values",
-                            "No voltage scaling or nearest-condition selection",
-                            "Bilinear interpolation is an estimate, not a measured surface",
-                            "Bilinear interpolation uses displayed corners. Interior source knots are not inserted."]}
+              "conditions": request["conditions"], "currents_a": currents, "voltages_v": voltages,
+              "units": {"current": "A", "voltage": "V", "energy": "J"},
+              "cells": cells, "estimate": estimate, "source_slices": slices,
+              "slice_diagnostics": diagnostics, "input_sha256": input_hash(request),
+              "assumptions": ["Exact fixed conditions, including unknown values",
+                              "No voltage scaling or nearest-condition selection",
+                              "Bilinear interpolation is an estimate, not a measured surface",
+                              "Bilinear interpolation uses displayed corners. Interior source knots are not inserted."]}
     if len(json.dumps(result, allow_nan=False).encode()) > MAX_RESPONSE_BYTES:
         raise AnalysisResourceLimitError("Energy-map response exceeds 24 MB")
     return result

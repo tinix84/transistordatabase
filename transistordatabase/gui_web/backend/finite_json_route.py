@@ -43,6 +43,7 @@ class FiniteJsonRoute(ParameterRoute):
             request._body = b"".join(chunks)
             # Inspect numeric literals before the standard JSON parser can turn
             # a nonzero decimal such as 1e-400 into a fabricated zero.
+
             def strict_float(literal):
                 number = float(literal)
                 mantissa = literal.lower().split("e", 1)[0]
@@ -79,4 +80,3 @@ class FiniteJsonRoute(ParameterRoute):
             return await original(request)
 
         return handler
-

@@ -1,486 +1,497 @@
 <template>
   <div class="transistor-form">
-    <div class="form-header">
-      <h2>{{ isEditing ? 'Edit Transistor' : 'Create New Transistor' }}</h2>
-      <button @click="$emit('cancel')" class="btn btn-secondary">Cancel</button>
-    </div>
-
-    <p v-if="saveError" class="save-error" role="alert">{{ saveError }}</p>
-
-    <!-- Section Tabs -->
-    <div class="section-tabs">
-      <button
-        v-for="tab in availableTabs"
-        :key="tab.key"
-        @click="activeTab = tab.key"
-        :class="['tab-btn', { active: activeTab === tab.key }]"
-      >
-        {{ tab.label }}
-      </button>
-    </div>
-
-    <!-- General Info Tab -->
-    <form v-show="activeTab === 'general'" @submit.prevent="handleSubmit" class="form-content">
-      <div class="form-section">
-        <h3>Metadata</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="name">Name *</label>
-            <input
-              id="name"
-              v-model="formData.metadata.name"
-              type="text"
-              :readonly="isEditing"
-              required
-              placeholder="e.g. IGBT_1200V_100A"
-            />
-            <small v-if="isEditing">Device names cannot be changed while editing.</small>
-          </div>
-
-          <div class="form-group">
-            <label for="type">Type *</label>
-            <select id="type" v-model="formData.metadata.type" required>
-              <option value="">Select type</option>
-              <option value="IGBT">IGBT</option>
-              <option value="MOSFET">MOSFET</option>
-              <option value="SiC-MOSFET">SiC-MOSFET</option>
-              <option value="GaN">GaN</option>
-              <option value="BJT">BJT</option>
-              <option value="Diode">Diode</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="manufacturer">Manufacturer *</label>
-            <input
-              id="manufacturer"
-              v-model="formData.metadata.manufacturer"
-              type="text"
-              required
-              placeholder="e.g. Infineon, Rohm, etc."
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="housing">Housing Type *</label>
-            <select id="housing" v-model="formData.metadata.housing_type" required>
-              <option value="">Select housing</option>
-              <option
-                v-if="formData.metadata.housing_type && !housingTypeOptions.includes(formData.metadata.housing_type)"
-                :value="formData.metadata.housing_type"
-              >{{ formData.metadata.housing_type }}</option>
-              <option value="TO247">TO-247</option>
-              <option value="TO220">TO-220</option>
-              <option value="TO263">TO-263</option>
-              <option value="TO92">TO-92</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="author">Author</label>
-            <input
-              id="author"
-              v-model="formData.metadata.author"
-              type="text"
-              placeholder="Optional"
-            />
-          </div>
-
-          <div class="form-group form-group-wide">
-            <label for="comment">Comment</label>
-            <textarea
-              id="comment"
-              v-model="formData.metadata.comment"
-              placeholder="Optional comments or notes"
-              rows="3"
-            ></textarea>
-          </div>
-        </div>
+    <header class="form-header">
+      <div class="device-heading">
+        <h2>{{ isEditing ? 'Edit Transistor' : 'Create New Transistor' }}</h2>
+        <p v-if="isEditing" class="part-number">{{ transistor.metadata.name }}</p>
       </div>
-
-      <div class="form-section">
-        <h3>Electrical Ratings</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="v_abs_max">V<sub>abs,max</sub> (V) *</label>
-            <input
-              id="v_abs_max"
-              v-model.number="formData.electrical.v_abs_max"
-              type="number"
-              step="0.1"
-              min="0"
-              required
-              placeholder="e.g. 1200"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="i_abs_max">I<sub>abs,max</sub> (A) *</label>
-            <input
-              id="i_abs_max"
-              v-model.number="formData.electrical.i_abs_max"
-              type="number"
-              step="0.1"
-              min="0"
-              required
-              placeholder="e.g. 100"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="i_cont">I<sub>cont</sub> (A) *</label>
-            <input
-              id="i_cont"
-              v-model.number="formData.electrical.i_cont"
-              type="number"
-              step="0.1"
-              min="0"
-              required
-              placeholder="e.g. 80"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="t_j_max">T<sub>j,max</sub> (°C) *</label>
-            <input
-              id="t_j_max"
-              v-model.number="formData.electrical.t_j_max"
-              type="number"
-              step="0.1"
-              required
-              placeholder="e.g. 175"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <h3>Thermal Properties</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="r_th_cs">R<sub>th,cs</sub> (K/W) *</label>
-            <input
-              id="r_th_cs"
-              v-model.number="formData.thermal.r_th_cs"
-              type="number"
-              step="0.001"
-              min="0"
-              required
-              placeholder="e.g. 0.5"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="r_th_switch_cs">R<sub>th,switch-cs</sub> (K/W) *</label>
-            <input
-              id="r_th_switch_cs"
-              v-model.number="formData.thermal.r_th_switch_cs"
-              type="number"
-              step="0.001"
-              min="0"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="r_th_diode_cs">R<sub>th,diode-cs</sub> (K/W) *</label>
-            <input
-              id="r_th_diode_cs"
-              v-model.number="formData.thermal.r_th_diode_cs"
-              type="number"
-              step="0.001"
-              min="0"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="housing_area">Housing Area (cm²) *</label>
-            <input
-              id="housing_area"
-              v-model.number="formData.thermal.housing_area"
-              type="number"
-              step="any"
-              min="0"
-              required
-              placeholder="e.g. 1.0"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="cooling_area">Cooling Area (cm²) *</label>
-            <input
-              id="cooling_area"
-              v-model.number="formData.thermal.cooling_area"
-              type="number"
-              step="any"
-              min="0"
-              required
-              placeholder="e.g. 1.0"
-            />
-          </div>
-        </div>
-      </div>
-
       <div class="form-actions">
-        <button type="button" @click="$emit('cancel')" class="btn btn-secondary">
-          Cancel
-        </button>
-        <button type="button" @click="validateForm" class="btn btn-secondary">
-          Validate
-        </button>
-        <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
-          {{ isSubmitting ? 'Saving...' : (isEditing ? 'Update' : 'Create') }}
-        </button>
-      </div>
-    </form>
-
-    <!-- Channel Curves Tab -->
-    <div v-show="activeTab === 'channel'" class="curve-tab-content">
-      <div class="curve-tab-header">
-        <h3>Channel Characteristic Curves</h3>
-        <div class="component-toggle">
-          <button
-            @click="curveComponent = 'switch'"
-            :class="['toggle-btn', { active: curveComponent === 'switch' }]"
-          >Switch</button>
-          <button
-            @click="curveComponent = 'diode'"
-            :class="['toggle-btn', { active: curveComponent === 'diode' }]"
-          >Diode</button>
-        </div>
-      </div>
-
-      <CurveList
-        :curves="curveComponent === 'switch' ? curves.switch_channel : curves.diode_channel"
-        :title="curveComponent === 'switch' ? 'Switch Channel Curves' : 'Diode Channel Curves'"
-        curveType="Channel"
-        @add="openCurveEditor('channel')"
-        @edit="editCurve('channel', $event)"
-        @view="viewCurve('channel', $event)"
-        @delete="deleteCurve('channel', $event)"
-      />
-      <CurveEditor
-        v-if="showEditor && editorCurveType === 'channel'"
-        :key="curveEditorKey('channel')"
-        curveType="channel"
-        :component="editingCurve?.route.component || curveComponent"
-        :edit-mode="Boolean(editingCurve)"
-        :initial-data="editingCurve?.initialData || null"
-        @submit="handleCurveSubmit"
-        @cancel="closeEditor"
-      />
-    </div>
-
-    <!-- Switching Losses Tab -->
-    <div v-show="activeTab === 'switching'" class="curve-tab-content">
-      <h3>Switching Loss Data</h3>
-      <div class="sub-tabs">
-        <button
-          v-for="lt in ['e_on', 'e_off', 'e_rr']"
-          :key="lt"
-          @click="activeLossType = lt"
-          :class="['sub-tab-btn', { active: activeLossType === lt }]"
-        >{{ lossTypeLabels[lt] }}</button>
-      </div>
-
-      <CurveList
-        :curves="curves['switching_' + activeLossType] || []"
-        :title="lossTypeLabels[activeLossType]"
-        curveType="Switching Loss"
-        @add="openCurveEditor('switching_loss')"
-        @edit="editCurve('switching_loss', $event)"
-        @view="viewCurve('switching_loss', $event)"
-        @delete="deleteCurve('switching_loss', $event)"
-      />
-      <CurveEditor
-        v-if="showEditor && editorCurveType === 'switching_loss'"
-        :key="curveEditorKey('switching_loss')"
-        curveType="switching_loss"
-        :lossType="editingCurve?.route.type || activeLossType"
-        :edit-mode="Boolean(editingCurve)"
-        :initial-data="editingCurve?.initialData || null"
-        @submit="handleCurveSubmit"
-        @cancel="closeEditor"
-      />
-    </div>
-
-    <!-- Gate Charge Tab -->
-    <div v-show="activeTab === 'gate_charge'" class="curve-tab-content">
-      <h3>Gate Charge Curves</h3>
-
-      <CurveList
-        :curves="curves.gate_charge || []"
-        title="Gate Charge Curves"
-        curveType="Gate Charge"
-        @add="openCurveEditor('gate_charge')"
-        @edit="editCurve('gate_charge', $event)"
-        @view="viewCurve('gate_charge', $event)"
-        @delete="deleteCurve('gate_charge', $event)"
-      />
-      <CurveEditor
-        v-if="showEditor && editorCurveType === 'gate_charge'"
-        :key="curveEditorKey('gate_charge')"
-        curveType="gate_charge"
-        :edit-mode="Boolean(editingCurve)"
-        :initial-data="editingCurve?.initialData || null"
-        @submit="handleCurveSubmit"
-        @cancel="closeEditor"
-      />
-    </div>
-
-    <!-- SOA Tab -->
-    <div v-show="activeTab === 'soa'" class="curve-tab-content">
-      <h3>Safe Operating Area</h3>
-
-      <CurveList
-        :curves="curves.soa || []"
-        title="SOA Curves"
-        curveType="SOA"
-        @add="openCurveEditor('soa')"
-        @edit="editCurve('soa', $event)"
-        @view="viewCurve('soa', $event)"
-        @delete="deleteCurve('soa', $event)"
-      />
-      <CurveEditor
-        v-if="showEditor && editorCurveType === 'soa'"
-        :key="curveEditorKey('soa')"
-        curveType="soa"
-        :edit-mode="Boolean(editingCurve)"
-        :initial-data="editingCurve?.initialData || null"
-        @submit="handleCurveSubmit"
-        @cancel="closeEditor"
-      />
-    </div>
-
-    <!-- Capacitance Tab -->
-    <div v-show="activeTab === 'capacitance'" class="curve-tab-content">
-      <h3>Voltage-Dependent Capacitance</h3>
-      <div class="sub-tabs">
-        <button
-          v-for="ct in ['c_oss', 'c_iss', 'c_rss']"
-          :key="ct"
-          @click="activeCapType = ct"
-          :class="['sub-tab-btn', { active: activeCapType === ct }]"
-        >{{ capTypeLabels[ct] }}</button>
-      </div>
-
-      <CurveList
-        :curves="curves['capacitance_' + activeCapType] || []"
-        :title="capTypeLabels[activeCapType]"
-        curveType="Capacitance"
-        @add="openCurveEditor('capacitance')"
-        @edit="editCurve('capacitance', $event)"
-        @view="viewCurve('capacitance', $event)"
-        @delete="deleteCurve('capacitance', $event)"
-      />
-      <CurveEditor
-        v-if="showEditor && editorCurveType === 'capacitance'"
-        :key="curveEditorKey('capacitance')"
-        curveType="capacitance"
-        :capType="editingCurve?.route.type || activeCapType"
-        :edit-mode="Boolean(editingCurve)"
-        :initial-data="editingCurve?.initialData || null"
-        @submit="handleCurveSubmit"
-        @cancel="closeEditor"
-      />
-    </div>
-
-    <div v-show="activeTab === 'thermal_curves'" class="curve-tab-content" data-testid="thermal-curve-tab">
-      <h3>Transient Junction-to-Case Thermal Impedance</h3>
-      <p>Stored samples are shown unchanged. Time is seconds; Zth(j-c) is K/W.</p>
-      <div class="component-toggle">
-        <button type="button" :disabled="Boolean(thermalDraft || thermalDeleteComponent)" @click="thermalComponent = 'switch'" :class="['toggle-btn', { active: thermalComponent === 'switch' }]">Switch</button>
-        <button type="button" :disabled="Boolean(thermalDraft || thermalDeleteComponent)" @click="thermalComponent = 'diode'" :class="['toggle-btn', { active: thermalComponent === 'diode' }]">Diode</button>
-      </div>
-
-      <p v-if="curveLoadError" class="curve-viewer-empty" role="alert">{{ curveLoadError }}</p>
-      <section v-else class="thermal-curve-card" :aria-label="`${thermalComponent} thermal curve`">
-        <template v-if="thermalCurves[thermalComponent].graph_t_rthjc">
-          <p>{{ thermalCurves[thermalComponent].graph_t_rthjc[0].length }} stored points</p>
-          <div class="card-actions">
-            <button type="button" class="btn btn-secondary" @click="viewThermalCurve">View</button>
-            <button type="button" class="btn btn-secondary" @click="editThermalCurve">Edit</button>
-            <button type="button" class="btn btn-danger" @click="startThermalDelete">Delete</button>
-          </div>
+        <button type="button" @click="$emit('cancel')" class="btn btn-secondary">Cancel</button>
+        <template v-if="activeTab === 'general'">
+          <button type="button" @click="validateForm" class="btn btn-secondary">
+            {{ isEditing ? 'Validate saved record' : 'Validate' }}
+          </button>
+          <button type="submit" form="transistor-properties" class="btn btn-primary" :disabled="isSubmitting">
+            {{ isSubmitting ? 'Saving...' : (isEditing ? 'Update' : 'Create') }}
+          </button>
         </template>
-        <p v-else role="status">No transient thermal curve is stored for this {{ thermalComponent }}.</p>
-        <button v-if="!thermalCurves[thermalComponent].graph_t_rthjc && !thermalDraft" type="button" class="btn btn-primary" @click="startThermalCurve">Add thermal curve</button>
-      </section>
+      </div>
+    </header>
 
-      <form v-if="thermalDraft" class="thermal-curve-editor" @submit.prevent="saveThermalCurve">
-        <h4>{{ thermalCurves[thermalDraftComponent].graph_t_rthjc ? 'Edit' : 'Add' }} {{ thermalDraftComponent }} thermal curve</h4>
-        <p>Enter time in seconds and thermal impedance in K/W. Time samples must increase.</p>
-        <table>
-          <thead><tr><th>Time (s)</th><th>Zth(j-c) (K/W)</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr v-for="(time, index) in thermalDraft[0]" :key="index">
-              <td><input v-model.number="thermalDraft[0][index]" type="number" step="any" :aria-label="`Time seconds point ${index + 1}`" /></td>
-              <td><input v-model.number="thermalDraft[1][index]" type="number" step="any" :aria-label="`Zth K per W point ${index + 1}`" /></td>
-              <td><button type="button" class="btn btn-secondary" :disabled="thermalDraft[0].length <= 2" :aria-label="`Remove point ${index + 1}`" @click="removeThermalPoint(index)">Remove</button></td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" @click="cancelThermalEdit">Cancel</button>
-          <button type="button" class="btn btn-secondary" @click="addThermalPoint">Add point</button>
-          <button type="submit" class="btn btn-primary">Save thermal curve</button>
-        </div>
-      </form>
-      <div v-if="thermalDeleteComponent" class="modal-overlay" @click="cancelThermalDelete">
-        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="thermal-delete-title" @click.stop>
-          <h4 id="thermal-delete-title">Delete {{ thermalDeleteComponent }} thermal curve?</h4>
-          <p>This clears only the stored graph_t_rthjc samples.</p>
-          <div class="modal-actions">
-            <button type="button" class="btn btn-secondary" @click="cancelThermalDelete">Cancel</button>
-            <button type="button" class="btn btn-danger" @click="deleteThermalCurve">Delete thermal curve</button>
+    <div class="editor-layout" :class="{ 'has-curve-nav': isEditing }">
+      <nav v-if="isEditing" class="section-tabs" aria-label="Device editor sections">
+        <button
+          v-for="tab in availableTabs"
+          :key="tab.key"
+          type="button"
+          @click="activeTab = tab.key"
+          :class="['tab-btn', { active: activeTab === tab.key }]"
+          :aria-current="activeTab === tab.key ? 'true' : undefined"
+        >
+          {{ tab.label }}
+        </button>
+      </nav>
+
+      <div class="editor-content">
+        <p v-if="saveError" class="save-error" role="alert">{{ saveError }}</p>
+
+        <div v-if="validationResult" class="validation-section" role="status">
+          <h3>Validation Results</h3>
+          <div v-if="validationResult.errors && validationResult.errors.length > 0" class="errors">
+            <h4>Errors:</h4>
+            <ul>
+              <li v-for="error in validationResult.errors" :key="error">{{ error }}</li>
+            </ul>
+          </div>
+          <div v-if="validationResult.warnings && validationResult.warnings.length > 0" class="warnings">
+            <h4>Warnings:</h4>
+            <ul>
+              <li v-for="warning in validationResult.warnings" :key="warning">{{ warning }}</li>
+            </ul>
+          </div>
+          <div v-if="(!validationResult.errors || validationResult.errors.length === 0)" class="success">
+            Validation passed successfully
           </div>
         </div>
-      </div>
-    </div>
 
-    <div v-if="selectedCurve" class="curve-viewer" data-testid="curve-viewer" role="region" aria-label="Curve detail">
-      <div class="curve-viewer-header">
-        <h4>{{ selectedCurve.title }}</h4>
-        <button type="button" class="btn btn-secondary" aria-label="Close curve view" @click="selectedCurve = null">
-          Close
-        </button>
-      </div>
-      <CurvePlotter
-        v-if="selectedCurvePlot"
-        :title="selectedCurve.title"
-        :datasets="[selectedCurvePlot.dataset]"
-        :x-label="selectedCurvePlot.xLabel"
-        :x-value-scientific="selectedCurvePlot.xValueScientific || false"
-        :y-label="selectedCurvePlot.yLabel"
-        :y-value-scientific="selectedCurvePlot.yValueScientific || false"
-        :x-log-scale="selectedCurvePlot.xLogScale"
-        :y-log-scale="selectedCurvePlot.yLogScale"
-      />
-      <p v-else class="curve-viewer-empty" role="status">This curve has no supported graph data to plot.</p>
-    </div>
-    <!-- Validation Results (shown on any tab) -->
-    <div v-if="validationResult" class="validation-section">
-      <h3>Validation Results</h3>
-      <div v-if="validationResult.errors && validationResult.errors.length > 0" class="errors">
-        <h4>Errors:</h4>
-        <ul>
-          <li v-for="error in validationResult.errors" :key="error">{{ error }}</li>
-        </ul>
-      </div>
-      <div v-if="validationResult.warnings && validationResult.warnings.length > 0" class="warnings">
-        <h4>Warnings:</h4>
-        <ul>
-          <li v-for="warning in validationResult.warnings" :key="warning">{{ warning }}</li>
-        </ul>
-      </div>
-      <div v-if="(!validationResult.errors || validationResult.errors.length === 0)" class="success">
-        Validation passed successfully
+        <!-- General Info Tab -->
+        <form
+          v-show="activeTab === 'general'"
+          id="transistor-properties"
+          class="form-content"
+          @submit.prevent="handleSubmit"
+        >
+          <section class="form-section identity-section" aria-labelledby="device-identity">
+            <h3 id="device-identity">Metadata</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="name">Name *</label>
+                <input
+                  id="name"
+                  v-model="formData.metadata.name"
+                  type="text"
+                  :readonly="isEditing"
+                  :aria-describedby="isEditing ? 'device-name-help' : undefined"
+                  required
+                  placeholder="e.g. IGBT_1200V_100A"
+                />
+                <small v-if="isEditing" id="device-name-help">Device names cannot be changed while editing.</small>
+              </div>
+
+              <div class="form-group">
+                <label for="type">Type *</label>
+                <select id="type" v-model="formData.metadata.type" required>
+                  <option value="">Select type</option>
+                  <option value="IGBT">IGBT</option>
+                  <option value="MOSFET">MOSFET</option>
+                  <option value="SiC-MOSFET">SiC-MOSFET</option>
+                  <option value="GaN">GaN</option>
+                  <option value="BJT">BJT</option>
+                  <option value="Diode">Diode</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="manufacturer">Manufacturer *</label>
+                <input
+                  id="manufacturer"
+                  v-model="formData.metadata.manufacturer"
+                  type="text"
+                  required
+                  placeholder="e.g. Infineon"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="housing">Housing Type *</label>
+                <select id="housing" v-model="formData.metadata.housing_type" required>
+                  <option value="">Select housing</option>
+                  <option
+                    v-if="formData.metadata.housing_type && !housingTypeOptions.includes(formData.metadata.housing_type)"
+                    :value="formData.metadata.housing_type"
+                  >{{ formData.metadata.housing_type }}</option>
+                  <option value="TO247">TO-247</option>
+                  <option value="TO220">TO-220</option>
+                  <option value="TO263">TO-263</option>
+                  <option value="TO92">TO-92</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="author">Author</label>
+                <input
+                  id="author"
+                  v-model="formData.metadata.author"
+                  type="text"
+                />
+              </div>
+
+              <div class="form-group form-group-wide">
+                <label for="comment">Comment</label>
+                <textarea
+                  id="comment"
+                  v-model="formData.metadata.comment"
+                  rows="3"
+                ></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section" aria-labelledby="device-ratings">
+            <h3 id="device-ratings">Electrical Ratings</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="v_abs_max">V<sub>abs,max</sub> (V) *</label>
+                <input
+                  id="v_abs_max"
+                  v-model.number="formData.electrical.v_abs_max"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  required
+                  placeholder="e.g. 1200"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="i_abs_max">I<sub>abs,max</sub> (A) *</label>
+                <input
+                  id="i_abs_max"
+                  v-model.number="formData.electrical.i_abs_max"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  required
+                  placeholder="e.g. 100"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="i_cont">I<sub>cont</sub> (A) *</label>
+                <input
+                  id="i_cont"
+                  v-model.number="formData.electrical.i_cont"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  required
+                  placeholder="e.g. 80"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="t_j_max">T<sub>j,max</sub> (°C) *</label>
+                <input
+                  id="t_j_max"
+                  v-model.number="formData.electrical.t_j_max"
+                  type="number"
+                  step="0.1"
+                  required
+                  placeholder="e.g. 175"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section" aria-labelledby="device-thermal">
+            <h3 id="device-thermal">Thermal Properties</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="r_th_cs">R<sub>th,cs</sub> (K/W) *</label>
+                <input
+                  id="r_th_cs"
+                  v-model.number="formData.thermal.r_th_cs"
+                  type="number"
+                  step="0.001"
+                  min="0"
+                  required
+                  placeholder="e.g. 0.5"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="r_th_switch_cs">R<sub>th,switch-cs</sub> (K/W) *</label>
+                <input
+                  id="r_th_switch_cs"
+                  v-model.number="formData.thermal.r_th_switch_cs"
+                  type="number"
+                  step="0.001"
+                  min="0"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="r_th_diode_cs">R<sub>th,diode-cs</sub> (K/W) *</label>
+                <input
+                  id="r_th_diode_cs"
+                  v-model.number="formData.thermal.r_th_diode_cs"
+                  type="number"
+                  step="0.001"
+                  min="0"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="housing_area">Housing Area (cm²) *</label>
+                <input
+                  id="housing_area"
+                  v-model.number="formData.thermal.housing_area"
+                  type="number"
+                  step="any"
+                  min="0"
+                  required
+                  placeholder="e.g. 1.0"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="cooling_area">Cooling Area (cm²) *</label>
+                <input
+                  id="cooling_area"
+                  v-model.number="formData.thermal.cooling_area"
+                  type="number"
+                  step="any"
+                  min="0"
+                  required
+                  placeholder="e.g. 1.0"
+                />
+              </div>
+            </div>
+          </section>
+
+        </form>
+
+        <!-- Channel Curves Tab -->
+        <div v-show="activeTab === 'channel'" class="curve-tab-content">
+          <div class="curve-tab-header">
+            <h3>Channel Characteristic Curves</h3>
+            <div class="component-toggle">
+              <button
+                @click="curveComponent = 'switch'"
+                :class="['toggle-btn', { active: curveComponent === 'switch' }]"
+              >Switch</button>
+              <button
+                @click="curveComponent = 'diode'"
+                :class="['toggle-btn', { active: curveComponent === 'diode' }]"
+              >Diode</button>
+            </div>
+          </div>
+
+          <CurveList
+            :curves="curveComponent === 'switch' ? curves.switch_channel : curves.diode_channel"
+            :title="curveComponent === 'switch' ? 'Switch Channel Curves' : 'Diode Channel Curves'"
+            curveType="Channel"
+            @add="openCurveEditor('channel')"
+            @edit="editCurve('channel', $event)"
+            @view="viewCurve('channel', $event)"
+            @delete="deleteCurve('channel', $event)"
+          />
+          <CurveEditor
+            v-if="showEditor && editorCurveType === 'channel'"
+            :key="curveEditorKey('channel')"
+            curveType="channel"
+            :component="editingCurve?.route.component || curveComponent"
+            :edit-mode="Boolean(editingCurve)"
+            :initial-data="editingCurve?.initialData || null"
+            @submit="handleCurveSubmit"
+            @cancel="closeEditor"
+          />
+        </div>
+
+        <!-- Switching Losses Tab -->
+        <div v-show="activeTab === 'switching'" class="curve-tab-content">
+          <h3>Switching Loss Data</h3>
+          <div class="sub-tabs">
+            <button
+              v-for="lt in ['e_on', 'e_off', 'e_rr']"
+              :key="lt"
+              @click="activeLossType = lt"
+              :class="['sub-tab-btn', { active: activeLossType === lt }]"
+            >{{ lossTypeLabels[lt] }}</button>
+          </div>
+
+          <CurveList
+            :curves="curves['switching_' + activeLossType] || []"
+            :title="lossTypeLabels[activeLossType]"
+            curveType="Switching Loss"
+            @add="openCurveEditor('switching_loss')"
+            @edit="editCurve('switching_loss', $event)"
+            @view="viewCurve('switching_loss', $event)"
+            @delete="deleteCurve('switching_loss', $event)"
+          />
+          <CurveEditor
+            v-if="showEditor && editorCurveType === 'switching_loss'"
+            :key="curveEditorKey('switching_loss')"
+            curveType="switching_loss"
+            :lossType="editingCurve?.route.type || activeLossType"
+            :edit-mode="Boolean(editingCurve)"
+            :initial-data="editingCurve?.initialData || null"
+            @submit="handleCurveSubmit"
+            @cancel="closeEditor"
+          />
+        </div>
+
+        <!-- Gate Charge Tab -->
+        <div v-show="activeTab === 'gate_charge'" class="curve-tab-content">
+          <h3>Gate Charge Curves</h3>
+
+          <CurveList
+            :curves="curves.gate_charge || []"
+            title="Gate Charge Curves"
+            curveType="Gate Charge"
+            @add="openCurveEditor('gate_charge')"
+            @edit="editCurve('gate_charge', $event)"
+            @view="viewCurve('gate_charge', $event)"
+            @delete="deleteCurve('gate_charge', $event)"
+          />
+          <CurveEditor
+            v-if="showEditor && editorCurveType === 'gate_charge'"
+            :key="curveEditorKey('gate_charge')"
+            curveType="gate_charge"
+            :edit-mode="Boolean(editingCurve)"
+            :initial-data="editingCurve?.initialData || null"
+            @submit="handleCurveSubmit"
+            @cancel="closeEditor"
+          />
+        </div>
+
+        <!-- SOA Tab -->
+        <div v-show="activeTab === 'soa'" class="curve-tab-content">
+          <h3>Safe Operating Area</h3>
+
+          <CurveList
+            :curves="curves.soa || []"
+            title="SOA Curves"
+            curveType="SOA"
+            @add="openCurveEditor('soa')"
+            @edit="editCurve('soa', $event)"
+            @view="viewCurve('soa', $event)"
+            @delete="deleteCurve('soa', $event)"
+          />
+          <CurveEditor
+            v-if="showEditor && editorCurveType === 'soa'"
+            :key="curveEditorKey('soa')"
+            curveType="soa"
+            :edit-mode="Boolean(editingCurve)"
+            :initial-data="editingCurve?.initialData || null"
+            @submit="handleCurveSubmit"
+            @cancel="closeEditor"
+          />
+        </div>
+
+        <!-- Capacitance Tab -->
+        <div v-show="activeTab === 'capacitance'" class="curve-tab-content">
+          <h3>Voltage-Dependent Capacitance</h3>
+          <div class="sub-tabs">
+            <button
+              v-for="ct in ['c_oss', 'c_iss', 'c_rss']"
+              :key="ct"
+              @click="activeCapType = ct"
+              :class="['sub-tab-btn', { active: activeCapType === ct }]"
+            >{{ capTypeLabels[ct] }}</button>
+          </div>
+
+          <CurveList
+            :curves="curves['capacitance_' + activeCapType] || []"
+            :title="capTypeLabels[activeCapType]"
+            curveType="Capacitance"
+            @add="openCurveEditor('capacitance')"
+            @edit="editCurve('capacitance', $event)"
+            @view="viewCurve('capacitance', $event)"
+            @delete="deleteCurve('capacitance', $event)"
+          />
+          <CurveEditor
+            v-if="showEditor && editorCurveType === 'capacitance'"
+            :key="curveEditorKey('capacitance')"
+            curveType="capacitance"
+            :capType="editingCurve?.route.type || activeCapType"
+            :edit-mode="Boolean(editingCurve)"
+            :initial-data="editingCurve?.initialData || null"
+            @submit="handleCurveSubmit"
+            @cancel="closeEditor"
+          />
+        </div>
+
+        <div v-show="activeTab === 'thermal_curves'" class="curve-tab-content" data-testid="thermal-curve-tab">
+          <h3>Transient Junction-to-Case Thermal Impedance</h3>
+          <p>Stored samples are shown unchanged. Time is seconds; Zth(j-c) is K/W.</p>
+          <div class="component-toggle">
+            <button type="button" :disabled="Boolean(thermalDraft || thermalDeleteComponent)" @click="thermalComponent = 'switch'" :class="['toggle-btn', { active: thermalComponent === 'switch' }]">Switch</button>
+            <button type="button" :disabled="Boolean(thermalDraft || thermalDeleteComponent)" @click="thermalComponent = 'diode'" :class="['toggle-btn', { active: thermalComponent === 'diode' }]">Diode</button>
+          </div>
+
+          <p v-if="curveLoadError" class="curve-viewer-empty" role="alert">{{ curveLoadError }}</p>
+          <section v-else class="thermal-curve-card" :aria-label="`${thermalComponent} thermal curve`">
+            <template v-if="thermalCurves[thermalComponent].graph_t_rthjc">
+              <p>{{ thermalCurves[thermalComponent].graph_t_rthjc[0].length }} stored points</p>
+              <div class="card-actions">
+                <button type="button" class="btn btn-secondary" @click="viewThermalCurve">View</button>
+                <button type="button" class="btn btn-secondary" @click="editThermalCurve">Edit</button>
+                <button type="button" class="btn btn-danger" @click="startThermalDelete">Delete</button>
+              </div>
+            </template>
+            <p v-else role="status">No transient thermal curve is stored for this {{ thermalComponent }}.</p>
+            <button v-if="!thermalCurves[thermalComponent].graph_t_rthjc && !thermalDraft" type="button" class="btn btn-primary" @click="startThermalCurve">Add thermal curve</button>
+          </section>
+
+          <form v-if="thermalDraft" class="thermal-curve-editor" @submit.prevent="saveThermalCurve">
+            <h4>{{ thermalCurves[thermalDraftComponent].graph_t_rthjc ? 'Edit' : 'Add' }} {{ thermalDraftComponent }} thermal curve</h4>
+            <p>Enter time in seconds and thermal impedance in K/W. Time samples must increase.</p>
+            <table>
+              <thead><tr><th>Time (s)</th><th>Zth(j-c) (K/W)</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr v-for="(time, index) in thermalDraft[0]" :key="index">
+                  <td><input v-model.number="thermalDraft[0][index]" type="number" step="any" :aria-label="`Time seconds point ${index + 1}`" /></td>
+                  <td><input v-model.number="thermalDraft[1][index]" type="number" step="any" :aria-label="`Zth K per W point ${index + 1}`" /></td>
+                  <td><button type="button" class="btn btn-secondary" :disabled="thermalDraft[0].length <= 2" :aria-label="`Remove point ${index + 1}`" @click="removeThermalPoint(index)">Remove</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" @click="cancelThermalEdit">Cancel</button>
+              <button type="button" class="btn btn-secondary" @click="addThermalPoint">Add point</button>
+              <button type="submit" class="btn btn-primary">Save thermal curve</button>
+            </div>
+          </form>
+          <div v-if="thermalDeleteComponent" class="modal-overlay" @click="cancelThermalDelete">
+            <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="thermal-delete-title" @click.stop>
+              <h4 id="thermal-delete-title">Delete {{ thermalDeleteComponent }} thermal curve?</h4>
+              <p>This clears only the stored graph_t_rthjc samples.</p>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" @click="cancelThermalDelete">Cancel</button>
+                <button type="button" class="btn btn-danger" @click="deleteThermalCurve">Delete thermal curve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="selectedCurve" class="curve-viewer" data-testid="curve-viewer" role="region" aria-label="Curve detail">
+          <div class="curve-viewer-header">
+            <h4>{{ selectedCurve.title }}</h4>
+            <button type="button" class="btn btn-secondary" aria-label="Close curve view" @click="selectedCurve = null">
+              Close
+            </button>
+          </div>
+          <CurvePlotter
+            v-if="selectedCurvePlot"
+            :title="selectedCurve.title"
+            :datasets="[selectedCurvePlot.dataset]"
+            :x-label="selectedCurvePlot.xLabel"
+            :x-value-scientific="selectedCurvePlot.xValueScientific || false"
+            :y-label="selectedCurvePlot.yLabel"
+            :y-value-scientific="selectedCurvePlot.yValueScientific || false"
+            :x-log-scale="selectedCurvePlot.xLogScale"
+            :y-log-scale="selectedCurvePlot.yLogScale"
+          />
+          <p v-else class="curve-viewer-empty" role="status">This curve has no supported graph data to plot.</p>
+        </div>
       </div>
     </div>
 
     <!-- Curve notification -->
-    <div v-if="curveMessage" :class="['curve-notification', curveMessage.type]">
+    <div v-if="curveMessage" :class="['curve-notification', curveMessage.type]" role="status">
       {{ curveMessage.text }}
     </div>
   </div>
@@ -987,286 +998,238 @@ async function handleSubmit() {
 
 <style scoped>
 .transistor-form {
-  max-width: 1000px;
-  margin: 0 auto;
-  background: var(--bg-secondary, white);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px var(--shadow, rgba(0,0,0,0.1));
-  overflow: hidden;
+  --editor-padding: clamp(.75rem, 2vw, 1.3rem);
+  width: min(100%, 1440px);
+  margin-inline: auto;
+  padding: var(--editor-padding);
+  color: var(--text-primary);
+  font-size: .875rem;
 }
 
-.save-error {
-  margin: 1rem 2rem 0;
-  color: #721c24;
-  background: #f8d7da;
-  border-radius: 6px;
-  padding: 0.75rem 1rem;
+.form-header,
+.form-actions,
+.curve-tab-header,
+.curve-viewer-header {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
 }
 
 .form-header {
-  background: #3498db;
-  color: white;
-  padding: 1rem 2rem;
-  display: flex;
   justify-content: space-between;
-  align-items: center;
+  flex-wrap: wrap;
+  padding-bottom: .8rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: .85rem;
 }
 
-.form-header h2 {
-  margin: 0;
+.device-heading { min-width: 0; }
+.form-header h2 { font-size: 1.4rem; line-height: 1.25; letter-spacing: -.015em; }
+.part-number {
+  color: var(--text-secondary);
+  font-family: ui-monospace, monospace;
+  font-size: .8rem;
+  overflow-wrap: anywhere;
 }
 
-/* Section Tabs */
+.form-actions { flex-wrap: wrap; }
+.transistor-form .btn {
+  min-height: 2rem;
+  padding: .25rem .65rem;
+  font: inherit;
+  font-weight: 550;
+}
+.transistor-form .btn-primary { background: var(--action-bg); border-color: var(--action-bg); }
+.transistor-form .btn-primary:hover:not(:disabled) { background: var(--action-hover); }
+.transistor-form .btn-secondary:hover:not(:disabled) { border-color: var(--accent-blue); }
+
+.editor-content { min-width: 0; }
+.has-curve-nav {
+  display: grid;
+  grid-template-columns: 10.75rem minmax(0, 1fr);
+  gap: .8rem;
+  align-items: start;
+}
+
 .section-tabs {
-  display: flex;
-  background: var(--bg-tertiary, #f8f9fa);
-  border-bottom: 1px solid var(--border-color, #e1e5e9);
-  overflow-x: auto;
+  display: grid;
+  gap: 2px;
+  padding: .3rem;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background: var(--bg-secondary);
 }
 
-.tab-btn {
-  padding: 0.75rem 1.25rem;
-  border: none;
+.tab-btn, .toggle-btn, .sub-tab-btn {
+  padding: .37rem .55rem;
+  border: 1px solid transparent;
+  border-radius: 3px;
   background: transparent;
-  color: var(--text-secondary, #666);
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  text-align: left;
   white-space: nowrap;
-  transition: all 0.2s;
 }
 
-.tab-btn:hover {
-  background: var(--bg-secondary, #fff);
-  color: var(--text-primary, #333);
+.tab-btn:hover, .toggle-btn:hover, .sub-tab-btn:hover,
+.tab-btn.active, .toggle-btn.active, .sub-tab-btn.active {
+  background: var(--accent-blue-light);
+  color: var(--accent-blue);
 }
 
-.tab-btn.active {
-  color: #3498db;
-  border-bottom-color: #3498db;
-  background: var(--bg-secondary, #fff);
-}
+.tab-btn.active { border-inline-start: 2px solid var(--accent-blue); font-weight: 650; }
 
 .form-content {
-  padding: 2rem;
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 5fr);
+  grid-template-rows: auto 1fr;
+  align-items: start;
+  gap: .65rem;
 }
 
-.form-section {
-  margin-bottom: 2rem;
+.form-section, .curve-tab-content, .curve-viewer, .validation-section, .save-error {
+  min-width: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background: var(--bg-secondary);
 }
+
+.identity-section { grid-row: 1 / span 2; }
 
 .form-section h3 {
-  color: var(--text-primary, #2c3e50);
-  margin: 0 0 1rem 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--border-color, #eee);
+  padding: .47rem .75rem;
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 5px 5px 0 0;
+  background: var(--bg-tertiary);
+  font-size: .8rem;
+  letter-spacing: .025em;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .7rem;
+  padding: .75rem;
 }
 
-.form-group {
+.form-group { display: grid; align-content: start; gap: .23rem; min-width: 0; }
+.form-group-wide { grid-column: 1 / -1; }
+.form-group label { font-size: .79rem; font-weight: 600; }
+.form-group label sub { line-height: 0; }
+.form-group small { color: var(--text-secondary); line-height: 1.35; }
+
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.1rem;
+  padding: .28rem .5rem;
+  font: inherit;
+}
+
+.form-group input[type="number"], #name { font-family: ui-monospace, monospace; }
+.form-group input[readonly] { background: var(--bg-tertiary); }
+.form-group textarea { resize: vertical; }
+
+.transistor-form :is(button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 1px;
+}
+
+.transistor-form button:focus:not(:focus-visible) { outline: none; }
+
+.curve-tab-content, .curve-viewer, .validation-section, .save-error { padding: .75rem; }
+.curve-tab-content > h3, .curve-tab-header { margin-bottom: .65rem; }
+.curve-tab-content h3, .validation-section h3 { font-size: 1rem; }
+.curve-tab-header, .curve-viewer-header { justify-content: space-between; flex-wrap: wrap; }
+.curve-viewer { margin-top: .65rem; }
+.curve-viewer-header { margin-bottom: .65rem; }
+.curve-viewer-empty { color: var(--text-secondary); }
+
+.sub-tabs, .component-toggle {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: .25rem;
+  margin-bottom: .55rem;
 }
 
-.form-group-wide {
-  grid-column: 1 / -1;
+.curve-tab-header .component-toggle { margin-bottom: 0; }
+
+.toggle-btn, .sub-tab-btn {
+  border-color: var(--border-color);
+  background: var(--bg-tertiary);
+  white-space: normal;
 }
 
-.form-group label {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  color: var(--text-secondary, #555);
+.thermal-curve-card, .thermal-curve-editor {
+  display: grid;
+  justify-items: start;
+  gap: .55rem;
+  padding: .65rem 0;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
-  padding: 0.75rem;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-  background: var(--bg-secondary, #fff);
-  color: var(--text-primary, #333);
+.thermal-curve-editor table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+.thermal-curve-editor input { width: 100%; min-width: 4rem; }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(15 23 42 / 48%);
 }
 
-.form-group textarea {
-  resize: vertical;
-  min-height: 80px;
+.modal-content {
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background: var(--bg-secondary);
 }
 
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-color, #eee);
-}
+.modal-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: .5rem; margin-top: .7rem; }
+.card-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
 
-/* Curve Tab Content */
-.curve-tab-content {
-  padding: 1.5rem 2rem;
-}
-
-.curve-tab-content h3 {
-  color: var(--text-primary, #2c3e50);
-  margin: 0 0 1rem 0;
-}
-
-.curve-tab-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.component-toggle {
-  display: flex;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.toggle-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  background: var(--bg-tertiary, #f5f5f5);
-  color: var(--text-secondary, #666);
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.2s;
-}
-
-.toggle-btn.active {
-  background: #3498db;
-  color: white;
-}
-
-.sub-tabs {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.sub-tab-btn {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 20px;
-  background: var(--bg-tertiary, #f5f5f5);
-  color: var(--text-secondary, #666);
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.2s;
-}
-
-.sub-tab-btn.active {
-  background: #3498db;
-  color: white;
-  border-color: #3498db;
-}
-
-.curve-viewer {
-  padding: 1rem 2rem 1.5rem;
-  border-top: 1px solid var(--border-color, #ddd);
-  background: var(--bg-secondary, #fff);
-}
-
-.curve-viewer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.curve-viewer-header h4 {
-  margin: 0;
-  color: var(--text-primary, #333);
-}
-
-.curve-viewer-empty {
-  color: var(--text-secondary, #666);
-}
-
-/* Validation and notification */
-.validation-section {
-  padding: 1rem 2rem 2rem;
-  background: var(--bg-tertiary, #f9f9f9);
-  border-top: 1px solid var(--border-color, #eee);
-}
-
-.validation-section h3 {
-  color: var(--text-primary, #2c3e50);
-  margin: 0 0 1rem 0;
-}
-
-.errors { color: #e74c3c; margin-bottom: 1rem; }
-.warnings { color: #f39c12; margin-bottom: 1rem; }
-.success { color: #27ae60; font-weight: bold; }
-.errors h4, .warnings h4 { margin: 0 0 0.5rem 0; }
-.errors ul, .warnings ul { margin: 0; padding-left: 1.5rem; }
+.validation-section, .save-error { margin-bottom: .65rem; }
+.save-error, .validation-section .errors { color: var(--text-primary); }
+.save-error { border-inline-start: 3px solid var(--danger-color); }
+.validation-section ul { padding-inline-start: 1.2rem; }
+.validation-section h4 { margin-top: .3rem; }
+.validation-section .success { font-weight: 600; }
 
 .curve-notification {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  z-index: 1000;
-  animation: slideIn 0.3s ease;
+  inset: auto var(--editor-padding) var(--editor-padding) auto;
+  max-width: calc(100% - 2 * var(--editor-padding));
+  padding: .55rem .75rem;
+  border: 1px solid var(--border-color);
+  border-inline-start: 3px solid var(--accent-blue);
+  border-radius: 5px;
+  background: var(--bg-secondary);
+  box-shadow: 0 2px 6px var(--shadow);
+  overflow-wrap: anywhere;
+  z-index: 550;
+}
+.curve-notification.error { border-inline-start-color: var(--danger-color); }
+
+@media (max-width: 900px) {
+  .has-curve-nav { grid-template-columns: minmax(0, 1fr); }
+  .section-tabs { display: flex; overflow-x: auto; }
 }
 
-.curve-notification.success {
-  background: #27ae60;
-  color: white;
+@media (max-width: 680px) {
+  .form-content { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .identity-section { grid-row: auto; }
 }
 
-.curve-notification.error {
-  background: #e74c3c;
-  color: white;
-}
-
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-/* Button styles */
-.btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-}
-
-.btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-primary { background: #3498db; color: white; }
-.btn-primary:hover:not(:disabled) { background: #2980b9; }
-.btn-secondary { background: #95a5a6; color: white; }
-.btn-secondary:hover { background: #7f8c8d; }
-
-@media (max-width: 768px) {
-  .form-grid { grid-template-columns: 1fr; }
-  .form-actions { flex-direction: column; }
-  .form-header { flex-direction: column; gap: 1rem; }
-  .curve-tab-header { flex-direction: column; gap: 0.5rem; }
-  .section-tabs { flex-wrap: wrap; }
+@media (max-width: 450px) {
+  .form-grid { grid-template-columns: minmax(0, 1fr); }
+  .form-header { align-items: flex-start; }
+  .form-actions .btn, .tab-btn { min-height: 2.45rem; }
 }
 </style>

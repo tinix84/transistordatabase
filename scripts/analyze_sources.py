@@ -1,3 +1,4 @@
+"""Summarize available semiconductor data files by format and source."""
 import os
 import json
 from pathlib import Path
@@ -14,7 +15,7 @@ def analyze_directory(base_path):
         'files': []
     }
 
-    for root, dirs, files in os.walk(base_path):
+    for root, _dirs, files in os.walk(base_path):
         for file in files:
             if file.endswith(('.json', '.xml', '.csv')):
                 full_path = os.path.join(root, file)
@@ -45,6 +46,7 @@ def analyze_directory(base_path):
                         print(f"Error reading {full_path}: {e}")
 
     return stats
+
 
 # Analyze all sources
 print("=== Analyzing TDB ===")

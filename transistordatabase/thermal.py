@@ -470,7 +470,10 @@ def simulate_foster(request):
             h = dt / tau
         if np.any(h < 4 * np.finfo(np.longdouble).tiny):
             raise ValueError(
-                "Positive interval/tau ratio underflows this platform's normal moment precision range; use a higher-precision runtime or supported numerical range"
+                (
+                    "Positive interval/tau ratio underflows this platform's normal moment precision range; use a higher-precision runtime"
+                    " or supported numerical range"
+                )
             )
         forcing = np.asarray([_convolution(coefficients, v, endpoint) for v in h])
         updated = np.exp(-h) * initial + r * forcing

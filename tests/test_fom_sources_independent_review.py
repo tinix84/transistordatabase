@@ -231,6 +231,7 @@ def test_declared_normalization_reports_all_minima_and_reproduces_fixed_populati
     catalog = mapped("part;V;I;R;price;tier;Qg\nL1;1;2;1;1;1;1\nL2;1;2;1;1;1;1\nM;4;4;1;1;1;1\nH;8;8;1;1;1;1\nZero;1;0;1;1;1;1\n")
     catalog = {k: catalog[k] for k in ("schema_version", "sources", "records")}
     base = {"snapshot": catalog, "source_id": catalog["sources"][0]["id"], "x_metric": "voltage_v", "y_metric": "current_a"}
+
     def run(mode, **filters):
         response = client.post("/api/catalog/screen", json={**base, "normalization": {"mode": mode, "metrics": ["current_a"]}, **filters})
         assert response.status_code == 200
@@ -286,8 +287,8 @@ def test_reference_sources_and_static_ooxml_match_the_bundled_artifact():
             assert len(native) == count and {c for s, c in inspected if s == sheet} == native
             cells = [(c.get("r"), c.find("s:f", NS)) for c in root.findall(".//s:c", NS)]
             groups = {f.get("si") for _, f in cells if f is not None and f.get("t") == "shared" and (f.text or "").startswith("GetURL(")}
-            xml_calls = {coord for coord, f in cells if f is not None and
-                         ((f.text or "").startswith("GetURL(") or (f.get("t") == "shared" and f.get("si") in groups))}
+            xml_calls = {coord for coord, f in cells if f is not None
+                         and ((f.text or "").startswith("GetURL(") or (f.get("t") == "shared" and f.get("si") in groups))}
             assert {c for s, c in formulas if s == sheet} == xml_calls
     assert len(inspected) == 59 and len(formulas) == 63
     for sheet, energy, current, volts in (("MOSFET", .000632, 36, 600), ("IGBT", .003, 80, 400)):

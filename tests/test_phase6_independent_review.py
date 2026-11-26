@@ -143,9 +143,9 @@ def test_random_electrothermal_against_direct_matrix_solution():
                    "initial_temperatures_c": [25., 25.], "max_iterations": 500,
                    "relaxation": .3, "tolerance_k": 1e-11,
                    "loss_models": [{**context(), "mode": "linear-temperature-estimate",
-                       "selected": True, "temperature_min_c": 25., "temperature_max_c": 175.,
-                       "reference_temperature_c": 25., "reference_power_w": p,
-                       "coefficient_per_k": a} for p, a in zip(powers, alpha, strict=True)]}
+                                    "selected": True, "temperature_min_c": 25., "temperature_max_c": 175.,
+                                    "reference_temperature_c": 25., "reference_power_w": p,
+                                    "coefficient_per_k": a} for p, a in zip(powers, alpha, strict=True)]}
         result = electrothermal(request)
         assert result["status"] == "converged"
         np.testing.assert_allclose(result["accepted_solution"]["temperature_c"],
@@ -320,7 +320,7 @@ def test_cubic_endpoint_cancellation_and_sampling_independence(samples):
 
 
 @pytest.mark.parametrize("time,energy", [(.01, 0.), (.01, .1), (.9, 0.), (.9, .1),
-                                      (.99999, 0.), (.999999, 0.), (.9999999, 0.)])
+                                         (.99999, 0.), (.999999, 0.), (.9999999, 0.)])
 def test_cubic_endpoint_remains_correct_after_event_cut(time, energy):
     """Physical cuts must preserve the original cubic; impulse has decayed away."""
     request = transient()

@@ -259,6 +259,7 @@ def test_gecko_incomplete_science_fails_before_any_write(tmp_path, failure):
 def test_services_use_explicit_paths_concurrently_without_global_mutation(tmp_path, monkeypatch):
     """Run concurrent public exports with every process-wide directory change blocked."""
     previous = os.getcwd()
+
     def reject_chdir(*args):
         raise AssertionError("Export attempted process-wide chdir")
     monkeypatch.setattr(os, "chdir", reject_chdir)

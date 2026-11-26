@@ -29,7 +29,12 @@ def point(**changes):
 def config():
     """Return aligned per-device comparison inputs."""
     op = point()
-    return {key: [value, value] if key in {"v_supply", "v_g", "v_g_off", "r_g_on", "r_g_off"} else value for key, value in op.items()} | {"parallel_count": [1, 1], "output_power_w": 1000}
+    return {key: [value, value] if key in {"v_supply", "v_g", "v_g_off", "r_g_on", "r_g_off"} else value for key, value in op.items()} | {
+        "parallel_count": [1, 1],
+        "output_power_w": 1000,
+    }
+
+
 def test_static_duty_physical_results_and_frequency():
     """Verify static duty physical results and frequency."""
     service = CalculationService()
@@ -147,7 +152,9 @@ def test_live_http_preserves_partial_panels_and_rejects_invalid_inputs(monkeypat
     assert result["loss_breakdown"]["rows"][0]["total"] == pytest.approx(305)
     assert result["loss_breakdown"]["rows"][1]["total"] is None
     assert len(result["switching_losses_eon"]["curves"]) == 2
-    invalid = client.post("/api/comparison/advanced", content='{"transistor_ids":["a","b"],"config":{"f_sw":NaN}}', headers={"content-type": "application/json"})
+    invalid = client.post(
+        "/api/comparison/advanced", content='{"transistor_ids":["a","b"],"config":{"f_sw":NaN}}', headers={"content-type": "application/json"}
+    )
     assert invalid.status_code == 422
     bad_length = client.post("/api/comparison/advanced", json={"transistor_ids": ["a", "b"], "config": {"v_supply": [400]}})
     assert bad_length.status_code == 422

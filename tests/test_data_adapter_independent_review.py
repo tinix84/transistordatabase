@@ -63,10 +63,10 @@ def review_op():
 def mapping(document):
     """Keep explicit fixture declarations separate from the source."""
     return dict(package_id="0", ratings=dict(v_abs_max=1200., i_abs_max=80.,
-        i_cont=40., t_j_max=175.), thermal_properties=dict(housing_area=.0001,
-        cooling_area=.0002), block_targets={"0": "switch"},
-        gate_voltage_by_table={t.source_path: 15. for t in document.packages[0].blocks[0].tables},
-        recovery_voltage_convention="preserve-signed")
+                                             i_cont=40., t_j_max=175.), thermal_properties=dict(housing_area=.0001,
+                                                                                                cooling_area=.0002), block_targets={"0": "switch"},
+                gate_voltage_by_table={t.source_path: 15. for t in document.packages[0].blocks[0].tables},
+                recovery_voltage_convention="preserve-signed")
 
 
 def client():
@@ -181,7 +181,7 @@ def test_native_full_json_export_restores_arrays_dates_unknowns_and_working_poin
     transistor.c_oss_er = EffectiveOutputCapacitance(2e-10, 0, 400)
     transistor._working_point = {"switch": LinearizedModel(40, 10, .1, 1., 12), "notes": [None, "recorded"]}
     transistor.switch.raw_measurement_data = [RawMeasurementData("dpt_u_i", measurement_date=stamp,
-        dpt_on_id=[np.array([[0., 1e-6], [0., 10.]])])]
+                                                                 dpt_on_id=[np.array([[0., 1e-6], [0., 10.]])])]
     path = tmp_path / "full-native-export.json"
     assert ExportService().export_to_json(transistor, path)
     restored = JsonTransistorLoader().load_from_json(path)
@@ -386,9 +386,9 @@ def test_generic_export_preserves_exact_unknown_and_mixed_context_rejects():
     transistor = finalize_plecs_package(doc, **mapping(doc))
     transistor.metadata.comment = "Independent ordinary core record"
     selected = dict(component="switch", conduction={"gate_voltage_v": 15.},
-        turn_on={"gate_voltage_v": 15., "gate_resistance_ohm": None},
-        turn_off={"gate_voltage_v": 15., "gate_resistance_ohm": None},
-        include_thermal=True, omission_reasons={}, recovery_voltage_convention="preserve-signed")
+                    turn_on={"gate_voltage_v": 15., "gate_resistance_ohm": None},
+                    turn_off={"gate_voltage_v": 15., "gate_resistance_ohm": None},
+                    include_thermal=True, omission_reasons={}, recovery_voltage_convention="preserve-signed")
     exported, report = core_selection_document(transistor, selected)
     assert report["evidence"][1]["curve_count"] == 4
     assert exported.packages[0].fixed_conditions["selection"] == selected

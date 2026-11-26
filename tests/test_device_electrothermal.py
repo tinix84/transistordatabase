@@ -18,11 +18,23 @@ def device():
         current = np.array([0., 2., 4.])
         resistance = 1 + .01 * (temperature - 25)
         item.switch.channel_data.append(ChannelCharacteristics(temperature, np.array([current * resistance, current]), 15))
-        for family, gate, energy in [('e_on_data', 15, .002), ('e_off_data', -15, .003)]:
-            getattr(item.switch, family).append(SwitchingLossData('graph_i_e', temperature, 600, gate,
-                r_g=5.6, v_g_off=None, graph_i_e=np.array([current, energy + .001 * current]),
-                commutation_device='Synthetic diode', load_inductance=.001, commutation_inductance=1e-9,
-                measurement_testbench='Synthetic bench', evidence=MeasurementEvidence(method='direct', convention='passive', event=family)))
+        for family, gate, energy in [('e_on_data', 15, 0.002), ('e_off_data', -15, 0.003)]:
+            getattr(item.switch, family).append(
+                SwitchingLossData(
+                    'graph_i_e',
+                    temperature,
+                    600,
+                    gate,
+                    r_g=5.6,
+                    v_g_off=None,
+                    graph_i_e=np.array([current, energy + 0.001 * current]),
+                    commutation_device='Synthetic diode',
+                    load_inductance=0.001,
+                    commutation_inductance=1e-9,
+                    measurement_testbench='Synthetic bench',
+                    evidence=MeasurementEvidence(method='direct', convention='passive', event=family),
+                )
+            )
     return item
 
 

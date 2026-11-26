@@ -100,8 +100,8 @@ def _mask(frequency, peaks, spec, peak_unit):
             low, high = position - 1, position
             if limits[low] is not None and limits[high] is not None:
                 if interpolation == "linear-frequency":
-                    weight = ((Fraction.from_float(hz) - Fraction.from_float(x[low])) /
-                              (Fraction.from_float(x[high]) - Fraction.from_float(x[low])))
+                    weight = ((Fraction.from_float(hz) - Fraction.from_float(x[low]))
+                              / (Fraction.from_float(x[high]) - Fraction.from_float(x[low])))
                 else:
                     left_distance = Fraction.from_float(_log_ratio(hz, x[low]))
                     right_distance = Fraction.from_float(_log_ratio(x[high], hz))
@@ -178,15 +178,15 @@ def analyze_spectrum_bins(frequency_hz, coefficients, *, sample_count, sample_in
     if len(peaks) != len(frequency):
         raise ValueError("Canonical peak amplitudes must align with every FFT bin")
     if amplitude_scale > 0 and any(value != 0 and peak == 0
-            for value, peak in zip(coefficients, peaks, strict=True)):
+                                   for value, peak in zip(coefficients, peaks, strict=True)):
         raise ValueError("Canonical peak amplitude loses a nonzero FFT coefficient outside the supported SI range")
     result = {"analysis_basis": {"signal_unit": signal_unit, "peak_unit": peak_unit, "rms_unit": rms_unit,
               "window": window, "detrend": detrend, "coherent_gain": gain,
-              "window_power_gain": power_gain, "sample_count": sample_count,
-              "observed_bin_count": len(frequency), "physical_nyquist_hz": nyquist,
-              "mask_basis": "Coherent-gain-corrected one-sided peak amplitude",
-              "band_basis": "Raw windowed detrended discrete Parseval RMS; no power-gain correction",
-              "selection_basis": "All observed bins, independent of display threshold or top-ten selection"}}
+                                 "window_power_gain": power_gain, "sample_count": sample_count,
+                                 "observed_bin_count": len(frequency), "physical_nyquist_hz": nyquist,
+                                 "mask_basis": "Coherent-gain-corrected one-sided peak amplitude",
+                                 "band_basis": "Raw windowed detrended discrete Parseval RMS; no power-gain correction",
+                                 "selection_basis": "All observed bins, independent of display threshold or top-ten selection"}}
     if mask is not None:
         result["mask_screening"] = _mask(frequency, peaks, mask, peak_unit)
     if bands is not None:

@@ -170,6 +170,7 @@ def test_semantic_export_must_preserve_empty_octave_string_shape_or_report_loss(
     """Prevent an undeclared shape change in a compatible source field."""
     raw = (TEXT_HEADER + b"# name: scData\n# type: scalar struct\n# ndims: 2\n1 1\n# length: 1\n"
            b"# name: note\n# type: sq_string\n# elements: 1\n# length: 0\n\n")
+
     def get_note(source):
         return legacy_mat.preview_mat(source)["variables"]["scData"]["fields"]["note"]
     assert get_note(raw)["shape"] == [1, 0]
@@ -233,7 +234,7 @@ def test_actual_forward_reference_reverse_negative_energy_and_octave_calibration
         legacy_mat.finalize_mat(binary_source, **declaration(kind="turn-off", conditions={**conditions, "supply_voltage_v": 400.}))
     with pytest.raises(ValueError, match="[Nn]egative"):
         legacy_mat.finalize_mat(binary_source, **declaration(kind="turn-off", branch="reverse", target="diode",
-            conditions={**conditions, "supply_voltage_v": 400.}))
+                                                             conditions={**conditions, "supply_voltage_v": 400.}))
     octave_source = (ARCHIVE / "db/scData/Infineon_IPW65R048CFDA_125C_HB_Sw+Sw.mat").read_bytes()
     assert sha256(octave_source).hexdigest() == "5b60413bae4f0289b1f44d3771e2cd78293684353cc91b7d000baeb009c849a6"
     with pytest.raises(ValueError):

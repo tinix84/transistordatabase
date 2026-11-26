@@ -107,23 +107,39 @@ def allocate_gate_current(*, time_s, current_a, gate, source, conditions, select
         for value in provenance.values():
             if isinstance(value, str):
                 _utf8(value)
-        provenance = {"source": None, "calibration_notes": None,
-                      "imported_filename": None, "edited_after_import": False} | provenance
-    inputs = {"time_s": time, "current_a": current, "gate": policy,
-              "source": source.strip(), "conditions": conditions,
-              "selected": True, "provenance": provenance}
-    rows = [{"time_s": t, "current_a": value, "gate_on": state,
-             "gate_on_current_a": value if state else 0.0,
-             "gate_off_current_a": 0.0 if state else value}
-            for t, value, state in zip(time, current, states, strict=True)]
-    result = {"samples": rows, "sample_count": len(time),
-              "semantics": "Sample-only mask. No state or interpolation is defined between samples. Threshold equality is low.",
-              "scope": "Gate-on channel allocation and gate-off diode allocation are command-state assumptions. They do not identify physical current paths, simultaneous sharing, losses or energy.",
-              "units": {"time_s": "s", "current_a": "A", "gate_on_current_a": "A",
-                        "gate_off_current_a": "A", "gate_on": "boolean"}}
+        provenance = {"source": None, "calibration_notes": None, "imported_filename": None, "edited_after_import": False} | provenance
+    inputs = {
+        "time_s": time,
+        "current_a": current,
+        "gate": policy,
+        "source": source.strip(),
+        "conditions": conditions,
+        "selected": True,
+        "provenance": provenance,
+    }
+    rows = [
+        {"time_s": t, "current_a": value, "gate_on": state, "gate_on_current_a": value if state else 0.0, "gate_off_current_a": 0.0 if state else value}
+        for t, value, state in zip(time, current, states, strict=True)
+    ]
+    result = {
+        "samples": rows,
+        "sample_count": len(time),
+        "semantics": "Sample-only mask. No state or interpolation is defined between samples. Threshold equality is low.",
+        "scope": (
+            "Gate-on channel allocation and gate-off diode allocation are command-state assumptions. They do not identify "
+            "physical current paths, simultaneous sharing, losses or energy."
+        ),
+        "units": {"time_s": "s", "current_a": "A", "gate_on_current_a": "A", "gate_off_current_a": "A", "gate_on": "boolean"},
+    }
     if digitization is not None:
         result["gate_digitization"] = digitization["evidence"]
-        result["semantics"] = "Sample-only hysteretic mask. Strict crossings change state. Equality and deadband hold the preceding sampled state. No switching time is inferred between samples."
+        result["semantics"] = (
+            (
+                "Sample-only hysteretic mask. Strict crossings change state. Equality and deadband hold the preceding sampled state. "
+                "No switching time is inferred between samples."
+            )
+        )
+
     def digest(value):
         return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"),
                                          allow_nan=False).encode()).hexdigest()

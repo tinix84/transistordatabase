@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Generate comprehensive GUI test report."""
+
 import os
 import sys
 import subprocess
@@ -9,17 +10,19 @@ os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 sys.path.insert(0, '/home/tinix/claude_wsl/transistordatabase')
 os.chdir('/home/tinix/claude_wsl/transistordatabase')
 
+
 def test_imports():
     """Test all imports."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("PART 1: STATIC ANALYSIS - IMPORT VALIDATION")
-    print("="*70)
+    print("=" * 70)
 
     results = []
 
     # Test 1.1: GUI Import
     try:
         from transistordatabase.gui.gui import MainWindow
+
         print("✅ 1.1: GUI main import")
         results.append(("GUI Main Import", "PASS"))
     except Exception as e:
@@ -36,7 +39,13 @@ def test_imports():
         from transistordatabase.gui.mixins.export_mixin import ExportToolsMixin
         from transistordatabase.gui.mixins.comparison_mixin import ComparisonToolsMixin
         from transistordatabase.gui.mixins.topology_mixin import TopologyCalculatorMixin
-        print("✅ 1.2: All 8 Mixin Imports (UtilitiesMixin, SettingsMixin, SearchDatabaseMixin, TransistorCreationMixin, CurveManagementMixin, ExportToolsMixin, ComparisonToolsMixin, TopologyCalculatorMixin)")
+
+        print(
+            (
+                "✅ 1.2: All 8 Mixin Imports (UtilitiesMixin, SettingsMixin, SearchDatabaseMixin, TransistorCreationMixin, "
+                "CurveManagementMixin, ExportToolsMixin, ComparisonToolsMixin, TopologyCalculatorMixin)"
+            )
+        )
         results.append(("Mixin Imports (8 classes)", "PASS"))
     except Exception as e:
         print(f"❌ 1.2: Mixin import - {e}")
@@ -46,6 +55,7 @@ def test_imports():
     try:
         from transistordatabase.gui._widgets import MatplotlibWidget
         from transistordatabase.gui._widgets import PopOutPlotWindow
+
         print("✅ 1.3: Widget Imports (MatplotlibWidget, PopOutPlotWindow)")
         results.append(("Widget Imports", "PASS"))
     except Exception as e:
@@ -55,6 +65,7 @@ def test_imports():
     # Test 1.4: API Client Import
     try:
         from transistordatabase.gui.api_client import TransistorAPIClient
+
         print("✅ 1.4: API Client Import")
         results.append(("API Client Import", "PASS"))
     except Exception as e:
@@ -66,9 +77,9 @@ def test_imports():
 
 def test_gui_structure():
     """Test GUI structure and methods."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("PART 2: GUI STRUCTURE VALIDATION")
-    print("="*70)
+    print("=" * 70)
 
     results = []
 
@@ -98,7 +109,7 @@ def test_gui_structure():
         try:
             menu_bar = window.menuBar()
             assert menu_bar is not None
-            print(f"✅ 2.2: Menu Bar Exists")
+            print("✅ 2.2: Menu Bar Exists")
             results.append(("Menu Bar", "PASS"))
         except Exception as e:
             print(f"❌ 2.2: Menu bar - {e}")
@@ -108,7 +119,7 @@ def test_gui_structure():
         try:
             central = window.centralWidget()
             assert central is not None
-            print(f"✅ 2.3: Central Widget Exists")
+            print("✅ 2.3: Central Widget Exists")
             results.append(("Central Widget", "PASS"))
         except Exception as e:
             print(f"❌ 2.3: Central widget - {e}")
@@ -118,7 +129,7 @@ def test_gui_structure():
         try:
             status_bar = window.statusBar()
             assert status_bar is not None
-            print(f"✅ 2.4: Status Bar Exists")
+            print("✅ 2.4: Status Bar Exists")
             results.append(("Status Bar", "PASS"))
         except Exception as e:
             print(f"❌ 2.4: Status bar - {e}")
@@ -160,9 +171,9 @@ def test_gui_structure():
 
 def test_mixin_presence():
     """Test that all mixins are present in MainWindow."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("PART 3: MIXIN PRESENCE IN MAINWINDOW")
-    print("="*70)
+    print("=" * 70)
 
     results = []
 
@@ -178,7 +189,7 @@ def test_mixin_presence():
             'CurveManagementMixin',
             'ExportToolsMixin',
             'ComparisonToolsMixin',
-            'TopologyCalculatorMixin'
+            'TopologyCalculatorMixin',
         ]
 
         bases_str = str(MainWindow.__bases__)
@@ -202,24 +213,18 @@ def test_mixin_presence():
 
 def run_pytest_tests():
     """Run pytest tests with simpler configuration."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("PART 4: PYTEST TEST EXECUTION")
-    print("="*70)
+    print("=" * 70)
 
     try:
         # Run pytest with minimal configuration
         result = subprocess.run(
-            [
-                'python3', '-m', 'pytest',
-                'tests/test_gui_imports.py',
-                '-v',
-                '--tb=short',
-                '-p', 'no:cacheprovider'
-            ],
+            ['python3', '-m', 'pytest', 'tests/test_gui_imports.py', '-v', '--tb=short', '-p', 'no:cacheprovider'],
             capture_output=True,
             text=True,
             timeout=60,
-            cwd='/home/tinix/claude_wsl/transistordatabase'
+            cwd='/home/tinix/claude_wsl/transistordatabase',
         )
 
         print("\nPytest Output:")
@@ -230,6 +235,7 @@ def run_pytest_tests():
         # Parse results
         if "passed" in result.stdout:
             import re
+
             match = re.search(r'(\d+) passed', result.stdout)
             if match:
                 return [("Pytest GUI Imports", f"PASS ({match.group(1)} tests)")]
@@ -243,9 +249,9 @@ def run_pytest_tests():
 
 def main():
     """Run all tests and generate report."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("PYQT5 GUI TEST EXECUTION REPORT")
-    print("="*70)
+    print("=" * 70)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Platform: {sys.platform}")
     print(f"Python: {sys.version.split()[0]}")
@@ -259,16 +265,16 @@ def main():
     all_results.extend(run_pytest_tests())
 
     # Generate summary
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST SUMMARY")
-    print("="*70)
+    print("=" * 70)
 
     passed = sum(1 for _, status in all_results if status.startswith("PASS"))
     failed = sum(1 for _, status in all_results if status.startswith("FAIL"))
     skipped = sum(1 for _, status in all_results if status.startswith("SKIP"))
     partial = sum(1 for _, status in all_results if status.startswith("PARTIAL"))
 
-    print(f"\nResults:")
+    print("\nResults:")
     print(f"  ✅ Passed:  {passed}")
     print(f"  ❌ Failed:  {failed}")
     print(f"  ⏭️  Skipped: {skipped}")
@@ -278,16 +284,14 @@ def main():
     print("\nDetailed Results:")
     print("-" * 70)
     for test_name, status in all_results:
-        symbol = "✅" if status.startswith("PASS") else \
-                 "❌" if status.startswith("FAIL") else \
-                 "⚠️" if status.startswith("SKIP") else "⚠️"
+        symbol = "✅" if status.startswith("PASS") else "❌" if status.startswith("FAIL") else "⚠️" if status.startswith("SKIP") else "⚠️"
         print(f"{symbol} {test_name:40} {status}")
 
     # Generate comprehensive report file
     report = []
-    report.append("="*70)
+    report.append("=" * 70)
     report.append("PYQT5 GUI TEST EXECUTION REPORT")
-    report.append("="*70)
+    report.append("=" * 70)
     report.append(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     report.append(f"Platform: {sys.platform}")
     report.append(f"Python: {sys.version}")
@@ -311,6 +315,7 @@ def main():
     report.append("TEST FILES CREATED")
     report.append("---")
     import glob
+
     test_files = sorted(glob.glob("tests/test_gui_*.py"))
     for f in test_files:
         report.append(f"  - {os.path.basename(f)}")
@@ -329,9 +334,9 @@ def main():
     with open('/home/tinix/claude_wsl/transistordatabase/PYQT_GUI_TEST_REPORT.txt', 'w') as f:
         f.write(report_text)
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("✅ Report saved to: PYQT_GUI_TEST_REPORT.txt")
-    print("="*70)
+    print("=" * 70)
 
 
 if __name__ == '__main__':

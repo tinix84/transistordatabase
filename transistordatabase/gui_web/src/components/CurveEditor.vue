@@ -2,19 +2,18 @@
   <div class="curve-editor">
     <div class="editor-header">
       <h3>{{ editMode ? 'Edit' : 'Add' }} {{ curveTypeLabel }}</h3>
-      <button @click="$emit('cancel')" class="btn-close">✕</button>
+      <button @click="$emit('cancel')" class="btn-close" aria-label="Close curve editor">Close</button>
     </div>
 
     <div class="editor-content">
       <!-- Curve Parameters Section -->
       <div class="section parameters-section">
-        <h4>📋 Curve Parameters</h4>
+        <h4>Curve Parameters</h4>
         <div class="form-grid">
           <div v-if="requiresTj" class="form-group">
-            <label>Junction Temperature (T_j) *</label>
+            <label for="curve-t_j">Junction Temperature (T_j) *</label>
             <div class="input-with-unit">
-              <input
-                v-model.number="formData.t_j"
+              <input id="curve-t_j" v-model.number="formData.t_j"
                 type="number"
                 step="1"
                 required
@@ -24,10 +23,9 @@
           </div>
 
           <div v-if="requiresVg" class="form-group">
-            <label>Gate Voltage (V_g) *</label>
+            <label for="curve-v_g">Gate Voltage (V_g) *</label>
             <div class="input-with-unit">
-              <input
-                v-model.number="formData.v_g"
+              <input id="curve-v_g" v-model.number="formData.v_g"
                 type="number"
                 step="0.1"
                 required
@@ -37,10 +35,9 @@
           </div>
 
           <div v-if="curveType === 'switching_loss'" class="form-group">
-            <label>Supply Voltage (V_supply) *</label>
+            <label for="curve-v_supply">Supply Voltage (V_supply) *</label>
             <div class="input-with-unit">
-              <input
-                v-model.number="formData.v_supply"
+              <input id="curve-v_supply" v-model.number="formData.v_supply"
                 type="number"
                 step="1"
                 required
@@ -50,26 +47,25 @@
           </div>
 
           <div v-if="curveType === 'switching_loss'" class="form-group">
-            <label>Gate Voltage (V_g) *</label>
+            <label for="curve-v_g-switching">Gate Voltage (V_g) *</label>
             <div class="input-with-unit">
-              <input v-model.number="formData.v_g" type="number" step="0.1" required />
+              <input id="curve-v_g-switching" v-model.number="formData.v_g" type="number" step="0.1" required />
               <span class="unit">V</span>
             </div>
           </div>
 
           <div v-if="curveType === 'switching_loss' && initialData?.dataset_type === 'graph_r_e'" class="form-group">
-            <label>Turn-off Gate Voltage (V_g,off)</label>
+            <label for="curve-v_g_off">Turn-off Gate Voltage (V_g,off)</label>
             <div class="input-with-unit">
-              <input v-model.number="formData.v_g_off" type="number" step="0.1" />
+              <input id="curve-v_g_off" v-model.number="formData.v_g_off" type="number" step="0.1" />
               <span class="unit">V</span>
             </div>
           </div>
 
           <div v-if="curveType === 'switching_loss'" class="form-group">
-            <label>Gate Resistance (R_g)</label>
+            <label for="curve-r_g">Gate Resistance (R_g)</label>
             <div class="input-with-unit">
-              <input
-                v-model.number="formData.r_g"
+              <input id="curve-r_g" v-model.number="formData.r_g"
                 type="number"
                 step="0.1"
               />
@@ -78,10 +74,9 @@
           </div>
 
           <div v-if="curveType === 'gate_charge'" class="form-group">
-            <label>Channel Current (I_channel) *</label>
+            <label for="curve-i_channel">Channel Current (I_channel) *</label>
             <div class="input-with-unit">
-              <input
-                v-model.number="formData.i_channel"
+              <input id="curve-i_channel" v-model.number="formData.i_channel"
                 type="number"
                 step="0.1"
                 required
@@ -91,10 +86,9 @@
           </div>
 
           <div v-if="curveType === 'gate_charge'" class="form-group">
-            <label>Supply Voltage (V_supply) *</label>
+            <label for="curve-v_supply-switching">Supply Voltage (V_supply) *</label>
             <div class="input-with-unit">
-              <input
-                v-model.number="formData.v_supply"
+              <input id="curve-v_supply-switching" v-model.number="formData.v_supply"
                 type="number"
                 step="1"
                 required
@@ -104,10 +98,9 @@
           </div>
 
           <div v-if="curveType === 'soa'" class="form-group">
-            <label>Case Temperature (T_c)</label>
+            <label for="curve-t_c">Case Temperature (T_c)</label>
             <div class="input-with-unit">
-              <input
-                v-model.number="formData.t_c"
+              <input id="curve-t_c" v-model.number="formData.t_c"
                 type="number"
                 step="1"
               />
@@ -116,10 +109,9 @@
           </div>
 
           <div v-if="curveType === 'soa'" class="form-group">
-            <label>Pulse Duration</label>
+            <label for="curve-time_pulse">Pulse Duration</label>
             <div class="input-with-unit">
-              <input
-                v-model.number="formData.time_pulse"
+              <input id="curve-time_pulse" v-model.number="formData.time_pulse"
                 type="number"
                 step="0.001"
               />
@@ -128,17 +120,17 @@
           </div>
 
           <div v-if="isSingleSwitchingEdit" class="form-group">
-            <label>Measured Current (I_x) *</label>
+            <label for="curve-i_x">Measured Current (I_x) *</label>
             <div class="input-with-unit">
-              <input v-model.number="formData.i_x" type="number" step="any" required />
+              <input id="curve-i_x" v-model.number="formData.i_x" type="number" step="any" required />
               <span class="unit">A</span>
             </div>
           </div>
 
           <div v-if="isSingleSwitchingEdit" class="form-group">
-            <label>Measured Energy (E_x) *</label>
+            <label for="curve-e_x">Measured Energy (E_x) *</label>
             <div class="input-with-unit">
-              <input v-model.number="formData.e_x" type="number" step="any" required />
+              <input id="curve-e_x" v-model.number="formData.e_x" type="number" step="any" required />
               <span class="unit">J</span>
             </div>
           </div>
@@ -147,19 +139,19 @@
 
       <!-- Data Input Method Selection -->
       <div v-if="!isSingleSwitchingEdit" class="section data-method-section">
-        <h4>📊 Data Input Method</h4>
+        <h4>Data Input Method</h4>
         <div class="method-tabs">
           <button
             @click="dataInputMethod = 'upload'"
             :class="['method-tab', { active: dataInputMethod === 'upload' }]"
           >
-            📁 Upload CSV
+            Upload CSV
           </button>
           <button
             @click="dataInputMethod = 'manual'"
             :class="['method-tab', { active: dataInputMethod === 'manual' }]"
           >
-            ✏️ Manual Entry
+            Manual Entry
           </button>
         </div>
 
@@ -183,7 +175,7 @@
               <span>{{ yAxisLabel }} ({{ yUnit }})</span>
             </div>
             <button @click="addDataPoint" class="btn btn-sm btn-primary">
-              ➕ Add Point
+              Add Point
             </button>
           </div>
 
@@ -195,12 +187,14 @@
             >
               <input
                 v-model.number="point.x"
+                :aria-label="`${xAxisLabel}, point ${index + 1} (${xUnit})`"
                 type="number"
                 step="any"
                 placeholder="0.0"
               />
               <input
                 v-model.number="point.y"
+                :aria-label="`${yAxisLabel}, point ${index + 1} (${yUnit})`"
                 type="number"
                 step="any"
                 placeholder="0.0"
@@ -209,8 +203,9 @@
                 @click="removeDataPoint(index)"
                 class="btn-icon btn-danger-icon"
                 title="Remove"
+                :aria-label="`Remove point ${index + 1}`"
               >
-                🗑️
+                Remove
               </button>
             </div>
           </div>
@@ -223,7 +218,7 @@
 
       <!-- Live Preview -->
       <div v-if="hasValidData && !isSingleSwitchingEdit" class="section preview-section">
-        <h4>📈 Live Preview</h4>
+        <h4>Live Preview</h4>
         <CurvePlotter
           :title="`${curveTypeLabel} Preview`"
           :datasets="previewDatasets"
@@ -233,7 +228,7 @@
       </div>
 
       <!-- Validation Status -->
-      <div v-if="validationMessage" :class="['validation-message', validationClass]">
+      <div v-if="validationMessage" :class="['validation-message', validationClass]" role="status">
         {{ validationMessage }}
       </div>
     </div>
@@ -247,7 +242,7 @@
         :disabled="!canSubmit"
         class="btn btn-primary"
       >
-        {{ editMode ? '💾 Update' : '✅ Add' }} Curve
+        {{ editMode ? 'Update' : 'Add' }} Curve
       </button>
     </div>
   </div>
@@ -451,7 +446,7 @@ export default {
         return true
       }
       if (this.currentData.length < 2) {
-        this.validationMessage = '⚠️ At least 2 data points required'
+        this.validationMessage = 'At least 2 data points required'
         this.validationClass = 'warning'
         return false
       }
@@ -461,10 +456,10 @@ export default {
       const isMonotonic = xValues.every((val, i) => i === 0 || val > xValues[i - 1])
 
       if (!isMonotonic) {
-        this.validationMessage = '⚠️ X-axis values should be monotonically increasing'
+        this.validationMessage = 'X-axis values should be monotonically increasing'
         this.validationClass = 'warning'
       } else {
-        this.validationMessage = `✅ ${this.currentData.length} data points ready`
+        this.validationMessage = `${this.currentData.length} data points ready`
         this.validationClass = 'success'
       }
 
@@ -585,36 +580,36 @@ export default {
 
 <style scoped>
 .curve-editor {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: var(--bg-secondary);
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
   max-width: 1200px;
-  margin: 0 auto;
+  margin: .7rem auto 0;
 }
 
 .editor-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 2px solid #e5e7eb;
+  padding: .55rem .75rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
 }
 
 .editor-header h3 {
   margin: 0;
-  color: #1f2937;
-  font-size: 20px;
+  color: var(--text-primary);
+  font-size: 1rem;
 }
 
 .btn-close {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: .78rem;
   cursor: pointer;
-  color: #6b7280;
-  padding: 0;
-  width: 32px;
-  height: 32px;
+  color: var(--text-secondary);
+  padding: .25rem .5rem;
+  min-height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -623,34 +618,34 @@ export default {
 }
 
 .btn-close:hover {
-  background: #f3f4f6;
-  color: #1f2937;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .editor-content {
-  padding: 24px;
+  padding: .75rem;
 }
 
 .section {
-  margin-bottom: 32px;
+  margin-bottom: 1rem;
 }
 
 .section h4 {
-  margin: 0 0 16px 0;
-  color: #374151;
-  font-size: 16px;
+  margin: 0 0 .55rem;
+  color: var(--text-primary);
+  font-size: .875rem;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   gap: 16px;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 6px;
-  color: #374151;
+  color: var(--text-primary);
   font-weight: 500;
   font-size: 14px;
 }
@@ -663,20 +658,20 @@ export default {
 
 .input-with-unit input {
   flex: 1;
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  min-width: 0;
+  padding: .3rem .45rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
   font-size: 14px;
 }
 
 .input-with-unit input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 1px;
 }
 
 .unit {
-  color: #6b7280;
+  color: var(--text-secondary);
   font-weight: 500;
   min-width: 30px;
 }
@@ -690,36 +685,39 @@ export default {
 .method-tab {
   flex: 1;
   padding: 12px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-secondary);
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s;
 }
 
 .method-tab:hover {
-  border-color: #3b82f6;
+  border-color: var(--accent-blue);
 }
 
 .method-tab.active {
-  border-color: #3b82f6;
-  background: #eff6ff;
-  color: #3b82f6;
+  border-color: var(--accent-blue);
+  background: var(--accent-blue-light);
+  color: var(--accent-blue);
 }
 
 .manual-header {
   display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
 }
 
 .column-labels {
-  display: flex;
-  gap: 100px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .5rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-primary);
   font-size: 14px;
 }
 
@@ -739,15 +737,16 @@ export default {
 
 .data-point-row input {
   flex: 1;
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  min-width: 0;
+  padding: .3rem .45rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
   font-size: 14px;
 }
 
 .btn-icon {
   background: none;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 6px 10px;
   cursor: pointer;
@@ -762,14 +761,13 @@ export default {
 
 .empty-manual {
   text-align: center;
-  padding: 40px;
-  color: #9ca3af;
-  font-style: italic;
+  padding: .8rem;
+  color: var(--text-secondary);
 }
 
 .validation-message {
   padding: 12px 16px;
-  border-radius: 6px;
+  border-radius: 4px;
   font-size: 14px;
   margin-top: 16px;
 }
@@ -796,14 +794,13 @@ export default {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding: 20px 24px;
-  border-top: 2px solid #e5e7eb;
+  padding: .55rem .75rem;
+  border-top: 1px solid var(--border-color);
 }
 
 .btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
+  padding: .3rem .65rem;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
   font-size: 14px;
@@ -816,12 +813,12 @@ export default {
 }
 
 .btn-primary {
-  background: #3b82f6;
+  background: var(--action-bg);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2563eb;
+  background: var(--action-hover);
 }
 
 .btn-primary:disabled {
@@ -829,12 +826,8 @@ export default {
   cursor: not-allowed;
 }
 
-.btn-secondary {
-  background: #6b7280;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background: #4b5563;
+.btn-secondary:hover { border-color: var(--accent-blue); }
+@media (max-width: 450px) {
+  .method-tabs { flex-wrap: wrap; }
 }
 </style>

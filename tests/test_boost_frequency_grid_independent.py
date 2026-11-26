@@ -18,7 +18,7 @@ from transistordatabase.topologies.semiconductor_pareto import calculate_boost_f
 
 
 def ideal_drop_device(name="Reference pair", on_energy=.001, off_energy=.002):
-    """The two channel curves have zero drop and switching energies are constant."""
+    """Use zero-drop channel curves and constant switching energies."""
     device = Transistor(
         TransistorMetadata(name, "MOSFET", "Fixture", "Fixture", "Fixture"),
         ElectricalRatings(1200, 100, 50, 175), ThermalProperties(.001, .001))
@@ -114,7 +114,7 @@ def test_mixed_line_retains_frequency_position_and_matches_independent_scalar_so
         f = result["x_values"][index]
         assert row["frequency_hz"] == f and row["status"] == "qualified"
         single = calculate_topology_operating_point("boost", flags | {"f_sw": f},
-                                                     device, device, include_waveforms=False)
+                                                    device, device, include_waveforms=False)
         assert row["operating_point"] == single
         check_scalar_equations(single, f, .003)
         assert result["values"][index] == pytest.approx(f * .003)
@@ -247,7 +247,7 @@ def test_normal_service_solves_exactly_listed_coordinates_and_retains_rejected_g
     monkeypatch.setattr(operating_point, "calculate_topology_operating_point", counted)
     monkeypatch.setattr(topology_service, "calculate_topology_operating_point", counted)
     request = boundary(f_sw=1000, sweep=dict(x_axis="f_sw", x_min=1000, x_max=19000,
-                                            x_points=3, metric="p_loss_total_w"))
+                                             x_points=3, metric="p_loss_total_w"))
     result = topology_service.TopologyCalculatorService.calculate("boost", request, device)
     line = result["sweep"]
     assert calls == line["x_values"] == [1000, 10000, 19000]
@@ -281,7 +281,7 @@ def test_list_backed_oversize_graph_rejects_before_a_scalar_solve(monkeypatch):
     monkeypatch.setattr(operating_point, "calculate_topology_operating_point", unexpected_scalar)
     with pytest.raises(ValueError):
         calculate_topology_sweep("boost", boundary(), dict(x_axis="f_sw", x_min=10000,
-                                  x_max=20000, x_points=2, metric="p_loss_total_w"), part, part)
+                                                           x_max=20000, x_points=2, metric="p_loss_total_w"), part, part)
 
 
 @pytest.mark.parametrize("path", ["/api/topology/switching-frequency-grid", "/api/topology/switching-frequency-pareto"])
@@ -297,7 +297,7 @@ def test_dedicated_transport_enforces_four_mib_of_actual_json_before_parsing(pat
 def test_legacy_paths_identify_dedicated_transport_for_new_inputs():
     client = TestClient(app)
     line = boundary() | dict(topology="boost", sweep=dict(x_axis="f_sw", x_min=10000, x_max=20000,
-                                                       x_points=2, metric="p_loss_total_w"))
+                                                          x_points=2, metric="p_loss_total_w"))
     pareto = dict(boundary=boundary(), frequencies_hz=[10000, 20000], catalog={},
                   candidates=[dict(candidate_id=name, label=name) for name in ("first", "second")])
     for old, new, request in (("/api/topology/calculate", "/api/topology/switching-frequency-grid", line),
@@ -312,7 +312,7 @@ def _http_switching_request(study, device_name):
         return boundary() | dict(
             topology="boost", switch_transistor_id=device_name, diode_transistor_id=device_name,
             diode_v_g=None, sweep=dict(x_axis="f_sw", x_min=10000, x_max=20000,
-                                      x_points=2, metric="p_loss_total_w"))
+                                       x_points=2, metric="p_loss_total_w"))
     entries = [
         dict(candidate_id=label, label=label, switch_transistor_id=device_name,
              diode_transistor_id=device_name, v_g=15, v_g_off=-5, diode_v_g=None,
@@ -395,8 +395,3 @@ def test_bounded_http_preserves_numeric_identity_labels_and_known_zero(tmp_path,
             assert [entry["label"] for entry in entries] == ["0001", "25.0000000000000000001"]
             assert all(entry["eligible"] and entry["objectives"]["included_loss_w"] == 0 for entry in entries)
     assert saved.read_bytes() == initial
-
-
-
-
-

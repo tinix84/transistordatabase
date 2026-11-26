@@ -38,8 +38,8 @@ def csv_trace(*, gate_rails=(-2., 12.)):
     for n, (_, v, i, g) in enumerate(zip(*source_trace(), strict=True)):
         low, high = gate_rails
         values = [n, v, -1000 * i, low + (g + 2) * (high - low) / 14]
-        writer.writerow([format(x, ".15g").replace(".", ",") for x in values] +
-                        ["observation; Δ\nquoted" if n == 0 else ""])
+        writer.writerow([format(x, ".15g").replace(".", ",") for x in values]
+                        + ["observation; Δ\nquoted" if n == 0 else ""])
     return stream.getvalue().encode("utf-8-sig")
 
 
@@ -287,8 +287,8 @@ def test_reordered_measure_ordinals_never_attach_to_wrong_current(api):
 @pytest.mark.parametrize("measure", ["eoff", "EOFF"])
 def test_unstepped_log_preserves_original_integral_expression(api, encoding, measure):
     """Keep the expression and window from LTspice's one-line measurement syntax."""
-    raw = ("Circuit: single\n" + measure +
-           ":  INTEG(V(ds)*I(dut))=3e-6 FROM 1e-6 TO 2e-6\n").encode(encoding)
+    raw = ("Circuit: single\n" + measure
+           + ":  INTEG(V(ds)*I(dut))=3e-6 FROM 1e-6 TO 2e-6\n").encode(encoding)
     request = request_for("log", raw)
     request["log"] = {"energy_off": "eoff", "energy_unit": "J"}
     result = post(api[0], "preview", request)

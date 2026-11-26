@@ -142,8 +142,8 @@ class IDialogFactory(ABC):
     
     @abstractmethod
     def create_file_dialog(self, dialog_type: str, 
-                          file_filter: str = "",
-                          title: str = "") -> Optional[Path]:
+                           file_filter: str = "",
+                           title: str = "") -> Optional[Path]:
         """
         Create file dialog.
         
@@ -156,8 +156,8 @@ class IDialogFactory(ABC):
     
     @abstractmethod
     def create_input_dialog(self, title: str, 
-                           label: str,
-                           default_value: str = "") -> Optional[str]:
+                            label: str,
+                            default_value: str = "") -> Optional[str]:
         """
         Create input dialog.
         
@@ -170,7 +170,7 @@ class IDialogFactory(ABC):
     
     @abstractmethod
     def create_confirmation_dialog(self, title: str, 
-                                 message: str) -> bool:
+                                   message: str) -> bool:
         """
         Create confirmation dialog.
         
@@ -198,8 +198,8 @@ class PlotController:
         self._current_plot_data = None
     
     def plot_channel_characteristics(self, transistor: Transistor,
-                                   component: str = "switch",
-                                   **kwargs) -> bool:
+                                     component: str = "switch",
+                                     **kwargs) -> bool:
         """
         Plot channel characteristics.
         
@@ -241,8 +241,8 @@ class PlotController:
             return False
     
     def plot_switching_losses(self, transistor: Transistor,
-                            loss_type: str = "e_on",
-                            plot_type: str = "i_e") -> bool:
+                              loss_type: str = "e_on",
+                              plot_type: str = "i_e") -> bool:
         """
         Plot switching losses.
         
@@ -547,8 +547,8 @@ class ApplicationController:
             return False
     
     def plot_transistor_characteristic(self, plot_name: str, 
-                                     characteristic_type: str,
-                                     **kwargs) -> bool:
+                                       characteristic_type: str,
+                                       **kwargs) -> bool:
         """Plot transistor characteristic in specified plot widget."""
         if plot_name not in self.plot_controllers:
             self.main_window.show_message(f"Plot controller '{plot_name}' not found", "error")

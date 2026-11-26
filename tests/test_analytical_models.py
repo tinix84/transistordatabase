@@ -27,7 +27,7 @@ class TestChristenBielaModel:
     def test_corrected_public_model(self):
         """Keep the public model import numerically tied to the independent fixture."""
         model = ChristenBielaModel(1e-9, 1e-9, 1e-9, 200e-9,
-                                  TransconductanceParams(10, 0, 1, 3))
+                                   TransconductanceParams(10, 0, 1, 3))
         result = model.calc_switching_energy(HalfBridgeParams(100, 10, 15, 0, 10, 0, 0))
         assert isinstance(result, SwitchingEnergyResult)
         assert result.e_total == pytest.approx(178.7589668316306e-6)
@@ -36,8 +36,8 @@ class TestChristenBielaModel:
         """Reject inconsistent lifetime/transit constants instead of silently using them."""
         with pytest.raises(ValueError, match='satisfy'):
             ChristenBielaModel(1e-9, 1e-9, 1e-9, 200e-9,
-                              TransconductanceParams(10, 0, 1, 3),
-                              ReverseRecoveryParams(8.6e-9, 16e-9, 18.6e-9, 88e-9))
+                               TransconductanceParams(10, 0, 1, 3),
+                               ReverseRecoveryParams(8.6e-9, 16e-9, 18.6e-9, 88e-9))
 
 
 class TestCapacitanceFunctions:

@@ -90,7 +90,7 @@ def test_per_device_gecko_slices_preserve_selection_and_scaled_data():
             assert observed == {"tj": 37, "uBlock": 430}
             np.testing.assert_array_equal(energy[0], [3, 5, 9, 13, 16, 17])
             np.testing.assert_allclose(energy[1:] / (scale * 1e-6),
-                                      [[9, 15, 17, 19, 28, 31], [24, 36, 60, 72, 81, 82]])
+                                       [[9, 15, 17, 19, 28, 31], [24, 36, 60, 72, 81, 82]])
             manifest = json.loads(archive.read(stem + ".manifest.json"))
             assert manifest["selection"] == selected[name]
             assert manifest["core_document"] == core_to_json_document(device)
@@ -118,10 +118,10 @@ def test_source_backed_plecs_scientific_corner_and_stale_source_guard():
     base = Path(__file__).parent / "test_data/sample_plecs_switch.xml"
     document = parse_plecs_document(base.read_bytes())
     device = finalize_plecs_package(document, package_id="0",
-        ratings={"v_abs_max": 875., "i_abs_max": 52., "i_cont": 35., "t_j_max": 160.},
-        thermal_properties={"housing_area": .001, "cooling_area": .002},
-        block_targets={"0": "switch"}, gate_voltage_by_table={
-            t.source_path: 13. for t in document.packages[0].blocks[0].tables})
+                                    ratings={"v_abs_max": 875., "i_abs_max": 52., "i_cont": 35., "t_j_max": 160.},
+                                    thermal_properties={"housing_area": .001, "cooling_area": .002},
+                                    block_targets={"0": "switch"}, gate_voltage_by_table={
+                                        t.source_path: 13. for t in document.packages[0].blocks[0].tables})
     client = client_for(device)
     uri = f"/api/transistors/{device.metadata.name}/export/plecs"
     received = client.post(uri)

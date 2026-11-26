@@ -142,7 +142,6 @@ def create_synthetic_gan_650v_30a() -> SyntheticDevice:
 
 def test_synthetic_device(device: SyntheticDevice) -> dict:
     """Test ChristenBielaModel on a synthetic device."""
-
     # Operating point: 80% voltage, 50% current
     v_0 = 0.8 * device.voltage_class
     i_0 = 0.5 * device.current_rating
@@ -196,7 +195,6 @@ def test_synthetic_device(device: SyntheticDevice) -> dict:
 
 def generate_extended_report(results: list[dict]) -> None:
     """Generate extended validation report."""
-
     report_path = Path("CHRISTEN_BIELA_VALIDATION_EXTENDED_REPORT.md")
 
     lines = []
@@ -251,8 +249,8 @@ def generate_extended_report(results: list[dict]) -> None:
     sic_devices = [r for r in results if "SiC" in r["type"]]
     if sic_devices:
         sic_ratios = [d["ratio"] for d in sic_devices]
-        lines.append(f"### SiC MOSFET E_on >> E_off Trend\n\n")
-        lines.append(f"- **Expected:** E_on/E_off ratio > 3 (due to body diode reverse recovery)\n")
+        lines.append("### SiC MOSFET E_on >> E_off Trend\n\n")
+        lines.append("- **Expected:** E_on/E_off ratio > 3 (due to body diode reverse recovery)\n")
         lines.append(f"- **Observed:** Ratios = {[f'{r:.2f}' for r in sic_ratios]}\n")
         lines.append(f"- **Result:** {'✓ PASS' if all(r > 3 for r in sic_ratios) else '✗ FAIL'}\n\n")
 
@@ -267,7 +265,7 @@ def generate_extended_report(results: list[dict]) -> None:
     if sic_1200v_20a and si_600v_50a:
         lines.append(f"- **1200V SiC (20A):** E_on = {sic_1200v_20a['e_on_uJ']:.2f} µJ\n")
         lines.append(f"- **600V Si (50A):** E_on = {si_600v_50a['e_on_uJ']:.2f} µJ\n")
-        lines.append(f"- **Observation:** Higher voltage devices have proportionally higher switching losses\n\n")
+        lines.append("- **Observation:** Higher voltage devices have proportionally higher switching losses\n\n")
 
     # Current scaling: E_on and E_off should scale roughly with current
     lines.append("### Current Scaling Validation\n\n")
@@ -279,7 +277,7 @@ def generate_extended_report(results: list[dict]) -> None:
         ratio_100a = sic_100a["e_on_per_amp"]
         lines.append(f"- **20A SiC:** E_on/A = {ratio_20a:.2f} µJ/A\n")
         lines.append(f"- **100A SiC:** E_on/A = {ratio_100a:.2f} µJ/A\n")
-        lines.append(f"- **Expected:** Larger chips have lower E_on per amp (better die utilization)\n")
+        lines.append("- **Expected:** Larger chips have lower E_on per amp (better die utilization)\n")
         lines.append(f"- **Result:** {'✓ PASS' if ratio_100a < ratio_20a else '✗ FAIL'}\n\n")
 
     # GaN minimal reverse recovery
@@ -288,7 +286,7 @@ def generate_extended_report(results: list[dict]) -> None:
         lines.append("### GaN Minimal Reverse Recovery\n\n")
         for gan in gan_devices:
             lines.append(f"- **{gan['name']}:** E_on/E_off = {gan['ratio']:.2f}\n")
-        lines.append(f"- **Expected:** GaN should have E_on ≈ E_off (minimal reverse recovery)\n")
+        lines.append("- **Expected:** GaN should have E_on ≈ E_off (minimal reverse recovery)\n")
         lines.append(f"- **Result:** {'✓ PASS' if all(0.5 < g['ratio'] < 2.0 for g in gan_devices) else '✗ FAIL'}\n\n")
 
     # Conclusions
@@ -325,8 +323,7 @@ def generate_extended_report(results: list[dict]) -> None:
 
 
 def main():
-    """Main validation routine for synthetic devices."""
-
+    """Run the extended validation with synthetic devices."""
     print("ChristenBielaModel Extended Validation (Synthetic Devices)")
     print("=" * 70)
 

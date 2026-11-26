@@ -3,13 +3,12 @@
     <div class="list-header">
       <h4>{{ title }}</h4>
       <button @click="$emit('add')" class="btn btn-primary">
-        ➕ Add {{ curveType }}
+        Add {{ curveType }}
       </button>
     </div>
 
     <div v-if="curves.length === 0" class="empty-state">
-      <p>📊 No {{ curveType }} curves yet</p>
-      <p class="help-text">Click "Add {{ curveType }}" to create a new curve</p>
+      <p>No {{ curveType }} curves yet</p>
     </div>
 
     <div v-else class="curves-grid">
@@ -20,36 +19,9 @@
         @click="selectCurve(index)"
         :class="{ selected: selectedIndex === index }"
       >
-        <div class="card-header">
-          <div class="curve-id">
-            <strong>Curve #{{ index + 1 }}</strong>
-          </div>
-          <div class="card-actions">
-            <button
-              @click.stop="$emit('edit', index)"
-              class="btn-icon"
-              title="Edit"
-              aria-label="Edit Curve"
-            >
-              ✏️
-            </button>
-            <button
-              @click.stop="$emit('view', index)"
-              class="btn-icon"
-              title="View Curve"
-            >
-              👁️
-            </button>
-            <button
-              @click.stop="confirmDelete(index)"
-              class="btn-icon btn-danger"
-              title="Delete"
-            >
-              🗑️
-            </button>
-          </div>
+        <div class="curve-id">
+          <strong>Curve #{{ index + 1 }}</strong>
         </div>
-
         <div class="card-content">
           <div class="curve-info">
             <div v-for="(value, key) in getCurveInfo(curve)" :key="key" class="info-row">
@@ -58,19 +30,39 @@
             </div>
           </div>
 
-          <div v-if="showPreview && hasGraphData(curve)" class="curve-preview">
-            <div class="preview-mini-chart">
-              📈 {{ getDataPointCount(curve) }} points
-            </div>
-          </div>
+          <span v-if="showPreview && hasGraphData(curve)" class="curve-preview">{{ getDataPointCount(curve) }} points</span>
+        </div>
+        <div class="card-actions">
+          <button
+            @click.stop="$emit('edit', index)"
+            class="btn-icon"
+            title="Edit"
+            aria-label="Edit Curve"
+          >
+            Edit
+          </button>
+          <button
+            @click.stop="$emit('view', index)"
+            class="btn-icon"
+            title="View Curve"
+          >
+            View
+          </button>
+          <button
+            @click.stop="confirmDelete(index)"
+            class="btn-icon btn-danger"
+            title="Delete"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Delete Confirmation Modal -->
     <div v-if="deleteConfirmIndex !== null" class="modal-overlay" @click="cancelDelete">
-      <div class="modal-content" @click.stop>
-        <h3>⚠️ Confirm Delete</h3>
+      <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="curve-delete-title" @click.stop>
+        <h3 id="curve-delete-title">Confirm Delete</h3>
         <p>
           Are you sure you want to delete <strong>Curve #{{ deleteConfirmIndex + 1 }}</strong>?
         </p>
@@ -205,208 +197,75 @@ export default {
 
 <style scoped>
 .curve-list {
-  padding: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.list-header, .curve-card {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
 }
 
 .list-header {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  flex-wrap: wrap;
+  padding: .45rem .65rem;
+  background: var(--bg-tertiary);
 }
 
-.list-header h4 {
-  margin: 0;
-  font-size: 18px;
-  color: #333;
-}
-
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.btn-primary {
-  background: #3b82f6;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #2563eb;
-}
-
-.btn-secondary {
-  background: #6b7280;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background: #4b5563;
-}
-
-.btn-danger {
-  background: #ef4444 !important;
-  color: white !important;
-}
-
-.btn-danger:hover {
-  background: #dc2626 !important;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #9ca3af;
-}
-
-.empty-state p {
-  margin: 8px 0;
-  font-size: 16px;
-}
-
-.help-text {
-  font-size: 14px;
-  color: #9ca3af;
-}
-
-.curves-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-}
+.list-header h4 { font-size: .8rem; }
+.curve-card, .empty-state { padding: .45rem .65rem; border-top: 1px solid var(--border-color); }
+.empty-state { color: var(--text-secondary); }
 
 .curve-card {
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 16px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.curve-card:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.curve-card.selected {
-  border-color: #3b82f6;
-  background: #eff6ff;
-}
-
-.card-header {
-  display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e5e7eb;
+  cursor: pointer;
 }
 
-.curve-id strong {
-  color: #1f2937;
-  font-size: 14px;
-}
+.curve-card:hover, .curve-card.selected { background: var(--accent-blue-light); }
+.curve-id { min-width: 4.5rem; }
+.card-content { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: .35rem 1rem; }
+.curve-info, .card-actions { display: flex; flex-wrap: wrap; gap: .35rem .65rem; }
+.info-row { display: flex; align-items: baseline; gap: .22rem; }
+.info-label, .curve-preview { color: var(--text-secondary); }
+.info-value { font-family: ui-monospace, monospace; overflow-wrap: anywhere; }
 
-.card-actions {
-  display: flex;
-  gap: 6px;
-}
-
+.btn, .btn-icon { padding: .24rem .55rem; font: inherit; }
+.btn-primary { background: var(--action-bg); border-color: var(--action-bg); }
+.btn-primary:hover:not(:disabled) { background: var(--action-hover); }
 .btn-icon {
-  background: none;
-  border: 1px solid #d1d5db;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 4px 8px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
 }
+.btn-icon:hover { border-color: var(--accent-blue); }
+.btn-icon.btn-danger { color: var(--danger-color); }
+.btn-icon.btn-danger:hover { border-color: var(--danger-color); }
 
-.btn-icon:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
-}
-
-.card-content {
-  font-size: 13px;
-}
-
-.curve-info {
-  display: grid;
-  gap: 6px;
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.info-label {
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.info-value {
-  color: #1f2937;
-  font-family: 'Courier New', monospace;
-}
-
-.curve-preview {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.preview-mini-chart {
-  text-align: center;
-  font-size: 12px;
-  color: #6b7280;
-}
-
-/* Modal Styles */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(15 23 42 / 48%);
+  z-index: 600;
 }
 
 .modal-content {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.3);
+  padding: .9rem;
+  max-width: 26rem;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background: var(--bg-secondary);
 }
 
-.modal-content h3 {
-  margin-top: 0;
-  color: #1f2937;
-}
+.warning-text { margin-top: .35rem; color: var(--text-secondary); }
+.modal-actions { display: flex; justify-content: flex-end; gap: .45rem; margin-top: .65rem; }
 
-.warning-text {
-  color: #ef4444;
-  font-size: 14px;
-  margin-top: 8px;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 24px;
+@media (max-width: 680px) {
+  .card-content { flex-basis: 100%; }
 }
 </style>

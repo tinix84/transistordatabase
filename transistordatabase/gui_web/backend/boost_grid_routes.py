@@ -46,4 +46,5 @@ def validate_grid_numeric_positions(value, kind):
         raise ValueError('Unknown bounded topology request kind')
     return value
 
+
 router = APIRouter(route_class=FiniteJsonRoute)

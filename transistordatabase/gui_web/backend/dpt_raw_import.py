@@ -89,7 +89,7 @@ def _find_data_marker(
                 break
             line_start = marker_index == start or (
                 marker_index >= start + len(newline)
-                and content[marker_index - len(newline) : marker_index] == newline
+                and content[marker_index - len(newline): marker_index] == newline
             )
             if line_start:
                 line_end = content.find(newline, marker_index + len(marker))
@@ -129,7 +129,7 @@ def _ascii_line(
         line_bytes = raw_line
         next_cursor = len(content)
     else:
-        raw_line = content[cursor : end + len(newline)]
+        raw_line = content[cursor: end + len(newline)]
         line_bytes = raw_line[: end - cursor]
         next_cursor = end + len(newline)
     try:
@@ -243,7 +243,7 @@ def _scan_raw_headers(content: bytes) -> list[dict[str, Any]]:
                 "A RAW plot has no Variables section. Re-export the LTspice result."
             )
         trace_names: list[str] = []
-        for expected_index, line in enumerate(lines[variables_line + 1 :]):
+        for expected_index, line in enumerate(lines[variables_line + 1:]):
             parts = line.lstrip().split("\t")
             if len(parts) < 3:
                 raise DptRawImportError(
@@ -473,7 +473,7 @@ def _selected_plot_bytes(
     selected_count = sum(item["sample_count"] for item in ordered_ranges)
     selected_mask = np.zeros(summary["sample_count"], dtype=np.bool_)
     for step in ordered_ranges:
-        selected_mask[step["start_index"] : step["end_index"]] = True
+        selected_mask[step["start_index"]: step["end_index"]] = True
 
     encoding = _raw_encoding(content)
     header_start = summary["_header_start"]
@@ -506,7 +506,7 @@ def _selected_plot_bytes(
         else encoding
     )
     selected_header = "".join(lines).encode(output_encoding)
-    marker_and_line = content[marker_index : summary["_data_start"]]
+    marker_and_line = content[marker_index: summary["_data_start"]]
     if output_encoding != encoding:
         marker_and_line = marker_and_line.decode(encoding).encode(output_encoding)
     data_start = summary["_data_start"]
@@ -756,7 +756,7 @@ def parse_ltspice_raw(
         )
         selected_time_values = np.concatenate(
             [
-                source_time_values[item["start_index"] : item["end_index"]]
+                source_time_values[item["start_index"]: item["end_index"]]
                 for item in ordered_source_ranges
             ]
         )

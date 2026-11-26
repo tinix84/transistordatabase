@@ -25,10 +25,29 @@ def b64(data):
 def xlsx(sheet_xml, rels=""):
     """Create minimal OOXML bytes, with explicit saved caches and no Excel engine."""
     contents = {
-        "[Content_Types].xml": '''<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>''',
-        "_rels/.rels": '''<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>''',
-        "xl/workbook.xml": '''<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="MOSFET" sheetId="1" r:id="rId1"/></sheets></workbook>''',
-        "xl/_rels/workbook.xml.rels": '''<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>''',
+        "[Content_Types].xml": (
+            "<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" "
+            "ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" "
+            "ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" "
+            "ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override "
+            "PartName=\"/xl/worksheets/sheet1.xml\" "
+            "ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/></Types>"
+        ),
+        "_rels/.rels": (
+            "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" "
+            "Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" "
+            "Target=\"xl/workbook.xml\"/></Relationships>"
+        ),
+        "xl/workbook.xml": (
+            "<workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" "
+            "xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><sheets><sheet name=\"MOSFET\" "
+            "sheetId=\"1\" r:id=\"rId1\"/></sheets></workbook>"
+        ),
+        "xl/_rels/workbook.xml.rels": (
+            "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" "
+            "Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" "
+            "Target=\"worksheets/sheet1.xml\"/></Relationships>"
+        ),
         "xl/worksheets/sheet1.xml": sheet_xml,
     }
     if rels:
@@ -43,11 +62,30 @@ def xlsx(sheet_xml, rels=""):
 @pytest.fixture
 def workbook():
     """Two duplicate headers, hidden row, cached formulas/errors and static links."""
-    return xlsx('''<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><dimension ref="A1:AA3"/><sheetData>
-    <row r="1"><c r="A1" t="inlineStr"><is><t>Part-No.</t></is></c><c r="B1" t="inlineStr"><is><t>Rating</t></is></c><c r="C1" t="inlineStr"><is><t>Rating</t></is></c><c r="Y1" t="inlineStr"><is><t>EON (TJ=175°C)</t></is></c><c r="Z1" t="inlineStr"><is><t>EOFF (TJ=175°C)</t></is></c><c r="AA1" t="inlineStr"><is><t>ERR (TJ=175°C)</t></is></c></row>
-    <row r="2" hidden="1"><c r="A2" t="inlineStr"><is><t>same</t></is></c><c r="B2"><f>1+1</f><v>2</v></c><c r="C2" t="e"><f>1/0</f><v>#DIV/0!</v></c><c r="D2" t="str"><f>HYPERLINK("../datasheet.pdf","quoted ""label""")</f><v>label</v></c><c r="E2" t="str"><f>GetURL(A2)</f><v>cached-not-a-link</v></c><c r="F2" t="inlineStr"><is><t>https://example.test/data</t></is></c><c r="X2"><v>600</v></c><c r="Y2"><f>0.000632/36</f><v>0.00001755555555555556</v></c><c r="Z2"><f>0.003/80</f><v>0.9</v></c><c r="AA2"><f>0.1/20</f></c></row>
-    <row r="3"><c r="A3" t="inlineStr"><is><t>same</t></is></c><c r="B3"><v>0</v></c></row></sheetData><hyperlinks><hyperlink ref="A2" r:id="rId1" tooltip="source"/><hyperlink ref="B2" location="MOSFET!A1" display="top"/><hyperlink ref="C2" r:id="missing"/></hyperlinks></worksheet>''',
-    '''<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="../original.pdf" TargetMode="External"/></Relationships>''')
+    return xlsx(
+        (
+            "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" "
+            "xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><dimension ref=\"A1:AA3\"/><sheetData>\n"
+            "    <row r=\"1\"><c r=\"A1\" t=\"inlineStr\"><is><t>Part-No.</t></is></c><c r=\"B1\" "
+            "t=\"inlineStr\"><is><t>Rating</t></is></c><c r=\"C1\" t=\"inlineStr\"><is><t>Rating</t></is></c><c r=\"Y1\" "
+            "t=\"inlineStr\"><is><t>EON (TJ=175°C)</t></is></c><c r=\"Z1\" t=\"inlineStr\"><is><t>EOFF (TJ=175°C)</t></is></c><c "
+            "r=\"AA1\" t=\"inlineStr\"><is><t>ERR (TJ=175°C)</t></is></c></row>\n"
+            "    <row r=\"2\" hidden=\"1\"><c r=\"A2\" t=\"inlineStr\"><is><t>same</t></is></c><c r=\"B2\"><f>1+1</f><v>2</v></c><c r=\"C2\" "
+            "t=\"e\"><f>1/0</f><v>#DIV/0!</v></c><c r=\"D2\" t=\"str\"><f>HYPERLINK(\"../datasheet.pdf\",\"quoted "
+            "\"\"label\"\"\")</f><v>label</v></c><c r=\"E2\" t=\"str\"><f>GetURL(A2)</f><v>cached-not-a-link</v></c><c r=\"F2\" "
+            "t=\"inlineStr\"><is><t>https://example.test/data</t></is></c><c r=\"X2\"><v>600</v></c><c "
+            "r=\"Y2\"><f>0.000632/36</f><v>0.00001755555555555556</v></c><c r=\"Z2\"><f>0.003/80</f><v>0.9</v></c><c "
+            "r=\"AA2\"><f>0.1/20</f></c></row>\n"
+            "    <row r=\"3\"><c r=\"A3\" t=\"inlineStr\"><is><t>same</t></is></c><c "
+            "r=\"B3\"><v>0</v></c></row></sheetData><hyperlinks><hyperlink ref=\"A2\" r:id=\"rId1\" tooltip=\"source\"/><hyperlink "
+            "ref=\"B2\" location=\"MOSFET!A1\" display=\"top\"/><hyperlink ref=\"C2\" r:id=\"missing\"/></hyperlinks></worksheet>"
+        ),
+        (
+            "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" "
+            "Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink\" Target=\"../original.pdf\" "
+            "TargetMode=\"External\"/></Relationships>"
+        ),
+    )
 
 
 def test_quoted_csv_bom_decimal_and_distinct_duplicate_parts():
@@ -57,10 +95,15 @@ def test_quoted_csv_bom_decimal_and_distinct_duplicate_parts():
     preview = preview_source("survey.csv", encoded, delimiter=";", decimal=",")
     assert preview["sheets"][0]["row_count"] == 4
     assert preview["sheets"][0]["headers"][0]["label"] == "Part"
-    snapshot = build_snapshot("survey.csv", encoded, sheet="CSV", delimiter=";", decimal=",",
-        mapping={"part_number": {"column": "1", "unit": "text"},
-                 "voltage_v": {"column": "2", "unit": "V"},
-                 "rds_ohm": {"column": "3", "unit": "mOhm"}}, metadata={})
+    snapshot = build_snapshot(
+        "survey.csv",
+        encoded,
+        sheet="CSV",
+        delimiter=";",
+        decimal=",",
+        mapping={"part_number": {"column": "1", "unit": "text"}, "voltage_v": {"column": "2", "unit": "V"}, "rds_ohm": {"column": "3", "unit": "mOhm"}},
+        metadata={},
+    )
     assert len(snapshot["records"]) == 3
     assert len({r["id"] for r in snapshot["records"]}) == 3
     assert snapshot["records"][0]["rds_ohm"] == .0025
@@ -69,7 +112,10 @@ def test_quoted_csv_bom_decimal_and_distinct_duplicate_parts():
     assert snapshot["records"][1]["rds_ohm"] is None
     assert snapshot["records"][2]["voltage_v"] is None
     assert base64.b64decode(snapshot["source_file"]["content_base64"]) == data
-    assert snapshot["snapshot_id"] == build_snapshot("survey.csv", encoded, sheet="CSV", delimiter=";", decimal=",", mapping=snapshot["mapping"]["mapping"], metadata={})["snapshot_id"]
+    assert (
+        snapshot["snapshot_id"]
+        == build_snapshot("survey.csv", encoded, sheet="CSV", delimiter=";", decimal=",", mapping=snapshot["mapping"]["mapping"], metadata={})["snapshot_id"]
+    )
 
 
 def test_duplicate_headers_hidden_rows_formula_cache_and_source_errors(workbook):
@@ -158,11 +204,14 @@ def test_resource_and_xml_declaration_guards():
 
 def test_declared_unit_prefixes_preserve_condition_tails_and_reject_wrong_decimal():
     """Recognized physical units do not consume current/gate test conditions."""
-    request = {"filename": "x.csv", "content_base64": b64(b'part;voltage;resistance\np;1.2kV;3.4Ohm @ 500mA, 10V\nq;600V;41mOhm bei 32A, 8V\nr;"1,2kV";unknown\n'),
-               "sheet": "CSV", "delimiter": ";", "mapping": {
-                   "part_number": {"column": "1", "unit": "text"},
-                   "voltage_v": {"column": "2", "unit": "V"},
-                   "rds_ohm": {"column": "3", "unit": "Ohm"}}, "metadata": {}}
+    request = {
+        "filename": "x.csv",
+        "content_base64": b64(b'part;voltage;resistance\np;1.2kV;3.4Ohm @ 500mA, 10V\nq;600V;41mOhm bei 32A, 8V\nr;"1,2kV";unknown\n'),
+        "sheet": "CSV",
+        "delimiter": ";",
+        "mapping": {"part_number": {"column": "1", "unit": "text"}, "voltage_v": {"column": "2", "unit": "V"}, "rds_ohm": {"column": "3", "unit": "Ohm"}},
+        "metadata": {},
+    }
     result = build_snapshot(**request)
     assert result["records"][0]["voltage_v"] == 1200
     assert result["records"][0]["rds_ohm"] == 3.4
@@ -173,7 +222,12 @@ def test_declared_unit_prefixes_preserve_condition_tails_and_reject_wrong_decima
 
 def test_misleading_ooxml_dimension_cannot_drop_stored_cells():
     """A false small dimension is a validation error rather than silent data loss."""
-    data = xlsx('''<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="A1"/><sheetData><row r="2"><c r="A2"><v>10</v></c></row></sheetData></worksheet>''')
+    data = xlsx(
+        (
+            "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><dimension ref=\"A1\"/><sheetData><row "
+            "r=\"2\"><c r=\"A2\"><v>10</v></c></row></sheetData></worksheet>"
+        )
+    )
     with pytest.raises(ValueError, match="dimension excludes"):
         read_source("x.xlsx", b64(data))
 
@@ -197,7 +251,9 @@ def test_http_equality_and_rejected_units(workbook):
     assert response.status_code == 200
     assert response.json() == build_snapshot(**snapshot)
     before = {"records": response.json()["records"]}
-    assert client.post("/api/catalog-sources/diff", json={"before": before, "after": before, "key_fields": ["row"]}).json() == compare_snapshots(before, before, key_fields=["row"])
+    assert client.post("/api/catalog-sources/diff", json={"before": before, "after": before, "key_fields": ["row"]}).json() == compare_snapshots(
+        before, before, key_fields=["row"]
+    )
 
 
 def test_mapping_snapshot_does_not_alias_callers_mutable_input():
@@ -259,9 +315,14 @@ def test_exact_archive_source_census_and_hash_unchanged(filename, digest):
 def test_explicit_mapping_retains_all_known_catalog_rows(filename, sheet, column, count):
     """The new general mapper reconciles all eight historical populations."""
     data = (ARCHIVE / filename).read_bytes()
-    result = build_snapshot(filename, b64(data), sheet=sheet,
-        mapping={"part_number": {"column": column, "unit": "text"}}, metadata={},
-        encoding="cp1252" if filename.endswith(".csv") else "utf-8-sig")
+    result = build_snapshot(
+        filename,
+        b64(data),
+        sheet=sheet,
+        mapping={"part_number": {"column": column, "unit": "text"}},
+        metadata={},
+        encoding="cp1252" if filename.endswith(".csv") else "utf-8-sig",
+    )
     assert len(result["records"]) == count
     assert len({r["id"] for r in result["records"]}) == count
     assert (ARCHIVE / filename).read_bytes() == data

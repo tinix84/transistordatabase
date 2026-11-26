@@ -105,7 +105,7 @@ def test_extended_target_cannot_silently_round_to_another_gate_voltage():
                     reason='This platform has no extended input precision beyond binary64')
 def test_zero_charge_mode_validates_resistance_before_it_can_round_to_zero():
     device = GateChargeModel(GateChargeModelParams(1e300, 0, 1e300, 2, 4,
-                                                  np.longdouble('1e-400'), 0))
+                                                   np.longdouble('1e-400'), 0))
     with pytest.raises(ValueError, match='binary64'):
         device.calc_switching_estimate(10, 0, settling_target_v=7)
 

@@ -19,16 +19,16 @@ def native_fixture():
     """Declare an unlisted actual vendor and unknown housing without coercion."""
     transistor = Transistor(
         TransistorMetadata("Preserved_Device", "MOSFET", "source author", "Unlisted Véndor", "",
-            comment="source identity and declarations remain exact",
-            datasheet_date=datetime(2020, 1, 2, 3, 4, 5, tzinfo=timezone(timedelta(hours=2)))),
+                           comment="source identity and declarations remain exact",
+                           datasheet_date=datetime(2020, 1, 2, 3, 4, 5, tzinfo=timezone(timedelta(hours=2)))),
         ElectricalRatings(1200., 75., 40., 175.), ThermalProperties(.0001, .0002))
-    transistor.switch.channel_data = [ChannelCharacteristics(25., np.array([[0.,1.],[0.,10.]]), None)]
+    transistor.switch.channel_data = [ChannelCharacteristics(25., np.array([[0., 1.], [0., 10.]]), None)]
     transistor.switch.raw_measurement_data = [RawMeasurementData("dpt_u_i", t_j=None,
-        dpt_on_id=[np.array([[0.,1.e-9],[0.,2.]])])]
-    transistor.switch.metadata = {"kind":"uninterpreted user metadata", "shape":[None, "unknown"],
-        "typed": (np.bool_(False), np.uint64(2**63 + 1))}
+                                                                 dpt_on_id=[np.array([[0., 1.e-9], [0., 2.]])])]
+    transistor.switch.metadata = {"kind": "uninterpreted user metadata", "shape": [None, "unknown"],
+                                  "typed": (np.bool_(False), np.uint64(2**63 + 1))}
     transistor.diode.q_rr = 100e-9
-    transistor._working_point = {"switch":LinearizedModel(25.,10.,.01,.5,None)}
+    transistor._working_point = {"switch": LinearizedModel(25., 10., .01, .5, None)}
     return transistor
 
 
@@ -55,12 +55,12 @@ def test_array_dtype_and_empty_shape_preserved(dtype):
     array = np.array([[1, 0], [0, 1]], dtype=dtype)
     if dtype == "longdouble":
         array[0, 0] = np.longdouble("1.000000000000000001")
-    transistor.switch.metadata = {"array":array, "empty":np.empty((2,0),dtype=dtype)}
+    transistor.switch.metadata = {"array": array, "empty": np.empty((2, 0), dtype=dtype)}
     document = json.loads(json.dumps(core_to_json_document(transistor), allow_nan=False))
     restored = core_from_json_document(document)
     assert restored.switch.metadata["array"].dtype == array.dtype
     np.testing.assert_array_equal(restored.switch.metadata["array"], array)
-    assert restored.switch.metadata["empty"].shape == (2,0)
+    assert restored.switch.metadata["empty"].shape == (2, 0)
 
 
 @pytest.mark.parametrize("version", [VERSION + 1, True, "1"])

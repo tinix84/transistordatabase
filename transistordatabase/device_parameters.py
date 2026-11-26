@@ -69,7 +69,7 @@ def integrate_capacitance(voltage_v, capacitance_f, start_v: float, end_v: float
     q = (yy[:-1] + yy[1:]) * dx / 2
     # Exact integral of V times a linear C, including interpolated endpoints.
     e = dx / 6 * ((2 * xx[:-1] + xx[1:]) * yy[:-1]
-                 + (xx[:-1] + 2 * xx[1:]) * yy[1:])
+                  + (xx[:-1] + 2 * xx[1:]) * yy[1:])
     result = _result(charge_c=np.sum(q), energy_j=np.sum(e))
     result.update(voltage_v=xx.tolist(), capacitance_f=yy.tolist(),
                   q_c=np.r_[0, np.cumsum(q)].tolist(), e_j=np.r_[0, np.cumsum(e)].tolist(),

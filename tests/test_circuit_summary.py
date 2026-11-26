@@ -165,7 +165,7 @@ def test_all_omitted_known_subtotals_are_null():
     request = fixture()
     omitted = {"omit": True, "omission_reason": "No physical data supplied"}
     request["converter"]["role_models"]["pair"] = {"conduction": deepcopy(omitted),
-        "switching": {"turn_on": deepcopy(omitted), "turn_off": deepcopy(omitted)}}
+                                                   "switching": {"turn_on": deepcopy(omitted), "turn_off": deepcopy(omitted)}}
     result = analyze_circuit_summary(request)
     assert result["electrical"]["known_component_power_w"] is None
     assert all(c["known_power_w"] is None for c in result["electrical"]["components"].values())
@@ -215,7 +215,7 @@ def test_route_preserves_nulls_and_rejects_unsafe_json_numbers():
 
 
 @pytest.mark.parametrize("power,resistance,temperature,source", [(-1, 1, 25, "s"), (1, -1, 25, "s"),
-    (1, None, 25, "s"), (True, 1, 25, "s"), (1, 1, float("inf"), "s"), (1, 1, 25, " ")])
+                                                                 (1, None, 25, "s"), (True, 1, 25, "s"), (1, 1, float("inf"), "s"), (1, 1, 25, " ")])
 def test_steady_junction_rejects_invalid_physical_inputs(power, resistance, temperature, source):
     """Reject invalid power, paths, boundary temperatures and sources."""
     with pytest.raises(ValueError):
@@ -229,7 +229,7 @@ def test_omission_reason_expansion_without_junctions_rejects_before_calculator()
     request["converter"]["bindings"][0].update(members=identifiers, multiplicity=128)
     omitted = {"omit": True, "omission_reason": "U" * 100000}
     request["converter"]["role_models"]["pair"] = {"conduction": deepcopy(omitted),
-        "switching": {"turn_on": deepcopy(omitted), "turn_off": deepcopy(omitted)}}
+                                                   "switching": {"turn_on": deepcopy(omitted), "turn_off": deepcopy(omitted)}}
     member = request["members"][0]
     member.update(layout_complete=False, junctions=[])
     for directions in member["loss_owners"].values():

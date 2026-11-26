@@ -18,13 +18,13 @@ def merit_fixture():
     configs = []
     for identity, drop, energy in (("A", 10, 4), ("B", 8, 8)):
         configs.append({"id": identity, "source": "Independent merit fixture",
-            "conduction": {"positive": {"mode": "linear-drop-estimate", "selected": True,
-                "offset_v": drop, "resistance_ohm": 0, "conditions": {}, "source": "Declared drop"}},
-            "switching": {
-                "turn_on": {"positive": {"mode": "recorded", "current_a": [1, 3],
-                    "energy_j": [energy, energy], "recorded_conditions": {},
-                    "requested_conditions": {}, "source": "Declared event energy"}},
-                "turn_off": {"omit": True, "omission_reason": "No turn-off event"}}})
+                        "conduction": {"positive": {"mode": "linear-drop-estimate", "selected": True,
+                                                    "offset_v": drop, "resistance_ohm": 0, "conditions": {}, "source": "Declared drop"}},
+                        "switching": {
+                            "turn_on": {"positive": {"mode": "recorded", "current_a": [1, 3],
+                                                     "energy_j": [energy, energy], "recorded_conditions": {},
+                                                     "requested_conditions": {}, "source": "Declared event energy"}},
+                            "turn_off": {"omit": True, "omission_reason": "No turn-off event"}}})
     points = [{"id": identity, "source": "Independent constant current", "weight": weight,
                "waveform": {"time_s": [0, 1], "current_a": [current, current], "gate_v": [0, 1]},
                "events": {"mode": "gate", "threshold_v": .5}}
@@ -145,12 +145,13 @@ def test_no_eligible_population_is_unavailable_without_changing_grid_rows():
 
 
 @pytest.mark.parametrize("weights", [[True, 1], [-1, 1], [0, 0], [math.inf, 1], [math.nan, 1],
-                                    [1e308, 1e308], [5e-324, 1e308]])
+                                     [1e308, 1e308], [5e-324, 1e308]])
 def test_invalid_or_unrepresentable_objective_weights_fail_early(weights):
     """Reject invalid totals and normalized positive-weight underflow before evaluation."""
     request = merit_fixture()
     for objective, weight in zip(request["objectives"], weights, strict=True):
         objective["weight"] = weight
+
     def must_not_evaluate(data):
         raise AssertionError("Invalid objective weights reached pair evaluation")
     with pytest.raises(ValueError):
@@ -207,10 +208,10 @@ def test_population_hash_binds_original_inputs_weights_and_raw_means():
     normalized = [{key: objective[key] for key in ("name", "unit", "direction", "weight", "normalized_weight", "active")}
                   for objective in merit["objectives"]]
     evidence = {"grid_input_sha256": result["input_sha256"], "population": merit["population"],
-        "objectives": normalized,
-        "raw_means": [{"configuration_id": row["configuration_id"],
-                       "means": {objective["name"]: objective["full_mean"] for objective in row["objectives"]}}
-                      for row in merit["rows"]]}
+                "objectives": normalized,
+                "raw_means": [{"configuration_id": row["configuration_id"],
+                               "means": {objective["name"]: objective["full_mean"] for objective in row["objectives"]}}
+                              for row in merit["rows"]]}
     assert input_hash(evidence) == merit["population_sha256"]
     request["objectives"][0]["weight"] = 2
     assert evaluate_grid(request, _evaluator=oracle)["merit"]["population_sha256"] != merit["population_sha256"]

@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, '/home/tinix/claude_wsl/transistordatabase')
 
-from transistordatabase.core.pair_models import SwitchingPair
+from transistordatabase.core.pair_models import SwitchingPair  # noqa: E402
 
 
 def validate_all_pairs(pairs_dir: Path) -> dict:

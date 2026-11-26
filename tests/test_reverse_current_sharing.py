@@ -322,7 +322,7 @@ def test_core_is_pure_and_canonical_hashes_replay(client):
 
 
 @pytest.mark.parametrize("current,mode,status", [(-4, "strict-recorded", "unsupported"),
-                                                (-4, "ideal-diode-blocking", "supported")])
+                                                 (-4, "ideal-diode-blocking", "supported")])
 def test_http_valid_unsupported_is_200(client, current, mode, status):
     """Distinguish valid unsupported operating points from malformed requests."""
     response = client.post(URL, json=case(current, mode))

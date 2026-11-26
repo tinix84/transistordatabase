@@ -108,7 +108,7 @@ def _presets():
                   bus=_ref("vdcp"), duty=_ref("dpfc", complement=True), frequency=_ref("fs")),
         ]
         for role, count, signal in (("phase_rectifier", phase, "idrl"),
-                                     ("neutral_rectifier", neutral, "idrn")):
+                                    ("neutral_rectifier", neutral, "idrn")):
             bindings.append({"role": role, "members": [f"{role}_{i}" for i in range(count)],
                              "multiplicity": count, "conduction_current": _ref(signal),
                              "duty": _ref(value=1), "frequency_hz": _ref(value=0),

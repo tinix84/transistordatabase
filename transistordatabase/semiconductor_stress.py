@@ -179,9 +179,7 @@ def calculate_stress_indices(
         "metrics": {
             "conduction": _metric(mean_square, "A^2"),
             "volume": _metric(volume, "A^2 V^2"),
-            "switching": _metric(switching, "Hz A^2 V",
-                                  "The transition records are unknown"
-                                  if switching is None else None),
+            "switching": _metric(switching, "Hz A^2 V", "The transition records are unknown" if switching is None else None),
             "cost": _metric(cost, "1/(ohm V^2)", cost_reason),
         },
         "transition_samples": samples,
@@ -195,7 +193,10 @@ def calculate_stress_indices(
             "sampling": "Bounded piecewise-linear interpolation at each explicit transition time, including endpoints",
             "frequency": "Each record supplies its own weight in Hz. No inferred event rate or cycle normalization",
         },
-        "scope": "Stress proxies only. These indices are not physical loss in W, volume in m^3, or currency. Signed switching values can be negative. No ENCO transition-detector equivalence is claimed",
+        "scope": (
+            "Stress proxies only. These indices are not physical loss in W, volume in m^3, or currency. Signed switching values "
+            "can be negative. No ENCO transition-detector equivalence is claimed"
+        ),
     }
     return {"inputs": inputs, "result": result,
             "evidence": {"method": "semiconductor-stress-v1",

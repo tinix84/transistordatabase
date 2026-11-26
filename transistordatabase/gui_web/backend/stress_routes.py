@@ -95,8 +95,6 @@ class StressResponse(Strict):
     evidence: Evidence
 
 
-
-
 router = APIRouter(prefix="/api/stress", tags=["Semiconductor stress proxies"],
                    route_class=FiniteJsonRoute)
 

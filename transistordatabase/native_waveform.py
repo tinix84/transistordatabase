@@ -936,4 +936,3 @@ def _assert_result_bounded(value: Any) -> None:
         _fail("resource-limit", f"Conduction exceeds {MAX_PLOT_RECORDS} plot records")
     if len(events) > MAX_SAMPLES - 1:
         _fail("resource-limit", "Event count exceeds the waveform bracket limit")
-

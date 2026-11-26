@@ -12,15 +12,15 @@ def fixture():
     """Use independently declared ratings and source unknown gates explicitly."""
     document = parse_plecs_document((Path(__file__).parent / "test_data/sample_plecs_switch.xml").read_bytes())
     transistor = finalize_plecs_package(document, package_id="0",
-        ratings=dict(v_abs_max=1200., i_abs_max=75., i_cont=40., t_j_max=175.),
-        thermal_properties=dict(housing_area=.0001, cooling_area=.0002),
-        block_targets={"0":"switch"},
-        gate_voltage_by_table={t.source_path:15. for t in document.packages[0].blocks[0].tables})
+                                        ratings=dict(v_abs_max=1200., i_abs_max=75., i_cont=40., t_j_max=175.),
+                                        thermal_properties=dict(housing_area=.0001, cooling_area=.0002),
+                                        block_targets={"0": "switch"},
+                                        gate_voltage_by_table={t.source_path: 15. for t in document.packages[0].blocks[0].tables})
     transistor.metadata.comment = "Ordinary core record with no PLECS source dependency"
     selection = dict(component="switch", conduction=dict(gate_voltage_v=15.),
-        turn_on=dict(gate_voltage_v=15.,gate_resistance_ohm=None),
-        turn_off=dict(gate_voltage_v=15.,gate_resistance_ohm=None),
-        include_thermal=True, omission_reasons={}, recovery_voltage_convention="preserve-signed")
+                     turn_on=dict(gate_voltage_v=15., gate_resistance_ohm=None),
+                     turn_off=dict(gate_voltage_v=15., gate_resistance_ohm=None),
+                     include_thermal=True, omission_reasons={}, recovery_voltage_convention="preserve-signed")
     return transistor, selection
 
 
@@ -33,7 +33,7 @@ def test_generic_core_no_source_dependency_roundtrip_all_corners():
     assert document.packages[0].partnumber == "TEST_MOSFET_001"
     assert document.packages[0].fixed_conditions["selection"] == selection
     assert document.packages[0].fixed_conditions["electrical_ratings"]["v_abs_max"] == 1200
-    assert document.packages[0].blocks[0].tables[1].slices[-1].plot_data[-1] == [50.,.0027]
+    assert document.packages[0].blocks[0].tables[1].slices[-1].plot_data[-1] == [50., .0027]
     after = parse_plecs_document(render_core_selection(transistor, selection))
     assert after.packages == document.packages
     assert (before == transistor.switch.e_on_data[0].graph_i_e).all()
@@ -72,9 +72,9 @@ def test_deliberate_omission_is_not_exported_zero():
     """A requested subset retains unknown omissions instead of invented tables."""
     transistor, selection = fixture()
     selection["turn_on"] = None
-    selection["omission_reasons"] = {"turn_on":"No applicable turn-on source for this scope"}
+    selection["omission_reasons"] = {"turn_on": "No applicable turn-on source for this scope"}
     document, report = core_selection_document(transistor, selection)
-    assert [t.kind for t in document.packages[0].blocks[0].tables] == ["conduction","turn-off"]
+    assert [t.kind for t in document.packages[0].blocks[0].tables] == ["conduction", "turn-off"]
     assert report["omitted_mechanisms"] == ["turn_on"]
 
 
@@ -108,5 +108,5 @@ def test_typed_http_selection_uses_injected_existing_repository(tmp_path):
     unsupported = deepcopy(selection)
     unsupported["turn_on"]["gate_voltage_v"] = 14.999
     assert client.post(route + "/export", json=unsupported).status_code == 422
-    ExportService().export_to_plecs(transistor, tmp_path, {"selection":selection})
+    ExportService().export_to_plecs(transistor, tmp_path, {"selection": selection})
     assert len(list(tmp_path.glob("*.xml"))) == 1

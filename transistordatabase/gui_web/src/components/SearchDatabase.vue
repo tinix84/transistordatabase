@@ -1,21 +1,21 @@
 <template>
   <div class="search-database">
     <div class="search-header">
-      <h2>🔍 Search Database</h2>
+      <h2>Search Database</h2>
       <div class="header-actions">
         <button @click="resetFilters" class="btn btn-secondary">
-          🔄 Reset Filters
+          Reset Filters
         </button>
         <button @click="exportResults" :disabled="filteredTransistors.length === 0" class="btn btn-primary">
-          💾 Export Results
+          Export Results
         </button>
       </div>
     </div>
 
     <div class="search-content">
       <!-- Filter Panel -->
-      <div class="filter-panel">
-        <h3>🎛️ Advanced Filters</h3>
+      <aside class="filter-panel" aria-labelledby="search-filters">
+        <h3 id="search-filters">Advanced Filters</h3>
         
         <!-- Basic Filters -->
         <div class="filter-section">
@@ -77,7 +77,7 @@
 
         <!-- Electrical Ratings Filters -->
         <div class="filter-section">
-          <h4>⚡ Electrical Ratings</h4>
+          <h4>Electrical Ratings</h4>
           <div class="filter-grid">
             <div class="filter-item range-filter">
               <label>
@@ -171,7 +171,7 @@
 
         <!-- Thermal Properties Filters -->
         <div class="filter-section">
-          <h4>🌡️ Thermal Properties</h4>
+          <h4>Thermal Properties</h4>
           <div class="filter-grid">
             <div class="filter-item range-filter">
               <label>
@@ -225,7 +225,7 @@
 
         <!-- Quick Filters -->
         <div class="filter-section">
-          <h4>🚀 Quick Filters</h4>
+          <h4>Quick Filters</h4>
           <div class="quick-filters">
             <button @click="applyQuickFilter('high_voltage')" class="btn btn-quick">
               High Voltage (>1000V)
@@ -244,32 +244,34 @@
             </button>
           </div>
         </div>
-      </div>
+      </aside>
 
       <!-- Results Panel -->
       <div class="results-panel">
         <div class="results-header">
-          <h3>📋 Search Results ({{ filteredTransistors.length }} devices)</h3>
+          <h3>Search Results ({{ filteredTransistors.length }} devices)</h3>
           <div class="view-controls">
             <button 
               @click="viewMode = 'table'" 
               :class="{ active: viewMode === 'table' }"
+              :aria-pressed="viewMode === 'table'"
               class="btn btn-sm"
             >
-              📊 Table
+              Table
             </button>
             <button 
               @click="viewMode = 'cards'" 
               :class="{ active: viewMode === 'cards' }"
+              :aria-pressed="viewMode === 'cards'"
               class="btn btn-sm"
             >
-              🗃️ Cards
+              Cards
             </button>
           </div>
         </div>
 
         <!-- Table View -->
-        <div v-if="viewMode === 'table'" class="table-view">
+        <div v-if="viewMode === 'table'" class="table-view" tabindex="0" role="region" aria-label="Device results table">
           <table class="results-table">
             <thead>
               <tr>
@@ -312,19 +314,19 @@
                 <td>{{ transistor.electrical.i_abs_max }}A</td>
                 <td>{{ formatNumber(transistor.thermal.r_th_cs) }} K/W</td>
                 <td class="actions">
-                  <button @click="loadToExportingTools(transistor)" class="btn btn-sm btn-primary">
-                    📤 Export
+                  <button @click="loadToExportingTools(transistor)" class="btn btn-sm">
+                    Export
                   </button>
-                  <button @click="loadToComparison(transistor)" class="btn btn-sm btn-secondary">
-                    🔍 Compare
+                  <button @click="loadToComparison(transistor)" class="btn btn-sm">
+                    Compare
                   </button>
-                  <button @click="loadToTopology(transistor)" class="btn btn-sm btn-info">
-                    🧮 Topology
+                  <button @click="loadToTopology(transistor)" class="btn btn-sm">
+                    Topology
                   </button>
-                  <button @click="emit('edit-transistor', transistor)" class="btn btn-sm btn-secondary">
+                  <button @click="emit('edit-transistor', transistor)" class="btn btn-sm">
                     Edit
                   </button>
-                  <button @click="emit('delete-transistor', transistor)" class="btn btn-sm btn-danger">
+                  <button @click="emit('delete-transistor', transistor)" class="btn btn-sm row-delete">
                     Delete
                   </button>
                 </td>
@@ -377,19 +379,19 @@
                   <p><strong>Thermal Resistance:</strong> {{ formatNumber(transistor.thermal.r_th_cs) }} K/W</p>
                 </div>
                 <div class="card-actions">
-                  <button @click="loadToExportingTools(transistor)" class="btn btn-sm btn-primary">
-                    📤 Export
+                  <button @click="loadToExportingTools(transistor)" class="btn btn-sm">
+                    Export
                   </button>
-                  <button @click="loadToComparison(transistor)" class="btn btn-sm btn-secondary">
-                    🔍 Compare
+                  <button @click="loadToComparison(transistor)" class="btn btn-sm">
+                    Compare
                   </button>
-                  <button @click="loadToTopology(transistor)" class="btn btn-sm btn-info">
-                    🧮 Topology
+                  <button @click="loadToTopology(transistor)" class="btn btn-sm">
+                    Topology
                   </button>
-                  <button @click="emit('edit-transistor', transistor)" class="btn btn-sm btn-secondary">
+                  <button @click="emit('edit-transistor', transistor)" class="btn btn-sm">
                     Edit
                   </button>
-                  <button @click="emit('delete-transistor', transistor)" class="btn btn-sm btn-danger">
+                  <button @click="emit('delete-transistor', transistor)" class="btn btn-sm row-delete">
                     Delete
                   </button>
                 </div>
@@ -678,370 +680,181 @@ watch(filters, () => {
 
 <style scoped>
 .search-database {
-  max-width: 1400px;
+  max-width: 1680px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: .85rem;
+  font-size: .85rem;
 }
 
-.search-header {
+.search-header,
+.results-header,
+.card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  flex-wrap: wrap;
+  gap: .55rem;
 }
 
-.header-actions {
+.search-header { margin-bottom: .7rem; }
+.search-header h2 { font-size: 1.25rem; }
+.header-actions, .view-controls, .card-actions {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: .35rem;
 }
 
 .search-content {
   display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 2rem;
+  grid-template-columns: clamp(210px, 20vw, 278px) minmax(0, 1fr);
+  gap: .7rem;
+  align-items: start;
 }
 
-.filter-panel {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  height: fit-content;
-  max-height: 80vh;
-  overflow-y: auto;
+.filter-panel, .results-panel {
+  min-width: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
 }
 
-.filter-section {
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+.filter-panel h3, .results-header {
+  padding: .5rem .7rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
 }
 
-.filter-section:last-child {
-  border-bottom: none;
-}
+.filter-panel h3, .results-header h3 { font-size: .85rem; }
+
+.filter-section { padding: .55rem .7rem .7rem; }
+.filter-section + .filter-section { border-top: 1px solid var(--border-color); }
 
 .filter-section h4 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
-  font-size: 1rem;
+  margin-bottom: .4rem;
+  color: var(--text-secondary);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .045em;
+  text-transform: uppercase;
 }
 
-.filter-grid {
-  display: grid;
-  gap: 1rem;
-}
-
-.filter-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+.filter-grid { display: grid; gap: .45rem; }
+.filter-item { display: grid; gap: .18rem; }
 
 .filter-item label {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
   font-weight: 500;
-  color: #555;
-  display: flex;
+}
+
+.filter-item input:not([type="checkbox"]), .filter-item select {
+  min-width: 0;
+  width: 100%;
+  padding: .22rem .35rem;
+  font: inherit;
+}
+
+.filter-item input:disabled, .filter-item select:disabled {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+.range-inputs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 0.5rem;
-}
-
-.filter-item input[type="text"],
-.filter-item input[type="number"],
-.filter-item select {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.9rem;
-}
-
-.filter-item input:disabled,
-.filter-item select:disabled {
-  background: #f5f5f5;
-  color: #999;
-}
-
-.range-filter .range-inputs {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.range-filter .range-inputs input {
-  flex: 1;
-}
-
-.range-filter .range-inputs span {
-  color: #666;
-  font-size: 0.9rem;
+  gap: .35rem;
+  color: var(--text-secondary);
 }
 
 .quick-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: .3rem;
 }
 
-.btn-quick {
-  padding: 0.5rem 1rem;
-  background: #e9ecef;
-  color: #495057;
-  border: 1px solid #ced4da;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.3s;
+.search-database .btn { padding: .29rem .55rem; font-size: .78rem; }
+.search-database .btn-sm, .search-database .btn-quick { padding: .18rem .36rem; }
+.search-database .btn-primary { background: var(--action-bg); border-color: var(--action-bg); }
+.search-database .btn-primary:hover:not(:disabled) { background: var(--action-hover); }
+.search-database .btn.active {
+  background: var(--accent-blue-light);
+  color: var(--accent-blue);
 }
 
-.btn-quick:hover {
-  background: #007bff;
-  color: white;
-  border-color: #007bff;
-}
+.table-view { overflow-x: auto; }
+.results-table { width: 100%; min-width: 52rem; font-variant-numeric: tabular-nums; }
 
-.results-panel {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  overflow: hidden;
-}
-
-.results-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid #eee;
-  background: #f8f9fa;
-}
-
-.view-controls {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.view-controls .btn {
-  padding: 0.25rem 0.75rem;
-  font-size: 0.8rem;
-}
-
-.view-controls .btn.active {
-  background: #007bff;
-  color: white;
-}
-
-.table-view {
-  overflow-x: auto;
-}
-
-.results-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.results-table th,
-.results-table td {
-  padding: 1rem;
+.results-table th, .results-table td {
+  border: 0;
+  border-bottom: 1px solid var(--border-color);
+  padding: .42rem .55rem;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  vertical-align: middle;
 }
 
-.results-table th {
-  background: #f8f9fa;
-  font-weight: 600;
-  position: sticky;
-  top: 0;
-}
-
-.results-table th.sortable {
-  cursor: pointer;
-  user-select: none;
-}
-
-.results-table th.sortable:hover {
-  background: #e9ecef;
-}
+.results-table th { background: var(--bg-tertiary); white-space: nowrap; }
+.results-table th.sortable { cursor: pointer; user-select: none; }
+.results-table th.sortable:hover, .results-table tbody tr:hover { background: var(--accent-blue-light); }
+.results-table td:nth-child(n+4):nth-child(-n+6) { white-space: nowrap; }
 
 .transistor-name {
-  font-weight: 600;
-  color: #007bff;
+  color: var(--accent-blue);
+  font: 600 .8rem ui-monospace, monospace;
+  min-width: 12rem;
 }
 
 .type-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  display: inline-block;
+  padding: .05rem .3rem;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background: var(--bg-tertiary);
+  font-size: .72rem;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.type-badge.igbt {
-  background: #e3f2fd;
-  color: #1976d2;
-}
-
-.type-badge.mosfet, .type-badge.sic-mosfet {
-  background: #f3e5f5;
-  color: #7b1fa2;
-}
-
-.type-badge.diode {
-  background: #e8f5e8;
-  color: #388e3c;
-}
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
-}
+.actions { min-width: 12rem; }
+.actions .btn { margin: .1rem .15rem .1rem 0; }
+.row-delete { color: var(--danger-color); }
 
 .pagination {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border-top: 1px solid #eee;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .45rem;
+  padding: .5rem;
 }
 
-.page-info {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.cards-view {
-  padding: 1.5rem;
-}
+.page-info, .card-info { color: var(--text-secondary); }
+.cards-view { padding: .7rem; }
 
 .transistor-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 245px), 1fr));
+  gap: .55rem;
 }
 
 .transistor-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
-  transition: all 0.3s;
-}
-
-.transistor-card:hover {
-  border-color: #007bff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.card-header h4 {
-  margin: 0;
-  color: #2c3e50;
-}
-
-.card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.card-info p {
-  margin: 0.25rem 0;
-  font-size: 0.9rem;
-  color: #555;
-}
-
-.card-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.btn {
-  padding: 0.5rem 1rem;
-  border: none;
+  min-width: 0;
+  padding: .65rem;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 0.9rem;
 }
 
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.transistor-card:hover { border-color: var(--accent-blue); }
+.card-header h4 { overflow-wrap: anywhere; }
+.card-content { display: grid; gap: .5rem; margin-top: .35rem; }
+
+@media (max-width: 760px) {
+  .search-content { grid-template-columns: minmax(0, 1fr); }
+  .filter-panel { max-height: min(42vh, 25rem); overflow: auto; }
 }
 
-.btn-primary {
-  background: #007bff;
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #0056b3;
-}
-
-.btn-secondary {
-  background: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: #545b62;
-}
-
-.btn-info {
-  background: #17a2b8;
-  color: white;
-}
-
-.btn-info:hover:not(:disabled) {
-  background: #138496;
-}
-
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.8rem;
-}
-
-@media (max-width: 1024px) {
-  .search-content {
-    grid-template-columns: 1fr;
-  }
-  
-  .filter-panel {
-    max-height: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .search-header {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .results-header {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .transistor-cards {
-    grid-template-columns: 1fr;
-  }
-  
-  .actions {
-    flex-direction: column;
-  }
+@media (pointer: coarse) {
+  .search-database .btn { min-height: 32px; }
 }
 </style>

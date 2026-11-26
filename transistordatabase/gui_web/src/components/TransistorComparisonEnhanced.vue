@@ -99,7 +99,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 .comparison-table-scroll th, .comparison-table-scroll td { min-width: 110px; text-align: left; padding: .65rem; border: 1px solid #cbd5e1; vertical-align: top; }
 @media (max-width: 650px) { .comparison-header { flex-direction: column; align-items: stretch !important; gap: 1rem; } }
 .transistor-comparison-enhanced {
-  padding: 24px;
+  padding: .85rem;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -108,13 +108,13 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
+  margin-bottom: .85rem;
 }
 
 .comparison-header h2 {
   margin: 0;
-  color: #1f2937;
-  font-size: 28px;
+  color: var(--text-primary);
+  font-size: 1.25rem;
 }
 
 .header-actions {
@@ -123,7 +123,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 }
 
 .btn {
-  padding: 10px 20px;
+  padding: .35rem .6rem;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -139,7 +139,6 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 
 .btn-primary:hover:not(:disabled) {
   background: #2563eb;
-  transform: translateY(-1px);
 }
 
 .btn-primary:disabled {
@@ -157,31 +156,31 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 }
 
 .selection-section {
-  margin-bottom: 32px;
+  margin-bottom: .85rem;
 }
 
 .selection-section h3 {
   margin-bottom: 20px;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .transistor-slots {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: .65rem;
 }
 
 .transistor-slot {
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 20px;
-  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: .75rem;
+  background: var(--bg-secondary);
   transition: all 0.2s;
 }
 
 .transistor-slot.filled {
   border-color: #3b82f6;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+
 }
 
 .slot-header {
@@ -193,7 +192,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 
 .slot-header h4 {
   margin: 0;
-  color: #374151;
+  color: var(--text-primary);
   font-size: 16px;
 }
 
@@ -217,14 +216,14 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 
 .transistor-info strong {
   display: block;
-  color: #1f2937;
+  color: var(--text-primary);
   font-size: 16px;
   margin-bottom: 6px;
 }
 
 .transistor-info p {
   margin: 0;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -238,7 +237,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
   background: #eff6ff;
   color: #1e40af;
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: 5px;
   font-size: 13px;
   font-weight: 500;
 }
@@ -248,7 +247,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   border-radius: 8px;
 }
 
@@ -261,7 +260,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 .config-row label {
   flex: 0 0 120px;
   font-size: 13px;
-  color: #374151;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
@@ -310,17 +309,17 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 }
 
 .global-config-section {
-  margin-bottom: 32px;
-  padding: 20px;
-  background: white;
-  border-radius: 12px;
-  border: 2px solid #e5e7eb;
+  margin-bottom: .85rem;
+  padding: .75rem;
+  background: var(--bg-secondary);
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
 }
 
 .global-config-section h3 {
   margin-top: 0;
   margin-bottom: 16px;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .global-config-grid {
@@ -337,7 +336,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 
 .config-item label {
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -351,7 +350,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 }
 
 .config-item .unit {
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -361,7 +360,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 
 .results-section h3 {
   margin-bottom: 20px;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .plot-tabs {
@@ -373,13 +372,13 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 
 .plot-tab {
   padding: 10px 16px;
-  background: white;
-  border: 2px solid #e5e7eb;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
   transition: all 0.2s;
 }
 
@@ -413,7 +412,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 16px;
   padding: 0;
   max-width: 800px;
@@ -428,13 +427,13 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px;
+  padding: .85rem;
   border-bottom: 2px solid #e5e7eb;
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .btn-close {
@@ -442,19 +441,19 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-secondary);
   padding: 0;
 }
 
 .btn-close:hover {
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .selector-filters {
   display: flex;
   gap: 12px;
   padding: 20px 24px;
-  background: #f9fafb;
+  background: var(--bg-tertiary);
 }
 
 .search-input {
@@ -501,7 +500,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 
 .item-name {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
   margin-bottom: 6px;
 }
 
@@ -509,7 +508,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
   display: flex;
   gap: 12px;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .already-selected {
@@ -519,7 +518,7 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
   background: #d1fae5;
   color: #047857;
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: 5px;
   font-size: 12px;
   font-weight: 600;
 }
@@ -557,7 +556,10 @@ function download() { const url = URL.createObjectURL(new Blob([JSON.stringify(c
 .loading-overlay p {
   margin-top: 20px;
   font-size: 18px;
-  color: #374151;
+  color: var(--text-primary);
   font-weight: 500;
 }
+.transistor-comparison-enhanced label { margin: .3rem 0; }
+.comparison-header { border-bottom: 1px solid var(--border-color); padding-bottom: .6rem; }
+.header-actions { flex-wrap: wrap; }
 </style>

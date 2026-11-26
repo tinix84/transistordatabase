@@ -196,7 +196,11 @@ def test_http_canonical_and_headless_match(client):
 @pytest.mark.parametrize("bad", ["NaN", "Infinity", "-Infinity"])
 def test_raw_nonfinite_safe_422(client, bad):
     """Nonstandard JSON numeric tokens still return JSON-safe validation errors."""
-    response = client.post("/api/assemblies/analyze", content='{"operation":"parallel-bank","count":3,"device":{"source":"x","cost":' + bad + '}}', headers={"content-type": "application/json"})
+    response = client.post(
+        "/api/assemblies/analyze",
+        content='{"operation":"parallel-bank","count":3,"device":{"source":"x","cost":' + bad + '}}',
+        headers={"content-type": "application/json"},
+    )
     assert response.status_code == 422
     assert response.json()["detail"]
 

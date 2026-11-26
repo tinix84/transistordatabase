@@ -42,10 +42,10 @@ def client():
     from transistordatabase.plecs_document import finalize_plecs_package, parse_plecs_document
     source = parse_plecs_document((Path(__file__).parent / "test_data/sample_plecs_switch.xml").read_bytes())
     source_device = finalize_plecs_package(source, package_id="0",
-        ratings=dict(v_abs_max=1200., i_abs_max=75., i_cont=40., t_j_max=175.),
-        thermal_properties=dict(housing_area=.0001, cooling_area=.0002),
-        block_targets={"0": "switch"},
-        gate_voltage_by_table={t.source_path: 15. for t in source.packages[0].blocks[0].tables})
+                                           ratings=dict(v_abs_max=1200., i_abs_max=75., i_cont=40., t_j_max=175.),
+                                           thermal_properties=dict(housing_area=.0001, cooling_area=.0002),
+                                           block_targets={"0": "switch"},
+                                           gate_voltage_by_table={t.source_path: 15. for t in source.packages[0].blocks[0].tables})
     devices["source-backed"] = source_device
 
     def lookup(name):
@@ -94,7 +94,7 @@ def test_existing_source_backed_and_exact_selected_plecs_exports_remain_availabl
     assert response.status_code == 200
     assert parse_plecs_document(response.content).packages[0].fixed_conditions["selection"] == selection
     response = client.post("/api/transistors/batch_export", json={"transistor_ids": [device.metadata.name],
-        "format": "plecs", "options": {"selection": selection}})
+                                                                  "format": "plecs", "options": {"selection": selection}})
     assert response.status_code == 200
 
 
@@ -133,7 +133,7 @@ def test_gecko_archive_retains_both_files_exact_curves_and_native_manifest(clien
 
 
 @pytest.mark.parametrize("changes", [{"r_g_on": -1}, {"v_supply": 0}, {"v_g_on": True},
-    {"output_path": "/tmp/not-used"}, {"recheck": False}, {"unexpected": 1}, {"component": "diode"}, {"t_j": 38}])
+                                     {"output_path": "/tmp/not-used"}, {"recheck": False}, {"unexpected": 1}, {"component": "diode"}, {"t_j": 38}])
 def test_bad_conditions_return_error_without_download(client, changes):
     """Reject unsupported or invalid selectors before returning a file."""
     response = client.post("/api/transistors/example/export/gecko", json=library["conditions"](**changes))

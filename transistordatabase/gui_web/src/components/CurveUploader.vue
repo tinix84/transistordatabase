@@ -7,13 +7,11 @@
       :class="['upload-zone', { dragging: isDragging, error: uploadError }]"
     >
       <div class="upload-content">
-        <div class="upload-icon">📁</div>
         <p class="upload-text">
-          <strong>Drag and drop CSV file here</strong>
+          <strong>Drop a CSV file here</strong>
         </p>
-        <p class="upload-subtext">or</p>
         <button @click="triggerFileInput" class="btn btn-upload">
-          Browse Files
+          Browse for CSV
         </button>
         <input
           ref="fileInput"
@@ -24,20 +22,20 @@
         />
       </div>
 
-      <div v-if="uploadError" class="error-message">
-        ⚠️ {{ uploadError }}
+      <div v-if="uploadError" class="error-message" role="alert">
+        {{ uploadError }}
       </div>
     </div>
 
     <div v-if="parsedData" class="preview-section">
       <div class="preview-header">
-        <h4>📊 Preview ({{ parsedData.length }} data points)</h4>
+        <h4>Preview ({{ parsedData.length }} data points)</h4>
         <div class="preview-actions">
           <button @click="clearData" class="btn btn-secondary btn-sm">
-            🗑️ Clear
+            Clear
           </button>
           <button @click="$emit('use-data', parsedData)" class="btn btn-primary btn-sm">
-            ✅ Use This Data
+            Use This Data
           </button>
         </div>
       </div>
@@ -77,7 +75,7 @@
 
     <div class="format-help">
       <details>
-        <summary>📋 CSV Format Guidelines</summary>
+        <summary>CSV Format Guidelines</summary>
         <div class="help-content">
           <h5>Expected Format:</h5>
           <ul>
@@ -304,22 +302,21 @@ export default {
 
 <style scoped>
 .curve-uploader {
-  padding: 16px;
+  padding: .7rem;
 }
 
 .upload-zone {
-  border: 3px dashed #d1d5db;
-  border-radius: 12px;
-  padding: 40px;
+  border: 1px dashed var(--border-color);
+  border-radius: 5px;
+  padding: .85rem;
   text-align: center;
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   transition: all 0.3s;
-  cursor: pointer;
 }
 
 .upload-zone.dragging {
   border-color: #3b82f6;
-  background: #eff6ff;
+  background: var(--accent-blue-light);
 }
 
 .upload-zone.error {
@@ -334,24 +331,16 @@ export default {
   gap: 12px;
 }
 
-.upload-icon {
-  font-size: 48px;
-}
 
 .upload-text {
   margin: 0;
-  color: #1f2937;
+  color: var(--text-primary);
   font-size: 16px;
 }
 
-.upload-subtext {
-  margin: 0;
-  color: #6b7280;
-  font-size: 14px;
-}
 
 .btn-upload {
-  background: #3b82f6;
+  background: var(--action-bg);
   color: white;
   border: none;
   padding: 10px 24px;
@@ -362,7 +351,7 @@ export default {
 }
 
 .btn-upload:hover {
-  background: #2563eb;
+  background: var(--action-hover);
 }
 
 .error-message {
@@ -379,7 +368,7 @@ export default {
   margin-top: 24px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  background: white;
+  background: var(--bg-secondary);
   overflow: hidden;
 }
 
@@ -387,14 +376,14 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  background: #f9fafb;
+  padding: .7rem;
+  background: var(--bg-tertiary);
   border-bottom: 1px solid #e5e7eb;
 }
 
 .preview-header h4 {
   margin: 0;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .preview-actions {
@@ -417,12 +406,12 @@ export default {
 }
 
 .btn-primary {
-  background: #3b82f6;
+  background: var(--action-bg);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #2563eb;
+  background: var(--action-hover);
 }
 
 .btn-secondary {
@@ -449,11 +438,11 @@ export default {
 .data-table th {
   position: sticky;
   top: 0;
-  background: #f3f4f6;
+  background: var(--bg-tertiary);
   padding: 10px;
   text-align: left;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-primary);
   border-bottom: 2px solid #d1d5db;
   z-index: 1;
 }
@@ -461,7 +450,7 @@ export default {
 .data-table td {
   padding: 8px 10px;
   border-bottom: 1px solid #e5e7eb;
-  color: #1f2937;
+  color: var(--text-primary);
   font-family: 'Courier New', monospace;
 }
 
@@ -472,7 +461,7 @@ export default {
 
 .more-rows {
   text-align: center;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-style: italic;
   padding: 16px !important;
 }
@@ -481,10 +470,10 @@ export default {
   display: flex;
   gap: 24px;
   padding: 12px 16px;
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   border-top: 1px solid #e5e7eb;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .format-help {
@@ -495,25 +484,25 @@ export default {
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   padding: 12px;
-  background: #f9fafb;
+  background: var(--bg-tertiary);
 }
 
 .format-help summary {
   cursor: pointer;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-primary);
   user-select: none;
 }
 
 .help-content {
   margin-top: 12px;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 13px;
 }
 
 .help-content h5 {
   margin: 12px 0 8px 0;
-  color: #1f2937;
+  color: var(--text-primary);
   font-size: 14px;
 }
 
@@ -527,13 +516,14 @@ export default {
 }
 
 .help-content pre {
-  background: white;
+  background: var(--bg-secondary);
   border: 1px solid #d1d5db;
   border-radius: 4px;
   padding: 12px;
   overflow-x: auto;
   font-family: 'Courier New', monospace;
   font-size: 12px;
-  color: #1f2937;
+  color: var(--text-primary);
 }
+.preview-header, .preview-actions, .file-info { flex-wrap: wrap; gap: .5rem; overflow-wrap: anywhere; }
 </style>

@@ -1943,7 +1943,7 @@ def test_loss_balanced_boost_dcm_ripple_uses_solved_nonlinear_diode_ramp() -> No
             * values["l_value"]
         )
         return np.concatenate(([0.0], np.cumsum(increments))
-)
+                              )
 
     on_time = cumulative_trapezoid(inverse_on_voltage)
     diode_time = cumulative_trapezoid(inverse_off_voltage)

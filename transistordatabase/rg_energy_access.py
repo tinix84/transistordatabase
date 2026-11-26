@@ -95,6 +95,7 @@ def _source(device_id, branch, index, record, snapshot):
     temperature = _number(record.t_j, "recorded t_j")
     unavailable = []
     diagnostics = []
+
     def optional_scalar(name, required):
         value = getattr(record, name)
         try:
@@ -120,7 +121,7 @@ def _source(device_id, branch, index, record, snapshot):
             diagnostics.append(str(exc))
     source_sha = getattr(evidence, "sha256", None)
     if source_sha is not None and (not isinstance(source_sha, str)
-                                  or re.fullmatch(r"[0-9a-fA-F]{64}", source_sha) is None):
+                                   or re.fullmatch(r"[0-9a-fA-F]{64}", source_sha) is None):
         source_sha = None
         unavailable.append("source_sha256")
         diagnostics.append("A recorded source SHA-256 must have 64 hexadecimal characters")
@@ -131,7 +132,7 @@ def _source(device_id, branch, index, record, snapshot):
         dependency, sort_keys=True, allow_nan=False, ensure_ascii=True,
         separators=(",", ":")).encode("utf-8")).hexdigest()
     positions = np.unique(np.linspace(0, len(axis) - 1,
-                                     min(len(axis), PREVIEW_SAMPLES), dtype=int))
+                                      min(len(axis), PREVIEW_SAMPLES), dtype=int))
     component = "diode" if branch == "e_rr" else "switch"
     source = {
         "source_id": f"{device_id}:{component}.{branch}_data[{index}]",
@@ -160,6 +161,7 @@ def _source(device_id, branch, index, record, snapshot):
 def _unavailable_source(device_id, branch, index, record, diagnostic, snapshot):
     """Retain an unusable row without turning invalid evidence into unknown data."""
     unavailable = ["coverage", "preview", "snapshot_sha256", "snapshot"]
+
     def scalar(name):
         value = getattr(record, name, None)
         if value is None:
@@ -189,7 +191,7 @@ def _unavailable_source(device_id, branch, index, record, diagnostic, snapshot):
             unavailable.append("source_filename")
     source_sha = getattr(evidence, "sha256", None)
     if source_sha is not None and (not isinstance(source_sha, str)
-                                  or re.fullmatch(r"[0-9a-fA-F]{64}", source_sha) is None):
+                                   or re.fullmatch(r"[0-9a-fA-F]{64}", source_sha) is None):
         source_sha = None
         unavailable.append("source_sha256")
     component = "diode" if branch == "e_rr" else "switch"

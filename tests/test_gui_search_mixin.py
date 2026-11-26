@@ -1,11 +1,12 @@
 """Test search mixin functionality."""
 import os
+# Configure the platform before the desktop imports.
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
-import pytest
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLineEdit, QListWidget, QComboBox
-from transistordatabase.gui.gui import MainWindow
+import pytest  # noqa: E402
+from PyQt5.QtCore import Qt  # noqa: E402
+from PyQt5.QtWidgets import QLineEdit, QListWidget, QComboBox  # noqa: E402
+from transistordatabase.gui.gui import MainWindow  # noqa: E402
 
 
 @pytest.fixture
@@ -28,13 +29,13 @@ def test_search_mixin_methods_exist(main_window):
 def test_search_has_on_search_method(main_window):
     """Test that MainWindow has search methods."""
     assert hasattr(main_window, 'on_search') or \
-           any('search' in method.lower() for method in dir(main_window))
+        any('search' in method.lower() for method in dir(main_window))
 
 
 def test_clear_search_method_exists(main_window):
     """Test that clear search functionality exists."""
     assert hasattr(main_window, 'on_search') or \
-           any('clear' in method.lower() for method in dir(main_window))
+        any('clear' in method.lower() for method in dir(main_window))
 
 
 def test_find_search_widgets(main_window):
@@ -67,5 +68,5 @@ def test_mainwindow_has_search_capability(main_window):
     """Test that MainWindow has search capability."""
     # Verify that search functionality is present
     has_search = hasattr(main_window, 'on_search') or \
-                 any('search' in m.lower() for m in dir(main_window))
+        any('search' in m.lower() for m in dir(main_window))
     assert has_search or True  # May not have explicit search in basic GUI

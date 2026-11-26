@@ -1,10 +1,11 @@
 """Test MainWindow initialization."""
 import os
+# Configure the platform before the desktop imports.
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
-import pytest
-from PyQt5.QtWidgets import QApplication, QToolBar
-from transistordatabase.gui.gui import MainWindow
+import pytest  # noqa: E402
+from PyQt5.QtWidgets import QApplication, QToolBar  # noqa: E402
+from transistordatabase.gui.gui import MainWindow  # noqa: E402
 
 
 @pytest.fixture

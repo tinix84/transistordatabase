@@ -154,6 +154,7 @@ class GateChargeModel:
         p = self.params
         if not np.isfinite(target) or not p.v_plateau < target < v_driver:
             raise ValueError('Require Vplateau < settling target < Von')
+
         def exact(value):
             number = float(value)
             if number != value:
@@ -220,8 +221,8 @@ class GateChargeModel:
             value = np.longdouble(p.v_plateau) + rail_span * -np.expm1(-np.longdouble(time) / tau)
             voltage.append(finite(value, 'Settling gate voltage'))
         voltage[0], voltage[-1] = float(p.v_plateau), target
-        currents = [finite(extended(exact(v_driver) - exact(value), 'Resistive voltage gap') /
-                           np.longdouble(resistance), 'Settling gate current') for value in voltage]
+        currents = [finite(extended(exact(v_driver) - exact(value), 'Resistive voltage gap')
+                           / np.longdouble(resistance), 'Settling gate current') for value in voltage]
         with np.errstate(over='ignore', invalid='ignore'):
             absolute = float(np.longdouble(anchor_s) + elapsed)
         resolved = np.isfinite(absolute) and absolute > anchor_s
@@ -374,8 +375,7 @@ class IgbtModel:
         """Calculate IGBT conduction loss using V_CE(sat) model.
 
         :param i_avg: Average current in A.
-        :param _i_rms: RMS current (unused in this model)
-        :param i_rms: RMS current in A.
+        :param _i_rms: RMS current in A (unused in this model).
         :return: Conduction power loss in W.
         """
         p = self.params

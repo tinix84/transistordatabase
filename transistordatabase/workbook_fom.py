@@ -221,11 +221,13 @@ def source_inputs(record, source):
                         inputs[name]["value"] = None
                         inputs[name]["validation"] = validation or agreement["validation"]
                     else:
-                        inputs[name].update({"value": agreement["value"],
-                                             "basis": "recognized literal J/A coefficient"})
-                inputs[name]["conditions"] = {"temperature_c": 175, "test_voltage_v": profile_cell(24).get("value"),
-                                               "reference_current_a": literal["reference_current_a"] if literal else None,
-                                               "gate_resistance_ohm": None}
+                        inputs[name].update({"value": agreement["value"], "basis": "recognized literal J/A coefficient"})
+                inputs[name]["conditions"] = {
+                    "temperature_c": 175,
+                    "test_voltage_v": profile_cell(24).get("value"),
+                    "reference_current_a": literal["reference_current_a"] if literal else None,
+                    "gate_resistance_ohm": None,
+                }
         origin = profile_cell(40).get("value")
         return profile, inputs, origin
     kind = record.get("workbook_profile")
@@ -276,7 +278,9 @@ def derive_workbook_metrics(record, source, settings):
             "thermal_path": profile["path"], "thermal_reference_kind": profile["reference"],
             "thermal_reference_temperature_c": 100,
             "switching_coefficient_temperature_c": 175 if record.get("source_id") in PROFILES else "not separately declared",
-            "capacitance_and_charge_conditions": "Source test voltage and measurement conditions are not separately recorded unless present in source conditions.",
+            "capacitance_and_charge_conditions": (
+                'Source test voltage and measurement conditions are not separately recorded unless present in source conditions.'
+            ),
         })
     if profile is None:
         return values, reasons, evidence
@@ -376,9 +380,20 @@ def derive_workbook_metrics(record, source, settings):
             raise ValueError(f"invalid-operand: {key}: {reasons[key]}")
         return values[key]
 
-    calculate("thermal_current_per_price", ("thermal_current_a", "workbook_price"), lambda: _arithmetic([from_metric("thermal_current_a")], [price()]), estimate=True)
-    calculate("thermal_vi_per_price", ("voltage_v", "thermal_current_a", "workbook_price"), lambda: _arithmetic([_number(record.get("voltage_v"), "voltage_v", positive=True), from_metric("thermal_current_a")], [price()]), estimate=True)
-    calculate("voltage_energy_per_price", ("voltage_energy_benchmark_hz", "workbook_price"), lambda: _arithmetic([from_metric("voltage_energy_benchmark_hz")], [price()]))
+    calculate(
+        "thermal_current_per_price", ("thermal_current_a", "workbook_price"), lambda: _arithmetic([from_metric("thermal_current_a")], [price()]), estimate=True
+    )
+    calculate(
+        "thermal_vi_per_price",
+        ("voltage_v", "thermal_current_a", "workbook_price"),
+        lambda: _arithmetic([_number(record.get("voltage_v"), "voltage_v", positive=True), from_metric("thermal_current_a")], [price()]),
+        estimate=True,
+    )
+    calculate(
+        "voltage_energy_per_price",
+        ("voltage_energy_benchmark_hz", "workbook_price"),
+        lambda: _arithmetic([from_metric("voltage_energy_benchmark_hz")], [price()]),
+    )
 
     def igbt_product(name):
         if profile["kind"] != "igbt":

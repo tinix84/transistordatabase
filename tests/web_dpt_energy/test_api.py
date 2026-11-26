@@ -527,10 +527,24 @@ def test_preview_rejects_nonpositive_existing_graph_samples(
     ("record_changes", "request_changes", "message"),
     [
         ({"t_j": 30.0}, {}, "source data changed after preview"),
-        ({}, {"points": [{"measurement_index": 0, "acquisition_index": 0, "i_x": 11.0, "vds_sign": 1, "id_sign": 1}, {"measurement_index": 1, "acquisition_index": 0, "i_x": 20.0, "vds_sign": 1, "id_sign": 1}]}, "inputs changed after preview"),
         (
             {},
-            {"points": [{"measurement_index": 99, "acquisition_index": 0, "i_x": 11.0, "vds_sign": 1, "id_sign": 1}, {"measurement_index": 1, "acquisition_index": 0, "i_x": 20.0, "vds_sign": 1, "id_sign": 1}]},
+            {
+                "points": [
+                    {"measurement_index": 0, "acquisition_index": 0, "i_x": 11.0, "vds_sign": 1, "id_sign": 1},
+                    {"measurement_index": 1, "acquisition_index": 0, "i_x": 20.0, "vds_sign": 1, "id_sign": 1},
+                ]
+            },
+            "inputs changed after preview",
+        ),
+        (
+            {},
+            {
+                "points": [
+                    {"measurement_index": 99, "acquisition_index": 0, "i_x": 11.0, "vds_sign": 1, "id_sign": 1},
+                    {"measurement_index": 1, "acquisition_index": 0, "i_x": 20.0, "vds_sign": 1, "id_sign": 1},
+                ]
+            },
             "inputs changed after preview",
         ),
     ],

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Transistor Database Migration Script
+Transistor Database Migration Script.
 
 Migrates transistors from multiple sources (File Exchange, sc archive) into TDB format.
 Handles format conversion, duplicate detection, validation, and quality scoring.
@@ -13,7 +13,7 @@ import csv
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, asdict, field as dataclass_field
 from datetime import datetime
 from collections import defaultdict
 import traceback
@@ -34,12 +34,13 @@ logging.basicConfig(
 @dataclass
 class MigrationResult:
     """Result of migrating one transistor."""
+
     source_file: str
     source_format: str
     success: bool
     transistor_id: Optional[str]
     error: Optional[str] = None
-    warnings: List[str] = field(default_factory=list)
+    warnings: List[str] = dataclass_field(default_factory=list)
     data_quality_score: float = 0.0
 
 
@@ -854,6 +855,7 @@ class TransistorMigrator:
 
 # CLI Interface
 def main():
+    """Run the migration with the command-line source and output options."""
     import argparse
 
     parser = argparse.ArgumentParser(description='Migrate transistors to TDB format')

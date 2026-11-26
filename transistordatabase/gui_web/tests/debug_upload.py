@@ -160,6 +160,7 @@ def test_minimal_upload():
         if os.path.exists(tmp_file_path):
             os.unlink(tmp_file_path)
 
+
 if __name__ == "__main__":
     print("🚀 Transistor Database Upload Test")
     print("=" * 60)

@@ -7,8 +7,8 @@
 
     <!-- Transistor Selector -->
     <div class="transistor-selector">
-      <label>Select Transistor:</label>
-      <select aria-label="DPT transistor label"
+      <label for="dpt-transistor">Select Transistor:</label>
+      <select id="dpt-transistor" aria-label="DPT transistor label"
         v-model="selectedTransistorId"
         :disabled="rawImportSaving || dptEnergySaving"
         @change="loadDPTData"
@@ -28,21 +28,21 @@
           @click="activeTab = 'data'"
           class="tab-btn"
         >
-          📊 DPT Data
+          DPT Data
         </button>
         <button
           :class="{ active: activeTab === 'netlist' }"
           @click="activeTab = 'netlist'"
           class="tab-btn"
         >
-          📝 Generate Netlist
+          Generate Netlist
         </button>
         <button
           :class="{ active: activeTab === 'validate' }"
           @click="activeTab = 'validate'"
           class="tab-btn"
         >
-          ✅ Validate Data
+          Validate Data
         </button>
       </div>
 
@@ -53,7 +53,6 @@
         <div v-if="dptData" class="data-overview">
           <div class="status-grid">
             <div class="status-card" :class="{ available: dptData.has_recorded_e_on ?? dptData.has_e_on }">
-              <div class="status-icon">{{ (dptData.has_recorded_e_on ?? dptData.has_e_on) ? '✅' : '❌' }}</div>
               <div class="status-label">Turn-On Energy (E_on)</div>
               <div class="status-text">
                 {{ dptData.has_e_on ? 'Available (DPT evidence)' : dptData.has_recorded_e_on ? 'Available (source unknown)' : 'Not available' }}
@@ -61,7 +60,6 @@
             </div>
 
             <div class="status-card" :class="{ available: dptData.has_recorded_e_off ?? dptData.has_e_off }">
-              <div class="status-icon">{{ (dptData.has_recorded_e_off ?? dptData.has_e_off) ? '✅' : '❌' }}</div>
               <div class="status-label">Turn-Off Energy (E_off)</div>
               <div class="status-text">
                 {{ dptData.has_e_off ? 'Available (DPT evidence)' : dptData.has_recorded_e_off ? 'Available (source unknown)' : 'Not available' }}
@@ -69,7 +67,6 @@
             </div>
 
             <div class="status-card" :class="{ available: dptData.has_recorded_e_rr ?? dptData.has_e_rr }">
-              <div class="status-icon">{{ (dptData.has_recorded_e_rr ?? dptData.has_e_rr) ? '✅' : '❌' }}</div>
               <div class="status-label">Reverse Recovery (E_rr)</div>
               <div class="status-text">
                 {{ dptData.has_e_rr ? 'Available (DPT evidence)' : dptData.has_recorded_e_rr ? 'Available (source unknown)' : 'Not available' }}
@@ -1025,10 +1022,10 @@
             <h4>Generated Netlist</h4>
             <div class="netlist-actions">
               <button @click="copyNetlist" class="btn-copy">
-                📋 Copy to Clipboard
+                Copy to Clipboard
               </button>
               <button @click="downloadNetlist" class="btn-download">
-                💾 Download .cir file
+                Download .cir file
               </button>
             </div>
           </div>
@@ -1054,9 +1051,6 @@
         <!-- Validation Results -->
         <div v-if="validationResults" class="validation-results">
           <div class="validation-summary" :class="validationResults.valid ? 'valid' : 'invalid'">
-            <div class="summary-icon">
-              {{ validationResults.valid ? '✅' : '⚠️' }}
-            </div>
             <div class="summary-text">
               <strong>{{ validationResults.valid ? 'Valid' : 'Issues Found' }}</strong>
               <p>{{ validationResults.valid ? 'All checks passed' : 'See details below' }}</p>
@@ -1094,7 +1088,7 @@
           <div v-if="validationResults.errors.length > 0" class="error-list">
             <h4>Errors ({{ validationResults.errors.length }})</h4>
             <div v-for="(error, index) in validationResults.errors" :key="index" class="error-item">
-              ❌ {{ error }}
+              {{ error }}
             </div>
           </div>
 
@@ -1102,7 +1096,7 @@
           <div v-if="validationResults.warnings.length > 0" class="warning-list">
             <h4>Warnings ({{ validationResults.warnings.length }})</h4>
             <div v-for="(warning, index) in validationResults.warnings" :key="index" class="warning-item">
-              ⚠️ {{ warning }}
+              {{ warning }}
             </div>
           </div>
         </div>
@@ -1117,15 +1111,21 @@
 </template>
 
 <script>
-import { computed, ref, watch, onMounted } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { transistorApi } from '../services/api'
 import CurvePlotter from './CurvePlotter.vue'
 
 export default {
   name: 'DPTManager',
   components: { CurvePlotter },
-  setup() {
-    const transistorList = ref([])
+  props: {
+    transistors: { type: Array, required: true }
+  },
+  setup(props) {
+    const transistorList = computed(() => props.transistors.map(device => ({
+      id: device.metadata?.name || device.name,
+      name: device.metadata?.name || device.name
+    })))
     const selectedTransistorId = ref('')
     const activeTab = ref('data')
     const dptData = ref(null)
@@ -2243,18 +2243,6 @@ export default {
       return typeof detail === 'string' ? detail : err.message
     }
 
-    onMounted(async () => {
-      try {
-        const transistors = await transistorApi.getAll()
-        transistorList.value = transistors.map(t => ({
-          id: t.metadata?.name || t.name,
-          name: t.metadata?.name || t.name
-        }))
-      } catch (err) {
-        error.value = 'Failed to load transistor list'
-      }
-    })
-
     async function loadDPTData() {
       const requestedTransistorId = selectedTransistorId.value
       if (!requestedTransistorId) return
@@ -2441,13 +2429,13 @@ export default {
 }
 
 h2 {
-  font-size: 24px;
-  margin-bottom: 10px;
+  font-size: 1.25rem;
+  margin-bottom: .35rem;
 }
 
 .description {
-  color: #666;
-  margin-bottom: 30px;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
 }
 
 /* Transistor Selector */
@@ -2532,10 +2520,6 @@ h2 {
   border-color: #4CAF50;
 }
 
-.status-icon {
-  font-size: 36px;
-  margin-bottom: 10px;
-}
 
 .status-label {
   font-weight: bold;
@@ -3111,9 +3095,6 @@ h2 {
   border-left: 4px solid #ff9800;
 }
 
-.summary-icon {
-  font-size: 48px;
-}
 
 .summary-text strong {
   font-size: 20px;

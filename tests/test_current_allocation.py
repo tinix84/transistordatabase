@@ -70,7 +70,7 @@ def test_science_rejects_ambiguous_or_invalid_input(patch):
 
 def test_typed_api_matches_python_and_preserves_provenance():
     inputs = fixture() | {"provenance": {"source": None, "calibration_notes": "SI assumed",
-                                       "imported_filename": "signed.csv", "edited_after_import": True}}
+                                         "imported_filename": "signed.csv", "edited_after_import": True}}
     response = client().post("/api/waveform/gate-allocation", json=inputs)
     assert response.status_code == 200
     assert response.json() == allocate_gate_current(**inputs)

@@ -533,7 +533,7 @@ class GateChargeModelRequest(BaseModel):
             except (OverflowError, ValueError) as error:
                 raise ValueError('Settling model input exceeds the finite numerical range') from error
             if not isfinite(number) or (isinstance(value, (int, Decimal))
-                    and Decimal(str(number)) != Decimal(value)):
+                                        and Decimal(str(number)) != Decimal(value)):
                 raise ValueError('Settling model input exceeds accepted binary64 precision')
         if all(name in values for name in ('q_g', 'q_gs', 'q_gd')):
             raw = Fraction(values['q_g']) - Fraction(values['q_gs']) - Fraction(values['q_gd'])

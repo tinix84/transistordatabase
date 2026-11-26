@@ -324,7 +324,7 @@ def test_request_byte_budget_exact_boundary_and_one_beyond(monkeypatch):
     original = evaluate_native_waveform(device, selection, case)
     snapshot = original["native_request_snapshot"]
     expected_bytes = len(json.dumps(snapshot, sort_keys=True, ensure_ascii=False,
-                                   separators=(",", ":"), allow_nan=False).encode())
+                                    separators=(",", ":"), allow_nan=False).encode())
     monkeypatch.setattr(native, "MAX_REQUEST_BYTES", expected_bytes)
     assert evaluate_native_waveform(device, selection, case)["request_sha256"] == original["request_sha256"]
     monkeypatch.setattr(native, "MAX_REQUEST_BYTES", expected_bytes - 1)
@@ -338,7 +338,7 @@ def test_output_byte_budget_exact_boundary_and_one_beyond(monkeypatch):
     device, selection, case = inputs()
     original = evaluate_native_waveform(device, selection, case)
     expected_bytes = len(json.dumps(original, sort_keys=True, ensure_ascii=False,
-                                   separators=(",", ":"), allow_nan=False).encode())
+                                    separators=(",", ":"), allow_nan=False).encode())
     monkeypatch.setattr(native, "MAX_OUTPUT_BYTES", expected_bytes)
     assert evaluate_native_waveform(device, selection, case) == original
     monkeypatch.setattr(native, "MAX_OUTPUT_BYTES", expected_bytes - 1)
@@ -403,7 +403,6 @@ def test_source_comment_hash_budget_exact_boundary_and_one_beyond(monkeypatch):
     with pytest.raises(NativeWaveformError) as error:
         evaluate_native_waveform(device, selection, case)
     assert error.value.code == "resource-limit"
-
 
 
 def test_curve_sample_boundary_and_one_beyond():
@@ -538,5 +537,3 @@ def test_exact_segment_and_plot_budget_and_one_beyond():
     with pytest.raises(NativeWaveformError) as error:
         evaluate_native_waveform(device, selection, case)
     assert error.value.code == "resource-limit"
-
-

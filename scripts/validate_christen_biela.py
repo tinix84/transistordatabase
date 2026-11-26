@@ -61,7 +61,7 @@ def load_transistor_from_json(file_path: Path) -> Optional[Transistor]:
         loader = JsonTransistorLoader()
         return loader.load_from_json(file_path)
     except Exception as e:
-        warnings.warn(f"Failed to load {file_path.name}: {e}")
+        warnings.warn(f"Failed to load {file_path.name}: {e}", stacklevel=2)
         return None
 
 
@@ -106,7 +106,6 @@ def classify_voltage_class(v_abs_max: float) -> int:
 
 def test_device(transistor: Transistor, file_path: Path) -> ValidationResult:
     """Test ChristenBielaModel on a single device."""
-
     # Extract metadata
     name = transistor.metadata.name
     device_type = transistor.metadata.type or "Unknown"
@@ -191,7 +190,6 @@ def test_device(transistor: Transistor, file_path: Path) -> ValidationResult:
 
 def analyze_results(results: list[ValidationResult]) -> dict:
     """Analyze validation results for consistency and trends."""
-
     successful = [r for r in results if r.success]
 
     if not successful:
@@ -299,14 +297,13 @@ def analyze_results(results: list[ValidationResult]) -> dict:
 
 def generate_report(results: list[ValidationResult], analysis: dict, output_path: Path) -> None:
     """Generate markdown validation report."""
-
     successful = [r for r in results if r.success]
     failed = [r for r in results if not r.success]
 
     report = []
     report.append("# ChristenBielaModel Validation Report\n")
     report.append(f"**Generated:** {Path(__file__).name}\n")
-    report.append(f"**Date:** 2026-02-16\n\n")
+    report.append("**Date:** 2026-02-16\n\n")
 
     # Executive Summary
     report.append("## Executive Summary\n")
@@ -386,8 +383,8 @@ def generate_report(results: list[ValidationResult], analysis: dict, output_path
             zvs_str = f"{r.i_0_zvs:.2f}" if r.i_0_zvs else "N/A"
 
             report.append(f"| {r.name} | {r.device_type} | {r.voltage_class}V | {r.current_rating:.0f}A | "
-                         f"{r.package} | {r.v_0:.0f}V | {r.i_0:.1f}A | {e_on_str} | {e_off_str} | "
-                         f"{ratio_str} | {zvs_str} |\n")
+                          f"{r.package} | {r.v_0:.0f}V | {r.i_0:.1f}A | {e_on_str} | {e_off_str} | "
+                          f"{ratio_str} | {zvs_str} |\n")
 
         report.append("\n")
 
@@ -433,8 +430,7 @@ def generate_report(results: list[ValidationResult], analysis: dict, output_path
 
 
 def main():
-    """Main validation routine."""
-
+    """Run the device database through the Christen-Biela validation."""
     print("ChristenBielaModel Database Validation")
     print("=" * 60)
 
@@ -456,7 +452,7 @@ def main():
             break
 
     if transistor_dir is None:
-        print(f"Error: Transistor directory not found. Tried:")
+        print("Error: Transistor directory not found. Tried:")
         for p in possible_dirs:
             print(f"  - {p}")
         return

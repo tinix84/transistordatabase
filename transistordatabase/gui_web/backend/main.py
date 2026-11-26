@@ -2673,8 +2673,8 @@ async def topology_recommendations(
         if t is None:
             continue
 
-        if (t.electrical_ratings.v_abs_max >= v_required and
-            t.electrical_ratings.i_abs_max >= i_required):
+        if (t.electrical_ratings.v_abs_max >= v_required
+                and t.electrical_ratings.i_abs_max >= i_required):
 
             v_util = v_required / t.electrical_ratings.v_abs_max
             i_util = i_required / t.electrical_ratings.i_abs_max
@@ -2876,7 +2876,7 @@ async def calculate_biela(request: BielaModelRequest) -> Dict[str, Any]:
             raise ValueError('Recovery constants supplied with omitted recovery; select charge_control explicitly')
         rr = ReverseRecoveryParams(*recovery_values) if request.recovery_mode == 'charge_control' else None
         gm = TransconductanceParams(request.k_1, request.k_2, request.x, request.v_th,
-                                   request.gm_i_min, request.gm_i_max)
+                                    request.gm_i_min, request.gm_i_max)
         model = ChristenBielaModel(request.c_gs, request.c_ds, request.c_gd, request.q_oss, gm, rr,
                                    v_ref=request.q_oss_v_ref, t_j=request.parameter_t_j, source=request.source)
         params = HalfBridgeParams(request.v_dc, request.i_load, request.v_driver_on,
@@ -3272,7 +3272,7 @@ async def preview_dpt_raw_traces(
                         "the selected plot. Reload the file preview."
                     )
                 step_times = parsed.time_values[
-                    selected_range["start_index"] : selected_range["end_index"]
+                    selected_range["start_index"]: selected_range["end_index"]
                 ] if parsed.time_values is not None else np.asarray([])
                 on_bounds = event_window_bounds(
                     step_times,
@@ -3425,7 +3425,7 @@ async def import_dpt_raw_measurement(
         assert parsed.trace_values is not None
         expected_loaded_times = np.concatenate(
             [
-                time_values[item["start_index"] : item["end_index"]]
+                time_values[item["start_index"]: item["end_index"]]
                 for item in sorted(
                     [window[0] for window in windows],
                     key=lambda item: item["start_index"],
@@ -3879,8 +3879,8 @@ async def get_dpt_data(
 
     # Provenance-free legacy curves do not establish a DPT source.
     def dpt_records(records):
-        return [record for record in records if record.evidence is not None and
-                record.evidence.method in ("waveform-local-edge", "supplied-log-integral")]
+        return [record for record in records if record.evidence is not None
+                and record.evidence.method in ("waveform-local-edge", "supplied-log-integral")]
     on = dpt_records(transistor.switch.e_on_data)
     off = dpt_records(transistor.switch.e_off_data)
     rr = dpt_records(transistor.diode.e_rr_data) if transistor.diode else []

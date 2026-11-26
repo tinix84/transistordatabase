@@ -70,6 +70,7 @@ def inverse(**updates):
 def client():
     """Inject a repository lookup with a real missing-device response."""
     device = part()
+
     def read(name):
         if name != device.metadata.name:
             raise HTTPException(404, "missing fixture device")
@@ -121,7 +122,7 @@ def test_inventory_locator_evidence_snapshot_hash_and_no_embedded_original(clien
     result = client.post(URL, json=query()).json()
     for source in result["sources"]:
         digest = hashlib.sha256(json.dumps(source["snapshot"], sort_keys=True,
-            allow_nan=False, ensure_ascii=True, separators=(",", ":")).encode()).hexdigest()
+                                           allow_nan=False, ensure_ascii=True, separators=(",", ":")).encode()).hexdigest()
         assert digest == source["snapshot_sha256"]
     assert "original_base64" not in response.text
     assert "must never leave repository" not in response.text
@@ -216,7 +217,7 @@ def test_every_condition_must_be_declared(client, name):
 
 
 @pytest.mark.parametrize("body", [b"{", b"\xff", br'{"operation":"\ud800"}',
-    b'{"r_g":1e-400}', b'{"r_g":1e400}', b'{"r_g":NaN}'])
+                                  b'{"r_g":1e-400}', b'{"r_g":1e400}', b'{"r_g":NaN}'])
 def test_invalid_json_and_finite_literal_limits(client, body):
     """Reject malformed JSON, invalid text and numerical underflow or overflow."""
     assert client.post(URL, content=body,

@@ -33,9 +33,9 @@ def request(data, fmt="csv"):
                 for key, name, unit in zip(("time", "voltage", "current", "gate"),
                                            names, ("s", "V", "A", "V"), strict=True)}
     return MeasurementRequest(format=fmt, filename="analytic." + fmt,
-        content_base64=base64.b64encode(data).decode(), source_kind="simulation",
-        disclosure="Analytic generic fixture. No device calibration.", mappings=mappings,
-        step_index=0).model_dump()
+                              content_base64=base64.b64encode(data).decode(), source_kind="simulation",
+                              disclosure="Analytic generic fixture. No device calibration.", mappings=mappings,
+                              step_index=0).model_dump()
 
 
 def csv_bytes():

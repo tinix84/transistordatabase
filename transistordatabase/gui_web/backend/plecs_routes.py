@@ -208,7 +208,7 @@ def core_export(transistor_id: str, request: CoreSelectionRequest,
                         media_type="application/xml", headers={
                             "Content-Disposition": 'attachment; filename="plecs-core-selection.xml"',
                             "X-PLECS-Export-Scope": "exact-core-subset",
-                        })
+        })
     except (ValueError, TypeError, OverflowError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
@@ -235,8 +235,8 @@ def core_contexts(transistor_id: str, repository=Depends(plecs_repository)):
             groups = {}
             if not isinstance(records, (list, tuple)):
                 diagnostics.append({"component": component_name, "kind": key,
-                    "record_index": None, "code": "invalid-record-collection",
-                    "message": "Core mechanism requires a record sequence"})
+                                    "record_index": None, "code": "invalid-record-collection",
+                                    "message": "Core mechanism requires a record sequence"})
                 records = []
             record_budget += len(records)
             if record_budget > 100_000:
@@ -258,12 +258,12 @@ def core_contexts(transistor_id: str, repository=Depends(plecs_repository)):
                             raise ValueError("Recorded dataset type must be text")
                         dataset_type = record.dataset_type
                         additional = {"gate_off_voltage_v": _finite(record.v_g_off, "Recorded gate-off voltage", nullable=True),
-                            "commutation_device": record.commutation_device,
-                            "load_inductance_h": _finite(record.load_inductance, "Recorded load inductance", nullable=True),
-                            "commutation_inductance_h": _finite(record.commutation_inductance, "Recorded commutation inductance", nullable=True)}
+                                      "commutation_device": record.commutation_device,
+                                      "load_inductance_h": _finite(record.load_inductance, "Recorded load inductance", nullable=True),
+                                      "commutation_inductance_h": _finite(record.commutation_inductance, "Recorded commutation inductance", nullable=True)}
                     identity = json.dumps([context, additional], sort_keys=True, allow_nan=False)
                     group = groups.setdefault(identity, {**context, "additional_conditions": additional,
-                        "curve_count": 0, "temperatures_c": [], "voltages_v": [], "dataset_types": []})
+                                                         "curve_count": 0, "temperatures_c": [], "voltages_v": [], "dataset_types": []})
                     group["curve_count"] += 1
                     group["temperatures_c"].append(temperature)
                     if key != "conduction":
@@ -271,7 +271,7 @@ def core_contexts(transistor_id: str, repository=Depends(plecs_repository)):
                         group["dataset_types"].append(dataset_type)
                 except (ValueError, TypeError, OverflowError, AttributeError) as exc:
                     diagnostics.append({"component": component_name, "kind": key,
-                        "record_index": index, "code": "invalid-record-conditions", "message": str(exc)})
+                                        "record_index": index, "code": "invalid-record-conditions", "message": str(exc)})
             for group in groups.values():
                 group["temperatures_c"] = sorted(set(group["temperatures_c"]))
                 group["voltages_v"] = sorted(set(group["voltages_v"])) if key != "conduction" else None

@@ -1,6 +1,6 @@
 # Product Requirements Document (PRD)
 
-<!-- Last modified: 2026-11-14 -->
+<!-- Last modified: 2026-11-26 -->
 
 ## Product: Transistor Database v1.0.1
 

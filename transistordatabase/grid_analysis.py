@@ -152,8 +152,8 @@ def evaluate_grid(request, *, _evaluator=None):
     if len(json.dumps(request)) > 4_000_000:
         raise AnalysisResourceLimitError("Analysis input exceeds 4 MB")
     weights = [p["weight"] for p in points]
-    if any(isinstance(w, bool) or not isinstance(w, (float, int)) or
-           not math.isfinite(w) or w < 0 for w in weights):
+    if any(isinstance(w, bool) or not isinstance(w, (float, int))
+           or not math.isfinite(w) or w < 0 for w in weights):
         raise ValueError("Operating-point weights must be finite and nonnegative")
     try:
         total_weight = math.fsum(weights)
@@ -162,8 +162,8 @@ def evaluate_grid(request, *, _evaluator=None):
     if not math.isfinite(total_weight) or total_weight <= 0:
         raise ValueError("Total operating-point weight must be positive and finite")
     objective = request["metric"]
-    if (objective["name"] not in METRICS or objective["unit"] != "W" or
-            objective["direction"] not in {"minimize", "maximize"}):
+    if (objective["name"] not in METRICS or objective["unit"] != "W"
+            or objective["direction"] not in {"minimize", "maximize"}):
         raise ValueError("Select a named power metric in W and its ranking direction")
     mode = request.get("summary_mode", "full")
     if mode not in {"full", "successful-subset"}:
@@ -204,8 +204,8 @@ def evaluate_grid(request, *, _evaluator=None):
             config_rows.append(row)
         metric_summaries = {}
         for name in METRICS:
-            retained = [r for r in config_rows if r["weight"] > 0 and
-                        r["metrics"][name]["value"] is not None]
+            retained = [r for r in config_rows if r["weight"] > 0
+                        and r["metrics"][name]["value"] is not None]
             retained_weight = math.fsum(r["weight"] for r in retained)
             subset_mean = _weighted_mean(retained, name, retained_weight) if retained_weight else None
             complete = all(r["metrics"][name]["value"] is not None
@@ -230,12 +230,12 @@ def evaluate_grid(request, *, _evaluator=None):
                 "value": s["metrics"][objective["name"]]["selected_mean"], "unit": "W"}
                for s in summaries if s["metrics"][objective["name"]]["selected_mean"] is not None]
     ranking.sort(key=lambda r: ((-1 if objective["direction"] == "maximize" else 1)
-                               * r["value"], r["configuration_id"]))
+                                * r["value"], r["configuration_id"]))
     output = {"method_version": METHOD_VERSION, "metric": objective, "summary_mode": mode,
-            "rows": rows, "summaries": summaries, "ranking": ranking,
-            "inputs": request, "input_sha256": input_hash(request),
-            "limits": {"max_pairs": MAX_PAIRS, "max_expanded_samples": MAX_EXPANDED_SAMPLES,
-                       "max_response_bytes": MAX_RESPONSE_BYTES}}
+              "rows": rows, "summaries": summaries, "ranking": ranking,
+              "inputs": request, "input_sha256": input_hash(request),
+              "limits": {"max_pairs": MAX_PAIRS, "max_expanded_samples": MAX_EXPANDED_SAMPLES,
+                         "max_response_bytes": MAX_RESPONSE_BYTES}}
     if grouped_exports:
         output["grouped_series_exports"] = project_grouped_series(
             rows, output["input_sha256"],
@@ -304,19 +304,19 @@ def thermal_handoff(request):
     if len(segments) > 10000 or len(events) > 10000:
         raise AnalysisResourceLimitError("Thermal handoff exceeds 10000 segments or events")
     output = {"method_version": "waveform-thermal-handoff-v1",
-            "source_request": request["waveform_request"], "input_sha256": input_hash(request),
-            "source_input_sha256": input_hash(request["waveform_request"]),
-            "direction_owners": owners, "segment_owners": segment_owners,
-            "omitted_components": omitted, "scope": "known-components-only" if omitted else "complete-waveform-heat",
-            "omission_reasons": {name: result["components"][name]["reason"] for name in omitted},
-            "waveform_result": result,
-            "thermal_input": {"segments": segments, "events": events,
-                              "network_heat_owner": network_owner, "event_mode": "impulse",
-                              "gap_policy": "reject"},
-            "required_inputs": ["network", "case_temperature_c", "initial_state", "samples_per_segment"],
-            "assumptions": ["Switching energy uses ideal instantaneous deposition",
-                            "Absolute waveform times are preserved",
-                            "Physical direction ownership is supplied explicitly"]}
+              "source_request": request["waveform_request"], "input_sha256": input_hash(request),
+              "source_input_sha256": input_hash(request["waveform_request"]),
+              "direction_owners": owners, "segment_owners": segment_owners,
+              "omitted_components": omitted, "scope": "known-components-only" if omitted else "complete-waveform-heat",
+              "omission_reasons": {name: result["components"][name]["reason"] for name in omitted},
+              "waveform_result": result,
+              "thermal_input": {"segments": segments, "events": events,
+                                "network_heat_owner": network_owner, "event_mode": "impulse",
+                                "gap_policy": "reject"},
+              "required_inputs": ["network", "case_temperature_c", "initial_state", "samples_per_segment"],
+              "assumptions": ["Switching energy uses ideal instantaneous deposition",
+                              "Absolute waveform times are preserved",
+                              "Physical direction ownership is supplied explicitly"]}
     if len(json.dumps(output, allow_nan=False).encode()) > MAX_RESPONSE_BYTES:
         raise AnalysisResourceLimitError("Thermal handoff response exceeds 24 MB")
     return output

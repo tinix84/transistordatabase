@@ -91,8 +91,8 @@ def test_permuted_sub_ulp_contacts_have_the_same_exact_resistance_and_temperatur
                 contact("film B", "common", 2 ** -53, 1)]
     for order in (contacts, list(reversed(contacts))):
         result = public_result(client, steady(interfaces=order, forward_power_w=2**52, reverse_power_w=0,
-                    sink_temperature_c=0, common_resistance_k_w=0, forward_resistance_k_w=0,
-                    reverse_resistance_k_w=0))["result"]
+                                              sink_temperature_c=0, common_resistance_k_w=0, forward_resistance_k_w=0,
+                                              reverse_resistance_k_w=0))["result"]
         assert result["path_resistances_k_w"]["common"] == math.nextafter(1.0, 2.0)
         assert result["shared_temperature_c"] == 2**52 + 1
         assert result["forward_temperature_c"] == result["reverse_temperature_c"] == 2**52 + 1

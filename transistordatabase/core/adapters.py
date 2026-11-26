@@ -451,7 +451,7 @@ def core_to_legacy_dicts(
 
     diode_args: dict[str, Any] = {
         't_j_max': getattr(di, 'metadata', {}).get('t_j_max', e.t_j_max)
-            if isinstance(getattr(di, 'metadata', None), dict) else e.t_j_max,
+        if isinstance(getattr(di, 'metadata', None), dict) else e.t_j_max,
         'comment': None,
         'manufacturer': None,
         'technology': None,

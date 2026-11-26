@@ -6,7 +6,7 @@ Quick answers to common questions! 💡
 
 - [General](#general)
 - [Getting Started](#getting-started)
-- [Search & Filtering](#search--filtering)
+- [Search & Filtering](#search-filtering)
 - [Data Entry](#data-entry)
 - [Exporting](#exporting)
 - [Comparison](#comparison)
@@ -486,7 +486,7 @@ Currently only CCM (Continuous Conduction Mode) is supported. The calculator che
 
 5. Hard refresh browser: `Ctrl+Shift+R`
 
-See [WEB_GUI_DEBUG_REPORT.md](../WEB_GUI_DEBUG_REPORT.md) for detailed debugging.
+See the [web GUI setup guide](https://github.com/tinix84/transistordatabase/blob/main/transistordatabase/gui_web/DEVELOPMENT_SETUP.md) for the development configuration.
 
 ### Tests are failing
 
@@ -511,7 +511,7 @@ npm run test:e2e
 - Ports changed
 - Selectors changed in UI
 
-**Solution**: See [TEST_README.md](../transistordatabase/gui_web/TEST_README.md)
+**Solution**: See [TEST_README.md](https://github.com/tinix84/transistordatabase/blob/main/transistordatabase/gui_web/TEST_README.md)
 
 ### Import error in Python
 

@@ -11,11 +11,9 @@ test.describe('Application Loading', () => {
     await expect(page.locator('h1')).toContainText('Transistor Database')
   })
 
-  test('should display contact links', async ({ page }) => {
+  test('should link to the project repository', async ({ page }) => {
     await page.goto('/')
 
-    await expect(page.locator('a[href*="linkedin"]')).toBeVisible()
-    await expect(page.locator('a[href*="discord"]')).toBeVisible()
     await expect(page.locator('a[href*="github"]')).toBeVisible()
   })
 

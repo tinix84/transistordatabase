@@ -224,15 +224,23 @@ def _sheet_metadata(archive):
             relationship = rels.get(link.attrib.get(REL), {})
             target = relationship.get("Target")
             location = link.attrib.get("location")
-            links.append({"cell": link.attrib["ref"], "kind": "stored-link",
-                          "target": target, "location": location,
-                          "display": link.attrib.get("display"),
-                          "tooltip": link.attrib.get("tooltip"),
-                          "target_mode": relationship.get("TargetMode"),
-                          "resolution": _target_kind(target, location)})
-        result[sheet.attrib["name"]] = {"bounds": (actual_row, actual_column), "numeric_errors": numeric_errors,
-                                         "hidden_rows": hidden, "links": links,
-                                         "state": sheet.attrib.get("state", "visible")}
+            links.append({
+                "cell": link.attrib["ref"],
+                "kind": "stored-link",
+                "target": target,
+                "location": location,
+                "display": link.attrib.get("display"),
+                "tooltip": link.attrib.get("tooltip"),
+                "target_mode": relationship.get("TargetMode"),
+                "resolution": _target_kind(target, location),
+            })
+        result[sheet.attrib["name"]] = {
+            "bounds": (actual_row, actual_column),
+            "numeric_errors": numeric_errors,
+            "hidden_rows": hidden,
+            "links": links,
+            "state": sheet.attrib.get("state", "visible"),
+        }
     return result
 
 
@@ -290,10 +298,8 @@ def read_source(filename, content_base64, *, encoding="utf-8-sig", delimiter=","
         try:
             with _zip(data) as archive:
                 metadata = _sheet_metadata(archive)
-            formulas = openpyxl.load_workbook(io.BytesIO(data), read_only=True,
-                                             data_only=False, keep_links=False)
-            cached = openpyxl.load_workbook(io.BytesIO(data), read_only=True,
-                                           data_only=True, keep_links=False)
+            formulas = openpyxl.load_workbook(io.BytesIO(data), read_only=True, data_only=False, keep_links=False)
+            cached = openpyxl.load_workbook(io.BytesIO(data), read_only=True, data_only=True, keep_links=False)
             try:
                 total = 0
                 for sheet in formulas:
@@ -320,17 +326,18 @@ def read_source(filename, content_base64, *, encoding="utf-8-sig", delimiter=","
                             error = value if saved.data_type == "e" or cell.data_type == "e" else None
                             if isinstance(value, float) and not math.isfinite(value):
                                 error = "nonfinite-numeric-source-value"
-                            item = {"column": openpyxl.utils.get_column_letter(i),
-                                          "cell": address,
-                                          "value": _json_cell(value),
-                                          "cached_value": _json_cell(saved.value),
-                                          "formula": formula,
-                                          "error": error}
+                            item = {
+                                "column": openpyxl.utils.get_column_letter(i),
+                                "cell": address,
+                                "value": _json_cell(value),
+                                "cached_value": _json_cell(saved.value),
+                                "formula": formula,
+                                "error": error,
+                            }
                             if address in numeric_errors:
                                 token, reason = numeric_errors[address]
                                 item.update(value=None, cached_value=None, raw_numeric_token=token, error=reason)
-                            text_size = _count_cell_text(text_size, item["value"], item["cached_value"],
-                                                        formula, item["error"], item.get("raw_numeric_token"))
+                            text_size = _count_cell_text(text_size, item["value"], item["cached_value"], formula, item["error"], item.get("raw_numeric_token"))
                             cells.append(item)
                         rows.append({"row": number, "hidden": number in hidden_rows, "cells": cells})
                     sheets.append({"name": sheet.title, **metadata[sheet.title], "rows": rows})
@@ -344,8 +351,7 @@ def read_source(filename, content_base64, *, encoding="utf-8-sig", delimiter=","
         raise ValueError("Supported source formats are CSV, TSV, XLSX and XLSM")
     for sheet in sheets:
         sheet["headers"] = _headers(sheet["rows"][0]["cells"]) if sheet["rows"] else []
-    return {"source_file": file_info, "format": {"encoding": encoding, "delimiter": delimiter,
-                                               "decimal": decimal}, "sheets": sheets}
+    return {"source_file": file_info, "format": {"encoding": encoding, "delimiter": delimiter, "decimal": decimal}, "sheets": sheets}
 
 
 def preview_source(filename, content_base64, *, preview_rows=20, **options):
@@ -390,8 +396,7 @@ def _number(value, unit, units, decimal, *, allow_negative=False):
                 break
         # Test-condition tails are retained in the original cell. They are
         # never concatenated into numbers or interpreted as measured models.
-        if remaining and not (remaining.startswith(("@", "bei ")) or
-                              (remaining.startswith("(") and remaining.endswith(")"))):
+        if remaining and not (remaining.startswith(("@", "bei ")) or (remaining.startswith("(") and remaining.endswith(")"))):
             return None, "unrecognized-unit-condition-or-decimal-convention"
         token = match[1].replace(",", ".")
         number = float(token)
@@ -511,15 +516,29 @@ def build_snapshot(filename, content_base64, *, sheet, mapping, metadata,
             records.append(record)
         if row_errors:
             errors.append({"row": row["row"], "record_id": record["id"], "errors": row_errors})
-    snapshot = {"schema_version": 1, "snapshot_id": identity, "version": identity,
-            "source_file": {**source["source_file"], "content_base64": content_base64},
-            "mapping": canonical, "sources": [{"id": source_id, "file": filename, "snapshot_id": identity,
-            "sheet": sheet, "sha256": source["source_file"]["sha256"],
-            "currency": metadata.get("currency") or "unspecified",
-            "snapshot": metadata.get("snapshot") or "supplied source; acquisition date unknown",
-            "headers": _headers(selected["rows"][header_row - 1]["cells"]),
-            "record_count": len(records), "notes": "Uploaded historical/source quote; no external refresh executed."}],
-            "records": records, "row_errors": errors}
+    snapshot = {
+        "schema_version": 1,
+        "snapshot_id": identity,
+        "version": identity,
+        "source_file": {**source["source_file"], "content_base64": content_base64},
+        "mapping": canonical,
+        "sources": [
+            {
+                "id": source_id,
+                "file": filename,
+                "snapshot_id": identity,
+                "sheet": sheet,
+                "sha256": source["source_file"]["sha256"],
+                "currency": metadata.get("currency") or "unspecified",
+                "snapshot": metadata.get("snapshot") or "supplied source; acquisition date unknown",
+                "headers": _headers(selected["rows"][header_row - 1]["cells"]),
+                "record_count": len(records),
+                "notes": "Uploaded historical/source quote; no external refresh executed.",
+            }
+        ],
+        "records": records,
+        "row_errors": errors,
+    }
     check_json_budget(snapshot)
     return snapshot
 
@@ -532,6 +551,7 @@ def compare_snapshots(before, after, *, key_fields):
     if any(len(snapshot["records"]) > MAX_ROWS for snapshot in (before, after)):
         raise ValueError("Snapshot comparison exceeds 10,000 records per side")
     check_json_budget({"before": before, "after": after, "key_fields": key_fields})
+
     def indexed(snapshot):
         result = {}
         for record in snapshot["records"]:
@@ -697,19 +717,42 @@ def workbook_coefficients(filename, content_base64, **options):
                 bus_value = bus.get("value")
                 bus_header = headers.get("X", {})
                 expected_bus = {"MOSFET": "VDS switching losses", "IGBT": "VCE switch"}[sheet["name"]]
-                bus_v = bus_value if bus_header.get("value") == expected_bus and isinstance(bus_value, (int, float)) and not isinstance(bus_value, bool) and math.isfinite(bus_value) and bus_value > 0 and not bus.get("error") else None
+                bus_v = (
+                    bus_value
+                    if bus_header.get("value") == expected_bus
+                    and isinstance(bus_value, (int, float))
+                    and not isinstance(bus_value, bool)
+                    and math.isfinite(bus_value)
+                    and bus_value > 0
+                    and not bus.get("error")
+                    else None
+                )
                 status = agreement["status"]
-                result.append({"sheet": sheet["name"], "row": row["row"],
-                               "part_number": cells["A"]["value"], "component": component,
-                               "cell": cell, "header": header, "unit": "J/A",
-                               "recognized_literal_coefficient_j_per_a": coefficient,
-                               "cached_coefficient_j_per_a": cache if numeric_cache and not cell.get("error") else None,
-                               "reference_current_a": current if recognized else None,
-                               "literal_energy_j": energy if recognized else None,
-                               "reference_voltage_cell": bus, "reference_voltage_v": bus_v,
-                               "reference_voltage_header_cell": bus_header,
-                               "reference_temperature_c": 175.0,
-                               "reference_temperature_header_cell": header["cell"],
-                               "gate_resistance_ohm": None, "status": status})
-    return {"source_file": source["source_file"], "coefficients": result,
-            "scope": "Documented MOSFET/IGBT Y/Z/AA J/A fields only; literal divisions are recognized, never arbitrary formula evaluation. Numeric source cells have unresolved reference current."}
+                result.append({
+                    "sheet": sheet["name"],
+                    "row": row["row"],
+                    "part_number": cells["A"]["value"],
+                    "component": component,
+                    "cell": cell,
+                    "header": header,
+                    "unit": "J/A",
+                    "recognized_literal_coefficient_j_per_a": coefficient,
+                    "cached_coefficient_j_per_a": cache if numeric_cache and not cell.get("error") else None,
+                    "reference_current_a": current if recognized else None,
+                    "literal_energy_j": energy if recognized else None,
+                    "reference_voltage_cell": bus,
+                    "reference_voltage_v": bus_v,
+                    "reference_voltage_header_cell": bus_header,
+                    "reference_temperature_c": 175.0,
+                    "reference_temperature_header_cell": header["cell"],
+                    "gate_resistance_ohm": None,
+                    "status": status,
+                })
+    return {
+        "source_file": source["source_file"],
+        "coefficients": result,
+        "scope": (
+            "Documented MOSFET/IGBT Y/Z/AA J/A fields only; literal divisions are recognized, never arbitrary formula evaluation."
+            " Numeric source cells have unresolved reference current."
+        ),
+    }

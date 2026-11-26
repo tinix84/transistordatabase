@@ -6,7 +6,7 @@ independent review.
 ## Goal
 
 Make the existing three-candidate semiconductor tradeoff in
-[`topology_semiconductor_pareto.ipynb`](../../examples/topology_semiconductor_pareto.ipynb)
+[`topology_semiconductor_pareto.ipynb`](https://github.com/tinix84/transistordatabase/blob/main/examples/topology_semiconductor_pareto.ipynb)
 usable through the local web GUI. Evaluate every switch/rectifier configuration
 at one shared Boost CCM boundary and compare channel-conduction loss,
 package-body volume, and sourced one-unit cost.

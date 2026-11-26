@@ -95,12 +95,31 @@ def hysteretic_gate_states(gate_v, digitizer):
         states.append(state)
     on = [i for i in range(len(states) - 1) if not states[i] and states[i + 1]]
     off = [i for i in range(len(states) - 1) if states[i] and not states[i + 1]]
-    return {"policy": {"thresholds": canonical, "initial_state": initial},
-            "evidence": {"method": "strict-hysteresis-v1", "threshold_scale": scale,
-                "low_v": low, "high_v": high, "calibration_min_v": minimum,
-                "calibration_max_v": maximum, "initial_state": states[0],
-                "initial_state_source": initial_source, "states": states,
-                "turn_on_brackets": on, "turn_off_brackets": off,
-                "semantics": "Strict > high and < low crossings. Equality and deadband hold the previous sampled state. No pre-trace event or interpolated switching time.",
-                "units": {"low_v": "V", "high_v": "V", "calibration_min_v": "V",
-                          "calibration_max_v": "V", "states": "boolean", "brackets": "pre-edge sample index"}}}
+    return {
+        "policy": {"thresholds": canonical, "initial_state": initial},
+        "evidence": {
+            "method": "strict-hysteresis-v1",
+            "threshold_scale": scale,
+            "low_v": low,
+            "high_v": high,
+            "calibration_min_v": minimum,
+            "calibration_max_v": maximum,
+            "initial_state": states[0],
+            "initial_state_source": initial_source,
+            "states": states,
+            "turn_on_brackets": on,
+            "turn_off_brackets": off,
+            "semantics": (
+                "Strict > high and < low crossings. Equality and deadband hold the previous sampled state. No pre-trace event or "
+                "interpolated switching time."
+            ),
+            "units": {
+                "low_v": "V",
+                "high_v": "V",
+                "calibration_min_v": "V",
+                "calibration_max_v": "V",
+                "states": "boolean",
+                "brackets": "pre-edge sample index",
+            },
+        },
+    }
