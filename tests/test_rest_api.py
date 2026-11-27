@@ -152,9 +152,9 @@ class TestExport:
         assert resp.status_code == 200
 
     def test_export_unsupported_format(self, client):
-        """Export with unsupported format returns 400."""
+        """Export with unsupported format returns 422."""
         resp = client.post("/api/transistors/CREE_C3M0016120K/export/pdf")
-        assert resp.status_code == 400
+        assert resp.status_code == 422
 
     def test_export_not_found(self, client):
         """Export for missing transistor returns 404."""
@@ -404,14 +404,14 @@ class TestAdditionalExportFormats:
     """Test additional export formats for coverage."""
 
     def test_export_spice(self, client):
-        """Export in SPICE format returns a file."""
+        """SPICE export is refused without a calibrated simulator model."""
         resp = client.post("/api/transistors/CREE_C3M0016120K/export/spice")
-        assert resp.status_code == 200
+        assert resp.status_code == 422
 
     def test_export_plecs(self, client):
-        """Export in PLECS format returns a file."""
+        """PLECS export is refused for a record without source-backed PLECS data."""
         resp = client.post("/api/transistors/CREE_C3M0016120K/export/plecs")
-        assert resp.status_code == 200
+        assert resp.status_code == 422
 
     def test_export_matlab(self, client):
         """Export in MATLAB format returns a file."""
@@ -419,11 +419,11 @@ class TestAdditionalExportFormats:
         assert resp.status_code == 200
 
     def test_export_gecko(self, client):
-        """Export in GeckoCIRCUITS format returns a file."""
+        """Gecko export is refused until all seven conditions are declared."""
         resp = client.post("/api/transistors/CREE_C3M0016120K/export/gecko")
-        assert resp.status_code == 200
+        assert resp.status_code == 422
 
     def test_export_ltspice(self, client):
-        """Export in LTSpice format returns a file."""
+        """LTSpice export is refused without explicit DPT conditions."""
         resp = client.post("/api/transistors/CREE_C3M0016120K/export/ltspice")
-        assert resp.status_code == 200
+        assert resp.status_code == 422
