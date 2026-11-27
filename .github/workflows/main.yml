@@ -27,8 +27,7 @@ jobs:
 
       - name: install tdb package
         run: |
-            pip install -e .
-            pip install pytest httpx fastapi python-multipart
+            pip install -e ".[webgui,dev]"
 
       # Runs a set of commands using the runners shell
       - name: Run pytests

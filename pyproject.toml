@@ -24,6 +24,8 @@ dynamic = ["dependencies"]
 
 [project.optional-dependencies]
 legacy-qt = ["PyQt5", "PyQtWebEngine"]
+webgui = ["fastapi", "uvicorn[standard]", "httpx", "python-multipart"]
+dev = ["pytest", "mongomock", "httpx", "playwright", "pytest-playwright"]
 
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }
