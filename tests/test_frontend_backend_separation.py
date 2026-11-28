@@ -111,13 +111,11 @@ class TestBackendServices:
         assert result is True
         assert json_file.exists()
         
-        # Verify JSON content
-        import json
-        with open(json_file, 'r') as f:
-            data = json.load(f)
-        
-        assert data['metadata']['name'] == "Test_IGBT_1200V_100A"
-        assert data['electrical']['v_abs_max'] == 1200.0
+        # The export is the reloadable native record, not a flat summary.
+        from transistordatabase.core.repository import JsonTransistorLoader
+        reloaded = JsonTransistorLoader().load_from_json(json_file)
+        assert reloaded.metadata.name == "Test_IGBT_1200V_100A"
+        assert reloaded.electrical_ratings.v_abs_max == 1200.0
     
     def test_export_service_csv(self, sample_transistors, tmp_path):
         """Test CSV export functionality."""
@@ -140,19 +138,11 @@ class TestBackendServices:
         assert rows[1]['name'] == "Test_MOSFET_650V_50A"
     
     def test_export_service_spice(self, sample_transistor, tmp_path):
-        """Test SPICE export functionality."""
-        export_service = ExportService()
+        """SPICE export refuses to emit an uncalibrated model."""
         spice_file = tmp_path / "test_transistor.cir"
-        
-        result = export_service.export_to_spice(sample_transistor, spice_file)
-        
-        assert result is True
-        assert spice_file.exists()
-        
-        # Verify SPICE content
-        content = spice_file.read_text()
-        assert "Test_IGBT_1200V_100A" in content
-        assert "BV=1200" in content
+        with pytest.raises(NotImplementedError, match="calibrated SPICE model"):
+            ExportService().export_to_spice(sample_transistor, spice_file)
+        assert not spice_file.exists()
     
     def test_comparison_service(self, sample_transistors):
         """Test transistor comparison functionality."""
@@ -501,14 +491,10 @@ class TestExportServiceBridge:
         return t
 
     def test_export_to_ltspice(self, rich_transistor, tmp_path):
-        """LTSpice export generates a netlist file."""
-        export_service = ExportService()
-        export_service.export_to_ltspice(rich_transistor, tmp_path)
-
-        netlist_files = list(tmp_path.glob("*.asc"))
-        assert len(netlist_files) == 1
-        content = netlist_files[0].read_text()
-        assert "Double Pulse Test" in content
+        """LTSpice export requires explicit DPT conditions via /api/dpt/generate."""
+        with pytest.raises(NotImplementedError, match="/api/dpt/generate"):
+            ExportService().export_to_ltspice(rich_transistor, tmp_path)
+        assert not list(tmp_path.glob("*.asc"))
 
     def test_export_to_matlab(self, rich_transistor, tmp_path):
         """MATLAB export generates a .mat file."""
@@ -519,38 +505,22 @@ class TestExportServiceBridge:
         assert len(mat_files) == 1
 
     def test_export_to_gecko_circuits(self, rich_transistor, tmp_path):
-        """GeckoCIRCUITS export generates .scl files."""
-        export_service = ExportService()
-        result = export_service.export_to_gecko_circuits(
-            rich_transistor,
-            {'output_path': str(tmp_path), 'recheck': False},
-        )
-        assert result == tmp_path
-
-        scl_files = list(tmp_path.glob("*.scl"))
-        assert len(scl_files) >= 1
+        """GeckoCIRCUITS export rejects parameters without the seven declared conditions."""
+        with pytest.raises(ValueError):
+            ExportService().export_to_gecko_circuits(
+                rich_transistor,
+                {'output_path': str(tmp_path), 'recheck': False},
+            )
+        assert not list(tmp_path.glob("*.scl"))
 
     def test_export_to_plecs(self, rich_transistor, tmp_path):
-        """PLECS export generates XML files."""
-        export_service = ExportService()
-        export_service.export_to_plecs(
-            rich_transistor, tmp_path,
-            template_config={'recheck': False},
-        )
-
-        xml_files = list(tmp_path.glob("*.xml"))
-        assert len(xml_files) >= 1
-
-    def test_export_methods_no_longer_raise(self, rich_transistor, tmp_path):
-        """Verify no export method raises NotImplementedError."""
-        export_service = ExportService()
-
-        # LTSpice
-        export_service.export_to_ltspice(rich_transistor, tmp_path / "ltspice")
-
-        # MATLAB
-        export_service.export_to_matlab(rich_transistor, tmp_path / "matlab")
-        assert True  # If we got here, no NotImplementedError was raised
+        """PLECS export rejects legacy template options."""
+        with pytest.raises(ValueError, match="Legacy PLECS template options"):
+            ExportService().export_to_plecs(
+                rich_transistor, tmp_path,
+                template_config={'recheck': False},
+            )
+        assert not list(tmp_path.glob("*.xml"))
 
 
 if __name__ == "__main__":

@@ -804,6 +804,9 @@ def _patch_legacy_record_unlocked(name: str, transistor_data: Dict[str, Any]) ->
     the original JSON document and replace just those values.
     """
     try:
+        record_path = _legacy_record_path(name)
+        if not record_path.exists():
+            raise FileNotFoundError(record_path)
         updated = dict_to_transistor(transistor_data)
         if updated.metadata.name != name:
             raise HTTPException(
@@ -811,7 +814,6 @@ def _patch_legacy_record_unlocked(name: str, transistor_data: Dict[str, Any]) ->
                 detail="Transistor names cannot be changed through the edit form.",
             )
 
-        record_path = _legacy_record_path(name)
         with record_path.open("r", encoding="utf-8") as record_file:
             record = _record_view(json.load(record_file))
         if not isinstance(record, dict) or _raw_record_name(record) != name:
@@ -1452,6 +1454,11 @@ def dict_to_transistor(data: Dict[str, Any]) -> Transistor:
     """
     if "schema" in data or ("version" in data and "transistor" in data):
         return _loader.load_from_dict(data)
+    if "name" in data and "switch" not in data and "diode" not in data:
+        # Flat form body with general fields only: reuse the nested-form branch.
+        metadata = {k: data[k] for k in ("name", "type", "manufacturer", "housing_type")}
+        metadata.update({k: data.get(k, "") for k in ("author", "comment")})
+        data = {"metadata": metadata, "electrical": data, "thermal": data}
     if "metadata" in data and "electrical" in data and "thermal" in data:
         metadata = TransistorMetadata(
             name=data["metadata"]["name"],
@@ -1540,7 +1547,11 @@ async def create_transistor(transistor_data: Dict[str, Any]) -> Dict[str, Any]:
                 _validate_raw_legacy_record(transistor_data)
             _validate_web_record_name(transistor.metadata.name)
             record_path = _legacy_record_path(transistor.metadata.name)
-            if _is_native_record(transistor_data) or "name" in transistor_data:
+            # A raw legacy file carries its switch section; a flat form body
+            # with only general fields is a new record built from core data.
+            if _is_native_record(transistor_data) or (
+                "name" in transistor_data and "switch" in transistor_data
+            ):
                 _validate_raw_legacy_record(transistor_data)
                 serialized_record = json.dumps(transistor_data, indent=2, allow_nan=False)
             else:
